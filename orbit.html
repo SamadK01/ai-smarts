@@ -1,16 +1,1401 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Galaxy Giggles — AI Smarts</title><style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono&family=Funnel+Display:wght@700;800&display=swap');
-*{box-sizing:border-box}html,body,canvas{width:100%;height:100%;margin:0}body{overflow:hidden;background:#03060e;color:#ece9df;font-family:Arial,sans-serif;touch-action:none}canvas{position:fixed;inset:0;display:block}.top,.bottom{position:fixed;z-index:2;font:11px 'DM Mono',monospace;pointer-events:none}.top{top:20px;left:22px;right:22px;display:flex;justify-content:space-between}.home,.sound{pointer-events:auto;color:#ece9df;text-decoration:none;background:none;border:0;font:inherit;cursor:pointer}.home:before{content:'← ';color:#f3a859}.sound{border:1px solid #ffffff2b;border-radius:100px;padding:7px 11px;color:#aeb9c8}.copy{position:fixed;z-index:1;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;transition:opacity .55s}.copy h1{font:800 clamp(54px,9vw,124px)/.82 'Funnel Display',sans-serif;letter-spacing:-.075em;margin:0;text-shadow:0 0 45px #816de044}.copy em{font-style:normal;color:#b1a3ff}.copy p{font-size:14px;color:#aeb4c0;margin:23px 0 0}.copy.hide{opacity:0}.bottom{bottom:20px;left:0;right:0;text-align:center;color:#7d8795}.badge{position:fixed;z-index:2;top:20px;left:50%;transform:translateX(-50%);color:#9ca6b2;font:11px 'DM Mono',monospace}.badge b{font-weight:400;color:#f3a859}@media(max-width:600px){.top{top:14px;left:15px;right:15px}.bottom{bottom:14px;padding:0 20px;line-height:1.4}.copy h1{font-size:62px}.copy p{max-width:250px}.badge{top:17px;font-size:10px}}
-</style></head><body><canvas id="galaxy"></canvas><header class="top"><a class="home" href="index.html">all experiments</a><button class="sound" id="sound">sound: on</button></header><div class="badge">planet pals <b id="worlds">0</b></div><section class="copy" id="copy"><h1>Galaxy<br><em>giggles.</em></h1><p>Tap the sky to make a silly planet.<br>Drag a planet to send it zooming around.</p></section><p class="bottom">tap the galaxy · make planet pals · poke the sun for a surprise</p><script>
-const canvas=document.querySelector('#galaxy'),ctx=canvas.getContext('2d'),copy=document.querySelector('#copy'),worlds=document.querySelector('#worlds'),soundButton=document.querySelector('#sound');let W,H,DPR,cx,cy,stars=[],dust=[],planets=[],muted=false,started=false,drag=null,last=performance.now(),audio;
-function size(){DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=W*DPR;canvas.height=H*DPR;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0);cx=W/2;cy=H/2;seed();}addEventListener('resize',size);
-function rand(a,b){return a+Math.random()*(b-a)}function seed(){stars=Array.from({length:Math.min(750,Math.floor(W*H/1700))},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.3+.15,a:rand(.18,.9),tw:rand(0,6)}));dust=[];for(let i=0;i<900;i++){let arm=i%2,rad=Math.pow(Math.random(),.58)*Math.min(W,H)*.48,angle=rad*.012+arm*Math.PI+rand(-.38,.38);dust.push({r:rad,a:angle,s:rand(.25,1.8),h:rand(205,285),alpha:rand(.04,.5)});}}
-function tone(f=.1){if(muted)return;const A=window.AudioContext||window.webkitAudioContext;if(!A)return;audio??=new A();const o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.035,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.18);o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+.18)}
-function addPlanet(x,y){started=true;copy.classList.add('hide');let r=Math.max(75,Math.min(Math.min(W,H)*.47,Math.hypot(x-cx,y-cy))),a=Math.atan2(y-cy,x-cx),h=Math.floor(rand(15,350));planets.push({r,a,h,size:rand(10,17),speed:rand(.16,.44)*(Math.random()<.5?-1:1),ring:Math.random()>.7,drag:false,face:Math.floor(Math.random()*3),bounce:1});worlds.textContent=planets.length;tone(240+planets.length*28)}
-function planetAt(x,y){return planets.find(p=>Math.hypot(x-(cx+Math.cos(p.a)*p.r),y-(cy+Math.sin(p.a)*p.r))<p.size+15)}
-function pointer(e){return {x:e.clientX,y:e.clientY}}canvas.addEventListener('pointerdown',e=>{let p=pointer(e),hit=planetAt(p.x,p.y);canvas.setPointerCapture(e.pointerId);if(hit){drag=hit;hit.drag=true;hit.bounce=1.8;tone(160)}else if(Math.hypot(p.x-cx,p.y-cy)<50){planets.forEach(q=>q.speed*=-1.8);tone(600,.24)}else addPlanet(p.x,p.y)});canvas.addEventListener('pointermove',e=>{if(!drag)return;let p=pointer(e);drag.r=Math.max(58,Math.min(Math.min(W,H)*.48,Math.hypot(p.x-cx,p.y-cy)));drag.a=Math.atan2(p.y-cy,p.x-cx)});function release(){if(drag){drag.drag=false;drag.bounce=1.7;tone(350)}drag=null}canvas.addEventListener('pointerup',release);canvas.addEventListener('pointercancel',release);
-soundButton.onclick=()=>{muted=!muted;soundButton.textContent=`sound: ${muted?'off':'on'}`};
-function glow(x,y,r,color,a){let g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,color.replace(')',`,`+a+')').replace('rgb','rgba'));g.addColorStop(1,color.replace(')',',0)').replace('rgb','rgba'));ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
-function draw(t){ctx.fillStyle='#03060e';ctx.fillRect(0,0,W,H);stars.forEach(s=>{let a=s.a*(.65+.35*Math.sin(t*.001+s.tw));ctx.fillStyle=`rgba(210,225,255,${a})`;ctx.fillRect(s.x,s.y,s.r,s.r)});ctx.save();ctx.translate(cx,cy);ctx.globalCompositeOperation='lighter';dust.forEach(d=>{let a=d.a+t*.000025*(d.r/120);let x=Math.cos(a)*d.r,y=Math.sin(a)*d.r*.52;ctx.fillStyle=`hsla(${d.h},80%,72%,${d.alpha})`;ctx.fillRect(x,y,d.s,d.s)});ctx.restore();glow(cx,cy,135,'rgb(112,88,255)',.22);glow(cx,cy,58,'rgb(255,159,88)',.62);ctx.fillStyle='#fff0ca';ctx.beginPath();ctx.arc(cx,cy,17,0,Math.PI*2);ctx.fill();planets.forEach(p=>{if(!p.drag)p.a+=p.speed*.012/p.r*150;p.bounce+=(1-p.bounce)*.08;let x=cx+Math.cos(p.a)*p.r,y=cy+Math.sin(p.a)*p.r,sz=p.size*p.bounce;ctx.strokeStyle=`hsla(${p.h},75%,74%,.12)`;ctx.beginPath();ctx.ellipse(cx,cy,p.r,p.r*.53,0,0,Math.PI*2);ctx.stroke();glow(x,y,sz*3,`rgb(${p.h<100?255:130},${p.h<100?150:190},${p.h>230?255:205})`,.2);ctx.fillStyle=`hsl(${p.h},72%,${p.drag?74:63}%)`;ctx.beginPath();ctx.arc(x,y,sz,0,Math.PI*2);ctx.fill();ctx.fillStyle='#172030';ctx.beginPath();ctx.arc(x-sz*.3,y-sz*.12,Math.max(1.5,sz*.13),0,Math.PI*2);ctx.arc(x+sz*.3,y-sz*.12,Math.max(1.5,sz*.13),0,Math.PI*2);ctx.fill();ctx.strokeStyle='#172030';ctx.lineWidth=Math.max(1,sz*.1);ctx.beginPath();if(p.face===0){ctx.arc(x,y+sz*.05,sz*.34,0,Math.PI)}else if(p.face===1){ctx.moveTo(x-sz*.35,y+sz*.28);ctx.lineTo(x+sz*.35,y+sz*.28)}else{ctx.arc(x,y+sz*.35,sz*.25,Math.PI,0)}ctx.stroke();if(p.ring){ctx.strokeStyle=`hsla(${p.h},75%,78%,.75)`;ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(x,y,sz*1.7,sz*.48,-.35,0,Math.PI*2);ctx.stroke()}});requestAnimationFrame(draw)}size();addPlanet(cx+150,cy);addPlanet(cx-235,cy-55);requestAnimationFrame(draw);
-</script></body></html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Universe Explorer 3D — Real Scale Cosmos Simulator</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@400;600;700;800&display=swap');
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #000000;
+  color: #e2e8f0;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  touch-action: none;
+}
+
+#canvas-container {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Clean NASA-inspired UI */
+.nasa-glass {
+  background: rgba(6, 10, 18, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
+}
+
+.nasa-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #e2e8f0;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.nasa-btn:hover {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+}
+
+.nasa-btn.active {
+  background: rgba(56, 189, 248, 0.25);
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.4);
+}
+
+/* TOP HEADER */
+.top-bar {
+  position: fixed;
+  top: 16px;
+  left: 18px;
+  right: 18px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.top-bar > * {
+  pointer-events: auto;
+}
+
+.brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-link {
+  color: #94a3b8;
+  text-decoration: none;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  background: rgba(6, 10, 18, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.home-link:hover {
+  color: #fff;
+  border-color: #38bdf8;
+}
+
+.brand-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-title span {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* SCALE LEVEL HUD */
+.scale-hud {
+  position: fixed;
+  top: 66px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  pointer-events: none;
+}
+
+.scale-pill {
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #64748b;
+  transition: all 0.25s ease;
+}
+
+.scale-pill.active {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  font-weight: 600;
+}
+
+/* LEFT HUD */
+.hud-left {
+  position: fixed;
+  top: 110px;
+  left: 18px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 260px;
+  pointer-events: none;
+}
+
+.hud-left > * {
+  pointer-events: auto;
+}
+
+.hud-card {
+  padding: 14px;
+}
+
+.card-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: #38bdf8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0 0 4px 0;
+}
+
+.card-desc {
+  font-size: 11px;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.stat-box .val {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: #38bdf8;
+}
+
+.stat-box .lbl {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+/* RIGHT NAVIGATION TOOLBAR */
+.hud-right {
+  position: fixed;
+  top: 110px;
+  right: 18px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.quick-nav {
+  position: fixed;
+  right: 18px;
+  bottom: 70px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 45vh;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.quick-nav::-webkit-scrollbar { width: 3px; }
+.quick-nav::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); }
+
+.quick-nav-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  padding: 5px 10px;
+  background: rgba(6, 10, 18, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.quick-nav-btn:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+  color: #fff;
+}
+
+/* BOTTOM TELEMETRY BAR */
+.bottom-bar {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 6px 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: #94a3b8;
+  pointer-events: auto;
+}
+
+.tele-item span {
+  color: #38bdf8;
+  font-weight: 500;
+}
+
+/* CELESTIAL INFO PANEL DRAWER */
+.info-drawer {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 340px;
+  z-index: 20;
+  padding: 18px;
+  transform: translateY(140%);
+  opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+  pointer-events: auto;
+}
+
+.info-drawer.active {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.drawer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.drawer-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.drawer-close {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.drawer-close:hover { color: #fff; }
+
+.celestial-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: #f8fafc;
+  margin: 0 0 2px 0;
+}
+
+.celestial-subtitle {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: #94a3b8;
+  margin-bottom: 10px;
+}
+
+.celestial-desc {
+  font-size: 12px;
+  color: #cbd5e1;
+  line-height: 1.45;
+  margin-bottom: 14px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.info-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.info-box .v {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.info-box .k {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+/* DISCOVERY TOAST */
+.discovery-toast {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  z-index: 40;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.discovery-toast.active {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast-text small {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: #38bdf8;
+  text-transform: uppercase;
+}
+
+.toast-text h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  margin: 1px 0 0 0;
+  color: #fff;
+}
+
+/* MISSIONS MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-box {
+  width: 100%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.mission-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 14px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.mission-item.completed {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: rgba(56, 189, 248, 0.06);
+}
+
+/* INTRO HERO OVERLAY */
+.hero-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 5;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.hero-overlay.hide { opacity: 0; }
+
+.hero-overlay h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(36px, 6.5vw, 84px);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  margin: 0;
+  color: #ffffff;
+}
+
+.hero-overlay h1 em {
+  font-style: normal;
+  color: #38bdf8;
+}
+
+.hero-overlay p {
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 16px 0 0 0;
+  font-family: 'DM Mono', monospace;
+}
+
+@media (max-width: 768px) {
+  .hud-left { width: 210px; top: 100px; left: 12px; }
+  .hud-right { top: 100px; right: 12px; }
+  .info-drawer { left: 12px; right: 12px; width: auto; bottom: 12px; }
+  .scale-hud { display: none; }
+  .quick-nav { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<!-- TOP BAR -->
+<header class="top-bar">
+  <div class="brand-badge">
+    <a class="home-link" href="index.html">← all experiments</a>
+    <div class="brand-title">UNIVERSE 3D <span>NASA DATA</span></div>
+  </div>
+
+  <div style="display: flex; gap: 6px;">
+    <button class="nasa-btn" id="sound-toggle">🔊 SOUND: ON</button>
+  </div>
+</header>
+
+<!-- MULTI-SCALE INDICATOR HUD -->
+<div class="scale-hud nasa-glass">
+  <div class="scale-pill active" id="scale-lvl-1">SOLAR SYSTEM</div>
+  <div class="scale-pill" id="scale-lvl-2">STELLAR NEIGHBORHOOD</div>
+  <div class="scale-pill" id="scale-lvl-3">MILKY WAY GALAXY</div>
+  <div class="scale-pill" id="scale-lvl-4">LOCAL GROUP</div>
+</div>
+
+<!-- INTRO HERO -->
+<div class="hero-overlay" id="hero-overlay">
+  <h1>Solar System<br>& <em>Milky Way 3D.</em></h1>
+  <p>Scroll to zoom from Earth out to the Milky Way & Andromeda Galaxy</p>
+</div>
+
+<!-- LEFT HUD (MISSION & TELEMETRY) -->
+<aside class="hud-left">
+  <div class="nasa-glass hud-card">
+    <div class="card-label">
+      <span>Current Mission</span>
+      <span id="mission-step-text">1/6</span>
+    </div>
+    <h3 class="card-title" id="mission-title">Destination Earth</h3>
+    <p class="card-desc" id="mission-desc">Locate and select planet Earth in the Solar System.</p>
+  </div>
+
+  <div class="nasa-glass hud-card">
+    <div class="card-label">Cosmic Telemetry</div>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="val" id="stat-dist">1.00 AU</div>
+        <div class="lbl">Cam Distance</div>
+      </div>
+      <div class="stat-box">
+        <div class="val" id="stat-scale">Solar System</div>
+        <div class="lbl">Scale Domain</div>
+      </div>
+      <div class="stat-box">
+        <div class="val" id="stat-discovered">0 / 14</div>
+        <div class="lbl">Discovered</div>
+      </div>
+      <div class="stat-box">
+        <div class="val" id="stat-xp">0 XP</div>
+        <div class="lbl">Explorer XP</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- RIGHT TOOLBAR -->
+<nav class="hud-right">
+  <button class="nasa-btn" id="btn-earth-zoom">🌍 Zoom to Earth</button>
+  <button class="nasa-btn" id="btn-solar-view">☀️ Solar System</button>
+  <button class="nasa-btn" id="btn-milkyway-view">🌌 Milky Way</button>
+  <button class="nasa-btn" id="btn-localgroup-view">🔭 Local Group</button>
+  <button class="nasa-btn" id="btn-missions">📜 Missions</button>
+</nav>
+
+<!-- QUICK CELESTIAL NAV LIST -->
+<div class="quick-nav" id="quick-nav-container">
+  <!-- Dynamically injected -->
+</div>
+
+<!-- BOTTOM TELEMETRY -->
+<footer class="bottom-bar nasa-glass">
+  <div class="tele-item">
+    COORD: <span id="tele-coords">X: 0.00 | Y: 15.00 | Z: 40.00</span>
+  </div>
+  <div class="tele-item">
+    TARGET: <span id="tele-selected">Planet Earth</span>
+  </div>
+</footer>
+
+<!-- CELESTIAL INFO PANEL DRAWER -->
+<div class="nasa-glass info-drawer" id="info-drawer">
+  <div class="drawer-top">
+    <span class="drawer-tag" id="drawer-tag">PLANET</span>
+    <button class="drawer-close" id="drawer-close-btn">&times;</button>
+  </div>
+  <h2 class="celestial-name" id="drawer-name">Earth</h2>
+  <div class="celestial-subtitle" id="drawer-subtitle">Terrestrial Planet / Home</div>
+  <p class="celestial-desc" id="drawer-desc">Third planet from the Sun. Liquid water oceans, atmosphere, and home to human civilization.</p>
+
+  <div class="info-grid">
+    <div class="info-box">
+      <div class="v" id="drawer-stat-1">1.00 AU</div>
+      <div class="k" id="drawer-lbl-1">Distance Sun</div>
+    </div>
+    <div class="info-box">
+      <div class="v" id="drawer-stat-2">12,742 km</div>
+      <div class="k" id="drawer-lbl-2">Diameter</div>
+    </div>
+    <div class="info-box">
+      <div class="v" id="drawer-stat-3">365.25 Days</div>
+      <div class="k" id="drawer-lbl-3">Orbital Period</div>
+    </div>
+    <div class="info-box">
+      <div class="v" id="drawer-stat-4">1 Moon</div>
+      <div class="k" id="drawer-lbl-4">Satellites</div>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 6px;">
+    <button class="nasa-btn" id="btn-flyto-target" style="flex: 1; justify-content: center; background: rgba(56,189,248,0.2); border-color: #38bdf8; color: #fff;">
+      🚀 Fly to Target
+    </button>
+  </div>
+</div>
+
+<!-- DISCOVERY TOAST -->
+<div class="nasa-glass discovery-toast" id="discovery-toast">
+  <div style="font-size: 22px;" id="toast-icon">🪐</div>
+  <div class="toast-text">
+    <small>Astronomical Discovery!</small>
+    <h3 id="toast-title">Discovered Earth</h3>
+  </div>
+</div>
+
+<!-- MISSIONS MODAL -->
+<div class="modal-overlay" id="missions-modal">
+  <div class="nasa-glass modal-box">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+      <div>
+        <h2 style="font-size: 22px; margin: 0; color: #fff;">Astronomical Journal</h2>
+        <div style="font-family: 'DM Mono', monospace; font-size: 11px; color: #38bdf8;">DISCOVERY LOG & MISSIONS</div>
+      </div>
+      <button class="drawer-close" id="modal-close-btn">&times;</button>
+    </div>
+
+    <div id="modal-missions-list"></div>
+  </div>
+</div>
+
+<!-- THREE.JS & ORBITCONTROLS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+/* =========================================================================
+   REALISTIC MULTI-SCALE UNIVERSE SIMULATOR — CLEAN RENDER & 3D GALAXY ENGINE
+   ========================================================================= */
+
+// Audio System
+let audioCtx = null, soundMuted = false;
+function initAudio() {
+  if (!audioCtx) {
+    const A = window.AudioContext || window.webkitAudioContext;
+    if (A) audioCtx = new A();
+  }
+}
+function playChime(freq = 440) {
+  if (soundMuted) return;
+  initAudio();
+  if (!audioCtx) return;
+  try {
+    const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+  } catch(e) {}
+}
+
+// --- PROCEDURAL TEXTURES & CIRCULAR POINT SPRITES ---
+
+// Smooth circular point sprite texture to eliminate ALL square blocky artifacts!
+function createCircularPointTexture() {
+  const c = document.createElement('canvas'); c.width = 64; c.height = 64;
+  const ctx = c.getContext('2d');
+  const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, 'rgba(255, 255, 255, 1)');
+  g.addColorStop(0.25, 'rgba(255, 255, 255, 0.8)');
+  g.addColorStop(0.6, 'rgba(255, 255, 255, 0.25)');
+  g.addColorStop(1, 'rgba(255, 255, 255, 0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 64, 64);
+  return new THREE.CanvasTexture(c);
+}
+
+function createSunTexture() {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+  const ctx = c.getContext('2d');
+  const g = ctx.createRadialGradient(256, 256, 0, 256, 256, 256);
+  g.addColorStop(0, '#ffffff');
+  g.addColorStop(0.2, '#fff2aa');
+  g.addColorStop(0.55, '#ffaa22');
+  g.addColorStop(0.85, '#cc3300');
+  g.addColorStop(1, '#000000');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 512, 512);
+  return new THREE.CanvasTexture(c);
+}
+
+function createEarthTexture() {
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 512;
+  const ctx = c.getContext('2d');
+  // Ocean base
+  ctx.fillStyle = '#113559'; ctx.fillRect(0, 0, 1024, 512);
+  // Continents
+  ctx.fillStyle = '#2e6633';
+  const continents = [
+    {x: 220, y: 180, rx: 130, ry: 90},
+    {x: 300, y: 340, rx: 95, ry: 125},
+    {x: 540, y: 170, rx: 120, ry: 85},
+    {x: 550, y: 300, rx: 105, ry: 115},
+    {x: 830, y: 350, rx: 75, ry: 65}
+  ];
+  continents.forEach(cont => {
+    ctx.beginPath(); ctx.ellipse(cont.x, cont.y, cont.rx, cont.ry, 0.15, 0, Math.PI * 2); ctx.fill();
+  });
+  // Deserts & Ice
+  ctx.fillStyle = '#d8bd8a'; ctx.fillRect(500, 220, 120, 50);
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 1024, 25); ctx.fillRect(0, 487, 1024, 25);
+  return new THREE.CanvasTexture(c);
+}
+
+function createEarthCloudsTexture() {
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 512;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = 'rgba(255, 255, 255, 0)'; ctx.fillRect(0, 0, 1024, 512);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+  for (let i = 0; i < 50; i++) {
+    const x = Math.random() * 1024, y = Math.random() * 400 + 56;
+    ctx.beginPath();
+    ctx.ellipse(x, y, Math.random() * 110 + 30, Math.random() * 25 + 10, 0.1, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  return new THREE.CanvasTexture(c);
+}
+
+function createMarsTexture() {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 256;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#c44e2b'; ctx.fillRect(0, 0, 512, 256);
+  ctx.fillStyle = '#822d14';
+  for (let i = 0; i < 25; i++) {
+    ctx.beginPath(); ctx.arc(Math.random() * 512, Math.random() * 256, Math.random() * 35 + 10, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 512, 12); ctx.fillRect(0, 244, 512, 12);
+  return new THREE.CanvasTexture(c);
+}
+
+function createJupiterTexture() {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 256;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#d4aa7d'; ctx.fillRect(0, 0, 512, 256);
+  const bands = ['#a87248', '#e0c4a4', '#703e1e', '#eed5ba', '#854722'];
+  for (let y = 0; y < 256; y += 16) {
+    ctx.fillStyle = bands[Math.floor(y / 16) % bands.length];
+    ctx.fillRect(0, y, 512, 14);
+  }
+  // Great Red Spot
+  ctx.fillStyle = '#c44223';
+  ctx.beginPath(); ctx.ellipse(320, 160, 36, 22, 0, 0, Math.PI * 2); ctx.fill();
+  return new THREE.CanvasTexture(c);
+}
+
+function createSaturnRingTexture() {
+  const c = document.createElement('canvas'); c.width = 256; c.height = 1;
+  const ctx = c.getContext('2d');
+  const g = ctx.createLinearGradient(0, 0, 256, 0);
+  g.addColorStop(0, 'rgba(0, 0, 0, 0)');
+  g.addColorStop(0.12, 'rgba(215, 188, 142, 0.45)');
+  g.addColorStop(0.42, 'rgba(185, 155, 115, 0.9)');
+  g.addColorStop(0.52, 'rgba(0, 0, 0, 0.1)'); // Cassini Division
+  g.addColorStop(0.68, 'rgba(215, 185, 145, 0.75)');
+  g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 256, 1);
+  return new THREE.CanvasTexture(c);
+}
+
+// --- SCIENTIFIC DATA DICTIONARY ---
+
+const ASTRONOMICAL_DATA = [
+  // Solar System Level
+  { id: 'sun', name: 'The Sun', scaleLvl: 1, type: 'Yellow Dwarf Star (G2V)', dist: '0.00 AU', size: '1,392,700 km', desc: 'The star at the center of the Solar System. Contains 99.86% of the system\'s total mass.', targetPos: new THREE.Vector3(0, 0, 0), camOffset: new THREE.Vector3(0, 35, 60) },
+  { id: 'mercury', name: 'Mercury', scaleLvl: 1, type: 'Terrestrial Planet', dist: '0.39 AU', size: '4,879 km', desc: 'Innermost and smallest planet. Cratered surface experiencing extreme temperatures from -180°C to 430°C.', targetPos: new THREE.Vector3(35, 0, 0), camOffset: new THREE.Vector3(6, 4, 12) },
+  { id: 'venus', name: 'Venus', scaleLvl: 1, type: 'Terrestrial Planet', dist: '0.72 AU', size: '12,104 km', desc: 'Hottest planet in the Solar System due to dense carbon dioxide clouds trapping solar heat.', targetPos: new THREE.Vector3(55, 0, 0), camOffset: new THREE.Vector3(8, 5, 14) },
+  { id: 'earth', name: 'Earth', scaleLvl: 1, type: 'Terrestrial Planet (Home)', dist: '1.00 AU', size: '12,742 km', desc: 'Our home planet. Liquid ocean coverage, dynamic atmosphere, and the only known world with life.', targetPos: new THREE.Vector3(80, 0, 0), camOffset: new THREE.Vector3(10, 5, 16) },
+  { id: 'moon', name: 'The Moon', scaleLvl: 1, type: 'Natural Satellite', dist: '1.00 AU', size: '3,474 km', desc: 'Earth\'s natural satellite. Synchronously locked with Earth in a 27.3 day orbit.', targetPos: new THREE.Vector3(84, 0, 0), camOffset: new THREE.Vector3(4, 2, 6) },
+  { id: 'mars', name: 'Mars', scaleLvl: 1, type: 'Terrestrial Planet', dist: '1.52 AU', size: '6,779 km', desc: 'The Red Planet. Iron oxide dust, polar ice caps, and Olympus Mons, the largest volcano in the Solar System.', targetPos: new THREE.Vector3(110, 0, 0), camOffset: new THREE.Vector3(8, 4, 14) },
+  { id: 'jupiter', name: 'Jupiter', scaleLvl: 1, type: 'Gas Giant', dist: '5.20 AU', size: '139,820 km', desc: 'Largest planet in the Solar System. Features horizontal cloud bands and the Great Red Spot storm.', targetPos: new THREE.Vector3(170, 0, 0), camOffset: new THREE.Vector3(26, 12, 40) },
+  { id: 'saturn', name: 'Saturn', scaleLvl: 1, type: 'Gas Giant', dist: '9.58 AU', size: '116,460 km', desc: 'Famous for its bright, multi-band ring system composed mostly of water ice and rocky particles.', targetPos: new THREE.Vector3(240, 0, 0), camOffset: new THREE.Vector3(32, 14, 50) },
+  { id: 'uranus', name: 'Uranus', scaleLvl: 1, type: 'Ice Giant', dist: '19.2 AU', size: '50,724 km', desc: 'Cyan ice giant with a dramatic axial tilt of 97.8 degrees, orbiting almost on its side.', targetPos: new THREE.Vector3(310, 0, 0), camOffset: new THREE.Vector3(20, 9, 30) },
+  { id: 'neptune', name: 'Neptune', scaleLvl: 1, type: 'Ice Giant', dist: '30.1 AU', size: '49,244 km', desc: 'Farthest major planet in the Solar System. Supersonic winds reaching 2,100 km/h.', targetPos: new THREE.Vector3(380, 0, 0), camOffset: new THREE.Vector3(20, 9, 30) },
+
+  // Stellar Neighborhood
+  { id: 'alpha-centauri', name: 'Alpha Centauri', scaleLvl: 2, type: 'Triple Star System', dist: '4.37 Light-Years', size: '1.1 Solar Radii', desc: 'Closest star system to our Solar System. Contains Proxima Centauri.', targetPos: new THREE.Vector3(1200, 180, -800), camOffset: new THREE.Vector3(0, 150, 300) },
+
+  // Milky Way Level
+  { id: 'milkyway', name: 'Milky Way Galaxy', scaleLvl: 3, type: 'Barred Spiral Galaxy', dist: '26,000 ly to Core', size: '100,000 Light-Years', desc: 'Our home galaxy containing over 100-400 billion stars. Our Solar System resides in the Orion Arm spur.', targetPos: new THREE.Vector3(0, 0, 0), camOffset: new THREE.Vector3(0, 3800, 5000) },
+
+  // Local Group Level
+  { id: 'andromeda', name: 'Andromeda Galaxy (M31)', scaleLvl: 4, type: 'Major Spiral Galaxy', dist: '2.537 Million ly', size: '220,000 Light-Years', desc: 'Largest galaxy in the Local Group. Merging trajectory with the Milky Way in ~4.5 billion years.', targetPos: new THREE.Vector3(32000, 9000, -22000), camOffset: new THREE.Vector3(0, 10000, 16000) },
+  { id: 'triangulum', name: 'Triangulum Galaxy (M33)', scaleLvl: 4, type: 'Spiral Galaxy', dist: '2.73 Million ly', size: '60,000 Light-Years', desc: 'Third-largest member of the Local Group with active starburst nebula regions.', targetPos: new THREE.Vector3(-42000, -6000, 28000), camOffset: new THREE.Vector3(0, 7000, 12000) }
+];
+
+const MISSIONS_LIST = [
+  { id: 'm1', title: 'Destination Earth', desc: 'Locate and select planet Earth in the Solar System.', targetId: 'earth', xp: 100 },
+  { id: 'm2', title: 'Red Planet Rover', desc: 'Inspect Mars in the inner solar system.', targetId: 'mars', xp: 150 },
+  { id: 'm3', title: 'Lord of the Rings', desc: 'Fly close to Saturn and observe its detailed ring structure.', targetId: 'saturn', xp: 200 },
+  { id: 'm4', title: 'Solar Core Explorer', desc: 'Inspect the Sun at the center of the Solar System.', targetId: 'sun', xp: 200 },
+  { id: 'm5', title: 'Galactic Horizon', desc: 'Zoom out to view our home, the Milky Way Galaxy.', targetId: 'milkyway', xp: 300 },
+  { id: 'm6', title: 'Intergalactic Voyager', desc: 'Travel to the Andromeda Galaxy (M31) in the Local Group.', targetId: 'andromeda', xp: 400 }
+];
+
+// --- THREE.JS GLOBALS ---
+
+let scene, camera, renderer, controls;
+let solarSystemGroup, stellarNeighborhoodGroup, milkyWayGroup, localGroupGroup;
+let earthMesh, earthCloudsMesh, moonMesh, saturnMesh;
+let raycaster, mousePointer;
+let pointTexture;
+
+let currentSelectedData = ASTRONOMICAL_DATA[3]; // Earth
+let discoveredIds = new Set();
+let completedMissions = new Set();
+let currentXP = 0;
+let cameraTargetPos = null, cameraLookTarget = new THREE.Vector3(0, 0, 0);
+
+// --- INITIALIZATION ---
+
+function init() {
+  const container = document.getElementById('canvas-container');
+
+  // Scene setup with PITCH BLACK space background (no fog/box artifacts)
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 500000);
+  camera.position.set(80 + 10, 5, 16);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x000000, 1);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.25;
+  container.appendChild(renderer.domElement);
+
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.05;
+  controls.maxDistance = 350000;
+  controls.minDistance = 2;
+
+  raycaster = new THREE.Raycaster();
+  mousePointer = new THREE.Vector2();
+
+  pointTexture = createCircularPointTexture();
+
+  // Hierarchy Scale Groups
+  solarSystemGroup = new THREE.Group();
+  stellarNeighborhoodGroup = new THREE.Group();
+  milkyWayGroup = new THREE.Group();
+  localGroupGroup = new THREE.Group();
+
+  scene.add(solarSystemGroup);
+  scene.add(stellarNeighborhoodGroup);
+  scene.add(milkyWayGroup);
+  scene.add(localGroupGroup);
+
+  buildDeepSpaceStarfield();
+  buildSolarSystem();
+  buildStellarNeighborhood();
+  buildMilkyWay();
+  buildLocalGroup();
+
+  window.addEventListener('resize', onWindowResize);
+  renderer.domElement.addEventListener('pointerdown', onPointerDown);
+
+  bindUI();
+  populateQuickNav();
+  updateHUD();
+
+  animate(0);
+}
+
+// --- BUILD SCENE OBJECTS ---
+
+function buildDeepSpaceStarfield() {
+  const count = 5000;
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(count * 3);
+  const col = new Float32Array(count * 3);
+
+  for (let i = 0; i < count; i++) {
+    const r = 180000 + Math.random() * 200000;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+
+    pos[i*3] = r * Math.sin(phi) * Math.cos(theta);
+    pos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+    pos[i*3+2] = r * Math.cos(phi);
+
+    col[i*3] = 0.85 + Math.random() * 0.15;
+    col[i*3+1] = 0.90 + Math.random() * 0.10;
+    col[i*3+2] = 1.0;
+  }
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+
+  const mat = new THREE.PointsMaterial({
+    size: 2.5,
+    map: pointTexture,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.75,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+  });
+  scene.add(new THREE.Points(geo, mat));
+}
+
+function buildSolarSystem() {
+  // Sun
+  const sunGeo = new THREE.SphereGeometry(14, 32, 32);
+  const sunMat = new THREE.MeshBasicMaterial({ map: createSunTexture() });
+  const sunMesh = new THREE.Mesh(sunGeo, sunMat);
+  sunMesh.userData = ASTRONOMICAL_DATA[0];
+  solarSystemGroup.add(sunMesh);
+
+  // Solar Light Source
+  const sunLight = new THREE.PointLight(0xfff8ee, 3.2, 1800);
+  solarSystemGroup.add(sunLight);
+  solarSystemGroup.add(new THREE.AmbientLight(0x223344, 0.45));
+
+  // Planets Definition
+  const planetConfigs = [
+    { idx: 1, radius: 1.5, color: 0x999999, dist: 35 },  // Mercury
+    { idx: 2, radius: 2.6, color: 0xe0a050, dist: 55 },  // Venus
+    { idx: 3, radius: 3.0, isEarth: true, dist: 80 },    // Earth
+    { idx: 5, radius: 2.2, isMars: true, dist: 110 },    // Mars
+    { idx: 6, radius: 8.5, isJupiter: true, dist: 170 }, // Jupiter
+    { idx: 7, radius: 6.8, isSaturn: true, dist: 240 },  // Saturn
+    { idx: 8, radius: 4.5, color: 0x55ccff, dist: 310 }, // Uranus
+    { idx: 9, radius: 4.3, color: 0x2255ff, dist: 380 }  // Neptune
+  ];
+
+  planetConfigs.forEach(cfg => {
+    const data = ASTRONOMICAL_DATA[cfg.idx];
+    let mat;
+
+    if (cfg.isEarth) {
+      mat = new THREE.MeshStandardMaterial({ map: createEarthTexture(), roughness: 0.55, metalness: 0.1 });
+    } else if (cfg.isMars) {
+      mat = new THREE.MeshStandardMaterial({ map: createMarsTexture(), roughness: 0.65 });
+    } else if (cfg.isJupiter) {
+      mat = new THREE.MeshStandardMaterial({ map: createJupiterTexture(), roughness: 0.45 });
+    } else {
+      mat = new THREE.MeshStandardMaterial({ color: cfg.color || 0xcccccc, roughness: 0.5 });
+    }
+
+    const geo = new THREE.SphereGeometry(cfg.radius, 32, 32);
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(cfg.dist, 0, 0);
+    mesh.userData = data;
+
+    // Earth specific layers
+    if (cfg.isEarth) {
+      earthMesh = mesh;
+      // Clouds layer
+      const cloudGeo = new THREE.SphereGeometry(cfg.radius * 1.02, 32, 32);
+      const cloudMat = new THREE.MeshStandardMaterial({
+        map: createEarthCloudsTexture(),
+        transparent: true,
+        opacity: 0.75
+      });
+      earthCloudsMesh = new THREE.Mesh(cloudGeo, cloudMat);
+      earthMesh.add(earthCloudsMesh);
+
+      // Moon
+      const moonGeo = new THREE.SphereGeometry(0.8, 16, 16);
+      const moonMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, roughness: 0.8 });
+      moonMesh = new THREE.Mesh(moonGeo, moonMat);
+      moonMesh.position.set(7, 0, 0);
+      moonMesh.userData = ASTRONOMICAL_DATA[4]; // Moon
+      earthMesh.add(moonMesh);
+    }
+
+    // Saturn Rings
+    if (cfg.isSaturn) {
+      saturnMesh = mesh;
+      const ringGeo = new THREE.RingGeometry(cfg.radius * 1.4, cfg.radius * 2.6, 64);
+      const ringMat = new THREE.MeshBasicMaterial({
+        map: createSaturnRingTexture(),
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.85
+      });
+      const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+      ringMesh.rotation.x = Math.PI / 2 + 0.35;
+      saturnMesh.add(ringMesh);
+    }
+
+    // Subtle Crisp Orbit Lines
+    const orbitGeo = new THREE.BufferGeometry();
+    const points = [];
+    for (let i = 0; i <= 128; i++) {
+      const a = (i / 128) * Math.PI * 2;
+      points.push(new THREE.Vector3(Math.cos(a) * cfg.dist, 0, Math.sin(a) * cfg.dist));
+    }
+    orbitGeo.setFromPoints(points);
+    const orbitLine = new THREE.Line(orbitGeo, new THREE.LineBasicMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.25
+    }));
+    solarSystemGroup.add(orbitLine);
+
+    solarSystemGroup.add(mesh);
+  });
+}
+
+function buildStellarNeighborhood() {
+  const st = ASTRONOMICAL_DATA[10]; // Alpha Centauri
+  const geo = new THREE.SphereGeometry(18, 32, 32);
+  const mat = new THREE.MeshBasicMaterial({ color: 0xffddaa });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.copy(st.targetPos);
+  mesh.userData = st;
+  stellarNeighborhoodGroup.add(mesh);
+}
+
+// Helper to construct a realistic 3D spiral galaxy with circular point texture
+function create3DSpiralGalaxy({ numStars = 14000, galaxyRadius = 12000, coreColor = '#ffaa44', armColor = '#38bdf8' }) {
+  const group = new THREE.Group();
+
+  // 1. Glowing Core Sphere
+  const coreGeo = new THREE.SphereGeometry(galaxyRadius * 0.08, 32, 32);
+  const coreMat = new THREE.MeshBasicMaterial({
+    color: coreColor,
+    transparent: true,
+    opacity: 0.85,
+    blending: THREE.AdditiveBlending
+  });
+  group.add(new THREE.Mesh(coreGeo, coreMat));
+
+  // 2. Logarithmic Spiral Arms Particles
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(numStars * 3);
+  const col = new Float32Array(numStars * 3);
+
+  const c1 = new THREE.Color(coreColor);
+  const c2 = new THREE.Color(armColor);
+  const arms = 4;
+
+  for (let i = 0; i < numStars; i++) {
+    const r = Math.pow(Math.random(), 1.5) * galaxyRadius;
+    const armIndex = i % arms;
+    const armAngle = (armIndex * 2 * Math.PI) / arms;
+    const spinAngle = r * 0.00045; // Logarithmic spiral twist
+    const theta = armAngle + spinAngle + (Math.random() - 0.5) * 0.45;
+
+    // Disc height dispersion decreases towards outer edge
+    const ySpread = (Math.random() - 0.5) * (450 * (1 - r / galaxyRadius));
+
+    pos[i * 3] = Math.cos(theta) * r;
+    pos[i * 3 + 1] = ySpread;
+    pos[i * 3 + 2] = Math.sin(theta) * r;
+
+    const lerpC = new THREE.Color().lerpColors(c1, c2, Math.min(1, r / (galaxyRadius * 0.8)));
+    col[i * 3] = lerpC.r;
+    col[i * 3 + 1] = lerpC.g;
+    col[i * 3 + 2] = lerpC.b;
+  }
+
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+
+  const mat = new THREE.PointsMaterial({
+    size: 8,
+    map: pointTexture,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.75,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+  });
+
+  const particleSystem = new THREE.Points(geo, mat);
+  group.add(particleSystem);
+
+  return group;
+}
+
+function buildMilkyWay() {
+  const data = ASTRONOMICAL_DATA[11];
+  const galaxyMesh = create3DSpiralGalaxy({
+    numStars: 16000,
+    galaxyRadius: 14000,
+    coreColor: '#ffaa44',
+    armColor: '#38bdf8'
+  });
+  galaxyMesh.children[0].userData = data;
+  galaxyMesh.children[1].userData = data;
+  milkyWayGroup.add(galaxyMesh);
+
+  // Solar System Location Marker in Orion Spur
+  const markerGeo = new THREE.SphereGeometry(60, 16, 16);
+  const markerMat = new THREE.MeshBasicMaterial({ color: 0xffdd00, wireframe: true });
+  const markerMesh = new THREE.Mesh(markerGeo, markerMat);
+  markerMesh.position.set(3500, 0, 2000);
+  milkyWayGroup.add(markerMesh);
+}
+
+function buildLocalGroup() {
+  const dataAndromeda = ASTRONOMICAL_DATA[12];
+  const dataTriangulum = ASTRONOMICAL_DATA[13];
+
+  // Andromeda 3D Galaxy
+  const meshAndromeda = create3DSpiralGalaxy({
+    numStars: 10000,
+    galaxyRadius: 10000,
+    coreColor: '#ffffff',
+    armColor: '#aaeeff'
+  });
+  meshAndromeda.position.copy(dataAndromeda.targetPos);
+  meshAndromeda.children[0].userData = dataAndromeda;
+  meshAndromeda.children[1].userData = dataAndromeda;
+  localGroupGroup.add(meshAndromeda);
+
+  // Triangulum 3D Galaxy
+  const meshTriangulum = create3DSpiralGalaxy({
+    numStars: 6000,
+    galaxyRadius: 6000,
+    coreColor: '#ff88aa',
+    armColor: '#66ddee'
+  });
+  meshTriangulum.position.copy(dataTriangulum.targetPos);
+  meshTriangulum.children[0].userData = dataTriangulum;
+  meshTriangulum.children[1].userData = dataTriangulum;
+  localGroupGroup.add(meshTriangulum);
+}
+
+// --- ANIMATION & RENDER LOOP ---
+
+function animate(t) {
+  requestAnimationFrame(animate);
+
+  // Rotations
+  if (earthMesh) earthMesh.rotation.y += 0.004;
+  if (earthCloudsMesh) earthCloudsMesh.rotation.y += 0.006;
+  if (milkyWayGroup) milkyWayGroup.rotation.y += 0.00015;
+
+  // Smooth Camera Fly-To transitions
+  if (cameraTargetPos) {
+    camera.position.lerp(cameraTargetPos, 0.06);
+    controls.target.lerp(cameraLookTarget, 0.06);
+    controls.update();
+
+    if (camera.position.distanceTo(cameraTargetPos) < 1.5) {
+      cameraTargetPos = null;
+    }
+  } else {
+    controls.update();
+  }
+
+  // Calculate Camera Distance & Scale Level
+  const dist = camera.position.distanceTo(controls.target);
+  updateScaleLevelHUD(dist);
+
+  // Telemetry update
+  document.getElementById('tele-coords').textContent = 
+    `X: ${camera.position.x.toFixed(0)} | Y: ${camera.position.y.toFixed(0)} | Z: ${camera.position.z.toFixed(0)}`;
+
+  renderer.render(scene, camera);
+}
+
+function updateScaleLevelHUD(dist) {
+  let scaleText = 'Solar System';
+  let levelIdx = 1;
+
+  if (dist > 15000) { scaleText = 'Local Group'; levelIdx = 4; }
+  else if (dist > 1200) { scaleText = 'Milky Way Galaxy'; levelIdx = 3; }
+  else if (dist > 450) { scaleText = 'Stellar Neighborhood'; levelIdx = 2; }
+
+  document.getElementById('stat-scale').textContent = scaleText;
+
+  let humanDist = `${dist.toFixed(1)} AU`;
+  if (dist > 1000) humanDist = `${(dist / 100).toFixed(1)} Light-Years`;
+  document.getElementById('stat-dist').textContent = humanDist;
+
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById(`scale-lvl-${i}`).classList.toggle('active', i === levelIdx);
+  }
+}
+
+// --- INTERACTION HANDLERS ---
+
+function onPointerDown(e) {
+  document.getElementById('hero-overlay').classList.add('hide');
+
+  mousePointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mousePointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mousePointer, camera);
+  const intersects = raycaster.intersectObjects(scene.children, true);
+
+  if (intersects.length > 0) {
+    let hitObj = intersects[0].object;
+    while (hitObj && !hitObj.userData.id) hitObj = hitObj.parent;
+
+    if (hitObj && hitObj.userData.id) {
+      selectCelestialBody(hitObj.userData);
+    }
+  }
+}
+
+function selectCelestialBody(data) {
+  currentSelectedData = data;
+  playChime(520);
+
+  // Set camera lerp target
+  cameraLookTarget.copy(data.targetPos);
+  cameraTargetPos = data.targetPos.clone().add(data.camOffset);
+
+  // Discover logic
+  if (!discoveredIds.has(data.id)) {
+    discoveredIds.add(data.id);
+    addXP(100);
+    showDiscoveryToast(data.name);
+    checkMissions();
+  }
+
+  // Update Drawer UI
+  document.getElementById('drawer-name').textContent = data.name;
+  document.getElementById('drawer-subtitle').textContent = data.type;
+  document.getElementById('drawer-desc').textContent = data.desc;
+  document.getElementById('drawer-stat-1').textContent = data.dist;
+  document.getElementById('drawer-stat-2').textContent = data.size;
+
+  document.getElementById('info-drawer').classList.add('active');
+  document.getElementById('tele-selected').textContent = data.name;
+}
+
+function addXP(val) {
+  currentXP += val;
+  updateHUD();
+}
+
+function showDiscoveryToast(name) {
+  const t = document.getElementById('discovery-toast');
+  document.getElementById('toast-title').textContent = `Discovered ${name}`;
+  t.classList.add('active');
+  setTimeout(() => t.classList.remove('active'), 3000);
+}
+
+function checkMissions() {
+  MISSIONS_LIST.forEach(m => {
+    if (completedMissions.has(m.id)) return;
+    if (discoveredIds.has(m.targetId)) {
+      completedMissions.add(m.id);
+      addXP(m.xp);
+      showDiscoveryToast(`Mission Completed: ${m.title}!`);
+    }
+  });
+  updateHUD();
+}
+
+function updateHUD() {
+  document.getElementById('stat-xp').textContent = `${currentXP} XP`;
+  document.getElementById('stat-discovered').textContent = `${discoveredIds.size} / ${ASTRONOMICAL_DATA.length}`;
+
+  const activeM = MISSIONS_LIST.find(m => !completedMissions.has(m.id));
+  if (activeM) {
+    document.getElementById('mission-title').textContent = activeM.title;
+    document.getElementById('mission-desc').textContent = activeM.desc;
+  } else {
+    document.getElementById('mission-title').textContent = 'Universe Explorer';
+    document.getElementById('mission-desc').textContent = 'All astronomical missions completed!';
+  }
+}
+
+function populateQuickNav() {
+  const container = document.getElementById('quick-nav-container');
+  container.innerHTML = '';
+  ASTRONOMICAL_DATA.forEach(data => {
+    const btn = document.createElement('button');
+    btn.className = 'quick-nav-btn';
+    btn.textContent = data.name;
+    btn.onclick = () => selectCelestialBody(data);
+    container.appendChild(btn);
+  });
+}
+
+function bindUI() {
+  document.getElementById('sound-toggle').onclick = () => {
+    soundMuted = !soundMuted;
+    document.getElementById('sound-toggle').textContent = `🔊 SOUND: ${soundMuted ? 'OFF' : 'ON'}`;
+  };
+
+  document.getElementById('drawer-close-btn').onclick = () => {
+    document.getElementById('info-drawer').classList.remove('active');
+  };
+
+  document.getElementById('btn-flyto-target').onclick = () => {
+    if (currentSelectedData) selectCelestialBody(currentSelectedData);
+  };
+
+  document.getElementById('btn-earth-zoom').onclick = () => selectCelestialBody(ASTRONOMICAL_DATA[3]);
+  document.getElementById('btn-solar-view').onclick = () => selectCelestialBody(ASTRONOMICAL_DATA[0]);
+  document.getElementById('btn-milkyway-view').onclick = () => selectCelestialBody(ASTRONOMICAL_DATA[11]);
+  document.getElementById('btn-localgroup-view').onclick = () => selectCelestialBody(ASTRONOMICAL_DATA[12]);
+
+  document.getElementById('btn-missions').onclick = openMissionsModal;
+  document.getElementById('modal-close-btn').onclick = () => {
+    document.getElementById('missions-modal').classList.remove('active');
+  };
+}
+
+function openMissionsModal() {
+  const list = document.getElementById('modal-missions-list');
+  list.innerHTML = '';
+  MISSIONS_LIST.forEach(m => {
+    const isDone = completedMissions.has(m.id);
+    const div = document.createElement('div');
+    div.className = `mission-item ${isDone ? 'completed' : ''}`;
+    div.innerHTML = `
+      <div>
+        <h4 style="margin: 0 0 4px 0; color: #fff;">${m.title}</h4>
+        <p style="margin: 0; font-size: 11px; color: #94a3b8;">${m.desc}</p>
+      </div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: ${isDone ? '#38bdf8' : '#64748b'};">
+        ${isDone ? '✓ COMPLETED (+' + m.xp + ' XP)' : 'PENDING'}
+      </div>
+    `;
+    list.appendChild(div);
+  });
+  document.getElementById('missions-modal').classList.add('active');
+}
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
