@@ -615,8 +615,8 @@ scene.background = new THREE.Color('#07090e');
 scene.fog = new THREE.FogExp2('#07090e', 0.015);
 
 const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 120);
-camera.position.set(0, 20, 24);
-camera.lookAt(0, 0, 0);
+camera.position.set(0, 6.5, 17.5);
+camera.lookAt(0, 0.4, -2.5);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -624,12 +624,20 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.3;
+renderer.toneMappingExposure = 1.35;
 container.appendChild(renderer.domElement);
 
-// Lighting: Dual St. James Club Vintage Billiard Pendant Fixtures
-const ambientLight = new THREE.AmbientLight('#2a3242', 2.0);
+// Lighting: Dual St. James Club Vintage Billiard Pendant Fixtures + Full Ambient
+const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
 scene.add(ambientLight);
+
+const hemiLight = new THREE.HemisphereLight(0xfff6ea, 0x182436, 1.8);
+scene.add(hemiLight);
+
+const dirLight = new THREE.DirectionalLight(0xfff5e4, 2.2);
+dirLight.position.set(10, 24, 12);
+dirLight.castShadow = true;
+scene.add(dirLight);
 
 // Table Spotlights
 const spotHead = new THREE.SpotLight('#fff2d4', 4.5, 45, Math.PI / 3, 0.35, 1.2);
@@ -856,7 +864,7 @@ scene.add(targetDeflectLine);
    ========================================================================== */
 let balls = [];
 let cueBall = null;
-let aimAngle = Math.PI * 0.5; // Radians
+let aimAngle = 0; // 0 = pointing straight forward down the table towards target balls
 let aimPower = 0.65; // 0.15 to 1.0
 let isAiming = true;
 let isStriking = false;
@@ -1357,11 +1365,20 @@ function animate() {
 
   // Smooth Dynamic Camera Positioning
   if (activeCamera === 'aim' && cueBall && !cueBall.isPotted) {
-    // First-person view right behind the cue stick looking down the table!
-    const backVec = new THREE.Vector3(-Math.sin(aimAngle), 0, Math.cos(aimAngle)).multiplyScalar(13);
-    const targetCam = new THREE.Vector3(cueBall.pos.x + backVec.x, 8.5, cueBall.pos.y + backVec.z);
+    // Dynamic cue aim view right behind the cue stick looking down the table!
+    const aimDir = new THREE.Vector3(Math.sin(aimAngle), 0, -Math.cos(aimAngle));
+    const targetCam = new THREE.Vector3(
+      cueBall.pos.x - aimDir.x * 12.0,
+      6.2,
+      cueBall.pos.y - aimDir.z * 12.0
+    );
+    const lookTarget = new THREE.Vector3(
+      cueBall.pos.x + aimDir.x * 10.0,
+      0.5,
+      cueBall.pos.y + aimDir.z * 10.0
+    );
     camera.position.lerp(targetCam, 0.08);
-    camera.lookAt(cueBall.pos.x, 0.4, cueBall.pos.y);
+    camera.lookAt(lookTarget);
   } else if (activeCamera === 'overhead') {
     // 2D Tactical View
     camera.position.lerp(new THREE.Vector3(0, 32, 0.001), 0.08);
@@ -1384,9 +1401,21 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// Boot Game
-rackGame('snooker');
-animate();
+// Boot Game with robust script loader check
+function bootBilliards() {
+  if (typeof THREE === 'undefined') {
+    setTimeout(bootBilliards, 40);
+    return;
+  }
+  rackGame('snooker');
+  animate();
+}
+
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', bootBilliards);
+} else {
+  bootBilliards();
+}
 </script>
 </body>
 </html>

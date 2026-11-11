@@ -1479,7 +1479,19 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-window.addEventListener('DOMContentLoaded', init);
+function bootOrbit() {
+  if (typeof THREE === 'undefined' || typeof THREE.OrbitControls === 'undefined') {
+    setTimeout(bootOrbit, 40);
+    return;
+  }
+  init();
+}
+
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', bootOrbit);
+} else {
+  bootOrbit();
+}
 </script>
 </body>
 </html>

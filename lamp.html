@@ -82,7 +82,7 @@
 
   .hud { position: fixed; inset: 0; pointer-events: none; font: 12px/1 var(--mono); color: var(--muted); }
   .hud > * { position: absolute; pointer-events: auto; }
-  .tl { top: 20px; left: 20px; letter-spacing: 0.04em; line-height: 1.7; }
+  .tl { top: 56px; left: 20px; letter-spacing: 0.04em; line-height: 1.7; }
   .tl b { font-weight: 400; color: rgba(236, 230, 218, 0.7); }
   .tr {
     top: 14px; right: 14px;
@@ -196,6 +196,7 @@
 </main>
 <canvas id="c"></canvas>
 <div class="hud">
+  <a href="index.html" style="position:fixed;top:16px;left:20px;z-index:50;display:inline-flex;align-items:center;gap:6px;background:rgba(18,22,32,0.85);border:1px solid rgba(255,255,255,0.15);padding:7px 15px;border-radius:999px;color:#ece6da;text-decoration:none;font:600 12px/1 'Bricolage Grotesque',sans-serif;backdrop-filter:blur(12px);transition:all 0.2s;" onmouseover="this.style.borderColor='#f3c98f';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='#ece6da'">← <span style="color:#f3c98f;font-weight:700">AI Smarts</span></a>
   <div class="tl">slingshot-lamp · <b id="state">on</b><br>shots <b id="shots">0</b> · bulbs <b id="bulbs">0</b></div>
   <button id="sound" class="tr">sound: on</button>
   <div id="switch" class="switch" role="switch" aria-checked="true" aria-label="Light switch" tabindex="0">
