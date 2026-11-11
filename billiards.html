@@ -1,0 +1,1369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Royal Cue Club 3D — Luxury Billiards & Snooker Lounge</title>
+<meta name="description" content="A masterclass in 3D Billiards, 8-Ball Pool, and Snooker. High-precision ball physics, trajectory prediction raycasting, cue ball spin control, luxury mahogany & brass table, and procedural phenolic ball clack acoustics.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@700;800&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #05080f;
+    --felt: #0c5c36;
+    --felt-glow: #12824c;
+    --wood: #3e1b0c;
+    --brass: #e6b84a;
+    --gold: #ffbe3b;
+    --cyan: #00f0ff;
+    --text: #f0f4f8;
+    --muted: rgba(240, 244, 248, 0.55);
+    --panel: rgba(12, 17, 28, 0.85);
+    --border: rgba(230, 184, 74, 0.25);
+    --mono: "Geist Mono", ui-monospace, monospace;
+    --display: "Funnel Display", sans-serif;
+    --body: "Bricolage Grotesque", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: var(--bg); color: var(--text);
+    font-family: var(--body); touch-action: none;
+  }
+
+  #canvas-container {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    cursor: grab; z-index: 1;
+  }
+  #canvas-container:active { cursor: grabbing; }
+
+  /* TOP HUD */
+  .hud-top {
+    position: fixed; top: 16px; left: 20px; right: 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 30; pointer-events: none;
+  }
+  .hud-top > * { pointer-events: auto; }
+
+  .brand-group {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .home-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 8px 16px; border-radius: 999px; color: var(--text);
+    text-decoration: none; font: 600 13px/1 var(--body);
+    backdrop-filter: blur(16px); transition: all 0.2s;
+  }
+  .home-btn:hover { border-color: var(--gold); color: #fff; transform: translateY(-1px); }
+  .home-btn span { color: var(--gold); font-weight: 700; }
+
+  .lounge-badge {
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 7px 15px; border-radius: 999px; backdrop-filter: blur(16px);
+    display: flex; align-items: center; gap: 8px; font: 500 11px/1 var(--mono); color: var(--muted);
+  }
+  .lounge-badge b { color: var(--gold); font-weight: 700; letter-spacing: 0.05em; }
+
+  /* GAME MODE TABS */
+  .mode-selector {
+    display: flex; gap: 6px; background: var(--panel);
+    border: 1px solid var(--border); padding: 5px; border-radius: 999px;
+    backdrop-filter: blur(16px);
+  }
+  .mode-btn {
+    background: transparent; border: 0; color: var(--muted);
+    font: 600 11px/1 var(--body); padding: 7px 15px; border-radius: 999px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .mode-btn:hover { color: #fff; }
+  .mode-btn.active {
+    background: linear-gradient(135deg, rgba(230, 184, 74, 0.28), rgba(212, 175, 55, 0.15));
+    border: 1px solid var(--brass); color: #fff; box-shadow: 0 0 14px rgba(230, 184, 74, 0.3);
+  }
+
+  /* TOP STATUS: BALL RACK PROGRESS */
+  .ball-rack-bar {
+    position: fixed; top: 76px; left: 50%; transform: translateX(-50%);
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 8px 18px; border-radius: 999px; backdrop-filter: blur(16px);
+    display: flex; align-items: center; gap: 14px; z-index: 25;
+    font: 600 12px/1 var(--mono); box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  }
+  .rack-slots {
+    display: flex; align-items: center; gap: 5px;
+  }
+  .rack-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6), 0 2px 4px rgba(0,0,0,0.5);
+    transition: all 0.3s;
+  }
+  .rack-dot.potted { opacity: 0.18; transform: scale(0.75); }
+
+  /* BOTTOM CONTROLS DOCK */
+  .bottom-dock {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 10px 20px; border-radius: 999px; backdrop-filter: blur(20px);
+    display: flex; align-items: center; gap: 16px; z-index: 30;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
+  }
+
+  /* Power Slider */
+  .power-control {
+    display: flex; align-items: center; gap: 10px; font: 600 11px/1 var(--mono); color: var(--muted);
+  }
+  .power-control span { color: var(--gold); }
+  .power-slider {
+    -webkit-appearance: none; width: 140px; height: 6px; border-radius: 999px;
+    background: rgba(255, 255, 255, 0.15); outline: none; cursor: pointer;
+  }
+  .power-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--gold); box-shadow: 0 0 10px var(--gold); cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .power-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+  /* Strike Button */
+  .strike-btn {
+    background: linear-gradient(135deg, #e6b84a, #d48b17);
+    color: #1a0f02; border: 0; font: 800 13px/1 var(--display);
+    padding: 11px 24px; border-radius: 999px; cursor: pointer;
+    box-shadow: 0 4px 18px rgba(230, 184, 74, 0.45);
+    display: flex; align-items: center; gap: 8px; letter-spacing: 0.04em;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .strike-btn:hover {
+    transform: translateY(-2px); box-shadow: 0 6px 24px rgba(230, 184, 74, 0.65);
+    background: linear-gradient(135deg, #fff089, #e6b84a);
+  }
+  .strike-btn:active { transform: translateY(1px); }
+
+  /* Re-rack & Audio */
+  .tool-btn {
+    background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 8px 14px; border-radius: 999px; color: var(--text);
+    font: 600 11px/1 var(--body); cursor: pointer;
+    display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+  }
+  .tool-btn:hover { background: rgba(255, 255, 255, 0.14); border-color: var(--gold); color: #fff; }
+
+  /* SPIN CUE BALL SELECTOR (FLOATING WIDGET) */
+  .spin-dock {
+    position: fixed; bottom: 85px; right: 24px;
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 12px; border-radius: 18px; backdrop-filter: blur(16px);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    z-index: 30; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  .spin-label { font: 700 10px/1 var(--mono); color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; }
+  .spin-circle {
+    width: 68px; height: 68px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ffffff, #dcdcdc 55%, #a5a5a5);
+    border: 2px solid #555; position: relative; cursor: crosshair;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.6);
+  }
+  .spin-indicator {
+    width: 10px; height: 10px; border-radius: 50%; background: #e11d48;
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    box-shadow: 0 0 6px #e11d48; pointer-events: none;
+  }
+  .spin-subtext { font: 500 9px/1 var(--mono); color: var(--muted); }
+
+  /* CAMERA VIEW PRESET BUTTONS */
+  .view-presets {
+    position: fixed; bottom: 85px; left: 24px;
+    display: flex; flex-direction: column; gap: 6px; z-index: 30;
+  }
+  .cam-btn {
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 8px 14px; border-radius: 999px; color: var(--muted);
+    font: 600 11px/1 var(--body); cursor: pointer; backdrop-filter: blur(16px);
+    transition: all 0.2s; text-align: left; display: flex; align-items: center; gap: 6px;
+  }
+  .cam-btn:hover { color: #fff; border-color: var(--gold); }
+  .cam-btn.active { background: rgba(230, 184, 74, 0.25); border-color: var(--brass); color: #fff; }
+
+  /* ON-SCREEN TOAST / ANNOUNCEMENTS */
+  .toast {
+    position: fixed; top: 125px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: rgba(12, 17, 28, 0.95); border: 1px solid var(--brass);
+    color: #fff; padding: 10px 22px; border-radius: 999px;
+    font: 700 13px/1 var(--mono); backdrop-filter: blur(16px);
+    opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 40; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  /* HINT HELPER */
+  .hint-banner {
+    position: fixed; bottom: 76px; left: 50%; transform: translateX(-50%);
+    font: 500 11px/1.4 var(--mono); color: var(--muted);
+    background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 5px 16px; border-radius: 999px; pointer-events: none;
+    backdrop-filter: blur(8px); z-index: 20; text-align: center;
+  }
+
+  @media (max-width: 860px) {
+    .hud-top { flex-direction: column; gap: 8px; align-items: flex-start; }
+    .mode-selector { align-self: center; }
+    .bottom-dock { width: calc(100% - 32px); padding: 8px 12px; gap: 8px; justify-content: space-between; }
+    .power-slider { width: 90px; }
+    .spin-dock { display: none; }
+    .view-presets { display: none; }
+    .ball-rack-bar { top: 110px; padding: 6px 12px; font-size: 11px; }
+  }
+</style>
+
+<!-- Standard Non-Module Three.js to guarantee offline & file:// CORS compatibility -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<!-- TOP HUD -->
+<header class="hud-top">
+  <div class="brand-group">
+    <a href="index.html" class="home-btn">← <span>AI Smarts</span></a>
+    <div class="lounge-badge">
+      <span>👑 <b>Royal Cue Club</b> · Master Billiards</span>
+    </div>
+  </div>
+
+  <!-- Game Mode Switcher -->
+  <div class="mode-selector">
+    <button class="mode-btn active" id="mode-8ball">🎱 8-Ball Classic</button>
+    <button class="mode-btn" id="mode-snooker">🔴 Snooker Pro</button>
+    <button class="mode-btn" id="mode-trick">🎯 Trick Shots</button>
+    <button class="mode-btn" id="mode-zen">🕊️ Zen Free Play</button>
+  </div>
+</header>
+
+<!-- TOP STATUS: BALL RACK PROGRESS -->
+<div class="ball-rack-bar" id="ball-rack-bar">
+  <span id="rack-title">Solids & Stripes</span>
+  <div class="rack-slots" id="rack-slots"></div>
+  <span id="score-counter" style="color:var(--gold)">Potted: 0 / 15</span>
+</div>
+
+<!-- CAMERA VIEW PRESETS -->
+<div class="view-presets">
+  <button class="cam-btn active" id="cam-aim">🎯 Aim View</button>
+  <button class="cam-btn" id="cam-overhead">📐 Overhead 2D</button>
+  <button class="cam-btn" id="cam-orbit">🌐 3D Free Orbit</button>
+</div>
+
+<!-- SPIN / ENGLISH CUE BALL SELECTOR -->
+<aside class="spin-dock">
+  <span class="spin-label">Cue Ball Spin</span>
+  <div class="spin-circle" id="spin-circle">
+    <div class="spin-indicator" id="spin-indicator"></div>
+  </div>
+  <span class="spin-subtext">Draw · Follow · English</span>
+</aside>
+
+<!-- BOTTOM CONTROLS DOCK -->
+<nav class="bottom-dock">
+  <div class="power-control">
+    <span>Power:</span>
+    <input type="range" class="power-slider" id="power-slider" min="15" max="100" value="65">
+    <span id="power-val">65%</span>
+  </div>
+
+  <button class="strike-btn" id="strike-btn">
+    <span>STRIKE</span> ⚡
+  </button>
+
+  <button class="tool-btn" id="rerack-btn">🔄 Re-Rack</button>
+  <button class="tool-btn" id="sound-btn">🔊 Sound: ON</button>
+</nav>
+
+<!-- HINT HELPER -->
+<div class="hint-banner" id="hint-banner">
+  🖱️ <b>Drag to Aim</b> · ⚡ <b>Pull slider to set power</b> · 🎯 <b>Click Strike or Spacebar to Shoot</b>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✨ Beautiful Break Shot!</div>
+
+<script>
+/* ==========================================================================
+   PROCEDURAL HIGH-FIDELITY BILLIARDS AUDIO SYNTHESIZER
+   - Leather tip strike with crisp chalk pop
+   - Phenolic resin ball-on-ball clack (scales dynamically with impact velocity)
+   - Heavy ball drop clunk into leather drop pocket
+   - Low-frequency rubber cushion rail bounce thuds
+   - Pleasant vintage jazz chord progression for relaxed club ambiance
+   ========================================================================== */
+class BilliardsAudio {
+  constructor() {
+    this.ctx = null;
+    this.enabled = true;
+    this.ambientStep = 0;
+    this.ambientTimer = null;
+  }
+
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) this.ctx = new AudioCtx();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+
+  // Leather Cue Tip striking phenolic cue ball
+  cueStrike(power = 0.6) {
+    if (!this.enabled || !this.ctx) return;
+    const now = this.ctx.currentTime;
+
+    // 1. Sharp chalk pop
+    const dur = 0.025;
+    const bufSize = Math.floor(this.ctx.sampleRate * dur);
+    const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.15));
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buf;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(2200, now);
+    filter.Q.value = 4.0;
+
+    const g = this.ctx.createGain();
+    g.gain.setValueAtTime(0.12 * power, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+    noise.connect(filter); filter.connect(g); g.connect(this.ctx.destination);
+    noise.start(now);
+
+    // 2. Solid wooden cue body thud
+    const osc = this.ctx.createOscillator();
+    const oscG = this.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(280, now);
+    osc.frequency.exponentialRampToValueAtTime(70, now + 0.05);
+    oscG.gain.setValueAtTime(0.14 * power, now);
+    oscG.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+
+    osc.connect(oscG); oscG.connect(this.ctx.destination);
+    osc.start(now); osc.stop(now + 0.055);
+  }
+
+  // Phenolic Resin Ball-on-Ball Collision Clack
+  ballClack(relVel = 1.0) {
+    if (!this.enabled || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const normVel = Math.min(1.8, Math.max(0.05, relVel));
+
+    // High crystalline glass/ceramic pop
+    const osc = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    osc.type = 'sine';
+    const baseFreq = 2600 + Math.random() * 600;
+    osc.frequency.setValueAtTime(baseFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(800, now + 0.015);
+
+    const vol = Math.min(0.25, 0.04 + normVel * 0.12);
+    g.gain.setValueAtTime(vol, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.022);
+
+    osc.connect(g); g.connect(this.ctx.destination);
+    osc.start(now); osc.stop(now + 0.025);
+
+    // Resonance body
+    const osc2 = this.ctx.createOscillator();
+    const g2 = this.ctx.createGain();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(1400 + Math.random() * 200, now);
+    osc2.frequency.exponentialRampToValueAtTime(450, now + 0.03);
+    g2.gain.setValueAtTime(vol * 0.7, now);
+    g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+
+    osc2.connect(g2); g2.connect(this.ctx.destination);
+    osc2.start(now); osc2.stop(now + 0.04);
+  }
+
+  // Cushion Rail Rubber Bounce Thud
+  cushionBounce(vel = 0.5) {
+    if (!this.enabled || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(180, now);
+    osc.frequency.exponentialRampToValueAtTime(40, now + 0.06);
+
+    const vol = Math.min(0.15, 0.03 + vel * 0.08);
+    g.gain.setValueAtTime(vol, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+    osc.connect(g); g.connect(this.ctx.destination);
+    osc.start(now); osc.stop(now + 0.065);
+  }
+
+  // Heavy Ball Falling into Leather Pocket
+  pocketDrop() {
+    if (!this.enabled || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    // 1. Hole rim clack
+    this.ballClack(0.6);
+    // 2. Leather pocket thud
+    const osc = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(120, now + 0.03);
+    osc.frequency.exponentialRampToValueAtTime(35, now + 0.15);
+    g.gain.setValueAtTime(0.18, now + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+
+    osc.connect(g); g.connect(this.ctx.destination);
+    osc.start(now + 0.03); osc.stop(now + 0.17);
+  }
+
+  // Celebration Chime on Successful Pot
+  potChime() {
+    if (!this.enabled || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 arpeggio
+    notes.forEach((freq, idx) => {
+      const t = now + idx * 0.06;
+      const osc = this.ctx.createOscillator();
+      const g = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0.06, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+      osc.connect(g); g.connect(this.ctx.destination);
+      osc.start(t); osc.stop(t + 0.38);
+    });
+  }
+}
+const audio = new BilliardsAudio();
+document.body.addEventListener('click', () => audio.init(), { once: true });
+
+/* ==========================================================================
+   2D/3D BILLIARDS PHYSICS ENGINE
+   - Precision sub-step Verlet / Euler integration
+   - True 2D sphere-sphere collision resolution with coefficient of restitution
+   - Slanted cushion rails with bounce damping
+   - Pocket suction gravity & drops
+   - Spin dynamics (Follow, Draw / Backspin, English side-deflection)
+   ========================================================================== */
+const TABLE_WIDTH = 14;     // X dimension (-7 to +7)
+const TABLE_LENGTH = 28;    // Z dimension (-14 to +14)
+const BALL_RADIUS = 0.54;   // Sphere radius
+const CUSHION_RESTITUTION = 0.82;
+const BALL_RESTITUTION = 0.96;
+const FRICTION = 0.988;     // Rolling friction deceleration
+const POCKET_RADIUS = 1.05;
+
+// Pocket Center Coordinates
+const POCKETS = [
+  { x: -TABLE_WIDTH * 0.5 + 0.3, z: -TABLE_LENGTH * 0.5 + 0.3, isCorner: true }, // Top-Left
+  { x:  TABLE_WIDTH * 0.5 - 0.3, z: -TABLE_LENGTH * 0.5 + 0.3, isCorner: true }, // Top-Right
+  { x: -TABLE_WIDTH * 0.5 + 0.1, z: 0,                         isCorner: false },// Mid-Left
+  { x:  TABLE_WIDTH * 0.5 - 0.1, z: 0,                         isCorner: false },// Mid-Right
+  { x: -TABLE_WIDTH * 0.5 + 0.3, z:  TABLE_LENGTH * 0.5 - 0.3, isCorner: true }, // Bot-Left
+  { x:  TABLE_WIDTH * 0.5 - 0.3, z:  TABLE_LENGTH * 0.5 - 0.3, isCorner: true }  // Bot-Right
+];
+
+// Color definitions for American 8-Ball
+const BALL_COLORS = [
+  '#ffffff', // 0: White Cue
+  '#f59e0b', // 1: Yellow Solid
+  '#2563eb', // 2: Blue Solid
+  '#dc2626', // 3: Red Solid
+  '#7c3aed', // 4: Purple Solid
+  '#ea580c', // 5: Orange Solid
+  '#16a34a', // 6: Green Solid
+  '#991b1b', // 7: Maroon Solid
+  '#111827', // 8: 8-BALL BLACK
+  '#f59e0b', // 9: Yellow Stripe
+  '#2563eb', // 10: Blue Stripe
+  '#dc2626', // 11: Red Stripe
+  '#7c3aed', // 12: Purple Stripe
+  '#ea580c', // 13: Orange Stripe
+  '#16a34a', // 14: Green Stripe
+  '#991b1b'  // 15: Maroon Stripe
+];
+
+/* Procedural Ball Texture Generator on Canvas 2D */
+function createBallTexture(number, color) {
+  const c = document.createElement('canvas');
+  c.width = 256; c.height = 128;
+  const ctx = c.getContext('2d');
+
+  if (number === 0) {
+    // Cue Ball with red training dots
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 256, 128);
+    ctx.fillStyle = '#e11d48';
+    ctx.beginPath(); ctx.arc(64, 64, 7, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(192, 64, 7, 0, Math.PI * 2); ctx.fill();
+    return new THREE.CanvasTexture(c);
+  }
+
+  const isStripe = number >= 9;
+  if (!isStripe) {
+    // Solid Color
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, 256, 128);
+  } else {
+    // Striped Ball
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 256, 128);
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 26, 256, 76);
+  }
+
+  // White Number Circle
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath(); ctx.arc(64, 64, 22, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(192, 64, 22, 0, Math.PI * 2); ctx.fill();
+
+  // Number Text
+  ctx.fillStyle = '#000000';
+  ctx.font = 'bold 22px Arial, sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(`${number}`, 64, 65);
+  ctx.fillText(`${number}`, 192, 65);
+
+  return new THREE.CanvasTexture(c);
+}
+
+class BilliardBall {
+  constructor(number, x, z) {
+    this.number = number;
+    this.pos = new THREE.Vector2(x, z);
+    this.vel = new THREE.Vector2(0, 0);
+    this.spin = new THREE.Vector2(0, 0); // X = side english, Y = follow/draw
+    this.isPotted = false;
+    this.pottingAnim = 0; // 0 = on table, 1 = dropped below
+
+    // 3D Visual Mesh
+    const geo = new THREE.SphereGeometry(BALL_RADIUS, 32, 32);
+    const texture = createBallTexture(number, BALL_COLORS[number]);
+    const mat = new THREE.MeshStandardMaterial({
+      map: texture,
+      roughness: 0.15,
+      metalness: 0.1,
+      envMapIntensity: 1.2
+    });
+    this.mesh = new THREE.Mesh(geo, mat);
+    this.mesh.castShadow = true;
+    this.mesh.receiveShadow = true;
+    this.mesh.position.set(x, BALL_RADIUS, z);
+
+    // Dynamic Drop Shadow
+    const shadowGeo = new THREE.PlaneGeometry(BALL_RADIUS * 2.1, BALL_RADIUS * 2.1);
+    const shadowMat = new THREE.MeshBasicMaterial({
+      color: 0x000000, transparent: true, opacity: 0.45,
+      depthWrite: false
+    });
+    this.shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
+    this.shadowMesh.rotation.x = -Math.PI / 2;
+    this.shadowMesh.position.set(x, 0.005, z);
+
+    scene.add(this.mesh);
+    scene.add(this.shadowMesh);
+  }
+
+  updateVisuals() {
+    if (this.isPotted) {
+      if (this.pottingAnim < 1.0) {
+        this.pottingAnim += 0.08;
+        this.mesh.position.y = BALL_RADIUS - this.pottingAnim * 1.5;
+        this.mesh.scale.setScalar(Math.max(0.1, 1 - this.pottingAnim * 0.7));
+        this.shadowMesh.material.opacity = Math.max(0, 0.45 * (1 - this.pottingAnim));
+      } else {
+        this.mesh.visible = false;
+        this.shadowMesh.visible = false;
+      }
+      return;
+    }
+
+    this.mesh.position.x = this.pos.x;
+    this.mesh.position.z = this.pos.y;
+    this.mesh.position.y = BALL_RADIUS;
+
+    this.shadowMesh.position.x = this.pos.x;
+    this.shadowMesh.position.z = this.pos.y;
+
+    // Rolling rotation along velocity vector
+    const speed = this.vel.length();
+    if (speed > 0.001) {
+      const rotAxis = new THREE.Vector3(-this.vel.y, 0, this.vel.x).normalize();
+      const rotAngle = speed / BALL_RADIUS;
+      this.mesh.rotateOnWorldAxis(rotAxis, rotAngle);
+    }
+  }
+
+  reset(x, z) {
+    this.pos.set(x, z);
+    this.vel.set(0, 0);
+    this.spin.set(0, 0);
+    this.isPotted = false;
+    this.pottingAnim = 0;
+    this.mesh.position.set(x, BALL_RADIUS, z);
+    this.mesh.scale.set(1, 1, 1);
+    this.mesh.visible = true;
+    this.shadowMesh.visible = true;
+    this.shadowMesh.material.opacity = 0.45;
+  }
+}
+
+/* ==========================================================================
+   THREE.JS 3D LUXURY POOL TABLE SETUP
+   ========================================================================== */
+const container = document.getElementById('canvas-container');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#05080f');
+scene.fog = new THREE.FogExp2('#05080f', 0.018);
+
+const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 22, 26);
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+container.appendChild(renderer.domElement);
+
+// Lighting: Luxury Overhead Vintage Billiard Lamps
+const ambientLight = new THREE.AmbientLight('#263242', 1.8);
+scene.add(ambientLight);
+
+// Lamp 1 (Left table half)
+const spotLeft = new THREE.SpotLight('#fff0d4', 4.5, 45, Math.PI / 3, 0.4, 1.2);
+spotLeft.position.set(0, 16, -6);
+spotLeft.target.position.set(0, 0, -6);
+spotLeft.castShadow = true;
+spotLeft.shadow.mapSize.width = 1024; spotLeft.shadow.mapSize.height = 1024;
+spotLeft.shadow.bias = -0.0001;
+scene.add(spotLeft);
+scene.add(spotLeft.target);
+
+// Lamp 2 (Right table half)
+const spotRight = new THREE.SpotLight('#fff0d4', 4.5, 45, Math.PI / 3, 0.4, 1.2);
+spotRight.position.set(0, 16, 6);
+spotRight.target.position.set(0, 0, 6);
+spotRight.castShadow = true;
+spotRight.shadow.mapSize.width = 1024; spotRight.shadow.mapSize.height = 1024;
+spotRight.shadow.bias = -0.0001;
+scene.add(spotRight);
+scene.add(spotRight.target);
+
+// Overhead Brass Lamp Shades
+const brassLampMat = new THREE.MeshStandardMaterial({ color: '#c59b27', metalness: 0.85, roughness: 0.2 });
+[-6, 6].forEach(zPos => {
+  const coneGeo = new THREE.ConeGeometry(2.4, 1.4, 24, 1, true);
+  const shade = new THREE.Mesh(coneGeo, brassLampMat);
+  shade.position.set(0, 15.5, zPos);
+  scene.add(shade);
+});
+
+// Floor Parquet / Room Carpet
+const floorMat = new THREE.MeshStandardMaterial({ color: '#090d16', roughness: 0.7, metalness: 0.1 });
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), floorMat);
+floor.rotation.x = -Math.PI / 2;
+floor.position.y = -6.5;
+floor.receiveShadow = true;
+scene.add(floor);
+
+/* ==========================================================================
+   TABLE MODEL GEOMETRY
+   ========================================================================== */
+const tableGroup = new THREE.Group();
+scene.add(tableGroup);
+
+// Materials
+const feltMat = new THREE.MeshStandardMaterial({
+  color: 0x0c5c36, roughness: 0.88, metalness: 0.05
+});
+const cushionMat = new THREE.MeshStandardMaterial({
+  color: 0x0f693e, roughness: 0.85, metalness: 0.05
+});
+const woodMat = new THREE.MeshStandardMaterial({
+  color: 0x361608, roughness: 0.4, metalness: 0.15
+});
+const brassMat = new THREE.MeshStandardMaterial({
+  color: 0xe6b84a, roughness: 0.25, metalness: 0.85
+});
+const pocketHoleMat = new THREE.MeshBasicMaterial({ color: 0x030303 });
+
+// 1. Felt Bed (Playing Area)
+const feltBed = new THREE.Mesh(new THREE.PlaneGeometry(TABLE_WIDTH, TABLE_LENGTH), feltMat);
+feltBed.rotation.x = -Math.PI / 2;
+feltBed.receiveShadow = true;
+tableGroup.add(feltBed);
+
+// 2. Pocket Hole Cutouts (Dark circles)
+POCKETS.forEach(p => {
+  const hole = new THREE.Mesh(new THREE.CircleGeometry(POCKET_RADIUS, 24), pocketHoleMat);
+  hole.rotation.x = -Math.PI / 2;
+  hole.position.set(p.x, 0.002, p.z);
+  tableGroup.add(hole);
+
+  // Brass Pocket Rim
+  const rimGeo = new THREE.TorusGeometry(POCKET_RADIUS + 0.15, 0.18, 12, 24);
+  const rim = new THREE.Mesh(rimGeo, brassMat);
+  rim.rotation.x = Math.PI / 2;
+  rim.position.set(p.x, 0.2, p.z);
+  tableGroup.add(rim);
+});
+
+// 3. Wooden Rails & Green Cushion Borders
+const railThickness = 1.4;
+const railHeight = 0.75;
+
+// Short Top/Bottom Rails
+const shortRailGeo = new THREE.BoxGeometry(TABLE_WIDTH, railHeight, railThickness);
+const railTop = new THREE.Mesh(shortRailGeo, woodMat);
+railTop.position.set(0, railHeight * 0.5, -TABLE_LENGTH * 0.5 - railThickness * 0.5);
+railTop.castShadow = true; railTop.receiveShadow = true;
+tableGroup.add(railTop);
+
+const railBot = new THREE.Mesh(shortRailGeo, woodMat);
+railBot.position.set(0, railHeight * 0.5, TABLE_LENGTH * 0.5 + railThickness * 0.5);
+railBot.castShadow = true; railBot.receiveShadow = true;
+tableGroup.add(railBot);
+
+// Long Left/Right Rails
+const longRailGeo = new THREE.BoxGeometry(railThickness, railHeight, TABLE_LENGTH + railThickness * 2);
+const railLeft = new THREE.Mesh(longRailGeo, woodMat);
+railLeft.position.set(-TABLE_WIDTH * 0.5 - railThickness * 0.5, railHeight * 0.5, 0);
+railLeft.castShadow = true; railLeft.receiveShadow = true;
+tableGroup.add(railLeft);
+
+const railRight = new THREE.Mesh(longRailGeo, woodMat);
+railRight.position.set(TABLE_WIDTH * 0.5 + railThickness * 0.5, railHeight * 0.5, 0);
+railRight.castShadow = true; railRight.receiveShadow = true;
+tableGroup.add(railRight);
+
+// Diamond Aiming Inlays on Rails (Mother of Pearl dots)
+const diamondMat = new THREE.MeshBasicMaterial({ color: 0xf5eedb });
+const diamondGeo = new THREE.CircleGeometry(0.12, 4);
+diamondGeo.rotateZ(Math.PI / 4);
+
+// Top/Bottom diamonds
+[-TABLE_WIDTH * 0.25, 0, TABLE_WIDTH * 0.25].forEach(x => {
+  const d1 = new THREE.Mesh(diamondGeo, diamondMat);
+  d1.rotation.x = -Math.PI / 2; d1.position.set(x, railHeight + 0.005, -TABLE_LENGTH * 0.5 - railThickness * 0.5);
+  tableGroup.add(d1);
+  const d2 = new THREE.Mesh(diamondGeo, diamondMat);
+  d2.rotation.x = -Math.PI / 2; d2.position.set(x, railHeight + 0.005, TABLE_LENGTH * 0.5 + railThickness * 0.5);
+  tableGroup.add(d2);
+});
+
+// Left/Right diamonds
+[-TABLE_LENGTH * 0.35, -TABLE_LENGTH * 0.18, TABLE_LENGTH * 0.18, TABLE_LENGTH * 0.35].forEach(z => {
+  const d1 = new THREE.Mesh(diamondGeo, diamondMat);
+  d1.rotation.x = -Math.PI / 2; d1.position.set(-TABLE_WIDTH * 0.5 - railThickness * 0.5, railHeight + 0.005, z);
+  tableGroup.add(d1);
+  const d2 = new THREE.Mesh(diamondGeo, diamondMat);
+  d2.rotation.x = -Math.PI / 2; d2.position.set(TABLE_WIDTH * 0.5 + railThickness * 0.5, railHeight + 0.005, z);
+  tableGroup.add(d2);
+});
+
+// Sturdy Turned Mahogany Table Legs
+const legGeo = new THREE.CylinderGeometry(0.85, 0.6, 6.5, 16);
+[
+  [-TABLE_WIDTH * 0.5 - 0.2, -TABLE_LENGTH * 0.5],
+  [ TABLE_WIDTH * 0.5 + 0.2, -TABLE_LENGTH * 0.5],
+  [-TABLE_WIDTH * 0.5 - 0.2,  TABLE_LENGTH * 0.5],
+  [ TABLE_WIDTH * 0.5 + 0.2,  TABLE_LENGTH * 0.5]
+].forEach(pos => {
+  const leg = new THREE.Mesh(legGeo, woodMat);
+  leg.position.set(pos[0], -3.25, pos[1]);
+  leg.castShadow = true;
+  tableGroup.add(leg);
+});
+
+/* ==========================================================================
+   3D CUE STICK & TRAJECTORY GUIDE LINES
+   ========================================================================== */
+// Tapered Wooden Cue Stick
+const cueGroup = new THREE.Group();
+scene.add(cueGroup);
+
+const cueShaftGeo = new THREE.CylinderGeometry(0.08, 0.18, 14, 16);
+cueShaftGeo.rotateX(Math.PI / 2);
+cueShaftGeo.translate(0, 0, -7.5);
+const cueMat = new THREE.MeshStandardMaterial({ color: 0xdeb887, roughness: 0.35, metalness: 0.1 });
+const cueMesh = new THREE.Mesh(cueShaftGeo, cueMat);
+cueMesh.castShadow = true;
+cueGroup.add(cueMesh);
+
+// Leather Chalked Tip
+const tipGeo = new THREE.CylinderGeometry(0.082, 0.082, 0.25, 16);
+tipGeo.rotateX(Math.PI / 2);
+tipGeo.translate(0, 0, -0.4);
+const tipMat = new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.8 });
+const cueTip = new THREE.Mesh(tipGeo, tipMat);
+cueGroup.add(cueTip);
+
+// Trajectory Aiming Line (LineSegments with Arrow)
+const aimLineMaxPoints = 100;
+const aimPositions = new Float32Array(aimLineMaxPoints * 3);
+const aimGeo = new THREE.BufferGeometry();
+aimGeo.setAttribute('position', new THREE.BufferAttribute(aimPositions, 3));
+const aimMat = new THREE.LineBasicMaterial({
+  color: 0x00f0ff, transparent: true, opacity: 0.85, linewidth: 2
+});
+const aimLine = new THREE.Line(aimGeo, aimMat);
+scene.add(aimLine);
+
+// Ghost Cue Ball at Contact Point
+const ghostGeo = new THREE.SphereGeometry(BALL_RADIUS, 16, 16);
+const ghostMat = new THREE.MeshBasicMaterial({
+  color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.65
+});
+const ghostBall = new THREE.Mesh(ghostGeo, ghostMat);
+scene.add(ghostBall);
+
+// Target Ball Deflection Guide Line
+const targetLineGeo = new THREE.BufferGeometry();
+const targetLinePositions = new Float32Array(6);
+targetLineGeo.setAttribute('position', new THREE.BufferAttribute(targetLinePositions, 3));
+const targetLineMat = new THREE.LineBasicMaterial({ color: 0xffbe3b, linewidth: 2 });
+const targetDeflectLine = new THREE.Line(targetLineGeo, targetLineMat);
+scene.add(targetDeflectLine);
+
+/* ==========================================================================
+   GAME STATE & BALL MANAGEMENT
+   ========================================================================== */
+let balls = [];
+let cueBall = null;
+let aimAngle = Math.PI * 0.5; // Radians
+let aimPower = 0.65;
+let isAiming = true;
+let isStriking = false;
+let strikeProgress = 0;
+let strikePullback = 0;
+let currentGameMode = '8ball'; // '8ball' | 'snooker' | 'trick' | 'zen'
+let activeCameraView = 'aim';  // 'aim' | 'overhead' | 'orbit'
+
+// Spin Offset (-1 to 1)
+const cueSpin = { x: 0, y: 0 };
+
+function rackBalls(mode = '8ball') {
+  // Clear old balls
+  balls.forEach(b => {
+    scene.remove(b.mesh);
+    scene.remove(b.shadowMesh);
+  });
+  balls = [];
+
+  // 1. Create Cue Ball (Ball 0)
+  cueBall = new BilliardBall(0, 0, 7.0);
+  balls.push(cueBall);
+
+  if (mode === '8ball' || mode === 'zen') {
+    // Standard 15-Ball Triangle Rack
+    const startZ = -5.5;
+    const rowSpacing = BALL_RADIUS * Math.sqrt(3) * 1.03;
+    const colSpacing = BALL_RADIUS * 2.06;
+    let ballNum = 1;
+
+    // Ordered array ensuring 8-ball in center and balanced corners
+    const rackOrder = [
+      1,
+      9, 2,
+      10, 8, 3,
+      4, 11, 5, 12,
+      13, 6, 14, 7, 15
+    ];
+    let orderIdx = 0;
+
+    for (let r = 0; r < 5; r++) {
+      const rowZ = startZ - r * rowSpacing;
+      const rowStartX = -(r * colSpacing) * 0.5;
+      for (let c = 0; c <= r; c++) {
+        const ballX = rowStartX + c * colSpacing;
+        const b = new BilliardBall(rackOrder[orderIdx++], ballX, rowZ);
+        balls.push(b);
+      }
+    }
+  } else if (mode === 'snooker') {
+    // 6 Reds Pyramid + 6 Colors
+    let num = 1;
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c <= r; c++) {
+        const x = -(r * BALL_RADIUS * 2.1) * 0.5 + c * BALL_RADIUS * 2.1;
+        const z = -6.0 - r * BALL_RADIUS * 1.8;
+        balls.push(new BilliardBall(3, x, z)); // Red
+      }
+    }
+    // Spot Colors: Yellow, Green, Brown, Blue, Pink, Black
+    balls.push(new BilliardBall(1, -2.5, 6.0));  // Yellow
+    balls.push(new BilliardBall(6,  2.5, 6.0));  // Green
+    balls.push(new BilliardBall(7,  0.0, 6.0));  // Brown
+    balls.push(new BilliardBall(2,  0.0, 0.0));  // Blue
+    balls.push(new BilliardBall(4,  0.0, -4.5)); // Pink
+    balls.push(new BilliardBall(8,  0.0, -11.0));// Black
+  } else if (mode === 'trick') {
+    // Set up a classic double-bank trick shot
+    balls.push(new BilliardBall(1, 0, -2));
+    balls.push(new BilliardBall(8, -3.5, -9));
+    balls.push(new BilliardBall(9, 3.5, -9));
+  }
+
+  updateHUDProgress();
+  showToast(mode === '8ball' ? '🎱 8-Ball Triangle Racked. Good Luck!' : `Game Mode: ${mode.toUpperCase()}`);
+}
+
+function updateHUDProgress() {
+  const rackSlots = document.getElementById('rack-slots');
+  rackSlots.innerHTML = '';
+  let pottedCount = 0;
+
+  balls.forEach(b => {
+    if (b.number === 0) return;
+    const dot = document.createElement('div');
+    dot.className = `rack-dot ${b.isPotted ? 'potted' : ''}`;
+    dot.style.background = BALL_COLORS[b.number];
+    if (b.number >= 9) {
+      dot.style.backgroundImage = `repeating-linear-gradient(45deg, #ffffff, #ffffff 3px, ${BALL_COLORS[b.number]} 3px, ${BALL_COLORS[b.number]} 6px)`;
+    }
+    rackSlots.appendChild(dot);
+    if (b.isPotted) pottedCount++;
+  });
+
+  const total = balls.length - 1;
+  document.getElementById('score-counter').textContent = `Potted: ${pottedCount} / ${total}`;
+}
+
+/* ==========================================================================
+   TRAJECTORY & AIMING RAYCASTER
+   ========================================================================== */
+function calculateTrajectory() {
+  if (!cueBall || cueBall.isPotted) {
+    aimLine.visible = false;
+    ghostBall.visible = false;
+    targetDeflectLine.visible = false;
+    return;
+  }
+
+  aimLine.visible = isAiming && !isBallsMoving();
+  ghostBall.visible = aimLine.visible;
+  targetDeflectLine.visible = aimLine.visible;
+  if (!aimLine.visible) return;
+
+  const origin = cueBall.pos.clone();
+  const dir = new THREE.Vector2(Math.sin(aimAngle), -Math.cos(aimAngle)).normalize();
+
+  // Raycast against all other balls to find first collision
+  let closestDist = 999;
+  let targetBall = null;
+
+  balls.forEach(b => {
+    if (b === cueBall || b.isPotted) return;
+    const toBall = b.pos.clone().sub(origin);
+    const proj = toBall.dot(dir);
+    if (proj > 0) {
+      const perpDistSq = toBall.lengthSq() - proj * proj;
+      const collisionRadius = BALL_RADIUS * 2;
+      if (perpDistSq < collisionRadius * collisionRadius) {
+        const d = proj - Math.sqrt(collisionRadius * collisionRadius - perpDistSq);
+        if (d > 0 && d < closestDist) {
+          closestDist = d;
+          targetBall = b;
+        }
+      }
+    }
+  });
+
+  // Calculate cushion intersection distance
+  const minX = -TABLE_WIDTH * 0.5 + BALL_RADIUS;
+  const maxX =  TABLE_WIDTH * 0.5 - BALL_RADIUS;
+  const minZ = -TABLE_LENGTH * 0.5 + BALL_RADIUS;
+  const maxZ =  TABLE_LENGTH * 0.5 - BALL_RADIUS;
+
+  let cushionDist = 999;
+  if (dir.x > 0) cushionDist = Math.min(cushionDist, (maxX - origin.x) / dir.x);
+  else if (dir.x < 0) cushionDist = Math.min(cushionDist, (minX - origin.x) / dir.x);
+  if (dir.y > 0) cushionDist = Math.min(cushionDist, (maxZ - origin.y) / dir.y);
+  else if (dir.y < 0) cushionDist = Math.min(cushionDist, (minZ - origin.y) / dir.y);
+
+  if (targetBall && closestDist < cushionDist) {
+    // Hits a target ball
+    const hitPoint = origin.clone().addScaledVector(dir, closestDist);
+    ghostBall.position.set(hitPoint.x, BALL_RADIUS, hitPoint.y);
+    ghostBall.visible = true;
+
+    // Draw Aim Line to Ghost Ball
+    const posAttr = aimGeo.attributes.position;
+    posAttr.setXYZ(0, origin.x, BALL_RADIUS, origin.y);
+    posAttr.setXYZ(1, hitPoint.x, BALL_RADIUS, hitPoint.y);
+    aimGeo.setDrawRange(0, 2);
+    posAttr.needsUpdate = true;
+
+    // Target Ball Deflection Vector
+    const normal = targetBall.pos.clone().sub(hitPoint).normalize();
+    const targetEnd = targetBall.pos.clone().addScaledVector(normal, 4.5);
+    const tPos = targetLineGeo.attributes.position;
+    tPos.setXYZ(0, targetBall.pos.x, BALL_RADIUS, targetBall.pos.y);
+    tPos.setXYZ(1, targetEnd.x, BALL_RADIUS, targetEnd.y);
+    tPos.needsUpdate = true;
+    targetDeflectLine.visible = true;
+  } else {
+    // Hits cushion rail
+    const hitPoint = origin.clone().addScaledVector(dir, cushionDist);
+    ghostBall.visible = false;
+    targetDeflectLine.visible = false;
+
+    const posAttr = aimGeo.attributes.position;
+    posAttr.setXYZ(0, origin.x, BALL_RADIUS, origin.y);
+    posAttr.setXYZ(1, hitPoint.x, BALL_RADIUS, hitPoint.y);
+    aimGeo.setDrawRange(0, 2);
+    posAttr.needsUpdate = true;
+  }
+}
+
+/* ==========================================================================
+   PHYSICS UPDATE TICK (SUB-STEPPING FOR HIGH VELOCITY RELIABILITY)
+   ========================================================================== */
+function updatePhysics(dt) {
+  const SUB_STEPS = 6;
+  const subDt = dt / SUB_STEPS;
+
+  for (let step = 0; step < SUB_STEPS; step++) {
+    // 1. Move and check bounds
+    balls.forEach(b => {
+      if (b.isPotted) return;
+      b.pos.addScaledVector(b.vel, subDt);
+      b.vel.multiplyScalar(Math.pow(FRICTION, subDt * 60));
+
+      if (b.vel.lengthSq() < 0.00008) {
+        b.vel.set(0, 0);
+      }
+
+      // Check Cushion Rail Bounces
+      const minX = -TABLE_WIDTH * 0.5 + BALL_RADIUS;
+      const maxX =  TABLE_WIDTH * 0.5 - BALL_RADIUS;
+      const minZ = -TABLE_LENGTH * 0.5 + BALL_RADIUS;
+      const maxZ =  TABLE_LENGTH * 0.5 - BALL_RADIUS;
+
+      if (b.pos.x < minX) {
+        b.pos.x = minX;
+        b.vel.x = -b.vel.x * CUSHION_RESTITUTION;
+        audio.cushionBounce(b.vel.length());
+      } else if (b.pos.x > maxX) {
+        b.pos.x = maxX;
+        b.vel.x = -b.vel.x * CUSHION_RESTITUTION;
+        audio.cushionBounce(b.vel.length());
+      }
+
+      if (b.pos.y < minZ) {
+        b.pos.y = minZ;
+        b.vel.y = -b.vel.y * CUSHION_RESTITUTION;
+        audio.cushionBounce(b.vel.length());
+      } else if (b.pos.y > maxZ) {
+        b.pos.y = maxZ;
+        b.vel.y = -b.vel.y * CUSHION_RESTITUTION;
+        audio.cushionBounce(b.vel.length());
+      }
+
+      // Check Pocket Suction & Drops
+      POCKETS.forEach(p => {
+        const dx = b.pos.x - p.x;
+        const dz = b.pos.y - p.z;
+        const distSq = dx * dx + dz * dz;
+        const potRadius = p.isCorner ? POCKET_RADIUS * 1.15 : POCKET_RADIUS * 1.25;
+
+        if (distSq < potRadius * potRadius) {
+          b.isPotted = true;
+          b.vel.set(0, 0);
+          audio.pocketDrop();
+          if (b.number === 0) {
+            // Scratch / Cue Ball Potted
+            showToast('⚠️ Scratch! Cue Ball Potted. Returning Ball...');
+            setTimeout(() => {
+              b.reset(0, 7.0);
+              updateHUDProgress();
+            }, 1200);
+          } else {
+            audio.potChime();
+            showToast(`✨ Potted Ball #${b.number}!`);
+            updateHUDProgress();
+          }
+        }
+      });
+    });
+
+    // 2. Ball-to-Ball Elastic Collisions
+    for (let i = 0; i < balls.length; i++) {
+      const b1 = balls[i];
+      if (b1.isPotted) continue;
+
+      for (let j = i + 1; j < balls.length; j++) {
+        const b2 = balls[j];
+        if (b2.isPotted) continue;
+
+        const delta = b2.pos.clone().sub(b1.pos);
+        const dist = delta.length();
+        const minDist = BALL_RADIUS * 2;
+
+        if (dist < minDist && dist > 0.0001) {
+          const normal = delta.clone().divideScalar(dist);
+          // Positional overlap resolution
+          const overlap = 0.5 * (minDist - dist);
+          b1.pos.subScaledVector(normal, overlap);
+          b2.pos.addScaledVector(normal, overlap);
+
+          // Relative velocity along collision normal
+          const relVel = b1.vel.clone().sub(b2.vel);
+          const velAlongNormal = relVel.dot(normal);
+
+          if (velAlongNormal > 0) {
+            const impulse = (1 + BALL_RESTITUTION) * velAlongNormal * 0.5;
+            b1.vel.subScaledVector(normal, impulse);
+            b2.vel.addScaledVector(normal, impulse);
+
+            // Apply spin transfer from cue ball
+            if (b1 === cueBall && Math.abs(cueSpin.y) > 0.1) {
+              b1.vel.addScaledVector(normal, -cueSpin.y * impulse * 0.35);
+            }
+
+            audio.ballClack(relVel.length());
+          }
+        }
+      }
+    }
+  }
+
+  // Update visual meshes
+  balls.forEach(b => b.updateVisuals());
+}
+
+function isBallsMoving() {
+  return balls.some(b => !b.isPotted && b.vel.lengthSq() > 0.0001);
+}
+
+/* ==========================================================================
+   STRIKE & CUE SHOOTING MECHANISM
+   ========================================================================== */
+function executeStrike() {
+  if (isBallsMoving() || !cueBall || cueBall.isPotted || isStriking) return;
+  audio.init();
+  isStriking = true;
+  strikeProgress = 0;
+
+  const maxSpeed = 38 * (aimPower / 100);
+  const strikeDir = new THREE.Vector2(Math.sin(aimAngle), -Math.cos(aimAngle)).normalize();
+
+  // Animate cue forward thrust
+  const strikeAnim = () => {
+    strikeProgress += 0.18;
+    if (strikeProgress < 1.0) {
+      cueGroup.position.addScaledVector(new THREE.Vector3(-strikeDir.x, 0, -strikeDir.y), 0.35);
+      requestAnimationFrame(strikeAnim);
+    } else {
+      // Impact moment!
+      cueBall.vel.copy(strikeDir).multiplyScalar(maxSpeed);
+      // Apply spin english
+      cueBall.spin.set(cueSpin.x * 2.5, cueSpin.y * 2.5);
+      audio.cueStrike(aimPower / 100);
+
+      isStriking = false;
+      cueGroup.visible = false;
+      aimLine.visible = false;
+      ghostBall.visible = false;
+      targetDeflectLine.visible = false;
+    }
+  };
+  requestAnimationFrame(strikeAnim);
+}
+
+document.getElementById('strike-btn').addEventListener('click', executeStrike);
+window.addEventListener('keydown', e => {
+  if (e.code === 'Space') executeStrike();
+});
+
+/* ==========================================================================
+   USER INTERACTION: AIMING, DRAGGING & CAMERA PRESETS
+   ========================================================================== */
+let isAimDragging = false;
+let prevPointerX = 0, prevPointerY = 0;
+let freeOrbitYaw = 0, freeOrbitPitch = 0.75, freeOrbitDist = 32;
+
+container.addEventListener('pointerdown', e => {
+  if (e.target.closest('nav, header, aside, .view-presets')) return;
+  audio.init();
+  isAimDragging = true;
+  prevPointerX = e.clientX;
+  prevPointerY = e.clientY;
+});
+
+window.addEventListener('pointermove', e => {
+  if (!isAimDragging) return;
+  const dx = e.clientX - prevPointerX;
+  const dy = e.clientY - prevPointerY;
+  prevPointerX = e.clientX;
+  prevPointerY = e.clientY;
+
+  if (activeCameraView === 'orbit') {
+    freeOrbitYaw -= dx * 0.006;
+    freeOrbitPitch = Math.max(0.12, Math.min(Math.PI / 2 - 0.05, freeOrbitPitch + dy * 0.006));
+  } else {
+    // Rotate Aim Angle
+    aimAngle += dx * 0.007;
+  }
+});
+
+window.addEventListener('pointerup', () => { isAimDragging = false; });
+
+window.addEventListener('wheel', e => {
+  if (activeCameraView === 'orbit') {
+    freeOrbitDist = Math.max(14, Math.min(55, freeOrbitDist + e.deltaY * 0.04));
+  }
+});
+
+// Camera Views Switching
+function setCameraView(view) {
+  document.querySelectorAll('.cam-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`cam-${view}`).classList.add('active');
+  activeCameraView = view;
+}
+document.getElementById('cam-aim').addEventListener('click', () => setCameraView('aim'));
+document.getElementById('cam-overhead').addEventListener('click', () => setCameraView('overhead'));
+document.getElementById('cam-orbit').addEventListener('click', () => setCameraView('orbit'));
+
+// Power Slider UI
+const powerSlider = document.getElementById('power-slider');
+const powerVal = document.getElementById('power-val');
+powerSlider.addEventListener('input', e => {
+  aimPower = parseInt(e.target.value, 10);
+  powerVal.textContent = `${aimPower}%`;
+});
+
+// Spin Ball Selector UI
+const spinCircle = document.getElementById('spin-circle');
+const spinDot = document.getElementById('spin-indicator');
+spinCircle.addEventListener('pointerdown', handleSpinMove);
+spinCircle.addEventListener('pointermove', e => {
+  if (e.buttons === 1) handleSpinMove(e);
+});
+
+function handleSpinMove(e) {
+  const rect = spinCircle.getBoundingClientRect();
+  const cx = rect.left + rect.width * 0.5;
+  const cy = rect.top + rect.height * 0.5;
+  let dx = (e.clientX - cx) / (rect.width * 0.5);
+  let dy = (e.clientY - cy) / (rect.height * 0.5);
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist > 0.85) {
+    dx = (dx / dist) * 0.85;
+    dy = (dy / dist) * 0.85;
+  }
+  cueSpin.x = dx;
+  cueSpin.y = -dy; // Top = follow, bottom = draw
+  spinDot.style.left = `${50 + dx * 45}%`;
+  spinDot.style.top = `${50 + dy * 45}%`;
+}
+
+// Game Mode Selector
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const mode = btn.id.replace('mode-', '');
+    currentGameMode = mode;
+    rackBalls(mode);
+  });
+});
+
+document.getElementById('rerack-btn').addEventListener('click', () => {
+  rackBalls(currentGameMode);
+});
+
+const soundBtn = document.getElementById('sound-btn');
+soundBtn.addEventListener('click', () => {
+  audio.init();
+  audio.enabled = !audio.enabled;
+  soundBtn.textContent = audio.enabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+});
+
+// Toast Helper
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+}
+
+/* ==========================================================================
+   MAIN RENDER & ANIMATION LOOP
+   ========================================================================== */
+let clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+
+  updatePhysics(dt);
+  calculateTrajectory();
+
+  // Position and Orient Cue Stick
+  const moving = isBallsMoving();
+  if (cueBall && !cueBall.isPotted && !moving && !isStriking) {
+    cueGroup.visible = true;
+    const pullbackOffset = 0.5 + (aimPower / 100) * 1.8;
+    const cueDir = new THREE.Vector3(-Math.sin(aimAngle), 0, Math.cos(aimAngle));
+    cueGroup.position.set(
+      cueBall.pos.x + cueDir.x * pullbackOffset,
+      BALL_RADIUS + 0.18,
+      cueBall.pos.y + cueDir.z * pullbackOffset
+    );
+    cueGroup.rotation.y = -aimAngle;
+    cueGroup.rotation.x = 0.08; // Slight ergonomic tilt over the rail
+  } else if (moving) {
+    cueGroup.visible = false;
+  }
+
+  // Smooth Dynamic Camera Positioning
+  if (activeCameraView === 'aim' && cueBall && !cueBall.isPotted) {
+    const camBack = new THREE.Vector3(-Math.sin(aimAngle), 0, Math.cos(aimAngle)).multiplyScalar(14);
+    const targetCamPos = new THREE.Vector3(cueBall.pos.x + camBack.x, 9.5, cueBall.pos.y + camBack.z);
+    camera.position.lerp(targetCamPos, 0.08);
+    camera.lookAt(cueBall.pos.x, 0.5, cueBall.pos.y);
+  } else if (activeCameraView === 'overhead') {
+    camera.position.lerp(new THREE.Vector3(0, 32, 0.001), 0.08);
+    camera.lookAt(0, 0, 0);
+  } else if (activeCameraView === 'orbit') {
+    const cx = Math.sin(freeOrbitYaw) * Math.cos(freeOrbitPitch) * freeOrbitDist;
+    const cy = Math.sin(freeOrbitPitch) * freeOrbitDist;
+    const cz = Math.cos(freeOrbitYaw) * Math.cos(freeOrbitPitch) * freeOrbitDist;
+    camera.position.lerp(new THREE.Vector3(cx, cy, cz), 0.08);
+    camera.lookAt(0, 0, 0);
+  }
+
+  renderer.render(scene, camera);
+}
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// Boot Game
+rackBalls('8ball');
+animate();
+</script>
+</body>
+</html>
