@@ -1,0 +1,1402 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>NeuroLife 3D — Artificial Life & Neural Evolution Simulator</title>
+<meta name="description" content="Watch real artificial neural networks evolve in 3D. Every organism has a live brain making autonomous decisions. Inspect their firing synapses, trigger cosmic mutations, spawn food, or possess any creature.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@700;800&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030712;
+    --card: rgba(13, 17, 30, 0.75);
+    --border: rgba(255, 255, 255, 0.12);
+    --cyan: #00f0ff;
+    --neon-green: #10f59b;
+    --neon-pink: #ff2a85;
+    --gold: #ffb703;
+    --purple: #8b5cf6;
+    --text: #f3f4f6;
+    --text-muted: rgba(243, 244, 246, 0.55);
+    --mono: "Geist Mono", ui-monospace, monospace;
+    --display: "Funnel Display", sans-serif;
+    --body: "Bricolage Grotesque", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: var(--bg); color: var(--text);
+    font-family: var(--body); touch-action: none;
+  }
+
+  #canvas-container {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    cursor: grab;
+  }
+  #canvas-container:active { cursor: grabbing; }
+
+  /* HUD HEADER */
+  .hud-top {
+    position: absolute; top: 16px; left: 20px; right: 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    pointer-events: none; z-index: 50;
+  }
+  .hud-top > * { pointer-events: auto; }
+
+  .brand {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .home-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--card); border: 1px solid var(--border);
+    padding: 8px 16px; border-radius: 999px; color: var(--text);
+    text-decoration: none; font: 600 13px/1 var(--body);
+    backdrop-filter: blur(16px); transition: all 0.2s;
+  }
+  .home-btn:hover { border-color: var(--cyan); color: #fff; transform: translateY(-1px); }
+  .badge-live {
+    font: 700 10px/1 var(--mono); color: var(--neon-green);
+    background: rgba(16, 245, 155, 0.12); border: 1px solid rgba(16, 245, 155, 0.35);
+    padding: 4px 8px; border-radius: 999px; display: inline-flex; align-items: center; gap: 4px;
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .badge-live::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--neon-green); box-shadow: 0 0 8px var(--neon-green);
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
+
+  .top-stats {
+    display: flex; gap: 10px; background: var(--card);
+    border: 1px solid var(--border); padding: 6px 14px;
+    border-radius: 999px; backdrop-filter: blur(16px);
+    font: 500 12px/1 var(--mono);
+  }
+  .stat-pill { display: flex; align-items: center; gap: 6px; }
+  .stat-label { color: var(--text-muted); font-size: 11px; text-transform: uppercase; }
+  .stat-val { color: #fff; font-weight: 700; }
+
+  /* BRAIN INSPECTOR MODAL (HOLOGRAPHIC DOCK) */
+  .brain-dock {
+    position: absolute; right: 20px; top: 76px; bottom: 85px; width: 340px;
+    background: rgba(10, 14, 26, 0.82); border: 1px solid rgba(0, 240, 255, 0.25);
+    border-radius: 20px; backdrop-filter: blur(20px);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 240, 255, 0.1);
+    display: flex; flex-direction: column; overflow: hidden;
+    z-index: 45; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
+    pointer-events: auto;
+  }
+  .brain-dock.hidden { transform: translateX(380px); opacity: 0; pointer-events: none; }
+
+  .dock-header {
+    padding: 16px 18px 12px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: flex-start;
+  }
+  .dock-title {
+    font: 800 18px/1.1 var(--display); letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff, var(--cyan));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .dock-subtitle { font: 500 11px/1.3 var(--mono); color: var(--text-muted); margin-top: 3px; }
+  .close-dock-btn {
+    background: transparent; border: none; color: var(--text-muted);
+    font-size: 18px; cursor: pointer; padding: 2px 6px; border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .close-dock-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.1); }
+
+  .dock-body {
+    flex: 1; overflow-y: auto; padding: 14px 18px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .dock-body::-webkit-scrollbar { width: 4px; }
+  .dock-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+  .creature-card {
+    background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px; padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    font: 11px/1.3 var(--mono);
+  }
+  .creature-prop { display: flex; flex-direction: column; }
+  .prop-label { color: var(--text-muted); font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .prop-val { color: var(--cyan); font-weight: 700; font-size: 13px; margin-top: 2px; }
+
+  .neural-graph-container {
+    background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(0, 240, 255, 0.2);
+    border-radius: 14px; padding: 10px; position: relative;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .graph-label {
+    position: absolute; top: 8px; left: 10px;
+    font: 700 9px/1 var(--mono); color: var(--cyan); letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  canvas#neural-canvas {
+    width: 100%; height: 210px; border-radius: 8px;
+  }
+
+  .neural-legend {
+    display: flex; justify-content: space-between; width: 100%;
+    margin-top: 6px; font: 500 9px/1 var(--mono); color: var(--text-muted);
+  }
+  .legend-item { display: flex; align-items: center; gap: 4px; }
+  .legend-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  .creature-actions {
+    display: flex; gap: 8px;
+  }
+  .action-btn {
+    flex: 1; padding: 10px; border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border);
+    color: var(--text); font: 700 11px/1 var(--mono); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all 0.2s;
+  }
+  .action-btn:hover { background: rgba(0, 240, 255, 0.15); border-color: var(--cyan); color: #fff; }
+  .action-btn.active { background: var(--cyan); color: #000; border-color: var(--cyan); }
+
+  /* BOTTOM GOD-MODE TOOLBAR */
+  .god-toolbar {
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: rgba(10, 14, 26, 0.85); border: 1px solid var(--border);
+    padding: 8px 14px; border-radius: 999px; backdrop-filter: blur(20px);
+    display: flex; align-items: center; gap: 10px; z-index: 50;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+  }
+  .tool-btn {
+    background: rgba(255, 255, 255, 0.06); border: 1px solid transparent;
+    padding: 8px 14px; border-radius: 999px; color: var(--text);
+    font: 600 12px/1 var(--mono); cursor: pointer;
+    display: flex; align-items: center; gap: 7px; transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tool-btn:hover {
+    background: rgba(255, 255, 255, 0.12); border-color: var(--border);
+    color: #fff; transform: translateY(-2px);
+  }
+  .tool-btn.primary {
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(139, 92, 246, 0.25));
+    border-color: rgba(0, 240, 255, 0.4); color: #fff;
+  }
+  .tool-btn.primary:hover {
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+    border-color: var(--cyan);
+  }
+  .tool-divider { width: 1px; height: 20px; background: var(--border); margin: 0 2px; }
+
+  /* POSSESSION COCKPIT OVERLAY */
+  .possession-hud {
+    position: absolute; top: 80px; left: 50%; transform: translateX(-50%);
+    background: rgba(255, 42, 133, 0.15); border: 1px solid var(--neon-pink);
+    color: #fff; padding: 10px 22px; border-radius: 999px;
+    font: 700 12px/1 var(--mono); backdrop-filter: blur(16px);
+    display: none; align-items: center; gap: 12px; z-index: 55;
+    box-shadow: 0 0 25px rgba(255, 42, 133, 0.35);
+    animation: pulseBorder 1.5s infinite alternate;
+  }
+  @keyframes pulseBorder {
+    0% { border-color: var(--neon-pink); box-shadow: 0 0 15px rgba(255, 42, 133, 0.3); }
+    100% { border-color: #fff; box-shadow: 0 0 30px rgba(255, 42, 133, 0.7); }
+  }
+  .possession-hud.active { display: flex; }
+  .possession-hud span { color: var(--gold); }
+  .exit-possess-btn {
+    background: #ff2a85; color: #fff; border: none; padding: 4px 10px;
+    border-radius: 999px; font: 700 10px/1 var(--mono); cursor: pointer;
+  }
+
+  /* CLICK PROMPT ON LAUNCH */
+  .onboarding-hint {
+    position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%);
+    font: 600 11px/1.4 var(--mono); color: var(--text-muted);
+    background: rgba(0, 0, 0, 0.55); border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 6px 16px; border-radius: 999px; pointer-events: none;
+    backdrop-filter: blur(8px); transition: opacity 0.5s; z-index: 40;
+    text-align: center;
+  }
+  .onboarding-hint.fade { opacity: 0; }
+
+  /* TOAST NOTIFICATION */
+  .toast {
+    position: absolute; top: 76px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: rgba(13, 17, 30, 0.95); border: 1px solid var(--cyan);
+    color: #fff; padding: 8px 18px; border-radius: 999px;
+    font: 600 12px/1 var(--mono); backdrop-filter: blur(16px);
+    opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 60; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  @media (max-width: 768px) {
+    .brain-dock { width: calc(100% - 32px); right: 16px; left: 16px; bottom: 85px; top: auto; height: 50vh; }
+    .god-toolbar { width: calc(100% - 32px); overflow-x: auto; justify-content: flex-start; padding: 8px 12px; }
+    .top-stats { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<!-- TOP NAVIGATION & STATUS -->
+<header class="hud-top">
+  <div class="brand">
+    <a href="index.html" class="home-btn">← <span>AI Smarts</span></a>
+    <div class="badge-live">Neural Sim Online</div>
+  </div>
+  <div class="top-stats">
+    <div class="stat-pill">
+      <span class="stat-label">Pop:</span>
+      <span class="stat-val" id="hud-pop">35</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-label">Gen:</span>
+      <span class="stat-val" id="hud-gen">1</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-label">Food:</span>
+      <span class="stat-val" id="hud-food">60</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-label">Avg Fit:</span>
+      <span class="stat-val" id="hud-fit" style="color:var(--neon-green)">120</span>
+    </div>
+  </div>
+</header>
+
+<!-- POSSESSION COCKPIT OVERLAY -->
+<div class="possession-hud" id="possession-hud">
+  <span>⚡ MIND-JACK ACTIVE</span> Pilot with [W/A/S/D] or [Arrows]
+  <button class="exit-possess-btn" id="exit-possess-btn">EXIT [ESC]</button>
+</div>
+
+<!-- ONBOARDING HINT -->
+<div class="onboarding-hint" id="onboarding-hint">
+  💡 <b>Left-Click</b> to spawn food · <b>Click any creature</b> to inspect its live neural network · <b>Drag</b> to rotate 3D view
+</div>
+
+<!-- TOAST MESSAGE -->
+<div class="toast" id="toast">Cosmic Ray Mutated Population!</div>
+
+<!-- HOLOGRAPHIC BRAIN VISOR DOCK -->
+<aside class="brain-dock hidden" id="brain-dock">
+  <div class="dock-header">
+    <div>
+      <div class="dock-title" id="dock-creature-name">Bio-Synapse #42</div>
+      <div class="dock-subtitle">Real-Time Neural Substrate</div>
+    </div>
+    <button class="close-dock-btn" id="close-dock-btn">✕</button>
+  </div>
+  <div class="dock-body">
+    <div class="creature-card">
+      <div class="creature-prop">
+        <span class="prop-label">Generation</span>
+        <span class="prop-val" id="prop-gen">Gen 3</span>
+      </div>
+      <div class="creature-prop">
+        <span class="prop-label">Energy Level</span>
+        <span class="prop-val" id="prop-energy">84%</span>
+      </div>
+      <div class="creature-prop">
+        <span class="prop-label">Age / Lifespan</span>
+        <span class="prop-val" id="prop-age">24s</span>
+      </div>
+      <div class="creature-prop">
+        <span class="prop-label">Offspring</span>
+        <span class="prop-val" id="prop-offspring">2 Children</span>
+      </div>
+      <div class="creature-prop">
+        <span class="prop-label">Top Speed</span>
+        <span class="prop-val" id="prop-speed">1.4x</span>
+      </div>
+      <div class="creature-prop">
+        <span class="prop-label">Status</span>
+        <span class="prop-val" id="prop-status" style="color:var(--neon-green)">Hunting Plankton</span>
+      </div>
+    </div>
+
+    <div class="neural-graph-container">
+      <span class="graph-label">Active Neural Firing</span>
+      <canvas id="neural-canvas" width="300" height="210"></canvas>
+      <div class="neural-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#00f0ff"></div> 8 Sensors (In)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div> 8 Hidden</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ff2a85"></div> 3 Motors (Out)</div>
+      </div>
+    </div>
+
+    <div class="creature-actions">
+      <button class="action-btn" id="btn-follow">🎥 Follow Cam</button>
+      <button class="action-btn" id="btn-possess">🕹️ Mind-Jack</button>
+      <button class="action-btn" id="btn-clone">🧬 Clone DNA</button>
+    </div>
+  </div>
+</aside>
+
+<!-- GOD-MODE TOOLBAR -->
+<nav class="god-toolbar">
+  <button class="tool-btn primary" id="btn-spawn-food">🌱 Plankton Bloom</button>
+  <button class="tool-btn" id="btn-cosmic-ray">⚡ Mutate Ray</button>
+  <button class="tool-btn" id="btn-apex-predator">🦖 Apex Predator</button>
+  <div class="tool-divider"></div>
+  <button class="tool-btn" id="btn-speed">⏩ Speed: 1x</button>
+  <button class="tool-btn" id="btn-audio">🔊 Sound: ON</button>
+  <button class="tool-btn" id="btn-reset">🔄 Re-Seed</button>
+</nav>
+
+<!-- THREE.JS STANDALONE CDN (CORS-SAFE, NO ES MODULE DEPENDENCY) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+/* ==========================================================================
+   AUDIO SYNTHESIS ENGINE (PROCEDURAL WEB AUDIO)
+   ========================================================================== */
+class AudioEngine {
+  constructor() {
+    this.ctx = null;
+    this.enabled = true;
+  }
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) this.ctx = new AudioCtx();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+  eat() {
+    if (!this.enabled || !this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    osc.type = 'sine';
+    const now = this.ctx.currentTime;
+    osc.frequency.setValueAtTime(520, now);
+    osc.frequency.exponentialRampToValueAtTime(1040, now + 0.12);
+    g.gain.setValueAtTime(0.08, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    osc.connect(g); g.connect(this.ctx.destination);
+    osc.start(now); osc.stop(now + 0.13);
+  }
+  reproduce() {
+    if (!this.enabled || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    [440, 554, 659, 880].forEach((freq, idx) => {
+      const osc = this.ctx.createOscillator();
+      const g = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.04);
+      g.gain.setValueAtTime(0.06, now + idx * 0.04);
+      g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.04 + 0.2);
+      osc.connect(g); g.connect(this.ctx.destination);
+      osc.start(now + idx * 0.04);
+      osc.stop(now + idx * 0.04 + 0.22);
+    });
+  }
+  synapseTick() {
+    if (!this.enabled || !this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    osc.type = 'sine';
+    const now = this.ctx.currentTime;
+    osc.frequency.setValueAtTime(1800 + Math.random() * 400, now);
+    g.gain.setValueAtTime(0.015, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+    osc.connect(g); g.connect(this.ctx.destination);
+    osc.start(now); osc.stop(now + 0.045);
+  }
+  mutation() {
+    if (!this.enabled || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(200, now);
+    osc.frequency.linearRampToValueAtTime(800, now + 0.25);
+    osc.frequency.linearRampToValueAtTime(300, now + 0.45);
+    g.gain.setValueAtTime(0.07, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+    osc.connect(g); g.connect(this.ctx.destination);
+    osc.start(now); osc.stop(now + 0.46);
+  }
+}
+const audio = new AudioEngine();
+document.body.addEventListener('click', () => audio.init(), { once: true });
+
+/* ==========================================================================
+   GENUINE ARTIFICIAL NEURAL NETWORK (DEEP FEEDFORWARD ENGINE)
+   ========================================================================== */
+class NeuralNetwork {
+  constructor(inputCount, hiddenCount, outputCount) {
+    this.inputCount = inputCount;
+    this.hiddenCount = hiddenCount;
+    this.outputCount = outputCount;
+
+    // Weights & Biases
+    this.weightsIH = this.randomMatrix(hiddenCount, inputCount);
+    this.biasH = new Float32Array(hiddenCount);
+    this.weightsHO = this.randomMatrix(outputCount, hiddenCount);
+    this.biasO = new Float32Array(outputCount);
+
+    this.hiddenActivations = new Float32Array(hiddenCount);
+    this.outputActivations = new Float32Array(outputCount);
+    this.lastInputs = new Float32Array(inputCount);
+
+    this.initRandomBiases();
+  }
+
+  randomMatrix(rows, cols) {
+    const mat = [];
+    for (let r = 0; r < rows; r++) {
+      const row = new Float32Array(cols);
+      for (let c = 0; c < cols; c++) {
+        row[c] = (Math.random() * 2 - 1) * Math.sqrt(2 / cols); // He initialization
+      }
+      mat.push(row);
+    }
+    return mat;
+  }
+
+  initRandomBiases() {
+    for (let i = 0; i < this.hiddenCount; i++) this.biasH[i] = (Math.random() * 2 - 1) * 0.2;
+    for (let i = 0; i < this.outputCount; i++) this.biasO[i] = (Math.random() * 2 - 1) * 0.2;
+  }
+
+  forward(inputs) {
+    for (let i = 0; i < this.inputCount; i++) this.lastInputs[i] = inputs[i];
+
+    // Input -> Hidden (Tanh)
+    for (let h = 0; h < this.hiddenCount; h++) {
+      let sum = this.biasH[h];
+      const wRow = this.weightsIH[h];
+      for (let i = 0; i < this.inputCount; i++) {
+        sum += wRow[i] * inputs[i];
+      }
+      this.hiddenActivations[h] = Math.tanh(sum);
+    }
+
+    // Hidden -> Output (Tanh for steering, Sigmoid for burst/reproduce)
+    for (let o = 0; o < this.outputCount; o++) {
+      let sum = this.biasO[o];
+      const wRow = this.weightsHO[o];
+      for (let h = 0; h < this.hiddenCount; h++) {
+        sum += wRow[h] * this.hiddenActivations[h];
+      }
+      // Output 0 = steering angle (-1 to 1: tanh)
+      // Output 1 = forward speed thrust (0 to 1: sigmoid)
+      // Output 2 = reproduce impulse (0 to 1: sigmoid)
+      if (o === 0) {
+        this.outputActivations[o] = Math.tanh(sum);
+      } else {
+        this.outputActivations[o] = 1 / (1 + Math.exp(-sum));
+      }
+    }
+
+    return this.outputActivations;
+  }
+
+  mutate(rate = 0.08, power = 0.35) {
+    // Mutate Input->Hidden
+    for (let r = 0; r < this.hiddenCount; r++) {
+      for (let c = 0; c < this.inputCount; c++) {
+        if (Math.random() < rate) {
+          this.weightsIH[r][c] += (Math.random() * 2 - 1) * power;
+        }
+      }
+      if (Math.random() < rate) this.biasH[r] += (Math.random() * 2 - 1) * power;
+    }
+    // Mutate Hidden->Output
+    for (let r = 0; r < this.outputCount; r++) {
+      for (let c = 0; c < this.hiddenCount; c++) {
+        if (Math.random() < rate) {
+          this.weightsHO[r][c] += (Math.random() * 2 - 1) * power;
+        }
+      }
+      if (Math.random() < rate) this.biasO[r] += (Math.random() * 2 - 1) * power;
+    }
+  }
+
+  clone() {
+    const clone = new NeuralNetwork(this.inputCount, this.hiddenCount, this.outputCount);
+    for (let r = 0; r < this.hiddenCount; r++) {
+      clone.weightsIH[r].set(this.weightsIH[r]);
+      clone.biasH[r] = this.biasH[r];
+    }
+    for (let r = 0; r < this.outputCount; r++) {
+      clone.weightsHO[r].set(this.weightsHO[r]);
+      clone.biasO[r] = this.biasO[r];
+    }
+    return clone;
+  }
+}
+
+/* ==========================================================================
+   THREE.JS SCENE, LIGHTING, ENVIRONMENT
+   ========================================================================== */
+const container = document.getElementById('canvas-container');
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x030712, 0.008);
+
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 75, 85);
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+container.appendChild(renderer.domElement);
+
+// Ambient & Directional Lighting
+const ambientLight = new THREE.AmbientLight(0x0e1830, 2.5);
+scene.add(ambientLight);
+
+const dirLight = new THREE.DirectionalLight(0x00f0ff, 1.2);
+dirLight.position.set(30, 80, 40);
+scene.add(dirLight);
+
+const purpleLight = new THREE.DirectionalLight(0x8b5cf6, 0.8);
+purpleLight.position.set(-40, 50, -40);
+scene.add(purpleLight);
+
+// Holographic Cyber Boundary & Ground Grid
+const ARENA_RADIUS = 75;
+const gridHelper = new THREE.GridHelper(ARENA_RADIUS * 2, 40, 0x00f0ff, 0x14203d);
+gridHelper.position.y = -0.1;
+scene.add(gridHelper);
+
+// Boundary Glow Ring
+const ringGeo = new THREE.RingGeometry(ARENA_RADIUS - 0.4, ARENA_RADIUS + 0.4, 64);
+const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
+const arenaRing = new THREE.Mesh(ringGeo, ringMat);
+arenaRing.rotation.x = Math.PI / 2;
+scene.add(arenaRing);
+
+// Bio Dust Motes (Floating particles)
+const dustCount = 300;
+const dustGeo = new THREE.BufferGeometry();
+const dustPositions = new Float32Array(dustCount * 3);
+for (let i = 0; i < dustCount * 3; i += 3) {
+  dustPositions[i] = (Math.random() - 0.5) * ARENA_RADIUS * 2;
+  dustPositions[i + 1] = Math.random() * 25 + 0.5;
+  dustPositions[i + 2] = (Math.random() - 0.5) * ARENA_RADIUS * 2;
+}
+dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPositions, 3));
+const dustMat = new THREE.PointsMaterial({ color: 0x38efdf, size: 0.7, transparent: true, opacity: 0.35 });
+const dustPoints = new THREE.Points(dustGeo, dustMat);
+scene.add(dustPoints);
+
+/* ==========================================================================
+   SIMULATION ENTITIES: FOOD (PLANKTON)
+   ========================================================================== */
+const foodGeometry = new THREE.SphereGeometry(0.7, 12, 12);
+const foodMaterial = new THREE.MeshStandardMaterial({
+  color: 0x10f59b, emissive: 0x10f59b, emissiveIntensity: 0.8,
+  roughness: 0.2, metalness: 0.1
+});
+
+class Food {
+  constructor(x, z) {
+    this.mesh = new THREE.Mesh(foodGeometry, foodMaterial);
+    this.mesh.position.set(
+      x !== undefined ? x : (Math.random() - 0.5) * (ARENA_RADIUS * 1.6),
+      0.8,
+      z !== undefined ? z : (Math.random() - 0.5) * (ARENA_RADIUS * 1.6)
+    );
+    this.floatOffset = Math.random() * Math.PI * 2;
+    this.mesh.castShadow = true;
+    scene.add(this.mesh);
+  }
+  update(time) {
+    this.mesh.position.y = 0.8 + Math.sin(time * 2 + this.floatOffset) * 0.3;
+  }
+  destroy() {
+    scene.remove(this.mesh);
+  }
+}
+
+/* ==========================================================================
+   SIMULATION ENTITIES: ORGANISM (CREATURE WITH LIVE NEURAL BRAIN)
+   ========================================================================== */
+let creatureIdCounter = 1;
+const sharedBodyGeo = new THREE.ConeGeometry(1.2, 3.2, 8);
+sharedBodyGeo.rotateX(Math.PI / 2); // Point forward along +Z
+
+class Creature {
+  constructor(x, z, brain, generation = 1) {
+    this.id = creatureIdCounter++;
+    this.generation = generation;
+    this.age = 0;
+    this.energy = 100;
+    this.maxEnergy = 160;
+    this.offspringCount = 0;
+    this.isDead = false;
+
+    // Movement
+    this.pos = new THREE.Vector3(
+      x !== undefined ? x : (Math.random() - 0.5) * 60,
+      1.2,
+      z !== undefined ? z : (Math.random() - 0.5) * 60
+    );
+    this.heading = Math.random() * Math.PI * 2;
+    this.velocity = 0;
+    this.turnRate = 0;
+    this.tailPhase = Math.random() * 10;
+
+    // Neural Network: 8 Inputs, 8 Hidden, 3 Outputs
+    this.brain = brain ? brain.clone() : new NeuralNetwork(8, 8, 3);
+
+    // 3D Visual Mesh Group
+    this.group = new THREE.Group();
+    this.group.position.copy(this.pos);
+    this.group.userData = { creature: this };
+
+    // Body Mesh (Bioluminescent cone / manta shape)
+    const hue = (this.generation * 45) % 360;
+    this.matColor = new THREE.Color(`hsl(${hue}, 85%, 60%)`);
+    this.bodyMat = new THREE.MeshStandardMaterial({
+      color: this.matColor,
+      emissive: this.matColor,
+      emissiveIntensity: 0.45,
+      roughness: 0.3,
+      metalness: 0.2
+    });
+    this.bodyMesh = new THREE.Mesh(sharedBodyGeo, this.bodyMat);
+    this.group.add(this.bodyMesh);
+
+    // Glowing Eyes / Sensors
+    const eyeGeo = new THREE.SphereGeometry(0.32, 8, 8);
+    const eyeMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
+    const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
+    eyeL.position.set(0.65, 0.3, 0.8);
+    const eyeR = new THREE.Mesh(eyeGeo, eyeMat);
+    eyeR.position.set(-0.65, 0.3, 0.8);
+    this.group.add(eyeL);
+    this.group.add(eyeR);
+
+    // Undulating Spine/Tail Segments
+    this.tailSegments = [];
+    const tailSegCount = 3;
+    for (let i = 0; i < tailSegCount; i++) {
+      const segGeo = new THREE.SphereGeometry(0.6 - i * 0.15, 6, 6);
+      const segMesh = new THREE.Mesh(segGeo, this.bodyMat);
+      segMesh.position.set(0, 0, -1.2 - i * 0.8);
+      this.group.add(segMesh);
+      this.tailSegments.push(segMesh);
+    }
+
+    scene.add(this.group);
+  }
+
+  sense(foods, predators) {
+    // 8 Inputs:
+    // 0: Distance to nearest food (normalized 0-1)
+    // 1: Relative angle to nearest food (-1 to 1)
+    // 2: Distance to nearest predator (normalized 0-1)
+    // 3: Relative angle to nearest predator (-1 to 1)
+    // 4: Wall proximity (0 = far, 1 = touching arena bound)
+    // 5: Wall angle relative to heading
+    // 6: Current Energy (normalized 0-1)
+    // 7: Periodic biological clock pulse (sin wave)
+
+    let closestFoodDist = 999;
+    let closestFoodAngle = 0;
+    for (let f of foods) {
+      const dx = f.mesh.position.x - this.pos.x;
+      const dz = f.mesh.position.z - this.pos.z;
+      const dist = Math.sqrt(dx * dx + dz * dz);
+      if (dist < closestFoodDist) {
+        closestFoodDist = dist;
+        const targetAngle = Math.atan2(dx, dz);
+        let diff = targetAngle - this.heading;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        closestFoodAngle = diff / Math.PI;
+      }
+    }
+    const normFoodDist = Math.max(0, 1 - closestFoodDist / 60);
+
+    let closestPredDist = 999;
+    let closestPredAngle = 0;
+    for (let p of predators) {
+      const dx = p.mesh.position.x - this.pos.x;
+      const dz = p.mesh.position.z - this.pos.z;
+      const dist = Math.sqrt(dx * dx + dz * dz);
+      if (dist < closestPredDist) {
+        closestPredDist = dist;
+        const targetAngle = Math.atan2(dx, dz);
+        let diff = targetAngle - this.heading;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        closestPredAngle = diff / Math.PI;
+      }
+    }
+    const normPredDist = Math.max(0, 1 - closestPredDist / 40);
+
+    // Wall proximity
+    const centerDist = Math.sqrt(this.pos.x * this.pos.x + this.pos.z * this.pos.z);
+    const wallProximity = Math.max(0, (centerDist - (ARENA_RADIUS - 15)) / 15);
+    const wallAngle = Math.atan2(-this.pos.x, -this.pos.z) - this.heading;
+
+    return [
+      normFoodDist,
+      closestFoodAngle,
+      normPredDist,
+      closestPredAngle,
+      wallProximity,
+      Math.sin(wallAngle),
+      this.energy / this.maxEnergy,
+      Math.sin(this.age * 3)
+    ];
+  }
+
+  update(delta, foods, predators, isPossessed = false, manualInputs = null) {
+    this.age += delta;
+    this.tailPhase += delta * 8;
+
+    let steer = 0;
+    let thrust = 0.5;
+    let wantReproduce = 0;
+
+    if (isPossessed && manualInputs) {
+      steer = manualInputs.steer;
+      thrust = manualInputs.thrust;
+    } else {
+      // Run Brain Forward Propagation
+      const inputs = this.sense(foods, predators);
+      const outputs = this.brain.forward(inputs);
+      steer = outputs[0];           // -1 (left) to +1 (right)
+      thrust = outputs[1];          // 0 to 1
+      wantReproduce = outputs[2];   // 0 to 1
+    }
+
+    // Apply Physics & Steering
+    this.heading += steer * 3.8 * delta;
+    this.velocity = (thrust * 14 + 2) * delta;
+    this.pos.x += Math.sin(this.heading) * this.velocity;
+    this.pos.z += Math.cos(this.heading) * this.velocity;
+
+    // Bounds containment (bounce back inside arena softly)
+    const distFromCenter = Math.sqrt(this.pos.x * this.pos.x + this.pos.z * this.pos.z);
+    if (distFromCenter > ARENA_RADIUS - 2) {
+      const normalAngle = Math.atan2(-this.pos.x, -this.pos.z);
+      this.heading = normalAngle + (Math.random() - 0.5) * 0.5;
+      this.pos.x = Math.sin(-normalAngle) * (ARENA_RADIUS - 2.5);
+      this.pos.z = Math.cos(-normalAngle) * (ARENA_RADIUS - 2.5);
+    }
+
+    // Energy Metabolism
+    const energyBurn = (0.05 + thrust * 0.08) * 60 * delta;
+    this.energy -= energyBurn;
+    if (this.energy <= 0) {
+      this.die();
+      return;
+    }
+
+    // Feeding Check
+    for (let i = foods.length - 1; i >= 0; i--) {
+      const f = foods[i];
+      const dx = f.mesh.position.x - this.pos.x;
+      const dz = f.mesh.position.z - this.pos.z;
+      if (dx * dx + dz * dz < 4.5) {
+        // Ate food!
+        this.energy = Math.min(this.maxEnergy, this.energy + 45);
+        f.destroy();
+        foods.splice(i, 1);
+        audio.eat();
+        // Emissive Flash
+        this.bodyMat.emissiveIntensity = 1.4;
+        break;
+      }
+    }
+
+    // Natural Reproduction (Sufficient energy & biological maturity)
+    if (this.energy > 125 && this.age > 4 && (wantReproduce > 0.65 || isPossessed)) {
+      this.energy -= 65;
+      this.offspringCount++;
+      const childBrain = this.brain.clone();
+      childBrain.mutate(0.12, 0.4);
+      const child = new Creature(
+        this.pos.x + (Math.random() - 0.5) * 3,
+        this.pos.z + (Math.random() - 0.5) * 3,
+        childBrain,
+        this.generation + 1
+      );
+      creatures.push(child);
+      audio.reproduce();
+      showToast(`✨ Gen ${child.generation} Organism Born!`);
+    }
+
+    // Smooth Mesh Transforms
+    this.group.position.x = this.pos.x;
+    this.group.position.z = this.pos.z;
+    this.group.rotation.y = this.heading;
+    this.group.rotation.z = -steer * 0.35; // Bank roll on turns
+
+    // Tail swimming wave
+    this.tailSegments.forEach((seg, idx) => {
+      seg.position.x = Math.sin(this.tailPhase - idx * 0.8) * (0.35 + idx * 0.2);
+    });
+
+    // Dim emissive flash back to resting glow
+    if (this.bodyMat.emissiveIntensity > 0.45) {
+      this.bodyMat.emissiveIntensity = Math.max(0.45, this.bodyMat.emissiveIntensity - delta * 2);
+    }
+  }
+
+  die() {
+    this.isDead = true;
+    scene.remove(this.group);
+  }
+}
+
+/* ==========================================================================
+   SIMULATION ENTITIES: APEX PREDATOR (TERRIFYING CRIMSON HUNTER)
+   ========================================================================== */
+const predGeo = new THREE.DodecahedronGeometry(2.2, 0);
+predGeo.scale(1, 0.65, 1.8);
+const predMat = new THREE.MeshStandardMaterial({
+  color: 0xff1e56, emissive: 0xff0044, emissiveIntensity: 0.8,
+  roughness: 0.1, metalness: 0.8
+});
+
+class ApexPredator {
+  constructor(x, z) {
+    this.mesh = new THREE.Mesh(predGeo, predMat);
+    this.pos = new THREE.Vector3(x || 0, 1.6, z || 0);
+    this.heading = Math.random() * Math.PI * 2;
+    this.mesh.position.copy(this.pos);
+    scene.add(this.mesh);
+  }
+  update(delta, preyList) {
+    // Hunt nearest prey
+    let closestPrey = null;
+    let closestDist = 999;
+    for (let p of preyList) {
+      if (p.isDead) continue;
+      const dx = p.pos.x - this.pos.x;
+      const dz = p.pos.z - this.pos.z;
+      const dist = Math.sqrt(dx * dx + dz * dz);
+      if (dist < closestDist) {
+        closestDist = dist;
+        closestPrey = p;
+      }
+    }
+
+    let targetAngle = this.heading;
+    let speed = 9 * delta;
+
+    if (closestPrey) {
+      targetAngle = Math.atan2(closestPrey.pos.x - this.pos.x, closestPrey.pos.z - this.pos.z);
+      if (closestDist < 3.2) {
+        // Devour prey!
+        closestPrey.die();
+        showToast(`💥 Predator hunted Gen ${closestPrey.generation} Bio-Bot!`);
+      }
+    } else {
+      targetAngle += (Math.random() - 0.5) * 0.2;
+    }
+
+    // Turn toward prey
+    let diff = targetAngle - this.heading;
+    while (diff > Math.PI) diff -= Math.PI * 2;
+    while (diff < -Math.PI) diff += Math.PI * 2;
+    this.heading += diff * 4.0 * delta;
+
+    this.pos.x += Math.sin(this.heading) * speed;
+    this.pos.z += Math.cos(this.heading) * speed;
+
+    // Arena boundary clamp
+    const d = Math.sqrt(this.pos.x * this.pos.x + this.pos.z * this.pos.z);
+    if (d > ARENA_RADIUS - 4) {
+      this.heading = Math.atan2(-this.pos.x, -this.pos.z);
+    }
+
+    this.mesh.position.copy(this.pos);
+    this.mesh.rotation.y = this.heading;
+  }
+  destroy() {
+    scene.remove(this.mesh);
+  }
+}
+
+/* ==========================================================================
+   SIMULATION POPULATION & WORLD MANAGER
+   ========================================================================== */
+let creatures = [];
+let foods = [];
+let predators = [];
+let simSpeed = 1.0;
+let inspectedCreature = null;
+let followCamEnabled = false;
+let possessedCreature = null;
+
+const manualKeys = {
+  forward: false, backward: false, left: false, right: false
+};
+
+function seedWorld(popSize = 35, foodCount = 65) {
+  // Clear old entities
+  creatures.forEach(c => c.die());
+  foods.forEach(f => f.destroy());
+  predators.forEach(p => p.destroy());
+  creatures = [];
+  foods = [];
+  predators = [];
+  inspectedCreature = null;
+  possessedCreature = null;
+  document.getElementById('brain-dock').classList.add('hidden');
+  document.getElementById('possession-hud').classList.remove('active');
+
+  for (let i = 0; i < popSize; i++) {
+    creatures.push(new Creature());
+  }
+  for (let i = 0; i < foodCount; i++) {
+    foods.push(new Food());
+  }
+}
+
+/* ==========================================================================
+   2D NEURAL NETWORK VISUALIZER (HOLOGRAPHIC SYNAPSE VISOR)
+   ========================================================================== */
+const nCanvas = document.getElementById('neural-canvas');
+const nCtx = nCanvas.getContext('2d');
+
+function renderNeuralGraph(creature) {
+  const w = nCanvas.width;
+  const h = nCanvas.height;
+  nCtx.clearRect(0, 0, w, h);
+
+  if (!creature || creature.isDead) return;
+  const net = creature.brain;
+
+  // Node Positions
+  const layerX = [35, w * 0.5, w - 35];
+  const inputY = [];
+  for (let i = 0; i < net.inputCount; i++) {
+    inputY.push(25 + (i * (h - 50)) / (net.inputCount - 1));
+  }
+  const hiddenY = [];
+  for (let hIdx = 0; hIdx < net.hiddenCount; hIdx++) {
+    hiddenY.push(25 + (hIdx * (h - 50)) / (net.hiddenCount - 1));
+  }
+  const outputY = [];
+  for (let o = 0; o < net.outputCount; o++) {
+    outputY.push(45 + (o * (h - 90)) / (net.outputCount - 1));
+  }
+
+  // Draw Weights: Input -> Hidden
+  for (let r = 0; r < net.hiddenCount; r++) {
+    for (let c = 0; c < net.inputCount; c++) {
+      const weight = net.weightsIH[r][c];
+      const activity = Math.abs(net.lastInputs[c]);
+      if (Math.abs(weight) < 0.15) continue;
+
+      nCtx.beginPath();
+      nCtx.moveTo(layerX[0], inputY[c]);
+      nCtx.lineTo(layerX[1], hiddenY[r]);
+      nCtx.strokeStyle = weight > 0
+        ? `rgba(0, 240, 255, ${Math.min(0.85, Math.abs(weight) * 0.6 + activity * 0.3)})`
+        : `rgba(255, 42, 133, ${Math.min(0.85, Math.abs(weight) * 0.6 + activity * 0.3)})`;
+      nCtx.lineWidth = Math.min(2.5, Math.abs(weight) * 1.5);
+      nCtx.stroke();
+    }
+  }
+
+  // Draw Weights: Hidden -> Output
+  for (let r = 0; r < net.outputCount; r++) {
+    for (let c = 0; c < net.hiddenCount; c++) {
+      const weight = net.weightsHO[r][c];
+      const act = Math.abs(net.hiddenActivations[c]);
+      if (Math.abs(weight) < 0.15) continue;
+
+      nCtx.beginPath();
+      nCtx.moveTo(layerX[1], hiddenY[c]);
+      nCtx.lineTo(layerX[2], outputY[r]);
+      nCtx.strokeStyle = weight > 0
+        ? `rgba(0, 240, 255, ${Math.min(0.85, Math.abs(weight) * 0.6 + act * 0.3)})`
+        : `rgba(255, 42, 133, ${Math.min(0.85, Math.abs(weight) * 0.6 + act * 0.3)})`;
+      nCtx.lineWidth = Math.min(2.5, Math.abs(weight) * 1.5);
+      nCtx.stroke();
+    }
+  }
+
+  // Draw Input Nodes
+  const inLabels = ['FoodDist', 'FoodAng', 'PredDist', 'PredAng', 'WallDist', 'WallAng', 'Energy', 'Clock'];
+  inputY.forEach((y, i) => {
+    const val = net.lastInputs[i] || 0;
+    nCtx.beginPath();
+    nCtx.arc(layerX[0], y, 5.5, 0, Math.PI * 2);
+    nCtx.fillStyle = `rgba(0, 240, 255, ${0.3 + Math.abs(val) * 0.7})`;
+    nCtx.fill();
+    nCtx.strokeStyle = '#fff';
+    nCtx.lineWidth = 1;
+    nCtx.stroke();
+
+    nCtx.fillStyle = '#a1a8c0';
+    nCtx.font = '7px monospace';
+    nCtx.fillText(inLabels[i], layerX[0] + 9, y + 2.5);
+  });
+
+  // Draw Hidden Nodes
+  hiddenY.forEach((y, hIdx) => {
+    const act = net.hiddenActivations[hIdx] || 0;
+    nCtx.beginPath();
+    nCtx.arc(layerX[1], y, 5, 0, Math.PI * 2);
+    nCtx.fillStyle = act > 0 ? `rgba(139, 92, 246, ${0.4 + act * 0.6})` : `rgba(255, 42, 133, ${0.4 + Math.abs(act) * 0.6})`;
+    nCtx.fill();
+    nCtx.strokeStyle = '#8b5cf6';
+    nCtx.lineWidth = 1;
+    nCtx.stroke();
+  });
+
+  // Draw Output Nodes
+  const outLabels = ['Steer', 'Thrust', 'Mate'];
+  outputY.forEach((y, o) => {
+    const act = net.outputActivations[o] || 0;
+    nCtx.beginPath();
+    nCtx.arc(layerX[2], y, 6.5, 0, Math.PI * 2);
+    nCtx.fillStyle = `rgba(16, 245, 155, ${0.4 + Math.abs(act) * 0.6})`;
+    nCtx.fill();
+    nCtx.strokeStyle = '#fff';
+    nCtx.lineWidth = 1.2;
+    nCtx.stroke();
+
+    nCtx.fillStyle = '#10f59b';
+    nCtx.font = '8px monospace';
+    nCtx.fillText(outLabels[o], layerX[2] - 38, y + 3);
+  });
+}
+
+/* ==========================================================================
+   INTERACTIONS & RAYCASTING
+   ========================================================================== */
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+let isDragging3D = false;
+let prevMouseX = 0;
+let prevMouseY = 0;
+let cameraYaw = 0;
+let cameraPitch = 0.65;
+let cameraDist = 110;
+
+window.addEventListener('mousedown', (e) => {
+  if (e.target.closest('header, aside, nav, .possession-hud, .home-btn')) return;
+  isDragging3D = true;
+  prevMouseX = e.clientX;
+  prevMouseY = e.clientY;
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!isDragging3D) return;
+  const dx = e.clientX - prevMouseX;
+  const dy = e.clientY - prevMouseY;
+  prevMouseX = e.clientX;
+  prevMouseY = e.clientY;
+
+  cameraYaw -= dx * 0.006;
+  cameraPitch = Math.max(0.12, Math.min(Math.PI / 2 - 0.05, cameraPitch + dy * 0.006));
+});
+
+window.addEventListener('mouseup', () => { isDragging3D = false; });
+
+window.addEventListener('wheel', (e) => {
+  if (e.target.closest('aside')) return;
+  cameraDist = Math.max(30, Math.min(180, cameraDist + e.deltaY * 0.08));
+});
+
+// Single Click: Raycast click on creatures or spawn food on arena plane
+container.addEventListener('click', (e) => {
+  document.getElementById('onboarding-hint').classList.add('fade');
+  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+
+  // Check creature click
+  const creatureMeshes = creatures.map(c => c.bodyMesh);
+  const hits = raycaster.intersectObjects(creatureMeshes);
+  if (hits.length > 0) {
+    const clickedCreature = hits[0].object.parent.userData.creature;
+    if (clickedCreature) {
+      inspectCreature(clickedCreature);
+      audio.synapseTick();
+      return;
+    }
+  }
+
+  // Else: Spawn food drop on ground
+  const planeGeo = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+  const targetPoint = new THREE.Vector3();
+  if (raycaster.ray.intersectPlane(planeGeo, targetPoint)) {
+    if (targetPoint.length() < ARENA_RADIUS) {
+      for (let i = 0; i < 3; i++) {
+        foods.push(new Food(
+          targetPoint.x + (Math.random() - 0.5) * 3,
+          targetPoint.z + (Math.random() - 0.5) * 3
+        ));
+      }
+      audio.eat();
+      showToast('🌱 Dispersed Plankton Cluster!');
+    }
+  }
+});
+
+function inspectCreature(c) {
+  inspectedCreature = c;
+  const dock = document.getElementById('brain-dock');
+  dock.classList.remove('hidden');
+  document.getElementById('dock-creature-name').textContent = `Bio-Synapse #${c.id}`;
+  document.getElementById('prop-gen').textContent = `Gen ${c.generation}`;
+  document.getElementById('prop-offspring').textContent = `${c.offspringCount} Children`;
+  document.getElementById('btn-follow').classList.toggle('active', followCamEnabled);
+}
+
+/* ==========================================================================
+   KEYBOARD CONTROLS FOR POSSESSION
+   ========================================================================== */
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'w' || e.key === 'ArrowUp') manualKeys.forward = true;
+  if (e.key === 's' || e.key === 'ArrowDown') manualKeys.backward = true;
+  if (e.key === 'a' || e.key === 'ArrowLeft') manualKeys.left = true;
+  if (e.key === 'd' || e.key === 'ArrowRight') manualKeys.right = true;
+  if (e.key === 'Escape' && possessedCreature) {
+    exitPossession();
+  }
+});
+
+window.addEventListener('keyup', (e) => {
+  if (e.key === 'w' || e.key === 'ArrowUp') manualKeys.forward = false;
+  if (e.key === 's' || e.key === 'ArrowDown') manualKeys.backward = false;
+  if (e.key === 'a' || e.key === 'ArrowLeft') manualKeys.left = false;
+  if (e.key === 'd' || e.key === 'ArrowRight') manualKeys.right = false;
+});
+
+function exitPossession() {
+  possessedCreature = null;
+  document.getElementById('possession-hud').classList.remove('active');
+  document.getElementById('btn-possess').classList.remove('active');
+  showToast('Mind-Jack Disengaged. AI Resumed.');
+}
+
+/* ==========================================================================
+   UI BUTTONS & GOD MODE HANDLERS
+   ========================================================================== */
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+}
+
+document.getElementById('close-dock-btn').addEventListener('click', () => {
+  document.getElementById('brain-dock').classList.add('hidden');
+  inspectedCreature = null;
+  followCamEnabled = false;
+});
+
+document.getElementById('btn-follow').addEventListener('click', () => {
+  followCamEnabled = !followCamEnabled;
+  document.getElementById('btn-follow').classList.toggle('active', followCamEnabled);
+});
+
+document.getElementById('btn-possess').addEventListener('click', () => {
+  if (!inspectedCreature || inspectedCreature.isDead) return;
+  possessedCreature = inspectedCreature;
+  followCamEnabled = true;
+  document.getElementById('possession-hud').classList.add('active');
+  document.getElementById('btn-possess').classList.add('active');
+  showToast('⚡ Mind-Jack Connected! Steering AI Creature');
+});
+
+document.getElementById('exit-possess-btn').addEventListener('click', exitPossession);
+
+document.getElementById('btn-clone').addEventListener('click', () => {
+  if (!inspectedCreature || inspectedCreature.isDead) return;
+  const cloneBrain = inspectedCreature.brain.clone();
+  cloneBrain.mutate(0.05, 0.2);
+  const clone = new Creature(
+    inspectedCreature.pos.x + 2,
+    inspectedCreature.pos.z + 2,
+    cloneBrain,
+    inspectedCreature.generation
+  );
+  creatures.push(clone);
+  audio.reproduce();
+  showToast(`🧬 Cloned Gen ${clone.generation} DNA!`);
+});
+
+document.getElementById('btn-spawn-food').addEventListener('click', () => {
+  for (let i = 0; i < 20; i++) foods.push(new Food());
+  audio.eat();
+  showToast('🌱 20 Plankton Spores Spawned!');
+});
+
+document.getElementById('btn-cosmic-ray').addEventListener('click', () => {
+  creatures.forEach(c => c.brain.mutate(0.35, 0.8));
+  audio.mutation();
+  showToast('⚡ Cosmic Radiation Hyper-Mutated All Brains!');
+});
+
+document.getElementById('btn-apex-predator').addEventListener('click', () => {
+  predators.push(new ApexPredator((Math.random() - 0.5) * 40, (Math.random() - 0.5) * 40));
+  showToast('🦖 Apex Hunter Introduced to Ocean!');
+});
+
+const speedBtn = document.getElementById('btn-speed');
+speedBtn.addEventListener('click', () => {
+  if (simSpeed === 1.0) { simSpeed = 2.5; speedBtn.textContent = '⏩ Speed: 2.5x'; }
+  else if (simSpeed === 2.5) { simSpeed = 5.0; speedBtn.textContent = '⏩ Speed: 5x'; }
+  else { simSpeed = 1.0; speedBtn.textContent = '⏩ Speed: 1x'; }
+  showToast(`Simulation speed: ${simSpeed}x`);
+});
+
+const soundBtn = document.getElementById('btn-audio');
+soundBtn.addEventListener('click', () => {
+  audio.init();
+  audio.enabled = !audio.enabled;
+  soundBtn.textContent = audio.enabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+});
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+  seedWorld(35, 65);
+  showToast('🔄 Ecosystem Re-Seeded with Gen 1 Specimen');
+});
+
+/* ==========================================================================
+   MAIN SIMULATION LOOP
+   ========================================================================== */
+let clock = new THREE.Clock();
+let totalSimTime = 0;
+
+function animate() {
+  requestAnimationFrame(animate);
+  const rawDelta = clock.getDelta();
+  const delta = Math.min(rawDelta, 0.1) * simSpeed;
+  totalSimTime += delta;
+
+  // Auto-replenish food if depleted
+  if (foods.length < 25) {
+    foods.push(new Food());
+  }
+
+  // Prevent full extinction
+  if (creatures.length < 12) {
+    // Spawn offspring or new ancestor
+    const bestSurvivor = creatures.reduce((prev, curr) => (curr.energy > prev.energy ? curr : prev), creatures[0]);
+    const brain = bestSurvivor ? bestSurvivor.brain.clone() : null;
+    if (brain) brain.mutate(0.2, 0.5);
+    creatures.push(new Creature(
+      (Math.random() - 0.5) * 30,
+      (Math.random() - 0.5) * 30,
+      brain,
+      bestSurvivor ? bestSurvivor.generation : 1
+    ));
+  }
+
+  // Update Foods
+  for (let f of foods) f.update(totalSimTime);
+
+  // Update Predators
+  for (let p of predators) p.update(delta, creatures);
+
+  // Prepare manual inputs if possessed
+  let manualInputObj = null;
+  if (possessedCreature && !possessedCreature.isDead) {
+    let steer = 0;
+    let thrust = 0.5;
+    if (manualKeys.left) steer -= 1;
+    if (manualKeys.right) steer += 1;
+    if (manualKeys.forward) thrust = 1.0;
+    if (manualKeys.backward) thrust = 0.1;
+    manualInputObj = { steer, thrust };
+  } else if (possessedCreature && possessedCreature.isDead) {
+    exitPossession();
+  }
+
+  // Update Creatures
+  for (let i = creatures.length - 1; i >= 0; i--) {
+    const c = creatures[i];
+    const isPossessed = (c === possessedCreature);
+    c.update(delta, foods, predators, isPossessed, manualInputObj);
+    if (c.isDead) {
+      creatures.splice(i, 1);
+    }
+  }
+
+  // Update HUD Metrics
+  document.getElementById('hud-pop').textContent = creatures.length;
+  document.getElementById('hud-food').textContent = foods.length;
+  const maxGen = creatures.reduce((acc, c) => Math.max(acc, c.generation), 1);
+  document.getElementById('hud-gen').textContent = maxGen;
+  const avgFit = creatures.length
+    ? Math.round(creatures.reduce((acc, c) => acc + c.energy, 0) / creatures.length)
+    : 0;
+  document.getElementById('hud-fit').textContent = avgFit;
+
+  // Update Inspected Creature Dock
+  if (inspectedCreature) {
+    if (inspectedCreature.isDead) {
+      document.getElementById('prop-status').textContent = 'Deceased / Starved';
+      document.getElementById('prop-status').style.color = '#ff2a85';
+      document.getElementById('prop-energy').textContent = '0%';
+    } else {
+      document.getElementById('prop-energy').textContent = `${Math.round(inspectedCreature.energy)}%`;
+      document.getElementById('prop-age').textContent = `${Math.round(inspectedCreature.age)}s`;
+      document.getElementById('prop-status').textContent = inspectedCreature === possessedCreature
+        ? '⚡ Mind-Jack Controlled'
+        : (inspectedCreature.energy > 120 ? 'Fertile / Seeking Mate' : 'Hunting Plankton');
+      document.getElementById('prop-status').style.color = inspectedCreature === possessedCreature ? '#ffb703' : '#10f59b';
+    }
+    renderNeuralGraph(inspectedCreature);
+  }
+
+  // Camera Control & Smooth Follow
+  if (followCamEnabled && (inspectedCreature || possessedCreature)) {
+    const target = possessedCreature || inspectedCreature;
+    if (target && !target.isDead) {
+      const targetPos = target.pos;
+      camera.position.lerp(
+        new THREE.Vector3(
+          targetPos.x - Math.sin(target.heading) * 18,
+          targetPos.y + 12,
+          targetPos.z - Math.cos(target.heading) * 18
+        ),
+        0.08
+      );
+      camera.lookAt(targetPos.x, targetPos.y + 0.8, targetPos.z);
+    }
+  } else {
+    // Free Orbit Cam around center
+    const cx = Math.sin(cameraYaw) * Math.cos(cameraPitch) * cameraDist;
+    const cy = Math.sin(cameraPitch) * cameraDist;
+    const cz = Math.cos(cameraYaw) * Math.cos(cameraPitch) * cameraDist;
+    camera.position.lerp(new THREE.Vector3(cx, cy, cz), 0.1);
+    camera.lookAt(0, 0, 0);
+  }
+
+  // Rotate arena dust slowly
+  dustPoints.rotation.y += 0.0008;
+
+  renderer.render(scene, camera);
+}
+
+// Window Resize Handling
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// Boot World
+seedWorld(35, 65);
+animate();
+</script>
+</body>
+</html>
