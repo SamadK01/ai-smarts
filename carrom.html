@@ -18,8 +18,8 @@
     --cyan: #00f0ff;
     --text: #f0f4f8;
     --muted: rgba(240, 244, 248, 0.6);
-    --panel: rgba(12, 16, 26, 0.92);
-    --border: rgba(230, 184, 74, 0.32);
+    --panel: rgba(12, 16, 26, 0.94);
+    --border: rgba(230, 184, 74, 0.35);
     --mono: "Geist Mono", ui-monospace, monospace;
     --display: "Funnel Display", sans-serif;
     --body: "Bricolage Grotesque", sans-serif;
@@ -34,7 +34,7 @@
 
   #canvas-container {
     position: fixed; inset: 0; width: 100%; height: 100%;
-    cursor: crosshair; z-index: 1;
+    cursor: default; z-index: 1;
   }
   #canvas-container.aiming { cursor: crosshair; }
   #canvas-container.dragging { cursor: grabbing; }
@@ -116,23 +116,31 @@
   .console-dock {
     position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
     background: var(--panel); border: 1px solid var(--border);
-    padding: 10px 22px; border-radius: 999px; backdrop-filter: blur(20px);
-    display: flex; align-items: center; gap: 16px; z-index: 35;
-    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.8);
+    padding: 9px 20px; border-radius: 999px; backdrop-filter: blur(20px);
+    display: flex; align-items: center; gap: 14px; z-index: 35;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.85);
   }
 
   .control-unit {
-    display: flex; align-items: center; gap: 8px; font: 600 11px/1 var(--mono);
+    display: flex; align-items: center; gap: 6px; font: 600 11px/1 var(--mono);
     color: var(--muted);
   }
   .control-label { text-transform: uppercase; letter-spacing: 0.5px; font-size: 10px; }
   .val-badge {
-    background: rgba(255, 255, 255, 0.08); padding: 3px 8px; border-radius: 6px;
-    color: var(--gold); font-weight: 700; min-width: 36px; text-align: center;
+    background: rgba(255, 255, 255, 0.08); padding: 3px 7px; border-radius: 6px;
+    color: var(--gold); font-weight: 700; min-width: 32px; text-align: center;
   }
 
+  .step-btn {
+    background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16);
+    color: var(--text); width: 22px; height: 22px; border-radius: 50%;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font: 700 10px var(--mono); transition: all 0.15s;
+  }
+  .step-btn:hover { background: var(--gold); color: #0b0d14; border-color: var(--gold); }
+
   .slider-input {
-    -webkit-appearance: none; width: 110px; height: 5px; border-radius: 999px;
+    -webkit-appearance: none; width: 95px; height: 5px; border-radius: 999px;
     background: rgba(255, 255, 255, 0.16); outline: none; cursor: pointer;
   }
   .slider-input::-webkit-slider-thumb {
@@ -147,7 +155,7 @@
   .strike-btn {
     position: relative; overflow: hidden;
     background: linear-gradient(135deg, #ffbe3b 0%, #e68a00 100%);
-    color: #0b0d14; border: 0; padding: 10px 24px; border-radius: 999px;
+    color: #0b0d14; border: 0; padding: 10px 22px; border-radius: 999px;
     font: 800 13px/1 var(--display); letter-spacing: 0.5px;
     cursor: pointer; display: flex; align-items: center; gap: 8px;
     box-shadow: 0 0 24px rgba(255, 190, 59, 0.55), 0 4px 12px rgba(0,0,0,0.5);
@@ -170,9 +178,9 @@
   .powder-btn {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
     border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff; padding: 8px 14px; border-radius: 999px;
+    color: #fff; padding: 8px 13px; border-radius: 999px;
     font: 600 11px/1 var(--mono); cursor: pointer;
-    display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+    display: flex; align-items: center; gap: 5px; transition: all 0.2s;
   }
   .powder-btn:hover { border-color: #fff; background: rgba(255, 255, 255, 0.25); }
 
@@ -186,9 +194,9 @@
 
   /* ONBOARDING SLINGSHOT HINT */
   .slingshot-hint {
-    position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.72); border: 1px solid rgba(255, 190, 59, 0.3);
-    padding: 7px 20px; border-radius: 999px; pointer-events: none;
+    position: fixed; bottom: 82px; left: 50%; transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.75); border: 1px solid rgba(255, 190, 59, 0.35);
+    padding: 7px 22px; border-radius: 999px; pointer-events: none;
     font: 600 11px/1.4 var(--mono); color: var(--muted); backdrop-filter: blur(10px);
     z-index: 25; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.6);
   }
@@ -209,11 +217,11 @@
   @media (max-width: 980px) {
     .hud-top { flex-direction: column; gap: 8px; align-items: flex-start; }
     .mode-tabs { align-self: center; }
-    .console-dock { width: calc(100% - 24px); padding: 8px 12px; gap: 8px; flex-wrap: wrap; justify-content: center; }
-    .slider-input { width: 80px; }
+    .console-dock { width: calc(100% - 24px); padding: 8px 10px; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .slider-input { width: 75px; }
     .view-presets { display: none; }
     .score-banner { top: 110px; padding: 6px 14px; font-size: 11px; }
-    .slingshot-hint { bottom: 116px; font-size: 10px; padding: 5px 14px; }
+    .slingshot-hint { bottom: 120px; font-size: 10px; padding: 5px 14px; }
   }
 </style>
 
@@ -260,7 +268,7 @@
 
 <!-- INSTRUCTION HINT -->
 <div class="slingshot-hint" id="slingshot-hint">
-  🏹 <b>Drag striker to pull & release</b> · Or aim & click <span>⚡ FLICK STRIKER</span> (Space)
+  🎯 <b>Set Aim & Baseline</b> · Click <span>⚡ FLICK STRIKER</span> (Space) or drag on board to shoot
 </div>
 
 <!-- MASTER BOTTOM CONSOLE -->
@@ -272,6 +280,15 @@
     <span id="baseline-pos" class="val-badge">0.0</span>
   </div>
 
+  <!-- Aim Angle Control -->
+  <div class="control-unit">
+    <span class="control-label">Aim:</span>
+    <button class="step-btn" id="aim-left-btn" title="Aim Left (A)">◀</button>
+    <input type="range" class="slider-input" id="aim-slider" min="-175" max="-5" step="1" value="-90">
+    <button class="step-btn" id="aim-right-btn" title="Aim Right (D)">▶</button>
+    <span id="aim-val" class="val-badge">90°</span>
+  </div>
+
   <!-- Power Meter -->
   <div class="control-unit">
     <span class="control-label">Power:</span>
@@ -279,7 +296,7 @@
     <span id="power-val" class="val-badge">75%</span>
   </div>
 
-  <!-- Big Glowing Strike Button -->
+  <!-- Big Tactile Strike Button -->
   <button class="strike-btn" id="strike-btn">
     <span>⚡</span>
     <span>FLICK STRIKER</span>
@@ -432,7 +449,7 @@ const PIECE_MASS = 5.5;
 const STRIKER_MASS = 15.0;
 const RESTITUTION = 0.94;
 const RAIL_RESTITUTION = 0.84;
-let frictionDecel = 4.8; // boric powder friction
+let frictionDecel = 4.8;
 const POCKET_RADIUS = 1.38;
 
 const POCKETS = [
@@ -443,7 +460,7 @@ const POCKETS = [
 ];
 
 /* ==========================================================================
-   BOARD MARKINGS TEXTURE (CENTRAL ROSETTE, BASELINES & CORNER ARROWS)
+   BOARD MARKINGS TEXTURE (CENTRAL ROSETTE, BASELINES, ARROWS & 4 DEEP HOLES)
    ========================================================================== */
 function makeCarromBoardTexture() {
   const c = document.createElement('canvas');
@@ -514,11 +531,43 @@ function makeCarromBoardTexture() {
     ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(baselineLen, baselineDist);
-    ctx.lineTo(440, 440);
+    ctx.lineTo(435, 435);
     ctx.stroke();
 
     ctx.restore();
   }
+
+  // 4. AUTHENTIC 4 CORNER POCKET HOLES ON THE BOARD TEXTURE
+  const pocketCenterDist = 453; // 8.85 * 51.2
+  [
+    [-pocketCenterDist, -pocketCenterDist],
+    [ pocketCenterDist, -pocketCenterDist],
+    [-pocketCenterDist,  pocketCenterDist],
+    [ pocketCenterDist,  pocketCenterDist]
+  ].forEach(([px, py]) => {
+    // Outer dark wood chamfer
+    ctx.fillStyle = '#1c0e07';
+    ctx.beginPath(); ctx.arc(px, py, 74, 0, Math.PI * 2); ctx.fill();
+
+    // Polished Brass Rim
+    ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.arc(px, py, 70, 0, Math.PI * 2); ctx.stroke();
+
+    // Deep Pitch-Black Pocket Hole
+    ctx.fillStyle = '#06070a';
+    ctx.beginPath(); ctx.arc(px, py, 66, 0, Math.PI * 2); ctx.fill();
+
+    // White woven crochet string net pattern
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)'; ctx.lineWidth = 1.5;
+    for (let k = -40; k <= 40; k += 16) {
+      ctx.beginPath();
+      ctx.moveTo(px + k, py - 40); ctx.lineTo(px + k, py + 40);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(px - 40, py + k); ctx.lineTo(px + 40, py + k);
+      ctx.stroke();
+    }
+  });
 
   ctx.restore();
   return new THREE.CanvasTexture(c);
@@ -634,7 +683,7 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color('#07090f');
 scene.fog = new THREE.FogExp2('#07090f', 0.012);
 
-// Framed camera height: 35.0 gives complete, comfortable view of the 24.4x24.4 board
+// Framed camera height: 35.0 gives complete view of the 24.4x24.4 board
 const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
 camera.position.set(0, 35, 1.0);
 camera.lookAt(0, 0, -0.6);
@@ -685,8 +734,27 @@ const boardBed = new THREE.Mesh(new THREE.PlaneGeometry(BOARD_SIZE, BOARD_SIZE),
 boardBed.rotation.x = -Math.PI / 2; boardBed.receiveShadow = true;
 boardGroup.add(boardBed);
 
-// 2. 4 Corner Crochet Pocket Net Drop Holes
+// 2. 4 Corner Crochet Pocket Net Drop Holes with Visible Surface Rings
 POCKETS.forEach(p => {
+  // Visible Jet-Black Surface Hole Entrance Disc
+  const pocketDisc = new THREE.Mesh(
+    new THREE.CircleGeometry(POCKET_RADIUS, 32),
+    new THREE.MeshBasicMaterial({ color: 0x050608 })
+  );
+  pocketDisc.rotation.x = -Math.PI / 2;
+  pocketDisc.position.set(p.x, 0.004, p.y);
+  boardGroup.add(pocketDisc);
+
+  // 3D Polished Brass Pocket Lip Ring
+  const pocketRim = new THREE.Mesh(
+    new THREE.TorusGeometry(POCKET_RADIUS, 0.07, 12, 32),
+    brassCornerMat
+  );
+  pocketRim.rotation.x = Math.PI / 2;
+  pocketRim.position.set(p.x, 0.015, p.y);
+  boardGroup.add(pocketRim);
+
+  // Deep crochet net well recessed below board
   const well = new THREE.Mesh(new THREE.CylinderGeometry(POCKET_RADIUS, POCKET_RADIUS * 0.8, 1.4, 24, 1, true), pocketNetMat);
   well.position.set(p.x, -0.7, p.y);
   boardGroup.add(well);
@@ -762,7 +830,7 @@ ghostStriker.rotation.x = -Math.PI / 2;
 ghostStriker.position.y = 0.05;
 scene.add(ghostStriker);
 
-// 2. Slingshot Tension Rubber Band (Behind striker when pulling back)
+// 2. Slingshot Tension Rubber Band
 const pullGeo = new THREE.BufferGeometry();
 const pullPos = new Float32Array(6);
 pullGeo.setAttribute('position', new THREE.BufferAttribute(pullPos, 3));
@@ -784,7 +852,7 @@ let currentGameMode = 'points';   // 'points' | 'zen' | 'trick'
 
 // Turn State: 'AIMING' | 'ROLLING' | 'RESETTING'
 let turnState = 'AIMING';
-let aimAngle = -Math.PI / 2; // Point straight up towards queen initially
+let aimAngle = -Math.PI / 2; // -90 deg: straight up towards center
 
 // Striker Slingshot Dragging State
 let isDragging = false;
@@ -833,7 +901,6 @@ function rackCarrom(mode = 'points') {
       pieces.push(new CarromPiece(outerPattern[i], Math.cos(ang) * outerR, Math.sin(ang) * outerR));
     }
   } else if (mode === 'zen') {
-    // Scattered Practice Layout
     pieces.push(new CarromPiece('queen', 0, -1.5));
     for (let i = 0; i < 9; i++) {
       const ang = (i / 9) * Math.PI * 2;
@@ -844,7 +911,6 @@ function rackCarrom(mode = 'points') {
       pieces.push(new CarromPiece('black', Math.cos(ang) * 6.0, Math.sin(ang) * 6.0));
     }
   } else if (mode === 'trick') {
-    // Precision Trick Cut Layout
     pieces.push(new CarromPiece('queen', 0, 0));
     pieces.push(new CarromPiece('white', -6.0, -6.0));
     pieces.push(new CarromPiece('white',  6.0, -6.0));
@@ -863,7 +929,7 @@ function rackCarrom(mode = 'points') {
   striker = new CarromPiece('striker', initX, 7.0);
 
   pullLine.visible = false;
-  aimAngle = -Math.PI / 2;
+  setAimAngle(-90);
   updateAimGuide();
   updateUIState();
   showToast(mode === 'points' ? '👑 Carrom Board Racked! Aim & Flick to Shoot' : `Game Mode: ${mode.toUpperCase()}`);
@@ -976,8 +1042,8 @@ function updatePhysics(dt) {
           const invM2 = 1 / d2.mass;
           const invSum = invM1 + invM2;
 
-          // Positional overlap resolution
-          d1.pos.subScaledVector(normal, overlap * (invM1 / invSum));
+          // Positional overlap resolution (Three.js addScaledVector)
+          d1.pos.addScaledVector(normal, -overlap * (invM1 / invSum));
           d2.pos.addScaledVector(normal, overlap * (invM2 / invSum));
 
           // Normal relative velocity
@@ -986,7 +1052,7 @@ function updatePhysics(dt) {
 
           if (vNorm > 0) {
             const impulse = (1 + RESTITUTION) * vNorm / invSum;
-            d1.vel.subScaledVector(normal, impulse * invM1);
+            d1.vel.addScaledVector(normal, -impulse * invM1);
             d2.vel.addScaledVector(normal, impulse * invM2);
 
             sfx.woodClack(vRel.length());
@@ -1068,6 +1134,33 @@ function launchStriker(powerRatio, angle) {
 }
 
 /* ==========================================================================
+   AIM ANGLE CONTROLLER HELPER
+   ========================================================================== */
+const aimSlider = document.getElementById('aim-slider');
+const aimValLabel = document.getElementById('aim-val');
+
+function setAimAngle(deg) {
+  const clampedDeg = Math.min(-5, Math.max(-175, deg));
+  aimAngle = (clampedDeg * Math.PI) / 180;
+  aimSlider.value = Math.round(clampedDeg);
+  aimValLabel.textContent = `${Math.abs(Math.round(clampedDeg))}°`;
+  updateAimGuide();
+}
+
+aimSlider.addEventListener('input', e => {
+  setAimAngle(parseFloat(e.target.value));
+});
+
+document.getElementById('aim-left-btn').addEventListener('click', () => {
+  const cur = parseFloat(aimSlider.value);
+  setAimAngle(cur - 3);
+});
+document.getElementById('aim-right-btn').addEventListener('click', () => {
+  const cur = parseFloat(aimSlider.value);
+  setAimAngle(cur + 3);
+});
+
+/* ==========================================================================
    TACTILE INPUT: SLINGSHOT DRAG, FORWARD FLICK & RAYCASTING
    ========================================================================== */
 const raycaster = new THREE.Raycaster();
@@ -1099,32 +1192,19 @@ container.addEventListener('pointerdown', e => {
   dragOrigin.set(striker.pos.x, striker.pos.y);
   dragCurrent.copy(hit);
 
-  // Update aim directly towards touch point
+  // Directly adjust aim toward touch point if clicked forward
   const dir = hit.clone().sub(striker.pos);
-  if (dir.length() > 0.3) {
-    aimAngle = Math.atan2(dir.y, dir.x);
-    updateAimGuide();
+  if (dir.length() > 0.4 && dir.y < 0) {
+    const deg = (Math.atan2(dir.y, dir.x) * 180) / Math.PI;
+    setAimAngle(deg);
   }
 });
 
 window.addEventListener('pointermove', e => {
+  if (!isDragging || !striker || turnState !== 'AIMING') return;
+
   const hit = getTableIntersect(e);
   if (!hit) return;
-
-  if (turnState === 'AIMING' && !isDragging && striker) {
-    // Dynamic mouse hover aiming: aim rotates smoothly towards cursor!
-    const dir = hit.clone().sub(striker.pos);
-    if (dir.length() > 0.5) {
-      // Allow aiming forward into the board
-      const targetAngle = Math.atan2(dir.y, dir.x);
-      if (targetAngle < -0.05 && targetAngle > -Math.PI + 0.05) {
-        aimAngle = targetAngle;
-        updateAimGuide();
-      }
-    }
-  }
-
-  if (!isDragging || !striker) return;
 
   dragCurrent.copy(hit);
   const dragVec = dragCurrent.clone().sub(dragOrigin);
@@ -1134,7 +1214,9 @@ window.addEventListener('pointermove', e => {
     if (dragVec.y > 0) {
       // Slingshot Pull Back (User pulled downward behind baseline)
       const pullAngle = Math.atan2(dragVec.y, dragVec.x);
-      aimAngle = pullAngle + Math.PI; // Shoot in opposite direction (forward)
+      const shootAngle = pullAngle + Math.PI; // Opposite direction (forward)
+      const deg = (shootAngle * 180) / Math.PI;
+      setAimAngle(deg > 0 ? deg - 360 : deg);
 
       const tensionLen = Math.min(6.0, dragLen);
       const powerPct = Math.round((tensionLen / 6.0) * 100);
@@ -1149,14 +1231,14 @@ window.addEventListener('pointermove', e => {
       pullLine.visible = true;
     } else {
       // Direct Forward Swipe
-      aimAngle = Math.atan2(dragVec.y, dragVec.x);
+      const deg = (Math.atan2(dragVec.y, dragVec.x) * 180) / Math.PI;
+      setAimAngle(deg);
       pullLine.visible = false;
 
       const powerPct = Math.min(100, Math.round((dragLen / 5.0) * 100));
       document.getElementById('power-slider').value = Math.max(30, powerPct);
       document.getElementById('power-val').textContent = `${Math.max(30, powerPct)}%`;
     }
-    updateAimGuide();
   }
 });
 
@@ -1257,11 +1339,11 @@ window.addEventListener('keydown', e => {
       updateAimGuide();
     }
   } else if (e.key === 'a' || e.key === 'A') {
-    aimAngle = Math.max(-Math.PI + 0.1, aimAngle - 0.05);
-    updateAimGuide();
+    const cur = parseFloat(aimSlider.value);
+    setAimAngle(cur - 2);
   } else if (e.key === 'd' || e.key === 'D') {
-    aimAngle = Math.min(-0.1, aimAngle + 0.05);
-    updateAimGuide();
+    const cur = parseFloat(aimSlider.value);
+    setAimAngle(cur + 2);
   } else if (e.key === 'r' || e.key === 'R') {
     rackCarrom(currentGameMode);
   } else if (e.key === 'p' || e.key === 'P') {
