@@ -31,10 +31,10 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
   - Output 2: Mitosis / Reproduction trigger (`sigmoid`).
 - **Interactive Holographic Brain Inspector**: Clicking any entity renders the active electrical potential of every synapse, color-coding excitatory and inhibitory connections in real-time.
 
-### 2. High-Precision Rigid Body & Collision Physics (`billiards.html`)
-- Sub-step Euler integration with sphere-to-sphere momentum transfer.
-- Angle-dependent cushion rail restitution with friction damping.
-- Dynamic trajectory prediction raycaster with ghost ball contact visualization and target deflection lines.
+### 2. High-Precision Rigid Body & Collision Physics (`carrom.html`)
+- Sub-step Euler integration with disk-to-disk momentum conservation (mass-weighted impulses: striker 15.0g vs pieces 5.5g).
+- Solid Sheesham wooden rail bounces with angle-dependent restitution and talcum powder boric glide friction.
+- Tactile forward flick, slingshot tension pullback, real-time trajectory laser, and ghost reticle preview.
 
 ### 3. Minimax AI with Alpha-Beta Pruning (`tictactoe.html`)
 - Computes optimal game tree branches with depth-weighted heuristics.
