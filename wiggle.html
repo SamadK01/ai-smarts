@@ -1,1 +1,762 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Eggplant Wiggle — AI Smarts</title><style>@import url('https://fonts.googleapis.com/css2?family=DM+Mono&family=Poppins:wght@400;600&display=swap');*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0}body{overflow:hidden;background:#f6e7f2;color:#2c1830;font-family:Poppins,Arial;touch-action:none}canvas{display:block;width:100%;height:100%;cursor:grab}.home{position:fixed;top:20px;left:22px;z-index:2;color:#39203c;text-decoration:none;font:11px 'DM Mono',monospace}.home:before{content:'← ';color:#9f4e97}.guide{position:fixed;left:50%;top:50%;z-index:1;transform:translate(-50%,-50%);text-align:center;pointer-events:none;transition:.35s}.guide.hide{opacity:0}.guide h1{margin:0;font:600 clamp(42px,7vw,88px)/.9 Poppins,sans-serif;letter-spacing:-.07em}.guide p{font-size:14px;color:#876b88}.note{position:fixed;bottom:18px;left:0;right:0;text-align:center;color:#967d97;font:11px 'DM Mono',monospace}@media(max-width:600px){.home{top:14px;left:15px}.guide h1{font-size:48px}.note{padding:0 20px}}</style></head><body><a class="home" href="index.html">all experiments</a><section class="guide" id="guide"><h1>Wiggle the<br>eggplant.</h1><p>Pull it around. Let it wobble.</p></section><p class="note">drag the 3D eggplant · release for maximum wiggle</p><script type="module">import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';const guide=document.querySelector('#guide');const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(38,innerWidth/innerHeight,.1,100);camera.position.set(0,.15,7);const r=new THREE.WebGLRenderer({antialias:true,alpha:true});r.setPixelRatio(Math.min(devicePixelRatio,2));r.setSize(innerWidth,innerHeight);r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;document.body.prepend(r.domElement);scene.fog=new THREE.Fog('#f6e7f2',8,15);const group=new THREE.Group();scene.add(group);const light=new THREE.HemisphereLight('#fff8ff','#9f4c83',2.3);scene.add(light);const key=new THREE.DirectionalLight('#fff7f0',4);key.position.set(4,5,5);key.castShadow=true;scene.add(key);const floor=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.ShadowMaterial({opacity:.17}));floor.rotation.x=-Math.PI/2;floor.position.y=-2.45;floor.receiveShadow=true;scene.add(floor);const purple=new THREE.MeshPhysicalMaterial({color:'#68245f',roughness:.32,metalness:.04,clearcoat:.6,clearcoatRoughness:.35});const body=new THREE.Mesh(new THREE.SphereGeometry(1.25,64,64),purple);body.scale.set(.78,1.55,.78);body.rotation.z=-.18;body.castShadow=true;group.add(body);const capMat=new THREE.MeshPhysicalMaterial({color:'#4f9e57',roughness:.48,clearcoat:.2});const cap=new THREE.Mesh(new THREE.ConeGeometry(.73,.47,5),capMat);cap.position.set(-.17,1.85,0);cap.rotation.z=-.18;cap.castShadow=true;group.add(cap);for(let i=0;i<5;i++){const leaf=new THREE.Mesh(new THREE.ConeGeometry(.22,.65,3),capMat);leaf.position.set(-.17+Math.cos(i*1.256)*.25,1.8,Math.sin(i*1.256)*.25);leaf.rotation.set(Math.cos(i*1.256)*.65,0,Math.sin(i*1.256)*.65);group.add(leaf)}const stem=new THREE.Mesh(new THREE.CylinderGeometry(.1,.13,.55,16),capMat);stem.position.set(-.31,2.19,0);stem.rotation.z=-.25;group.add(stem);group.rotation.z=.12;let targetX=0,targetY=0,velX=0,velY=0,drag=false,lastX,lastY;function pos(e){return{x:e.clientX,y:e.clientY}}r.domElement.addEventListener('pointerdown',e=>{drag=true;lastX=e.clientX;lastY=e.clientY;r.domElement.setPointerCapture(e.pointerId);guide.classList.add('hide')});r.domElement.addEventListener('pointermove',e=>{if(!drag)return;let dx=e.clientX-lastX,dy=e.clientY-lastY;velY=dx*.012;velX=dy*.012;targetY+=velY;targetX+=velX;lastX=e.clientX;lastY=e.clientY});r.domElement.addEventListener('pointerup',()=>drag=false);addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();r.setSize(innerWidth,innerHeight)});let t=0;function loop(){requestAnimationFrame(loop);t+=.016;if(!drag){velX+=-targetX*.09;velY+=-targetY*.09;velX*=.91;velY*=.91;targetX+=velX;targetY+=velY}group.rotation.x=targetX;group.rotation.y=targetY;group.rotation.z=.12+Math.sin(t*5)*velY*.15;group.position.y=-.25+Math.sin(t*7)*Math.min(.12,Math.abs(velY+velX)*.1);r.render(scene,camera)}loop();</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Retro Laptop 2006 — AI Smarts</title>
+<meta name="description" content="An interactive 3D retro 2000s laptop with tactile mechanical typing, opening clamshell hinge, vintage OS, Hacker Terminal, MSN RetroChat, and procedural nostalgic audio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@700;800&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #090c12;
+    --text: #e8ebf0;
+    --muted: rgba(220, 230, 245, 0.45);
+    --cyan: #35f3df;
+    --amber: #ffb732;
+    --coral: #ff4757;
+    --green: #2ecc71;
+    --mono: "Geist Mono", ui-monospace, "SF Mono", monospace;
+    --display: "Funnel Display", -apple-system, sans-serif;
+    --body: "Bricolage Grotesque", -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: var(--bg); color: var(--text);
+    font-family: var(--body);
+    touch-action: none;
+  }
+  canvas#webgl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; }
+
+  /* TOP HUD */
+  .hud {
+    position: fixed; inset: 0; pointer-events: none; z-index: 10;
+    font: 12px/1.4 var(--mono); color: var(--muted);
+  }
+  .hud > * { pointer-events: auto; }
+
+  .top-bar {
+    position: absolute; top: 18px; left: 20px; right: 20px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  /* Left: Back Link & Device Info */
+  .hud-left {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .home-link {
+    color: var(--text); text-decoration: none; font: 600 13px/1 var(--body);
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(18, 22, 32, 0.8); border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 8px 15px; border-radius: 999px; backdrop-filter: blur(12px);
+    transition: all 0.2s ease;
+  }
+  .home-link:hover { border-color: var(--cyan); color: #fff; }
+  .home-link span { color: var(--cyan); font-weight: 700; }
+
+  .device-tag {
+    background: rgba(18, 22, 32, 0.8); border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 7px 16px; border-radius: 999px; backdrop-filter: blur(12px);
+    display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted);
+  }
+  .device-tag b { color: #fff; font-weight: 600; }
+  .led-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+    box-shadow: 0 0 8px var(--green); animation: led-blink 2.2s infinite;
+  }
+  @keyframes led-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+
+  /* Center: Camera Angle Presets */
+  .hud-center {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 6px; background: rgba(18, 22, 32, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 4px; border-radius: 999px; backdrop-filter: blur(14px);
+  }
+  .view-btn {
+    background: transparent; border: 0; color: var(--muted);
+    font: 600 11px/1 var(--body); padding: 7px 14px; border-radius: 999px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .view-btn:hover { color: #fff; }
+  .view-btn.active {
+    background: rgba(53, 243, 223, 0.18); border: 1px solid var(--cyan); color: #fff;
+  }
+
+  /* Right: Sound & Lid Toggle */
+  .hud-right {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .hud-btn {
+    background: rgba(18, 22, 32, 0.8); border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 8px 14px; border-radius: 999px; color: var(--text);
+    font: 600 11px/1 var(--body); cursor: pointer; backdrop-filter: blur(12px);
+    display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+  }
+  .hud-btn:hover { border-color: var(--cyan); color: #fff; transform: translateY(-1px); }
+
+  /* Bottom Help Bar */
+  .bottom-bar {
+    position: absolute; bottom: 22px; left: 0; right: 0;
+    display: flex; justify-content: center; pointer-events: none;
+  }
+  .hint-pill {
+    background: rgba(18, 22, 32, 0.9); border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px; padding: 9px 24px;
+    font: 500 12px/1 var(--mono); color: var(--muted);
+    backdrop-filter: blur(16px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    display: flex; align-items: center; gap: 10px; pointer-events: auto;
+  }
+  .hint-pill b { color: var(--cyan); font-weight: 600; }
+  .hint-badge {
+    background: rgba(255, 255, 255, 0.1); padding: 3px 8px; border-radius: 6px;
+    font: 700 11px/1 var(--mono); color: #fff;
+  }
+
+  @media (max-width: 700px) {
+    .top-bar { top: 12px; left: 12px; right: 12px; flex-wrap: wrap; gap: 10px; }
+    .hud-center { position: static; transform: none; order: 3; width: 100%; justify-content: center; }
+    .device-tag { display: none; }
+    .bottom-bar { bottom: 14px; }
+    .hint-pill { font-size: 11px; padding: 7px 16px; }
+  }
+</style>
+
+<!-- Standard Non-Module Scripts to avoid file:// CORS blocking -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+<canvas id="webgl"></canvas>
+
+<div class="hud">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="hud-left">
+      <a class="home-link" href="index.html">← <span>AI Smarts</span> / 2006</a>
+      <div class="device-tag">
+        <span class="led-dot"></span>
+        <span>Model: <b>ThinkRetro T42 (2006)</b></span>
+      </div>
+    </div>
+
+    <!-- Center: View Presets -->
+    <div class="hud-center">
+      <button class="view-btn active" id="view-typing">⌨️ Typing View</button>
+      <button class="view-btn" id="view-screen">🖥️ Close-Up</button>
+      <button class="view-btn" id="view-orbit">🌐 3D Orbit</button>
+    </div>
+
+    <!-- Right: Controls -->
+    <div class="hud-right">
+      <button class="hud-btn" id="lid-btn">📂 Close Lid</button>
+      <button class="hud-btn" id="modem-btn">📡 Dial-up</button>
+      <button class="hud-btn" id="sound-btn">🔊 Sound</button>
+    </div>
+  </div>
+
+  <!-- Bottom Bar Hint -->
+  <div class="bottom-bar">
+    <div class="hint-pill">
+      <span>Type on your keyboard to hack & chat</span>
+      <span class="hint-badge">CLICK KEYS</span>
+      <span class="hint-badge">DRAG SCREEN TO TILT</span>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ==========================================================================
+   PROCEDURAL AUDIO SYNTHESIZER (Mechanical Clicks, 56k Dial-up, Chimes)
+   ========================================================================== */
+let audioCtx = null;
+let soundEnabled = true;
+
+function initAudio() {
+  if (audioCtx) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return;
+  }
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioContextClass();
+  } catch(e) {}
+}
+
+const sfx = {
+  // Mechanical Keyboard Switch Click-Clack
+  keyClick() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    const dur = 0.038;
+    const node = audioCtx.createBufferSource();
+    const buf = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * dur), audioCtx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) {
+      d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (d.length * 0.18));
+    }
+    node.buffer = buf;
+
+    const f = audioCtx.createBiquadFilter();
+    f.type = 'bandpass';
+    f.frequency.setValueAtTime(1400 + Math.random() * 600, t);
+    f.Q.value = 3.5;
+
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.08, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+    node.connect(f); f.connect(g); g.connect(audioCtx.destination);
+    node.start(t);
+  },
+
+  // Dial-up 56k Modem Connect Sound
+  dialup() {
+    if (!soundEnabled || !audioCtx) return;
+    const t0 = audioCtx.currentTime;
+    const freqs = [697, 770, 852, 941, 1209, 1336, 1477];
+    for (let i = 0; i < 7; i++) {
+      const t = t0 + i * 0.08;
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freqs[i % freqs.length], t);
+      g.gain.setValueAtTime(0.04, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.07);
+      osc.connect(g); g.connect(audioCtx.destination);
+      osc.start(t); osc.stop(t + 0.08);
+    }
+
+    const squealTime = t0 + 0.6;
+    const osc2 = audioCtx.createOscillator();
+    const g2 = audioCtx.createGain();
+    osc2.type = 'sawtooth';
+    osc2.frequency.setValueAtTime(2100, squealTime);
+    osc2.frequency.linearRampToValueAtTime(1200, squealTime + 0.4);
+    osc2.frequency.linearRampToValueAtTime(1800, squealTime + 0.8);
+    g2.gain.setValueAtTime(0.035, squealTime);
+    g2.gain.exponentialRampToValueAtTime(0.0001, squealTime + 1.2);
+    osc2.connect(g2); g2.connect(audioCtx.destination);
+    osc2.start(squealTime); osc2.stop(squealTime + 1.25);
+  },
+
+  // MSN Messenger Nudge / Alert
+  nudge() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(440, t);
+    osc.frequency.exponentialRampToValueAtTime(880, t + 0.12);
+    g.gain.setValueAtTime(0.07, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+    osc.connect(g); g.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t + 0.2);
+  },
+
+  // Hinge Creak / Snap
+  hinge() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(90, t);
+    osc.frequency.exponentialRampToValueAtTime(45, t + 0.14);
+    g.gain.setValueAtTime(0.06, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+    osc.connect(g); g.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t + 0.18);
+  }
+};
+
+/* ==========================================================================
+   2D RETRO OS CANVAS TEXTURE (Screen Content: Terminal, Chat, Media Player)
+   ========================================================================== */
+const osCanvas = document.createElement('canvas');
+osCanvas.width = 1024;
+osCanvas.height = 768;
+const osCtx = osCanvas.getContext('2d');
+
+let activeApp = 'terminal'; // 'terminal' | 'chat' | 'winamp'
+let terminalLines = [
+  "Microsoft(R) Windows 2000 [Version 5.00.2195]",
+  "(C) Copyright 1985-2000 Microsoft Corp.",
+  "",
+  "C:\\REEF_NET> connect 192.168.1.1",
+  "Establishing dial-up link... 56.6 Kbps connected.",
+  "System initialized. Type anything on keyboard to hack!"
+];
+let codeSnippets = [
+  "int main(int argc, char** argv) { init_buffer(); }",
+  "void decrypt_packet(uint8_t* stream, size_t len) {",
+  "    for (int i = 0; i < len; i++) stream[i] ^= 0xA5;",
+  "    if (verify_checksum(stream)) grant_access();",
+  "}",
+  ">> BYPASSING FIREWALL... STATUS: 200 OK",
+  ">> OVERRIDING MAINFRAME ENCRYPTION 128-BIT...",
+  ">> ACCESS GRANTED: REEF_CORE_SYS [ROOT USER]",
+  ">> DOWNLOADING MATRIX_KERNEL_2006.BIN...",
+  ">> PING 127.0.0.1: TIME=14ms TTL=64",
+  ">> ALL SECURE PORTS UNLOCKED."
+];
+let snippetIdx = 0;
+
+let chatMessages = [
+  { user: "xX_CoolGamer_06_Xx", text: "yo! did u see the new matrix movie??", time: "11:42 PM" },
+  { user: "StarGazer", text: "brb mom needs to use the landline phone :(", time: "11:43 PM" },
+  { user: "You", text: "typing on my new ThinkRetro laptop, feels amazing!", time: "11:44 PM" },
+  { user: "xX_CoolGamer_06_Xx", text: "nice!! check out this winamp chiptune track", time: "11:45 PM" }
+];
+
+function drawRetroScreen(time) {
+  // 1. Classic Windows 2000/XP Bliss-style gradient desktop
+  const bg = osCtx.createLinearGradient(0, 0, 0, 768);
+  bg.addColorStop(0, '#2b588e');
+  bg.addColorStop(0.55, '#3b78be');
+  bg.addColorStop(1, '#1b3e6e');
+  osCtx.fillStyle = bg;
+  osCtx.fillRect(0, 0, 1024, 768);
+
+  // Desktop Icons (My Computer, Terminal, MSN, Winamp)
+  const icons = [
+    { name: "My Computer", x: 40, y: 35, icon: "💻", app: "terminal" },
+    { name: "Terminal.exe", x: 40, y: 135, icon: "⚡", app: "terminal" },
+    { name: "RetroChat 06", x: 40, y: 235, icon: "💬", app: "chat" },
+    { name: "WinMedia", x: 40, y: 335, icon: "🎵", app: "winamp" }
+  ];
+
+  icons.forEach(ic => {
+    osCtx.font = "32px sans-serif";
+    osCtx.textAlign = "center";
+    osCtx.fillText(ic.icon, ic.x + 30, ic.y + 35);
+    osCtx.font = "bold 13px Tahoma, Arial";
+    osCtx.fillStyle = "#ffffff";
+    osCtx.shadowColor = "#000"; osCtx.shadowBlur = 4;
+    osCtx.fillText(ic.name, ic.x + 30, ic.y + 60);
+    osCtx.shadowBlur = 0;
+  });
+
+  // 2. Active Window Frame
+  const winX = 140, winY = 45, winW = 840, winH = 665;
+  osCtx.fillStyle = "rgba(0,0,0,0.35)";
+  osCtx.fillRect(winX + 8, winY + 8, winW, winH);
+
+  osCtx.fillStyle = "#ece9d8";
+  osCtx.fillRect(winX, winY, winW, winH);
+  osCtx.strokeStyle = "#0055ea";
+  osCtx.lineWidth = 3;
+  osCtx.strokeRect(winX, winY, winW, winH);
+
+  const titleGrad = osCtx.createLinearGradient(winX, winY, winX + winW, winY);
+  titleGrad.addColorStop(0, '#0a246a');
+  titleGrad.addColorStop(0.3, '#0055ea');
+  titleGrad.addColorStop(1, '#3b93f7');
+  osCtx.fillStyle = titleGrad;
+  osCtx.fillRect(winX, winY, winW, 34);
+
+  osCtx.fillStyle = "#ffffff";
+  osCtx.font = "bold 15px Tahoma, Arial";
+  osCtx.textAlign = "left";
+  const titleText = activeApp === 'terminal' ? "⚡ Command Prompt - HackerTyper 2006 [ONLINE]" :
+                    (activeApp === 'chat' ? "💬 RetroChat 2006 - Instant Messenger" : "🎵 WinMedia Classic Visualizer");
+  osCtx.fillText(titleText, winX + 14, winY + 23);
+
+  // Close Button
+  const btnX = winX + winW - 85;
+  osCtx.fillStyle = "#d84a38";
+  osCtx.fillRect(btnX + 50, winY + 6, 22, 20);
+  osCtx.fillStyle = "#ffffff";
+  osCtx.font = "bold 12px Arial";
+  osCtx.textAlign = "center";
+  osCtx.fillText("✕", btnX + 61, winY + 21);
+
+  // Inner Content Area
+  const cx = winX + 8, cy = winY + 38, cw = winW - 16, ch = winH - 46;
+
+  if (activeApp === 'terminal') {
+    osCtx.fillStyle = "#020904";
+    osCtx.fillRect(cx, cy, cw, ch);
+
+    osCtx.font = "15px 'Courier New', monospace";
+    osCtx.fillStyle = "#33ff55";
+    osCtx.textAlign = "left";
+
+    const maxLines = 26;
+    const startIdx = Math.max(0, terminalLines.length - maxLines);
+    for (let i = startIdx; i < terminalLines.length; i++) {
+      osCtx.fillText(terminalLines[i], cx + 16, cy + 26 + (i - startIdx) * 22);
+    }
+    if (Math.floor(time * 2) % 2 === 0) {
+      const curY = cy + 26 + Math.min(terminalLines.length, maxLines) * 22;
+      osCtx.fillRect(cx + 16, curY - 14, 10, 18);
+    }
+  } else if (activeApp === 'chat') {
+    osCtx.fillStyle = "#ffffff";
+    osCtx.fillRect(cx, cy, cw, ch);
+
+    osCtx.fillStyle = "#e6edf8";
+    osCtx.fillRect(cx, cy, cw, 45);
+    osCtx.fillStyle = "#0c2850";
+    osCtx.font = "bold 14px Tahoma";
+    osCtx.fillText("To: xX_CoolGamer_06_Xx <coolgamer06@retro.net> (Online)", cx + 16, cy + 28);
+
+    chatMessages.forEach((msg, idx) => {
+      osCtx.font = "bold 13px Tahoma";
+      osCtx.fillStyle = msg.user === 'You' ? '#b83b10' : '#104eb8';
+      osCtx.fillText(`${msg.user} (${msg.time}):`, cx + 16, cy + 75 + idx * 48);
+      osCtx.font = "13px Tahoma";
+      osCtx.fillStyle = "#222";
+      osCtx.fillText(msg.text, cx + 24, cy + 96 + idx * 48);
+    });
+  } else if (activeApp === 'winamp') {
+    osCtx.fillStyle = "#111116";
+    osCtx.fillRect(cx, cy, cw, ch);
+
+    osCtx.fillStyle = "#00ff77";
+    osCtx.font = "bold 16px 'Courier New'";
+    osCtx.fillText("WINAMP 2.91 - 01. Linkin_Park_Numb_Chiptune.mp3 (128kbps)", cx + 20, cy + 35);
+
+    const numBars = 32;
+    const barW = (cw - 60) / numBars;
+    for (let i = 0; i < numBars; i++) {
+      const barH = 50 + Math.sin(time * 5 + i * 0.4) * 45 + Math.cos(time * 3 + i * 0.8) * 35;
+      const bx = cx + 30 + i * barW;
+      const by = cy + ch - 80 - barH;
+
+      const grad = osCtx.createLinearGradient(0, by + barH, 0, by);
+      grad.addColorStop(0, '#00ff77');
+      grad.addColorStop(0.7, '#ffcc00');
+      grad.addColorStop(1, '#ff3344');
+      osCtx.fillStyle = grad;
+      osCtx.fillRect(bx, by, barW - 4, barH);
+    }
+  }
+
+  // 3. Retro Taskbar on Bottom
+  osCtx.fillStyle = "#245edb";
+  osCtx.fillRect(0, 730, 1024, 38);
+
+  const startGrad = osCtx.createLinearGradient(0, 730, 120, 768);
+  startGrad.addColorStop(0, '#388e3c');
+  startGrad.addColorStop(1, '#2e7d32');
+  osCtx.fillStyle = startGrad;
+  osCtx.fillRect(0, 730, 115, 38);
+  osCtx.fillStyle = "#ffffff";
+  osCtx.font = "italic bold 16px Arial";
+  osCtx.fillText("start ⊞", 22, 755);
+
+  osCtx.fillStyle = "#0f3b82";
+  osCtx.fillRect(910, 730, 114, 38);
+  osCtx.fillStyle = "#ffffff";
+  osCtx.font = "bold 13px Tahoma";
+  osCtx.textAlign = "center";
+  osCtx.fillText("11:46 PM", 965, 754);
+}
+
+/* ==========================================================================
+   INITIALIZE 3D ENGINE (Supports Three.js with fallback)
+   ========================================================================== */
+function init3D() {
+  if (typeof THREE === 'undefined') {
+    console.warn("THREE not loaded yet, retrying...");
+    setTimeout(init3D, 200);
+    return;
+  }
+
+  const canvas3D = document.getElementById('webgl');
+  let W = window.innerWidth;
+  let H = window.innerHeight;
+  let DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color('#0b0e16');
+  scene.fog = new THREE.FogExp2('#0b0e16', 0.05);
+
+  const camera = new THREE.PerspectiveCamera(38, W / H, 0.1, 100);
+  camera.position.set(0, 2.2, 3.4);
+
+  const renderer = new THREE.WebGLRenderer({ canvas: canvas3D, antialias: true });
+  renderer.setPixelRatio(DPR);
+  renderer.setSize(W, H);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  // Lights
+  const ambientLight = new THREE.AmbientLight('#ffffff', 1.4);
+  scene.add(ambientLight);
+
+  const hemiLight = new THREE.HemisphereLight('#b8d8ff', '#241a10', 1.0);
+  scene.add(hemiLight);
+
+  const deskLight = new THREE.DirectionalLight('#fff8ea', 3.0);
+  deskLight.position.set(3, 6, 4);
+  deskLight.castShadow = true;
+  deskLight.shadow.mapSize.width = 2048;
+  deskLight.shadow.mapSize.height = 2048;
+  scene.add(deskLight);
+
+  // Screen glow PointLight
+  const screenLight = new THREE.PointLight('#70d2ff', 2.2, 4.0);
+  screenLight.position.set(0, 1.4, 0.2);
+  scene.add(screenLight);
+
+  // Desk surface
+  const deskMat = new THREE.MeshStandardMaterial({ color: '#141822', roughness: 0.7, metalness: 0.1 });
+  const desk = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), deskMat);
+  desk.rotation.x = -Math.PI / 2;
+  desk.position.y = -0.01;
+  desk.receiveShadow = true;
+  scene.add(desk);
+
+  // LAPTOP ROOT GROUP
+  const laptopGroup = new THREE.Group();
+  scene.add(laptopGroup);
+
+  const screenTexture = new THREE.CanvasTexture(osCanvas);
+  screenTexture.anisotropy = 4;
+
+  const chassisMat = new THREE.MeshStandardMaterial({ color: '#1a1d24', roughness: 0.5, metalness: 0.2 });
+  const keyboardWellMat = new THREE.MeshStandardMaterial({ color: '#101216', roughness: 0.8 });
+  const keycapMat = new THREE.MeshStandardMaterial({ color: '#272b33', roughness: 0.45, metalness: 0.1 });
+  const trackpointMat = new THREE.MeshStandardMaterial({ color: '#e74c3c', roughness: 0.3 });
+  const screenGlassMat = new THREE.MeshBasicMaterial({ map: screenTexture });
+
+  // 1. BASE CHASSIS
+  const baseWidth = 3.2, baseDepth = 2.2, baseHeight = 0.16;
+  const baseChassis = new THREE.Mesh(new THREE.BoxGeometry(baseWidth, baseHeight, baseDepth), chassisMat);
+  baseChassis.position.set(0, baseHeight * 0.5, 0);
+  baseChassis.castShadow = true;
+  baseChassis.receiveShadow = true;
+  laptopGroup.add(baseChassis);
+
+  // Keyboard Well
+  const deckWell = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.02, 1.25), keyboardWellMat);
+  deckWell.position.set(0, baseHeight + 0.001, -0.25);
+  deckWell.receiveShadow = true;
+  laptopGroup.add(deckWell);
+
+  // Trackpad
+  const trackpad = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.005, 0.5), new THREE.MeshStandardMaterial({ color: '#22252c', roughness: 0.6 }));
+  trackpad.position.set(0, baseHeight + 0.005, 0.65);
+  laptopGroup.add(trackpad);
+
+  // 3D KEYBOARD KEYS
+  const keysList = [];
+  const rows = 5, cols = 14;
+  const keyW = 0.16, keyD = 0.15, keyH = 0.04;
+  const startX = -1.14, startZ = -0.74;
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (r === 4 && c >= 4 && c <= 8) {
+        if (c === 4) {
+          const spaceMesh = new THREE.Mesh(new THREE.BoxGeometry(keyW * 5.2, keyH, keyD), keycapMat);
+          spaceMesh.position.set(0, baseHeight + keyH * 0.5, startZ + r * 0.2);
+          spaceMesh.castShadow = true;
+          laptopGroup.add(spaceMesh);
+          keysList.push(spaceMesh);
+        }
+        continue;
+      }
+      const keyMesh = new THREE.Mesh(new THREE.BoxGeometry(keyW, keyH, keyD), keycapMat);
+      keyMesh.position.set(startX + c * 0.176, baseHeight + keyH * 0.5, startZ + r * 0.2);
+      keyMesh.castShadow = true;
+      laptopGroup.add(keyMesh);
+      keysList.push(keyMesh);
+    }
+  }
+
+  // Red TrackPoint Nub
+  const trackpoint = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.05, 16), trackpointMat);
+  trackpoint.position.set(0, baseHeight + 0.04, -0.34);
+  laptopGroup.add(trackpoint);
+
+  // 2. CLAMSHELL SCREEN LID & HINGE
+  const lidGroup = new THREE.Group();
+  lidGroup.position.set(0, baseHeight, -baseDepth * 0.5); // Back edge hinge
+  laptopGroup.add(lidGroup);
+
+  // Hinge brackets
+  const hingeGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.25, 16);
+  const hingeL = new THREE.Mesh(hingeGeo, chassisMat);
+  hingeL.rotation.z = Math.PI * 0.5;
+  hingeL.position.set(-1.1, 0, 0);
+  lidGroup.add(hingeL);
+
+  const hingeR = new THREE.Mesh(hingeGeo, chassisMat);
+  hingeR.rotation.z = Math.PI * 0.5;
+  hingeR.position.set(1.1, 0, 0);
+  lidGroup.add(hingeR);
+
+  // Screen Outer Bezel
+  const lidHeight = 2.1, lidThickness = 0.08;
+  const lidBezel = new THREE.Mesh(new THREE.BoxGeometry(baseWidth, lidHeight, lidThickness), chassisMat);
+  lidBezel.position.set(0, lidHeight * 0.5, -lidThickness * 0.5);
+  lidBezel.castShadow = true;
+  lidGroup.add(lidBezel);
+
+  // Screen Display Panel
+  const screenPanel = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.75), screenGlassMat);
+  screenPanel.position.set(0, lidHeight * 0.5 + 0.02, 0.005);
+  lidGroup.add(screenPanel);
+
+  // Default lid open angle (~15 degrees backward tilt)
+  let targetLidAngle = -0.25;
+  let currentLidAngle = targetLidAngle;
+  lidGroup.rotation.x = currentLidAngle;
+
+  /* Typing & Key Depression */
+  function pressKey() {
+    initAudio();
+    sfx.keyClick();
+
+    const key = keysList[Math.floor(Math.random() * keysList.length)];
+    if (key) {
+      key.position.y -= 0.025;
+      setTimeout(() => { key.position.y += 0.025; }, 90);
+    }
+
+    if (activeApp === 'terminal') {
+      terminalLines.push(codeSnippets[snippetIdx % codeSnippets.length]);
+      snippetIdx++;
+      if (terminalLines.length > 50) terminalLines.shift();
+    } else if (activeApp === 'chat') {
+      if (Math.random() < 0.25) {
+        chatMessages.push({
+          user: "xX_CoolGamer_06_Xx",
+          text: "lol that's awesome! type more :D",
+          time: "11:47 PM"
+        });
+        sfx.nudge();
+      }
+    }
+  }
+
+  window.addEventListener('keydown', () => pressKey());
+
+  /* Camera Presets */
+  const cameraPresets = {
+    typing: { pos: new THREE.Vector3(0, 2.2, 3.2), target: new THREE.Vector3(0, 0.5, -0.4) },
+    screen: { pos: new THREE.Vector3(0, 1.4, 2.0), target: new THREE.Vector3(0, 1.2, -0.9) },
+    orbit:  { pos: new THREE.Vector3(2.6, 2.6, 3.6), target: new THREE.Vector3(0, 0.5, 0) }
+  };
+  let activePreset = 'typing';
+  let targetCamPos = cameraPresets.typing.pos.clone();
+  let targetCamLook = cameraPresets.typing.target.clone();
+
+  document.getElementById('view-typing').addEventListener('click', () => setCameraPreset('typing'));
+  document.getElementById('view-screen').addEventListener('click', () => setCameraPreset('screen'));
+  document.getElementById('view-orbit').addEventListener('click', () => setCameraPreset('orbit'));
+
+  function setCameraPreset(mode) {
+    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`view-${mode}`).classList.add('active');
+    activePreset = mode;
+    targetCamPos = cameraPresets[mode].pos.clone();
+    targetCamLook = cameraPresets[mode].target.clone();
+  }
+
+  // Click on 3D keys with mouse
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  canvas3D.addEventListener('pointerdown', e => {
+    initAudio();
+    mouse.x = (e.clientX / W) * 2 - 1;
+    mouse.y = -(e.clientY / H) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(keysList);
+    if (intersects.length > 0) pressKey();
+  });
+
+  // Lid Open / Close toggle
+  const lidBtn = document.getElementById('lid-btn');
+  let lidClosed = false;
+  lidBtn.addEventListener('click', () => {
+    initAudio();
+    sfx.hinge();
+    lidClosed = !lidClosed;
+    // Fold forward to 1.55 rad (closed) or tilt back to -0.25 rad (open)
+    targetLidAngle = lidClosed ? 1.55 : -0.25;
+    lidBtn.textContent = lidClosed ? '📂 Open Lid' : '📁 Close Lid';
+  });
+
+  document.getElementById('modem-btn').addEventListener('click', () => {
+    initAudio();
+    sfx.dialup();
+  });
+
+  const soundBtn = document.getElementById('sound-btn');
+  soundBtn.addEventListener('click', () => {
+    initAudio();
+    soundEnabled = !soundEnabled;
+    soundBtn.textContent = soundEnabled ? '🔊 Sound' : '🔇 Muted';
+  });
+
+  // Cycle Active App on screen click
+  canvas3D.addEventListener('click', e => {
+    mouse.x = (e.clientX / W) * 2 - 1;
+    mouse.y = -(e.clientY / H) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    const hits = raycaster.intersectObject(screenPanel);
+    if (hits.length > 0) {
+      if (activeApp === 'terminal') activeApp = 'chat';
+      else if (activeApp === 'chat') activeApp = 'winamp';
+      else activeApp = 'terminal';
+      initAudio();
+      sfx.bloop && sfx.nudge();
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    camera.aspect = W / H;
+    camera.updateProjectionMatrix();
+    renderer.setSize(W, H);
+  });
+
+  /* Animation Loop */
+  let clock = new THREE.Clock();
+  function animate() {
+    requestAnimationFrame(animate);
+    const time = clock.getElapsedTime();
+
+    // Smooth lid hinge motion
+    currentLidAngle += (targetLidAngle - currentLidAngle) * 0.12;
+    lidGroup.rotation.x = currentLidAngle;
+
+    // Smooth camera motion
+    camera.position.lerp(targetCamPos, 0.08);
+    camera.lookAt(targetCamLook);
+
+    // Floating 3D rotation in orbit mode
+    if (activePreset === 'orbit') {
+      laptopGroup.rotation.y = Math.sin(time * 0.45) * 0.3;
+    } else {
+      laptopGroup.rotation.y = 0;
+    }
+
+    // Draw and update screen texture
+    drawRetroScreen(time);
+    screenTexture.needsUpdate = true;
+
+    renderer.render(scene, camera);
+  }
+
+  drawRetroScreen(0);
+  animate();
+}
+
+// Initial Boot
+drawRetroScreen(0);
+init3D();
+</script>
+</body>
+</html>

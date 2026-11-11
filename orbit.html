@@ -556,6 +556,7 @@ canvas {
 
   <div style="display: flex; gap: 6px;">
     <button class="nasa-btn" id="sound-toggle">🔊 SOUND: ON</button>
+    <button class="nasa-btn" id="speed-toggle">⚡ SPEED: 1x</button>
   </div>
 </header>
 
@@ -872,6 +873,13 @@ let earthMesh, earthCloudsMesh, moonMesh, saturnMesh;
 let raycaster, mousePointer;
 let pointTexture;
 
+let planetsToUpdate = [];
+let moonAngle = 0;
+let orbitSpeedMultiplier = 1;
+let speedMultiplierIndex = 0;
+const speedMultipliers = [1, 2, 5, 0, 0.5];
+const speedLabels = ['1x', '2x', '5x', 'PAUSED (0x)', '0.5x'];
+
 let currentSelectedData = ASTRONOMICAL_DATA[3]; // Earth
 let discoveredIds = new Set();
 let completedMissions = new Set();
@@ -887,7 +895,6 @@ function init() {
   scene = new THREE.Scene();
 
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 500000);
-  camera.position.set(80 + 10, 5, 16);
 
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -924,6 +931,15 @@ function init() {
   buildStellarNeighborhood();
   buildMilkyWay();
   buildLocalGroup();
+
+  // Set initial camera focus to Earth's starting position
+  const earthData = ASTRONOMICAL_DATA[3];
+  if (earthData) {
+    controls.target.copy(earthData.targetPos);
+    camera.position.copy(earthData.targetPos).add(earthData.camOffset);
+  } else {
+    camera.position.set(90, 5, 16);
+  }
 
   window.addEventListener('resize', onWindowResize);
   renderer.domElement.addEventListener('pointerdown', onPointerDown);
@@ -972,6 +988,8 @@ function buildDeepSpaceStarfield() {
 }
 
 function buildSolarSystem() {
+  planetsToUpdate = [];
+
   // Sun
   const sunGeo = new THREE.SphereGeometry(14, 32, 32);
   const sunMat = new THREE.MeshBasicMaterial({ map: createSunTexture() });
@@ -984,19 +1002,19 @@ function buildSolarSystem() {
   solarSystemGroup.add(sunLight);
   solarSystemGroup.add(new THREE.AmbientLight(0x223344, 0.45));
 
-  // Planets Definition
+  // Planets Definition with serene realistic orbital speeds and rotational speeds
   const planetConfigs = [
-    { idx: 1, radius: 1.5, color: 0x999999, dist: 35 },  // Mercury
-    { idx: 2, radius: 2.6, color: 0xe0a050, dist: 55 },  // Venus
-    { idx: 3, radius: 3.0, isEarth: true, dist: 80 },    // Earth
-    { idx: 5, radius: 2.2, isMars: true, dist: 110 },    // Mars
-    { idx: 6, radius: 8.5, isJupiter: true, dist: 170 }, // Jupiter
-    { idx: 7, radius: 6.8, isSaturn: true, dist: 240 },  // Saturn
-    { idx: 8, radius: 4.5, color: 0x55ccff, dist: 310 }, // Uranus
-    { idx: 9, radius: 4.3, color: 0x2255ff, dist: 380 }  // Neptune
+    { idx: 1, radius: 1.5, color: 0x999999, dist: 35, orbitSpeed: 0.0022, rotSpeed: 0.005 },  // Mercury
+    { idx: 2, radius: 2.6, color: 0xe0a050, dist: 55, orbitSpeed: 0.0015, rotSpeed: -0.003 },  // Venus
+    { idx: 3, radius: 3.0, isEarth: true, dist: 80, orbitSpeed: 0.0010, rotSpeed: 0.01 },    // Earth
+    { idx: 5, radius: 2.2, isMars: true, dist: 110, orbitSpeed: 0.0007, rotSpeed: 0.009 },    // Mars
+    { idx: 6, radius: 8.5, isJupiter: true, dist: 170, orbitSpeed: 0.0004, rotSpeed: 0.02 }, // Jupiter
+    { idx: 7, radius: 6.8, isSaturn: true, dist: 240, orbitSpeed: 0.00028, rotSpeed: 0.018 },  // Saturn
+    { idx: 8, radius: 4.5, color: 0x55ccff, dist: 310, orbitSpeed: 0.00020, rotSpeed: 0.012 }, // Uranus
+    { idx: 9, radius: 4.3, color: 0x2255ff, dist: 380, orbitSpeed: 0.00015, rotSpeed: 0.011 }  // Neptune
   ];
 
-  planetConfigs.forEach(cfg => {
+  planetConfigs.forEach((cfg, index) => {
     const data = ASTRONOMICAL_DATA[cfg.idx];
     let mat;
 
@@ -1012,8 +1030,24 @@ function buildSolarSystem() {
 
     const geo = new THREE.SphereGeometry(cfg.radius, 32, 32);
     const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.set(cfg.dist, 0, 0);
+
+    // Stagger initial angles around orbit ring so planets do NOT start aligned in 1 single row!
+    const initialAngle = (index / planetConfigs.length) * Math.PI * 2 + (index * 0.4);
+    mesh.position.set(Math.cos(initialAngle) * cfg.dist, 0, Math.sin(initialAngle) * cfg.dist);
     mesh.userData = data;
+
+    // Track planet for orbital motion in animate loop
+    planetsToUpdate.push({
+      mesh: mesh,
+      data: data,
+      dist: cfg.dist,
+      angle: initialAngle,
+      orbitSpeed: cfg.orbitSpeed,
+      rotSpeed: cfg.rotSpeed
+    });
+
+    // Update targetPos initially
+    mesh.getWorldPosition(data.targetPos);
 
     // Earth specific layers
     if (cfg.isEarth) {
@@ -1197,13 +1231,51 @@ function buildLocalGroup() {
 function animate(t) {
   requestAnimationFrame(animate);
 
-  // Rotations
-  if (earthMesh) earthMesh.rotation.y += 0.004;
-  if (earthCloudsMesh) earthCloudsMesh.rotation.y += 0.006;
+  // Store previous target position for target tracking
+  const prevTargetPos = new THREE.Vector3();
+  const isTrackingBody = currentSelectedData && currentSelectedData.scaleLvl === 1 && currentSelectedData.id !== 'sun';
+  if (isTrackingBody) {
+    prevTargetPos.copy(currentSelectedData.targetPos);
+  }
+
+  // Update Sun self-rotation
+  if (solarSystemGroup && solarSystemGroup.children[0]) {
+    solarSystemGroup.children[0].rotation.y += 0.001 * orbitSpeedMultiplier;
+  }
+
+  // Update all planet orbital revolving positions & rotational spins
+  planetsToUpdate.forEach(p => {
+    p.angle += p.orbitSpeed * orbitSpeedMultiplier;
+    p.mesh.position.x = Math.cos(p.angle) * p.dist;
+    p.mesh.position.z = Math.sin(p.angle) * p.dist;
+    p.mesh.rotation.y += p.rotSpeed * orbitSpeedMultiplier;
+
+    // Keep data.targetPos in sync with live world position
+    p.mesh.getWorldPosition(p.data.targetPos);
+  });
+
+  // Earth Clouds rotation
+  if (earthCloudsMesh) earthCloudsMesh.rotation.y += 0.004 * orbitSpeedMultiplier;
+
+  // Moon orbiting Earth
+  if (moonMesh) {
+    moonAngle += 0.006 * orbitSpeedMultiplier;
+    moonMesh.position.x = Math.cos(moonAngle) * 7;
+    moonMesh.position.z = Math.sin(moonAngle) * 7;
+    moonMesh.rotation.y += 0.008 * orbitSpeedMultiplier;
+    const moonData = ASTRONOMICAL_DATA[4];
+    if (moonData) moonMesh.getWorldPosition(moonData.targetPos);
+  }
+
+  // Milky Way rotation
   if (milkyWayGroup) milkyWayGroup.rotation.y += 0.00015;
 
-  // Smooth Camera Fly-To transitions
+  // Smooth Camera Fly-To transitions & dynamic tracking
   if (cameraTargetPos) {
+    if (isTrackingBody) {
+      cameraLookTarget.copy(currentSelectedData.targetPos);
+      cameraTargetPos.copy(currentSelectedData.targetPos).add(currentSelectedData.camOffset);
+    }
     camera.position.lerp(cameraTargetPos, 0.06);
     controls.target.lerp(cameraLookTarget, 0.06);
     controls.update();
@@ -1212,6 +1284,12 @@ function animate(t) {
       cameraTargetPos = null;
     }
   } else {
+    // If tracking a moving planet, shift camera and controls target seamlessly
+    if (isTrackingBody) {
+      const delta = new THREE.Vector3().subVectors(currentSelectedData.targetPos, prevTargetPos);
+      controls.target.add(delta);
+      camera.position.add(delta);
+    }
     controls.update();
   }
 
@@ -1347,6 +1425,12 @@ function bindUI() {
   document.getElementById('sound-toggle').onclick = () => {
     soundMuted = !soundMuted;
     document.getElementById('sound-toggle').textContent = `🔊 SOUND: ${soundMuted ? 'OFF' : 'ON'}`;
+  };
+
+  document.getElementById('speed-toggle').onclick = () => {
+    speedMultiplierIndex = (speedMultiplierIndex + 1) % speedMultipliers.length;
+    orbitSpeedMultiplier = speedMultipliers[speedMultiplierIndex];
+    document.getElementById('speed-toggle').textContent = `⚡ SPEED: ${speedLabels[speedMultiplierIndex]}`;
   };
 
   document.getElementById('drawer-close-btn').onclick = () => {
