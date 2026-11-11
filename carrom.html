@@ -15,10 +15,11 @@
     --border-wood: #2c1208;
     --gold: #ffbe3b;
     --amber: #e69224;
+    --cyan: #00f0ff;
     --text: #f0f4f8;
-    --muted: rgba(240, 244, 248, 0.55);
-    --panel: rgba(12, 16, 26, 0.88);
-    --border: rgba(230, 184, 74, 0.28);
+    --muted: rgba(240, 244, 248, 0.6);
+    --panel: rgba(12, 16, 26, 0.92);
+    --border: rgba(230, 184, 74, 0.32);
     --mono: "Geist Mono", ui-monospace, monospace;
     --display: "Funnel Display", sans-serif;
     --body: "Bricolage Grotesque", sans-serif;
@@ -33,9 +34,10 @@
 
   #canvas-container {
     position: fixed; inset: 0; width: 100%; height: 100%;
-    cursor: grab; z-index: 1;
+    cursor: crosshair; z-index: 1;
   }
-  #canvas-container:active { cursor: grabbing; }
+  #canvas-container.aiming { cursor: crosshair; }
+  #canvas-container.dragging { cursor: grabbing; }
 
   /* TOP HUD */
   .hud-top {
@@ -76,59 +78,99 @@
   }
   .mode-tab:hover { color: #fff; }
   .mode-tab.active {
-    background: linear-gradient(135deg, rgba(230, 184, 74, 0.3), rgba(198, 146, 40, 0.15));
-    border: 1px solid var(--gold); color: #fff; box-shadow: 0 0 14px rgba(230, 184, 74, 0.3);
+    background: linear-gradient(135deg, rgba(230, 184, 74, 0.35), rgba(198, 146, 40, 0.2));
+    border: 1px solid var(--gold); color: #fff; box-shadow: 0 0 14px rgba(230, 184, 74, 0.35);
   }
 
   /* TOP MATCH SCOREBOARD */
   .score-banner {
-    position: fixed; top: 76px; left: 50%; transform: translateX(-50%);
+    position: fixed; top: 74px; left: 50%; transform: translateX(-50%);
     background: var(--panel); border: 1px solid var(--border);
     padding: 8px 22px; border-radius: 999px; backdrop-filter: blur(16px);
     display: flex; align-items: center; gap: 18px; z-index: 25;
     font: 600 12px/1 var(--mono); box-shadow: 0 10px 30px rgba(0,0,0,0.6);
   }
-  .score-val { color: var(--gold); font-weight: 700; font-size: 14px; }
+  .score-val { color: var(--gold); font-weight: 800; font-size: 15px; }
   .pieces-summary { display: flex; align-items: center; gap: 12px; }
   .piece-pill { display: flex; align-items: center; gap: 5px; font-size: 11px; }
   .p-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
   .p-white { background: #fdfaf2; border: 1px solid #999; }
-  .p-black { background: #1c1917; border: 1px solid #444; }
-  .p-queen { background: #dc2626; border: 1px solid #ffd700; box-shadow: 0 0 6px #dc2626; }
+  .p-black { background: #1c1917; border: 1px solid #555; }
+  .p-queen { background: #dc2626; border: 1px solid #ffd700; box-shadow: 0 0 8px #dc2626; }
 
-  /* BOTTOM STRIKER POSITIONING SLIDER */
-  .baseline-dock {
-    position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%);
+  /* CAMERA VIEW PRESETS */
+  .view-presets {
+    position: fixed; top: 74px; left: 20px;
+    display: flex; flex-direction: column; gap: 6px; z-index: 25;
+  }
+  .cam-btn {
     background: var(--panel); border: 1px solid var(--border);
-    padding: 8px 22px; border-radius: 999px; backdrop-filter: blur(16px);
-    display: flex; align-items: center; gap: 14px; z-index: 30;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.6); font: 600 11px/1 var(--mono);
+    padding: 7px 14px; border-radius: 999px; color: var(--muted);
+    font: 600 11px/1 var(--body); cursor: pointer; backdrop-filter: blur(16px);
+    transition: all 0.2s; text-align: left; display: flex; align-items: center; gap: 6px;
   }
-  .baseline-slider {
-    -webkit-appearance: none; width: 180px; height: 6px; border-radius: 999px;
-    background: rgba(255, 255, 255, 0.15); outline: none; cursor: pointer;
-  }
-  .baseline-slider::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
-    background: #ffffff; border: 2px solid var(--gold);
-    box-shadow: 0 0 10px var(--gold); cursor: pointer;
-    transition: transform 0.1s;
-  }
-  .baseline-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  .cam-btn:hover { color: #fff; border-color: var(--gold); }
+  .cam-btn.active { background: rgba(230, 184, 74, 0.28); border-color: var(--gold); color: #fff; }
 
-  /* BOTTOM CONTROLS DOCK */
-  .bottom-dock {
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  /* MASTER BOTTOM CONTROL CONSOLE */
+  .console-dock {
+    position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
     background: var(--panel); border: 1px solid var(--border);
     padding: 10px 22px; border-radius: 999px; backdrop-filter: blur(20px);
-    display: flex; align-items: center; gap: 14px; z-index: 30;
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+    display: flex; align-items: center; gap: 16px; z-index: 35;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.8);
+  }
+
+  .control-unit {
+    display: flex; align-items: center; gap: 8px; font: 600 11px/1 var(--mono);
+    color: var(--muted);
+  }
+  .control-label { text-transform: uppercase; letter-spacing: 0.5px; font-size: 10px; }
+  .val-badge {
+    background: rgba(255, 255, 255, 0.08); padding: 3px 8px; border-radius: 6px;
+    color: var(--gold); font-weight: 700; min-width: 36px; text-align: center;
+  }
+
+  .slider-input {
+    -webkit-appearance: none; width: 110px; height: 5px; border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16); outline: none; cursor: pointer;
+  }
+  .slider-input::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+    background: #ffffff; border: 2px solid var(--gold);
+    box-shadow: 0 0 8px var(--gold); cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .slider-input::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+  /* BIG TACTILE STRIKE BUTTON */
+  .strike-btn {
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #ffbe3b 0%, #e68a00 100%);
+    color: #0b0d14; border: 0; padding: 10px 24px; border-radius: 999px;
+    font: 800 13px/1 var(--display); letter-spacing: 0.5px;
+    cursor: pointer; display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 0 24px rgba(255, 190, 59, 0.55), 0 4px 12px rgba(0,0,0,0.5);
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .strike-btn:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 0 32px rgba(255, 190, 59, 0.8), 0 6px 16px rgba(0,0,0,0.6);
+  }
+  .strike-btn:active { transform: translateY(1px) scale(0.98); }
+  .strike-btn.disabled {
+    opacity: 0.45; filter: grayscale(0.8); pointer-events: none;
+    box-shadow: none;
+  }
+  .strike-hint {
+    background: rgba(0, 0, 0, 0.25); color: #fff; font: 700 9px/1 var(--mono);
+    padding: 3px 6px; border-radius: 4px; letter-spacing: 0;
   }
 
   .powder-btn {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
     border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff; padding: 9px 16px; border-radius: 999px;
+    color: #fff; padding: 8px 14px; border-radius: 999px;
     font: 600 11px/1 var(--mono); cursor: pointer;
     display: flex; align-items: center; gap: 6px; transition: all 0.2s;
   }
@@ -136,29 +178,26 @@
 
   .tool-btn {
     background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12);
-    padding: 8px 14px; border-radius: 999px; color: var(--text);
+    padding: 8px 12px; border-radius: 999px; color: var(--text);
     font: 600 11px/1 var(--body); cursor: pointer;
-    display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+    display: flex; align-items: center; gap: 5px; transition: all 0.2s;
   }
-  .tool-btn:hover { background: rgba(255, 255, 255, 0.14); border-color: var(--gold); color: #fff; }
+  .tool-btn:hover { background: rgba(255, 255, 255, 0.15); border-color: var(--gold); color: #fff; }
 
-  /* CAMERA VIEW PRESETS */
-  .view-presets {
-    position: fixed; bottom: 84px; left: 24px;
-    display: flex; flex-direction: column; gap: 6px; z-index: 30;
+  /* ONBOARDING SLINGSHOT HINT */
+  .slingshot-hint {
+    position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.72); border: 1px solid rgba(255, 190, 59, 0.3);
+    padding: 7px 20px; border-radius: 999px; pointer-events: none;
+    font: 600 11px/1.4 var(--mono); color: var(--muted); backdrop-filter: blur(10px);
+    z-index: 25; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.6);
   }
-  .cam-btn {
-    background: var(--panel); border: 1px solid var(--border);
-    padding: 8px 14px; border-radius: 999px; color: var(--muted);
-    font: 600 11px/1 var(--body); cursor: pointer; backdrop-filter: blur(16px);
-    transition: all 0.2s; text-align: left; display: flex; align-items: center; gap: 6px;
-  }
-  .cam-btn:hover { color: #fff; border-color: var(--gold); }
-  .cam-btn.active { background: rgba(230, 184, 74, 0.25); border-color: var(--gold); color: #fff; }
+  .slingshot-hint b { color: var(--gold); }
+  .slingshot-hint span { color: var(--cyan); }
 
-  /* TOAST */
+  /* TOAST NOTIFICATION */
   .toast {
-    position: fixed; top: 125px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    position: fixed; top: 122px; left: 50%; transform: translateX(-50%) translateY(-20px);
     background: rgba(12, 16, 26, 0.96); border: 1px solid var(--gold);
     color: #fff; padding: 10px 24px; border-radius: 999px;
     font: 700 13px/1 var(--mono); backdrop-filter: blur(16px);
@@ -167,24 +206,14 @@
   }
   .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-  /* ONBOARDING SLINGSHOT HINT */
-  .slingshot-hint {
-    position: fixed; bottom: 140px; left: 50%; transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.65); border: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 6px 18px; border-radius: 999px; pointer-events: none;
-    font: 500 11px/1.4 var(--mono); color: var(--muted); backdrop-filter: blur(8px);
-    z-index: 25; text-align: center;
-  }
-  .slingshot-hint b { color: var(--gold); }
-
-  @media (max-width: 860px) {
+  @media (max-width: 980px) {
     .hud-top { flex-direction: column; gap: 8px; align-items: flex-start; }
     .mode-tabs { align-self: center; }
-    .baseline-dock { bottom: 76px; padding: 6px 16px; }
-    .bottom-dock { width: calc(100% - 32px); padding: 8px 12px; justify-content: space-between; }
+    .console-dock { width: calc(100% - 24px); padding: 8px 12px; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .slider-input { width: 80px; }
     .view-presets { display: none; }
-    .baseline-slider { width: 120px; }
     .score-banner { top: 110px; padding: 6px 14px; font-size: 11px; }
+    .slingshot-hint { bottom: 116px; font-size: 10px; padding: 5px 14px; }
   }
 </style>
 
@@ -229,24 +258,38 @@
   <button class="cam-btn" id="cam-orbit">🌐 3D Free Orbit</button>
 </div>
 
-<!-- BASELINE STRIKER PLACEMENT SLIDER -->
-<div class="baseline-dock">
-  <span>Baseline Position:</span>
-  <input type="range" class="baseline-slider" id="baseline-slider" min="-6.2" max="6.2" step="0.1" value="0">
-  <span id="baseline-pos">0.0</span>
-</div>
-
-<!-- BOTTOM DOCK -->
-<nav class="bottom-dock">
-  <button class="powder-btn" id="powder-btn">✨ Sprinkle Powder</button>
-  <button class="tool-btn" id="reset-btn">🔄 Re-Rack Board</button>
-  <button class="tool-btn" id="sound-btn">🔊 Sound: ON</button>
-</nav>
-
-<!-- SLINGSHOT INSTRUCTION HINT -->
+<!-- INSTRUCTION HINT -->
 <div class="slingshot-hint" id="slingshot-hint">
-  🎯 <b>Slide baseline to position striker</b> · 🏹 <b>Drag striker backward & release to shoot!</b>
+  🏹 <b>Drag striker to pull & release</b> · Or aim & click <span>⚡ FLICK STRIKER</span> (Space)
 </div>
+
+<!-- MASTER BOTTOM CONSOLE -->
+<nav class="console-dock">
+  <!-- Baseline Slider -->
+  <div class="control-unit">
+    <span class="control-label">Baseline:</span>
+    <input type="range" class="slider-input" id="baseline-slider" min="-6.2" max="6.2" step="0.1" value="0">
+    <span id="baseline-pos" class="val-badge">0.0</span>
+  </div>
+
+  <!-- Power Meter -->
+  <div class="control-unit">
+    <span class="control-label">Power:</span>
+    <input type="range" class="slider-input" id="power-slider" min="25" max="100" step="5" value="75">
+    <span id="power-val" class="val-badge">75%</span>
+  </div>
+
+  <!-- Big Glowing Strike Button -->
+  <button class="strike-btn" id="strike-btn">
+    <span>⚡</span>
+    <span>FLICK STRIKER</span>
+    <span class="strike-hint">SPACE</span>
+  </button>
+
+  <button class="powder-btn" id="powder-btn" title="Sprinkle talcum powder to reduce friction">✨ Powder</button>
+  <button class="tool-btn" id="reset-btn" title="Re-rack board">🔄 Re-Rack</button>
+  <button class="tool-btn" id="sound-btn">🔊 Sound</button>
+</nav>
 
 <!-- TOAST NOTIFICATION -->
 <div class="toast" id="toast">✨ White Piece Potted (+20 pts)!</div>
@@ -258,7 +301,6 @@
    - Solid Sheesham wooden boundary rail rebound thuds
    - Soft talcum powder friction swoosh
    - Corner pocket drop clunks into crochet string nets
-   - Queen potted royal fanfare
    ========================================================================== */
 class CarromAudio {
   constructor() {
@@ -273,23 +315,22 @@ class CarromAudio {
     if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
   }
 
-  // Wooden disk-on-disk strike (Crisp mango wood / sheesham clack)
+  // Wooden disk-on-disk strike (Crisp sheesham clack)
   woodClack(relVel = 1.0) {
     if (!this.enabled || !this.ctx) return;
     const now = this.ctx.currentTime;
-    const v = Math.min(2.2, Math.max(0.08, relVel));
+    const v = Math.min(2.5, Math.max(0.1, relVel));
 
-    // Sharp high transient snap
     const osc = this.ctx.createOscillator();
     const g = this.ctx.createGain();
     osc.type = 'triangle';
-    const pitch = 1450 + Math.random() * 300;
+    const pitch = 1450 + Math.random() * 320;
     osc.frequency.setValueAtTime(pitch, now);
     osc.frequency.exponentialRampToValueAtTime(320, now + 0.018);
 
-    const vol = Math.min(0.28, 0.05 + v * 0.12);
+    const vol = Math.min(0.32, 0.06 + v * 0.12);
     g.gain.setValueAtTime(vol, now);
-    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.026);
     osc.connect(g); g.connect(this.ctx.destination);
     osc.start(now); osc.stop(now + 0.03);
 
@@ -299,7 +340,7 @@ class CarromAudio {
     osc2.type = 'sine';
     osc2.frequency.setValueAtTime(620 + Math.random() * 120, now);
     osc2.frequency.exponentialRampToValueAtTime(180, now + 0.04);
-    g2.gain.setValueAtTime(vol * 0.8, now);
+    g2.gain.setValueAtTime(vol * 0.75, now);
     g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
     osc2.connect(g2); g2.connect(this.ctx.destination);
     osc2.start(now); osc2.stop(now + 0.05);
@@ -312,12 +353,12 @@ class CarromAudio {
     const osc = this.ctx.createOscillator();
     const g = this.ctx.createGain();
     osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(260, now);
-    osc.frequency.exponentialRampToValueAtTime(60, now + 0.04);
-    g.gain.setValueAtTime(0.15 * power, now);
-    g.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
+    osc.frequency.setValueAtTime(280, now);
+    osc.frequency.exponentialRampToValueAtTime(55, now + 0.045);
+    g.gain.setValueAtTime(0.18 * power, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
     osc.connect(g); g.connect(this.ctx.destination);
-    osc.start(now); osc.stop(now + 0.05);
+    osc.start(now); osc.stop(now + 0.055);
   }
 
   // Boundary Wood Rail Thud
@@ -327,26 +368,26 @@ class CarromAudio {
     const osc = this.ctx.createOscillator();
     const g = this.ctx.createGain();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(210, now);
-    osc.frequency.exponentialRampToValueAtTime(55, now + 0.06);
-    const vol = Math.min(0.16, 0.04 + vel * 0.08);
+    osc.frequency.setValueAtTime(220, now);
+    osc.frequency.exponentialRampToValueAtTime(50, now + 0.06);
+    const vol = Math.min(0.18, 0.05 + vel * 0.08);
     g.gain.setValueAtTime(vol, now);
-    g.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
     osc.connect(g); g.connect(this.ctx.destination);
-    osc.start(now); osc.stop(now + 0.065);
+    osc.start(now); osc.stop(now + 0.07);
   }
 
   // Dropping into Crochet Net Corner Pocket
   pocketDrop() {
     if (!this.enabled || !this.ctx) return;
     const now = this.ctx.currentTime;
-    this.woodClack(0.4);
+    this.woodClack(0.5);
     const osc = this.ctx.createOscillator();
     const g = this.ctx.createGain();
     osc.type = 'triangle';
-    osc.frequency.setValueAtTime(125, now + 0.02);
+    osc.frequency.setValueAtTime(130, now + 0.02);
     osc.frequency.exponentialRampToValueAtTime(40, now + 0.14);
-    g.gain.setValueAtTime(0.18, now + 0.02);
+    g.gain.setValueAtTime(0.2, now + 0.02);
     g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
     osc.connect(g); g.connect(this.ctx.destination);
     osc.start(now + 0.02); osc.stop(now + 0.16);
@@ -365,22 +406,23 @@ class CarromAudio {
     const f = this.ctx.createBiquadFilter();
     f.type = 'bandpass'; f.frequency.setValueAtTime(3200, now); f.Q.value = 2.0;
     const g = this.ctx.createGain();
-    g.gain.setValueAtTime(0.06, now);
+    g.gain.setValueAtTime(0.07, now);
     g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
     src.connect(f); f.connect(g); g.connect(this.ctx.destination);
     src.start(now);
   }
 }
 const sfx = new CarromAudio();
-document.body.addEventListener('click', () => sfx.init(), { once: true });
+document.body.addEventListener('pointerdown', () => sfx.init(), { once: true });
+document.body.addEventListener('keydown', () => sfx.init(), { once: true });
 
 /* ==========================================================================
    PHYSICS CONSTANTS & TALCUM POWDER FRICTION MODEL
    - Board Surface: 20 x 20 units
    - Carrom Men: radius = 0.62 units, mass = 5.5 grams
-   - Striker: radius = 0.85 units, mass = 15.0 grams (Heavy acrylic momentum!)
-   - Linear friction deceleration: v(t+dt) = max(0, v - a*dt) -> 100% natural glide
-   - 4 Corner Pockets: (±8.8, ±8.8) with radius 1.35 units
+   - Striker: radius = 0.86 units, mass = 15.0 grams (Heavy acrylic momentum!)
+   - Linear friction deceleration: v(t+dt) = max(0, v - a*dt)
+   - 4 Corner Pockets: (±8.85, ±8.85) with radius 1.38 units
    ========================================================================== */
 const BOARD_SIZE = 20.0;
 const HALF_BOARD = 10.0;
@@ -389,8 +431,8 @@ const STRIKER_R = 0.86;
 const PIECE_MASS = 5.5;
 const STRIKER_MASS = 15.0;
 const RESTITUTION = 0.94;
-const RAIL_RESTITUTION = 0.82;
-let frictionDecel = 5.2; // Units per second squared (simulates fine boric powder)
+const RAIL_RESTITUTION = 0.84;
+let frictionDecel = 4.8; // boric powder friction
 const POCKET_RADIUS = 1.38;
 
 const POCKETS = [
@@ -422,7 +464,6 @@ function makeCarromBoardTexture() {
   ctx.translate(512, 512);
 
   // 2. Central Concentric Rings & Rosette
-  // Outer circle
   ctx.strokeStyle = '#222222'; ctx.lineWidth = 4;
   ctx.beginPath(); ctx.arc(0, 0, 160, 0, Math.PI * 2); ctx.stroke();
   ctx.lineWidth = 2;
@@ -515,7 +556,7 @@ class CarromPiece {
     } else if (type === 'striker') {
       color = 0xffffff;
       roughness = 0.15;
-      metalness = 0.1;
+      metalness = 0.15;
     }
 
     const mat = new THREE.MeshStandardMaterial({ color, roughness, metalness });
@@ -524,14 +565,18 @@ class CarromPiece {
     this.mesh.receiveShadow = true;
     this.mesh.position.set(x, h * 0.5, y);
 
-    // Decorative center ring on top of coins
+    // Decorative Center Ring / Jade Gem
     if (type === 'striker') {
-      const gem = new THREE.Mesh(new THREE.CylinderGeometry(this.r * 0.4, this.r * 0.4, h + 0.02, 16),
-        new THREE.MeshStandardMaterial({ color: 0x059669, roughness: 0.2, metalness: 0.5 }));
+      const gem = new THREE.Mesh(
+        new THREE.CylinderGeometry(this.r * 0.42, this.r * 0.42, h + 0.02, 16),
+        new THREE.MeshStandardMaterial({ color: 0x059669, roughness: 0.2, metalness: 0.6 })
+      );
       this.mesh.add(gem);
     } else {
-      const ring = new THREE.Mesh(new THREE.TorusGeometry(this.r * 0.5, 0.04, 8, 20),
-        new THREE.MeshBasicMaterial({ color: type === 'black' ? 0x444444 : (type === 'queen' ? 0xffd700 : 0xccbba5) }));
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(this.r * 0.5, 0.04, 8, 20),
+        new THREE.MeshBasicMaterial({ color: type === 'black' ? 0x444444 : (type === 'queen' ? 0xffd700 : 0xccbba5) })
+      );
       ring.rotation.x = Math.PI / 2;
       ring.position.y = h * 0.5 + 0.002;
       this.mesh.add(ring);
@@ -573,7 +618,7 @@ class CarromPiece {
     this.vel.set(0, 0);
     this.isPotted = false;
     this.dropAnim = 0;
-    this.mesh.position.set(x, 0.16, y);
+    this.mesh.position.set(x, 0.19, y);
     this.mesh.scale.set(1, 1, 1);
     this.mesh.visible = true;
     this.shadow.visible = true;
@@ -589,9 +634,10 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color('#07090f');
 scene.fog = new THREE.FogExp2('#07090f', 0.012);
 
+// Framed camera height: 35.0 gives complete, comfortable view of the 24.4x24.4 board
 const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(0, 28, 0.001); // Default Overhead
-camera.lookAt(0, 0, 0);
+camera.position.set(0, 35, 1.0);
+camera.lookAt(0, 0, -0.6);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -602,8 +648,8 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.35;
 container.appendChild(renderer.domElement);
 
-// Lighting: Warm Room Chandelier & Soft Shadows
-const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
+// Lighting: Warm Room Chandelier & Soft Ambient
+const ambientLight = new THREE.AmbientLight(0xffffff, 1.45);
 scene.add(ambientLight);
 
 const hemiLight = new THREE.HemisphereLight(0xfff7ed, 0x1c2438, 1.6);
@@ -616,8 +662,8 @@ dirLight.shadow.mapSize.width = 2048; dirLight.shadow.mapSize.height = 2048;
 dirLight.shadow.bias = -0.0001;
 scene.add(dirLight);
 
-// Floor & Room
-const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 60),
+// Floor
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(70, 70),
   new THREE.MeshStandardMaterial({ color: 0x0c0f18, roughness: 0.7, metalness: 0.1 }));
 floor.rotation.x = -Math.PI / 2; floor.position.y = -6.0;
 floor.receiveShadow = true; scene.add(floor);
@@ -641,7 +687,6 @@ boardGroup.add(boardBed);
 
 // 2. 4 Corner Crochet Pocket Net Drop Holes
 POCKETS.forEach(p => {
-  // Deep net well recessed below board
   const well = new THREE.Mesh(new THREE.CylinderGeometry(POCKET_RADIUS, POCKET_RADIUS * 0.8, 1.4, 24, 1, true), pocketNetMat);
   well.position.set(p.x, -0.7, p.y);
   boardGroup.add(well);
@@ -688,7 +733,7 @@ railR.castShadow = true; railR.receiveShadow = true; boardGroup.add(railR);
   boardGroup.add(cap);
 });
 
-// Sturdy Turned Wood Table Legs
+// Sturdy Table Legs
 const legGeo = new THREE.CylinderGeometry(0.85, 0.6, 6.0, 16);
 [
   [-HALF_BOARD - 0.5, -HALF_BOARD - 0.5], [HALF_BOARD + 0.5, -HALF_BOARD - 0.5],
@@ -700,20 +745,29 @@ const legGeo = new THREE.CylinderGeometry(0.85, 0.6, 6.0, 16);
 });
 
 /* ==========================================================================
-   SLINGSHOT TENSION & TRAJECTORY GUIDE LINES (TACTILE LIKE LAMP.HTML)
+   TACTILE AIMING LASER GUIDE & SLINGSHOT TENSION LINE
    ========================================================================== */
-// Trajectory Aiming Line (Projects forward from striker)
+// 1. Forward Trajectory Laser Guide
 const aimGeo = new THREE.BufferGeometry();
 const aimPos = new Float32Array(6);
 aimGeo.setAttribute('position', new THREE.BufferAttribute(aimPos, 3));
-const aimLine = new THREE.Line(aimGeo, new THREE.LineBasicMaterial({ color: 0x00f0ff, linewidth: 2 }));
+const aimLine = new THREE.Line(aimGeo, new THREE.LineBasicMaterial({ color: 0x00f0ff, linewidth: 3 }));
 scene.add(aimLine);
 
-// Slingshot Tension Rubber Band Line (Pulls backward from striker)
+// Ghost Striker Target Reticle Indicator
+const ghostStrikerGeo = new THREE.RingGeometry(STRIKER_R * 0.85, STRIKER_R, 32);
+const ghostStrikerMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.6, side: THREE.DoubleSide });
+const ghostStriker = new THREE.Mesh(ghostStrikerGeo, ghostStrikerMat);
+ghostStriker.rotation.x = -Math.PI / 2;
+ghostStriker.position.y = 0.05;
+scene.add(ghostStriker);
+
+// 2. Slingshot Tension Rubber Band (Behind striker when pulling back)
 const pullGeo = new THREE.BufferGeometry();
 const pullPos = new Float32Array(6);
 pullGeo.setAttribute('position', new THREE.BufferAttribute(pullPos, 3));
-const pullLine = new THREE.Line(pullGeo, new THREE.LineBasicMaterial({ color: 0xff4757, linewidth: 3 }));
+const pullLine = new THREE.Line(pullGeo, new THREE.LineBasicMaterial({ color: 0xff3b30, linewidth: 4 }));
+pullLine.visible = false;
 scene.add(pullLine);
 
 /* ==========================================================================
@@ -728,14 +782,20 @@ let queenPotted = false;
 let currentCamMode = 'overhead'; // 'overhead' | 'player' | 'orbit'
 let currentGameMode = 'points';   // 'points' | 'zen' | 'trick'
 
+// Turn State: 'AIMING' | 'ROLLING' | 'RESETTING'
+let turnState = 'AIMING';
+let aimAngle = -Math.PI / 2; // Point straight up towards queen initially
+
 // Striker Slingshot Dragging State
-let isDraggingStriker = false;
-let dragStart = new THREE.Vector2();
+let isDragging = false;
+let dragOrigin = new THREE.Vector2();
 let dragCurrent = new THREE.Vector2();
 
 function rackCarrom(mode = 'points') {
   currentGameMode = mode;
-  // Clear old pieces
+  turnState = 'AIMING';
+
+  // Clear existing pieces
   pieces.forEach(p => {
     scene.remove(p.mesh);
     scene.remove(p.shadow);
@@ -750,29 +810,51 @@ function rackCarrom(mode = 'points') {
   document.getElementById('black-count').textContent = '9';
   document.getElementById('queen-status').textContent = 'Center';
 
-  // 1. Red Queen in Exact Center
-  pieces.push(new CarromPiece('queen', 0, 0));
+  if (mode === 'points') {
+    // 1. Red Queen in Exact Center
+    pieces.push(new CarromPiece('queen', 0, 0));
 
-  // 2. Inner Ring: 6 Pieces alternating White & Black around Queen
-  const innerR = PIECE_R * 2.05;
-  for (let i = 0; i < 6; i++) {
-    const ang = (i * Math.PI) / 3;
-    const type = i % 2 === 0 ? 'white' : 'black';
-    pieces.push(new CarromPiece(type, Math.cos(ang) * innerR, Math.sin(ang) * innerR));
+    // 2. Inner Ring: 6 Pieces alternating White & Black around Queen
+    const innerR = PIECE_R * 2.05;
+    for (let i = 0; i < 6; i++) {
+      const ang = (i * Math.PI) / 3;
+      const type = i % 2 === 0 ? 'white' : 'black';
+      pieces.push(new CarromPiece(type, Math.cos(ang) * innerR, Math.sin(ang) * innerR));
+    }
+
+    // 3. Outer Ring: 12 Pieces alternating
+    const outerR = PIECE_R * 4.08;
+    const outerPattern = [
+      'white', 'white', 'black', 'white', 'black', 'black',
+      'white', 'white', 'black', 'white', 'black', 'black'
+    ];
+    for (let i = 0; i < 12; i++) {
+      const ang = (i * Math.PI) / 6 + Math.PI / 12;
+      pieces.push(new CarromPiece(outerPattern[i], Math.cos(ang) * outerR, Math.sin(ang) * outerR));
+    }
+  } else if (mode === 'zen') {
+    // Scattered Practice Layout
+    pieces.push(new CarromPiece('queen', 0, -1.5));
+    for (let i = 0; i < 9; i++) {
+      const ang = (i / 9) * Math.PI * 2;
+      pieces.push(new CarromPiece('white', Math.cos(ang) * 4.2, Math.sin(ang) * 4.2));
+    }
+    for (let i = 0; i < 9; i++) {
+      const ang = (i / 9) * Math.PI * 2 + 0.35;
+      pieces.push(new CarromPiece('black', Math.cos(ang) * 6.0, Math.sin(ang) * 6.0));
+    }
+  } else if (mode === 'trick') {
+    // Precision Trick Cut Layout
+    pieces.push(new CarromPiece('queen', 0, 0));
+    pieces.push(new CarromPiece('white', -6.0, -6.0));
+    pieces.push(new CarromPiece('white',  6.0, -6.0));
+    pieces.push(new CarromPiece('black', -6.0,  6.0));
+    pieces.push(new CarromPiece('black',  6.0,  6.0));
+    pieces.push(new CarromPiece('white', 0, -4.5));
+    pieces.push(new CarromPiece('black', 0, 4.5));
   }
 
-  // 3. Outer Ring: 12 Pieces alternating
-  const outerR = PIECE_R * 4.08;
-  const outerPattern = [
-    'white', 'white', 'black', 'white', 'black', 'black',
-    'white', 'white', 'black', 'white', 'black', 'black'
-  ];
-  for (let i = 0; i < 12; i++) {
-    const ang = (i * Math.PI) / 6 + Math.PI / 12;
-    pieces.push(new CarromPiece(outerPattern[i], Math.cos(ang) * outerR, Math.sin(ang) * outerR));
-  }
-
-  // 4. Create Striker on Baseline (y = 7.0)
+  // Create Striker on Baseline (y = 7.0)
   if (striker) {
     scene.remove(striker.mesh);
     scene.remove(striker.shadow);
@@ -780,9 +862,11 @@ function rackCarrom(mode = 'points') {
   const initX = parseFloat(document.getElementById('baseline-slider').value) || 0;
   striker = new CarromPiece('striker', initX, 7.0);
 
-  aimLine.visible = false;
   pullLine.visible = false;
-  showToast(mode === 'points' ? '👑 Carrom Board Racked! Aim & Pull to Shoot' : `Game Mode: ${mode.toUpperCase()}`);
+  aimAngle = -Math.PI / 2;
+  updateAimGuide();
+  updateUIState();
+  showToast(mode === 'points' ? '👑 Carrom Board Racked! Aim & Flick to Shoot' : `Game Mode: ${mode.toUpperCase()}`);
 }
 
 /* ==========================================================================
@@ -792,20 +876,25 @@ function updatePhysics(dt) {
   const allDisks = [...pieces, striker].filter(d => d && !d.isPotted);
   const SUB_STEPS = 8;
   const subDt = dt / SUB_STEPS;
+  const STOP_EPS = 0.08;
 
   for (let step = 0; step < SUB_STEPS; step++) {
     // 1. Move & Linear Talcum Powder Friction
     allDisks.forEach(d => {
       d.pos.addScaledVector(d.vel, subDt);
       const speed = d.vel.length();
+
       if (speed > 0) {
-        // Natural linear friction: v = max(0, v - a*dt)
         const newSpeed = Math.max(0, speed - frictionDecel * subDt);
-        d.vel.multiplyScalar(newSpeed / speed);
+        if (newSpeed < STOP_EPS) {
+          d.vel.set(0, 0);
+        } else {
+          d.vel.multiplyScalar(newSpeed / speed);
+        }
       }
 
-      // Check Corner Pockets
-      POCKETS.forEach(p => {
+      // Corner Pocket Detection
+      for (let p of POCKETS) {
         const dx = d.pos.x - p.x;
         const dy = d.pos.y - p.y;
         if (dx * dx + dy * dy < POCKET_RADIUS * POCKET_RADIUS) {
@@ -817,10 +906,6 @@ function updatePhysics(dt) {
             showToast('⚠️ Foul! Striker Potted (-10 pts penalty)');
             currentScore = Math.max(0, currentScore - 10);
             document.getElementById('score-val').textContent = `${currentScore} pts`;
-            setTimeout(() => {
-              const sliderX = parseFloat(document.getElementById('baseline-slider').value) || 0;
-              striker.reset(sliderX, 7.0);
-            }, 1000);
           } else {
             currentScore += d.points;
             document.getElementById('score-val').textContent = `${currentScore} pts`;
@@ -839,31 +924,33 @@ function updatePhysics(dt) {
               showToast('👑 RED QUEEN POTTED (+50 PTS)!');
             }
           }
-        }
-      });
-
-      // Check Outer Wooden Border Rails (Excluding Pocket Openings)
-      const bound = HALF_BOARD - d.r;
-      const cornerThreshold = 7.4;
-
-      // Top / Bottom Rails
-      if (Math.abs(d.pos.x) < cornerThreshold) {
-        if (d.pos.y < -bound) {
-          d.pos.y = -bound; d.vel.y = -d.vel.y * RAIL_RESTITUTION;
-          sfx.railBounce(d.vel.length());
-        } else if (d.pos.y > bound) {
-          d.pos.y = bound; d.vel.y = -d.vel.y * RAIL_RESTITUTION;
-          sfx.railBounce(d.vel.length());
+          break;
         }
       }
 
-      // Left / Right Rails
-      if (Math.abs(d.pos.y) < cornerThreshold) {
+      // Wooden Boundary Rails Collision & Containment
+      if (!d.isPotted) {
+        const bound = HALF_BOARD - d.r;
+
+        // X Bounds (Left / Right)
         if (d.pos.x < -bound) {
-          d.pos.x = -bound; d.vel.x = -d.vel.x * RAIL_RESTITUTION;
+          d.pos.x = -bound;
+          d.vel.x = -d.vel.x * RAIL_RESTITUTION;
           sfx.railBounce(d.vel.length());
         } else if (d.pos.x > bound) {
-          d.pos.x = bound; d.vel.x = -d.vel.x * RAIL_RESTITUTION;
+          d.pos.x = bound;
+          d.vel.x = -d.vel.x * RAIL_RESTITUTION;
+          sfx.railBounce(d.vel.length());
+        }
+
+        // Y Bounds (Top / Bottom)
+        if (d.pos.y < -bound) {
+          d.pos.y = -bound;
+          d.vel.y = -d.vel.y * RAIL_RESTITUTION;
+          sfx.railBounce(d.vel.length());
+        } else if (d.pos.y > bound) {
+          d.pos.y = bound;
+          d.vel.y = -d.vel.y * RAIL_RESTITUTION;
           sfx.railBounce(d.vel.length());
         }
       }
@@ -884,13 +971,12 @@ function updatePhysics(dt) {
 
         if (dist < minDist && dist > 0.0001) {
           const normal = delta.clone().divideScalar(dist);
-
-          // Positional overlap resolution weighted by inverse masses
           const overlap = minDist - dist;
           const invM1 = 1 / d1.mass;
           const invM2 = 1 / d2.mass;
           const invSum = invM1 + invM2;
 
+          // Positional overlap resolution
           d1.pos.subScaledVector(normal, overlap * (invM1 / invSum));
           d2.pos.addScaledVector(normal, overlap * (invM2 / invSum));
 
@@ -916,119 +1002,227 @@ function updatePhysics(dt) {
 
 function areDisksMoving() {
   const allDisks = [...pieces, striker].filter(d => d && !d.isPotted);
-  return allDisks.some(d => d.vel.lengthSq() > 0.0001);
+  return allDisks.some(d => d.vel.lengthSq() > 0.001);
 }
 
 /* ==========================================================================
-   SLINGSHOT STRIKER PULLBACK & SHOOTING (JUST LIKE LAMP.HTML)
+   VISUAL AIM & RETICLE GUIDE
+   ========================================================================== */
+function updateAimGuide() {
+  if (!striker || turnState !== 'AIMING') {
+    aimLine.visible = false;
+    ghostStriker.visible = false;
+    return;
+  }
+
+  aimLine.visible = true;
+  ghostStriker.visible = true;
+
+  const sx = striker.pos.x;
+  const sy = striker.pos.y;
+  const aimDist = 7.5;
+  const tx = sx + Math.cos(aimAngle) * aimDist;
+  const ty = sy + Math.sin(aimAngle) * aimDist;
+
+  // Aim Line
+  const aPos = aimGeo.attributes.position;
+  aPos.setXYZ(0, sx, 0.2, sy);
+  aPos.setXYZ(1, tx, 0.2, ty);
+  aPos.needsUpdate = true;
+
+  // Ghost Reticle
+  ghostStriker.position.set(tx, 0.06, ty);
+}
+
+function updateUIState() {
+  const strikeBtn = document.getElementById('strike-btn');
+  if (turnState === 'AIMING') {
+    strikeBtn.classList.remove('disabled');
+    container.classList.add('aiming');
+    container.classList.remove('dragging');
+  } else {
+    strikeBtn.classList.add('disabled');
+    container.classList.remove('aiming');
+  }
+}
+
+/* ==========================================================================
+   LAUNCH / FLICK ACTION
+   ========================================================================== */
+function launchStriker(powerRatio, angle) {
+  if (turnState !== 'AIMING' || !striker || striker.isPotted) return;
+
+  sfx.init();
+  turnState = 'ROLLING';
+  aimLine.visible = false;
+  ghostStriker.visible = false;
+  pullLine.visible = false;
+  updateUIState();
+
+  const clampedPower = Math.min(1.0, Math.max(0.2, powerRatio));
+  const maxSpeed = 38.0;
+  const speed = maxSpeed * clampedPower;
+
+  striker.vel.set(Math.cos(angle) * speed, Math.sin(angle) * speed);
+  sfx.strikerFlick(clampedPower);
+}
+
+/* ==========================================================================
+   TACTILE INPUT: SLINGSHOT DRAG, FORWARD FLICK & RAYCASTING
    ========================================================================== */
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 const tablePlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
 
-container.addEventListener('pointerdown', e => {
-  if (e.target.closest('header, nav, .mode-tabs, .baseline-dock, .view-presets')) return;
-  sfx.init();
-
-  if (areDisksMoving() || !striker || striker.isPotted) return;
-
+function getTableIntersect(e) {
   mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
   raycaster.setFromCamera(mouse, camera);
-
   const hitPoint = new THREE.Vector3();
   if (raycaster.ray.intersectPlane(tablePlane, hitPoint)) {
-    const distToStriker = Math.sqrt(
-      Math.pow(hitPoint.x - striker.pos.x, 2) + Math.pow(hitPoint.z - striker.pos.y, 2)
-    );
+    return new THREE.Vector2(hitPoint.x, hitPoint.z);
+  }
+  return null;
+}
 
-    // Clicked on or near striker: begin slingshot pull
-    if (distToStriker < 2.5) {
-      isDraggingStriker = true;
-      dragStart.set(striker.pos.x, striker.pos.y);
-      dragCurrent.set(hitPoint.x, hitPoint.z);
-    }
+container.addEventListener('pointerdown', e => {
+  if (e.target.closest('header, nav, .mode-tabs, .console-dock, .view-presets')) return;
+  sfx.init();
+
+  if (turnState !== 'AIMING' || !striker || striker.isPotted) return;
+
+  const hit = getTableIntersect(e);
+  if (!hit) return;
+
+  isDragging = true;
+  container.classList.add('dragging');
+  dragOrigin.set(striker.pos.x, striker.pos.y);
+  dragCurrent.copy(hit);
+
+  // Update aim directly towards touch point
+  const dir = hit.clone().sub(striker.pos);
+  if (dir.length() > 0.3) {
+    aimAngle = Math.atan2(dir.y, dir.x);
+    updateAimGuide();
   }
 });
 
 window.addEventListener('pointermove', e => {
-  if (!isDraggingStriker) return;
-  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-  raycaster.setFromCamera(mouse, camera);
+  const hit = getTableIntersect(e);
+  if (!hit) return;
 
-  const hitPoint = new THREE.Vector3();
-  if (raycaster.ray.intersectPlane(tablePlane, hitPoint)) {
-    dragCurrent.set(hitPoint.x, hitPoint.z);
+  if (turnState === 'AIMING' && !isDragging && striker) {
+    // Dynamic mouse hover aiming: aim rotates smoothly towards cursor!
+    const dir = hit.clone().sub(striker.pos);
+    if (dir.length() > 0.5) {
+      // Allow aiming forward into the board
+      const targetAngle = Math.atan2(dir.y, dir.x);
+      if (targetAngle < -0.05 && targetAngle > -Math.PI + 0.05) {
+        aimAngle = targetAngle;
+        updateAimGuide();
+      }
+    }
+  }
 
-    // Calculate Pullback Vector (Max tension clamped)
-    const pullVec = dragCurrent.clone().sub(dragStart);
-    if (pullVec.length() > 6.0) pullVec.setLength(6.0);
+  if (!isDragging || !striker) return;
 
-    // Forward aim direction is the opposite of the pull!
-    const shootDir = pullVec.clone().negate();
-    const power = pullVec.length() / 6.0;
+  dragCurrent.copy(hit);
+  const dragVec = dragCurrent.clone().sub(dragOrigin);
+  const dragLen = dragVec.length();
 
-    // Draw Tension Rubber Band (Behind striker)
-    const pPos = pullGeo.attributes.position;
-    pPos.setXYZ(0, striker.pos.x, 0.2, striker.pos.y);
-    pPos.setXYZ(1, striker.pos.x + pullVec.x, 0.2, striker.pos.y + pullVec.y);
-    pPos.needsUpdate = true;
-    pullLine.visible = true;
+  if (dragLen > 0.4) {
+    if (dragVec.y > 0) {
+      // Slingshot Pull Back (User pulled downward behind baseline)
+      const pullAngle = Math.atan2(dragVec.y, dragVec.x);
+      aimAngle = pullAngle + Math.PI; // Shoot in opposite direction (forward)
 
-    // Draw Forward Trajectory Laser (Ahead of striker)
-    const aPos = aimGeo.attributes.position;
-    aPos.setXYZ(0, striker.pos.x, 0.2, striker.pos.y);
-    aPos.setXYZ(1, striker.pos.x + shootDir.x * 3.5, 0.2, striker.pos.y + shootDir.y * 3.5);
-    aPos.needsUpdate = true;
-    aimLine.visible = true;
+      const tensionLen = Math.min(6.0, dragLen);
+      const powerPct = Math.round((tensionLen / 6.0) * 100);
+      document.getElementById('power-slider').value = powerPct;
+      document.getElementById('power-val').textContent = `${powerPct}%`;
+
+      // Render red slingshot tension line behind striker
+      const pPos = pullGeo.attributes.position;
+      pPos.setXYZ(0, striker.pos.x, 0.2, striker.pos.y);
+      pPos.setXYZ(1, dragCurrent.x, 0.2, dragCurrent.y);
+      pPos.needsUpdate = true;
+      pullLine.visible = true;
+    } else {
+      // Direct Forward Swipe
+      aimAngle = Math.atan2(dragVec.y, dragVec.x);
+      pullLine.visible = false;
+
+      const powerPct = Math.min(100, Math.round((dragLen / 5.0) * 100));
+      document.getElementById('power-slider').value = Math.max(30, powerPct);
+      document.getElementById('power-val').textContent = `${Math.max(30, powerPct)}%`;
+    }
+    updateAimGuide();
   }
 });
 
 window.addEventListener('pointerup', () => {
-  if (!isDraggingStriker) return;
-  isDraggingStriker = false;
-  aimLine.visible = false;
+  if (!isDragging) return;
+  isDragging = false;
+  container.classList.remove('dragging');
   pullLine.visible = false;
 
-  const pullVec = dragCurrent.clone().sub(dragStart);
-  if (pullVec.length() > 0.4) {
-    if (pullVec.length() > 6.0) pullVec.setLength(6.0);
-    const powerRatio = pullVec.length() / 6.0;
-    const shootDir = pullVec.clone().negate().normalize();
+  const dragVec = dragCurrent.clone().sub(dragOrigin);
+  const dragLen = dragVec.length();
 
-    // Launch striker forward!
-    const maxSpeed = 34.0;
-    striker.vel.copy(shootDir).multiplyScalar(maxSpeed * powerRatio);
-    sfx.strikerFlick(powerRatio);
+  if (dragLen > 0.6) {
+    const powerSliderVal = parseFloat(document.getElementById('power-slider').value) / 100;
+    launchStriker(powerSliderVal, aimAngle);
+  } else {
+    updateAimGuide();
   }
 });
 
-// Horizontal Baseline Placement Slider
+/* ==========================================================================
+   CONSOLE CONTROLS & HUD LISTENERS
+   ========================================================================== */
+// 1. Strike Button
+const strikeBtn = document.getElementById('strike-btn');
+strikeBtn.addEventListener('click', () => {
+  if (turnState !== 'AIMING') return;
+  const power = parseFloat(document.getElementById('power-slider').value) / 100;
+  launchStriker(power, aimAngle);
+});
+
+// 2. Baseline Slider
 const baselineSlider = document.getElementById('baseline-slider');
 const baselinePosLabel = document.getElementById('baseline-pos');
 baselineSlider.addEventListener('input', e => {
-  if (areDisksMoving() || !striker || striker.isPotted) return;
+  if (turnState !== 'AIMING' || !striker || striker.isPotted) return;
   const val = parseFloat(e.target.value);
   striker.pos.x = val;
   striker.pos.y = 7.0;
   striker.updateVisuals();
   baselinePosLabel.textContent = val.toFixed(1);
+  updateAimGuide();
 });
 
-// Sprinkle Powder Button
+// 3. Power Slider
+const powerSlider = document.getElementById('power-slider');
+const powerValLabel = document.getElementById('power-val');
+powerSlider.addEventListener('input', e => {
+  powerValLabel.textContent = `${e.target.value}%`;
+});
+
+// 4. Sprinkle Powder Button
 document.getElementById('powder-btn').addEventListener('click', () => {
+  sfx.init();
   sfx.powderShake();
-  frictionDecel = Math.max(3.2, frictionDecel - 0.5);
-  showToast('✨ Talcum Powder Sprinkled! Surface friction reduced.');
+  frictionDecel = Math.max(2.8, frictionDecel - 0.5);
+  showToast('✨ Talcum Powder Sprinkled! Ultra-smooth frictionless glide.');
 });
 
-// Re-Rack Board
+// 5. Re-Rack Board
 document.getElementById('reset-btn').addEventListener('click', () => {
+  sfx.init();
   rackCarrom(currentGameMode);
 });
 
-// Sound Toggle
+// 6. Sound Toggle
 const soundBtn = document.getElementById('sound-btn');
 soundBtn.addEventListener('click', () => {
   sfx.init();
@@ -1036,7 +1230,48 @@ soundBtn.addEventListener('click', () => {
   soundBtn.textContent = sfx.enabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
 });
 
-// Camera Views Switching
+// 7. Keyboard Shortcuts (Space, Arrows, A/D, R, P)
+window.addEventListener('keydown', e => {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (turnState === 'AIMING') {
+      const power = parseFloat(document.getElementById('power-slider').value) / 100;
+      launchStriker(power, aimAngle);
+    }
+  } else if (e.key === 'ArrowLeft' || e.key === 'Left') {
+    if (turnState === 'AIMING') {
+      const newVal = Math.max(-6.2, parseFloat(baselineSlider.value) - 0.3);
+      baselineSlider.value = newVal;
+      baselinePosLabel.textContent = newVal.toFixed(1);
+      striker.pos.x = newVal;
+      striker.updateVisuals();
+      updateAimGuide();
+    }
+  } else if (e.key === 'ArrowRight' || e.key === 'Right') {
+    if (turnState === 'AIMING') {
+      const newVal = Math.min(6.2, parseFloat(baselineSlider.value) + 0.3);
+      baselineSlider.value = newVal;
+      baselinePosLabel.textContent = newVal.toFixed(1);
+      striker.pos.x = newVal;
+      striker.updateVisuals();
+      updateAimGuide();
+    }
+  } else if (e.key === 'a' || e.key === 'A') {
+    aimAngle = Math.max(-Math.PI + 0.1, aimAngle - 0.05);
+    updateAimGuide();
+  } else if (e.key === 'd' || e.key === 'D') {
+    aimAngle = Math.min(-0.1, aimAngle + 0.05);
+    updateAimGuide();
+  } else if (e.key === 'r' || e.key === 'R') {
+    rackCarrom(currentGameMode);
+  } else if (e.key === 'p' || e.key === 'P') {
+    sfx.powderShake();
+    frictionDecel = Math.max(2.8, frictionDecel - 0.5);
+    showToast('✨ Powder Sprinkled!');
+  }
+});
+
+// 8. Camera Views Switching
 function setCameraView(mode) {
   document.querySelectorAll('.cam-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(`cam-${mode}`).classList.add('active');
@@ -1046,7 +1281,7 @@ document.getElementById('cam-overhead').addEventListener('click', () => setCamer
 document.getElementById('cam-player').addEventListener('click', () => setCameraView('player'));
 document.getElementById('cam-orbit').addEventListener('click', () => setCameraView('orbit'));
 
-// Mode Tabs
+// 9. Mode Tabs
 document.querySelectorAll('.mode-tab').forEach(t => {
   t.addEventListener('click', () => {
     document.querySelectorAll('.mode-tab').forEach(b => b.classList.remove('active'));
@@ -1069,30 +1304,36 @@ function showToast(msg) {
    MAIN RENDER & ANIMATION LOOP
    ========================================================================== */
 let clock = new THREE.Clock();
-let freeOrbitYaw = 0, freeOrbitPitch = 0.65, freeOrbitDist = 30;
+let freeOrbitYaw = 0, freeOrbitPitch = 0.65, freeOrbitDist = 32;
 
 function animate() {
   requestAnimationFrame(animate);
-  const dt = Math.min(clock.getDelta(), 0.05);
+  const dt = Math.min(clock.getDelta(), 0.04);
 
   updatePhysics(dt);
 
-  // If pieces are done moving and striker was played, reset striker to baseline
-  if (!areDisksMoving() && striker && !striker.isPotted && striker.pos.y < 6.5) {
-    setTimeout(() => {
-      if (!areDisksMoving() && striker && !striker.isPotted) {
-        const sliderVal = parseFloat(baselineSlider.value) || 0;
-        striker.reset(sliderVal, 7.0);
-      }
-    }, 400);
+  // Turn State Transition & Settling
+  if (turnState === 'ROLLING') {
+    if (!areDisksMoving()) {
+      turnState = 'RESETTING';
+      setTimeout(() => {
+        if (striker) {
+          const sliderVal = parseFloat(baselineSlider.value) || 0;
+          striker.reset(sliderVal, 7.0);
+        }
+        turnState = 'AIMING';
+        updateAimGuide();
+        updateUIState();
+      }, 350);
+    }
   }
 
   // Camera Smooth Lerp
   if (currentCamMode === 'overhead') {
-    camera.position.lerp(new THREE.Vector3(0, 27, 0.001), 0.08);
-    camera.lookAt(0, 0, 0);
+    camera.position.lerp(new THREE.Vector3(0, 35, 1.0), 0.08);
+    camera.lookAt(0, 0, -0.6);
   } else if (currentCamMode === 'player') {
-    camera.position.lerp(new THREE.Vector3(0, 15, 18), 0.08);
+    camera.position.lerp(new THREE.Vector3(0, 16, 21), 0.08);
     camera.lookAt(0, 0, -2);
   } else if (currentCamMode === 'orbit') {
     const cx = Math.sin(freeOrbitYaw) * Math.cos(freeOrbitPitch) * freeOrbitDist;
