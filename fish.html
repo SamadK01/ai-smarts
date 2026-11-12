@@ -226,13 +226,90 @@
     box-shadow: 0 8px 25px rgba(53, 243, 223, 0.35); margin-bottom: 8px;
   }
 
+  /* JELLY AQUARIUM TANK (FLOATING LIVEWELL) */
+  .jelly-tank-container {
+    position: fixed; right: 22px; bottom: 22px;
+    width: 250px; height: 185px;
+    background: radial-gradient(135deg, rgba(34, 211, 238, 0.16) 0%, rgba(4, 20, 33, 0.9) 100%);
+    border: 2px solid rgba(53, 243, 223, 0.45);
+    border-radius: 20px;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.8), 0 0 35px rgba(53, 243, 223, 0.22), inset 0 0 25px rgba(53, 243, 223, 0.12);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    overflow: hidden; z-index: 25; display: flex; flex-direction: column;
+    pointer-events: auto; cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.18, 1, 0.22, 1), border-color 0.2s, box-shadow 0.2s;
+  }
+  .jelly-tank-container:hover {
+    border-color: var(--cyan);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.85), 0 0 45px rgba(53, 243, 223, 0.38);
+  }
+  .jelly-tank-container.jelly-wobble {
+    animation: jellyWobble 0.65s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  @keyframes jellyWobble {
+    0% { transform: scale(1, 1); }
+    20% { transform: scale(1.16, 0.84) rotate(-3deg); }
+    40% { transform: scale(0.88, 1.14) rotate(2deg); }
+    60% { transform: scale(1.06, 0.95) rotate(-1deg); }
+    80% { transform: scale(0.97, 1.02) rotate(0.5deg); }
+    100% { transform: scale(1, 1); }
+  }
+
+  .jelly-tank-header {
+    padding: 8px 12px; background: rgba(2, 14, 24, 0.7);
+    border-bottom: 1px solid rgba(53, 243, 223, 0.25);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .jelly-tank-title {
+    display: flex; align-items: center; gap: 6px;
+    font: 800 11px/1 var(--mono); color: var(--cyan); letter-spacing: 0.05em;
+  }
+  .jelly-icon { font-size: 13px; animation: bubbleFloat 2s infinite ease-in-out; }
+  @keyframes bubbleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+  .jelly-tank-badge {
+    background: var(--amber); color: #030d17;
+    padding: 2px 8px; border-radius: 999px;
+    font: 800 10px/1 var(--mono);
+  }
+
+  .jelly-canvas-wrap {
+    flex: 1; position: relative; overflow: hidden;
+  }
+  #jelly-canvas {
+    width: 100%; height: 100%; display: block;
+  }
+  .jelly-empty-prompt {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    color: rgba(220, 240, 245, 0.45); font: 600 11px/1.4 var(--mono);
+    pointer-events: none; padding: 10px;
+  }
+
+  .jelly-tank-footer {
+    padding: 6px 12px 8px; background: rgba(2, 14, 24, 0.75);
+    border-top: 1px solid rgba(53, 243, 223, 0.2);
+  }
+  .jelly-latest {
+    font: 700 10px/1.2 var(--body); color: #fff;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .jelly-sub {
+    font: 600 9px/1.2 var(--mono); color: var(--muted); margin-top: 2px;
+  }
+
   @media (max-width: 640px) {
     .top-bar { top: 12px; left: 12px; right: 12px; }
     .score-label { display: none; }
     .hud-center { position: static; transform: none; order: 2; }
     .top-bar { flex-wrap: wrap; gap: 10px; }
-    .bottom-bar { bottom: 14px; }
-    .hint-pill { font-size: 11px; padding: 7px 16px; }
+    .bottom-bar { bottom: 14px; left: 12px; right: auto; max-width: calc(100% - 190px); }
+    .hint-pill { font-size: 10px; padding: 6px 12px; }
+    .jelly-tank-container { width: 175px; height: 135px; right: 12px; bottom: 12px; }
+    .jelly-sub { display: none; }
   }
 </style>
 </head>
@@ -273,9 +350,30 @@
   <!-- Bottom Bar -->
   <div class="bottom-bar">
     <div class="hint-pill">
-      move hook near fish to <b>hook & catch</b> · drops into <b>catch bag</b>
+      guide hook to <b>pierce fish</b> · reels up slowly & leaps into <b>jelly aquarium</b>
     </div>
     <button class="feed-btn" id="feed-btn">🥖 Drop Food</button>
+  </div>
+
+  <!-- FLOATING JELLY AQUARIUM BOX -->
+  <div class="jelly-tank-container" id="jelly-tank" title="Jelly Live Aquarium — Click to view catch log">
+    <div class="jelly-tank-header">
+      <div class="jelly-tank-title">
+        <span class="jelly-icon">🫧</span>
+        <span>JELLY AQUARIUM</span>
+      </div>
+      <div class="jelly-tank-badge" id="jelly-count">0 FISH</div>
+    </div>
+    <div class="jelly-canvas-wrap">
+      <canvas id="jelly-canvas"></canvas>
+      <div class="jelly-empty-prompt" id="jelly-empty">
+        Hook fishes to fill<br>jelly aquarium live!
+      </div>
+    </div>
+    <div class="jelly-tank-footer">
+      <div class="jelly-latest" id="jelly-latest">Awaiting first catch...</div>
+      <div class="jelly-sub">CLICK TO EXPAND HAUL ↗</div>
+    </div>
   </div>
 </div>
 
@@ -404,6 +502,105 @@ const sfx = {
     osc.connect(g); g.connect(audioCtx.destination);
     osc.start(t); osc.stop(t + 0.25);
     sfx.splash();
+  },
+
+  hookPierce() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    // Meaty puncture crack & barb strike
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(340, t);
+    osc.frequency.exponentialRampToValueAtTime(65, t + 0.14);
+    g.gain.setValueAtTime(0.2, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+    osc.connect(g); g.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t + 0.18);
+
+    // Sharp water friction snap
+    const n = audioCtx.createBufferSource();
+    const dur = 0.09;
+    const buf = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * dur), audioCtx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (d.length * 0.15));
+    n.buffer = buf;
+    const fn = audioCtx.createBiquadFilter();
+    fn.type = 'bandpass'; fn.frequency.setValueAtTime(1900, t); fn.Q.value = 4.2;
+    const gn = audioCtx.createGain();
+    gn.gain.setValueAtTime(0.16, t); gn.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    n.connect(fn); fn.connect(gn); gn.connect(audioCtx.destination);
+    n.start(t);
+  },
+
+  reelRatchet() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(420 + Math.random() * 180, t);
+    g.gain.setValueAtTime(0.042, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.024);
+    osc.connect(g); g.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t + 0.028);
+  },
+
+  surfaceBreach() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    // Explosive water breach eruption
+    const dur = 0.48;
+    const node = audioCtx.createBufferSource();
+    const buf = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * dur), audioCtx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (d.length * 0.38));
+    node.buffer = buf;
+    const f = audioCtx.createBiquadFilter();
+    f.type = 'lowpass'; f.frequency.setValueAtTime(800, t); f.frequency.linearRampToValueAtTime(160, t + dur);
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.26, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    node.connect(f); f.connect(g); g.connect(audioCtx.destination);
+    node.start(t);
+
+    // High splash droplet sparkle
+    const osc = audioCtx.createOscillator();
+    const go = audioCtx.createGain();
+    osc.type = 'sine'; osc.frequency.setValueAtTime(860, t); osc.frequency.exponentialRampToValueAtTime(220, t + 0.24);
+    go.gain.setValueAtTime(0.09, t); go.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+    osc.connect(go); go.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t + 0.26);
+  },
+
+  jellyDrop() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    // Bouncy cartoon gelatinous water plop
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(170, t);
+    osc.frequency.exponentialRampToValueAtTime(620, t + 0.07);
+    osc.frequency.exponentialRampToValueAtTime(290, t + 0.17);
+    g.gain.setValueAtTime(0.18, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.26);
+    osc.connect(g); g.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t + 0.27);
+  },
+
+  bigFishTug() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    // Heavy deep sub-bass tug rumble
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(95, t);
+    osc.frequency.exponentialRampToValueAtTime(45, t + 0.35);
+    g.gain.setValueAtTime(0.22, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
+    osc.connect(g); g.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t + 0.4);
   },
 
   bagPlop() {
@@ -537,6 +734,36 @@ const SPECIES = [
     bodyL: 36, bodyW: 24,
     primary: '#d4b334', belly: '#fffde0',
     speed: 0.9, depth: [0.35, 0.9]
+  },
+  {
+    id: 'tuna',
+    name: 'Grand Bluefin Tuna',
+    role: 'trophy',
+    basePoints: 2400,
+    len: [130, 210],
+    bodyL: 118, bodyW: 42,
+    primary: '#0e2a47', secondary: '#94a3b8', finlet: '#eab308',
+    speed: 1.45, depth: [0.4, 0.92]
+  },
+  {
+    id: 'gold_king',
+    name: 'Golden Emperor Arowana',
+    role: 'trophy',
+    basePoints: 3400,
+    len: [100, 160],
+    bodyL: 110, bodyW: 36,
+    primary: '#f59e0b', secondary: '#fef3c7', glow: '#fbbf24',
+    speed: 1.15, depth: [0.25, 0.82]
+  },
+  {
+    id: 'angler',
+    name: 'Colossal Abyssal Angler',
+    role: 'trophy',
+    basePoints: 4200,
+    len: [85, 140],
+    bodyL: 96, bodyW: 52,
+    primary: '#1e293b', secondary: '#0f766e', lure: '#22d3ee',
+    speed: 0.88, depth: [0.55, 0.95]
   }
 ];
 
@@ -621,8 +848,284 @@ bagBtn.addEventListener('click', () => {
 bagClose.addEventListener('click', () => bagModal.classList.remove('show'));
 
 /* --------------------------------------------------------------------------
-   PARTICLES, AIRBORNE LEAPING FISH & FOOD
+   PARTICLES, AIRBORNE LEAPING FISH & JELLY AQUARIUM TANK
    -------------------------------------------------------------------------- */
+class BloodParticle {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    const ang = Math.random() * Math.PI * 2;
+    const spd = 20 + Math.random() * 85;
+    this.vx = Math.cos(ang) * spd;
+    this.vy = Math.sin(ang) * spd - 12; // Slight upward buoyancy
+    this.r = 3.0 + Math.random() * 3.5;
+    this.maxR = this.r * (2.6 + Math.random() * 1.5); // Expands into soft water cloud
+    this.life = 1.3 + Math.random() * 0.6;
+    this.maxLife = this.life;
+    const colors = ['#dc2626', '#b91c1c', '#991b1b', '#7f1d1d', '#e11d48'];
+    this.color = colors[Math.floor(Math.random() * colors.length)];
+  }
+  update(dt) {
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    this.vx *= Math.pow(0.25, dt);
+    this.vy *= Math.pow(0.25, dt);
+    this.vy -= 8 * dt; // Soft upward plume drift
+
+    this.life -= dt;
+    this.r += (this.maxR - this.r) * dt * 2.8;
+    this.alpha = Math.max(0, (this.life / this.maxLife) * 0.88);
+  }
+  draw(ctx) {
+    if (this.alpha <= 0) return;
+    ctx.save();
+    const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.r);
+    grad.addColorStop(0, this.color);
+    grad.addColorStop(0.65, this.color);
+    grad.addColorStop(1, 'transparent');
+    ctx.globalAlpha = this.alpha;
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+class BubbleParticle {
+  constructor(x, y) {
+    this.x = x + (Math.random() - 0.5) * 14;
+    this.y = y;
+    this.r = 2 + Math.random() * 3.5;
+    this.vy = -75 - Math.random() * 70;
+    this.vx = (Math.random() - 0.5) * 20;
+    this.wobble = Math.random() * Math.PI * 2;
+    this.alive = true;
+  }
+  update(dt) {
+    this.wobble += 11 * dt;
+    this.x += (this.vx + Math.sin(this.wobble) * 16) * dt;
+    this.y += this.vy * dt;
+    if (this.y < 65) this.alive = false;
+  }
+  draw(ctx) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(210, 250, 255, 0.75)';
+    ctx.lineWidth = 1.2;
+    ctx.fillStyle = 'rgba(210, 250, 255, 0.22)';
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    // Shiny highlight
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(this.x - this.r * 0.35, this.y - this.r * 0.35, this.r * 0.35, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+class SplashParticle {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    const ang = -Math.PI * 0.5 + (Math.random() - 0.5) * 1.6;
+    const spd = 60 + Math.random() * 150;
+    this.vx = Math.cos(ang) * spd;
+    this.vy = Math.sin(ang) * spd;
+    this.r = 2.5 + Math.random() * 3.5;
+    this.alpha = 1.0;
+    this.alive = true;
+  }
+  update(dt) {
+    this.vy += 320 * dt; // Gravity
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    this.alpha -= 1.6 * dt;
+    if (this.alpha <= 0) this.alive = false;
+  }
+  draw(ctx) {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, this.alpha);
+    ctx.fillStyle = '#bbf7f0';
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+// Jelly Tank DOM references & Livewell Manager
+const jellyTankEl = document.getElementById('jelly-tank');
+const jellyCanvas = document.getElementById('jelly-canvas');
+const jellyCtx = jellyCanvas.getContext('2d');
+const jellyCountEl = document.getElementById('jelly-count');
+const jellyEmptyEl = document.getElementById('jelly-empty');
+const jellyLatestEl = document.getElementById('jelly-latest');
+
+class MiniJellyFish {
+  constructor(species, len) {
+    this.species = species;
+    this.len = len;
+    const w = jellyCanvas.width / (window.devicePixelRatio || 1);
+    const h = jellyCanvas.height / (window.devicePixelRatio || 1);
+    this.x = 25 + Math.random() * Math.max(20, w - 50);
+    this.y = 20 + Math.random() * Math.max(20, h - 40);
+    this.vx = (Math.random() < 0.5 ? 1 : -1) * (20 + Math.random() * 15);
+    this.vy = (Math.random() - 0.5) * 12;
+    this.scale = Math.min(1.2, 0.45 + (species.bodyL / 120) * 0.4);
+    this.swimPhase = Math.random() * Math.PI * 2;
+  }
+  update(dt, w, h) {
+    this.swimPhase += 6.5 * dt;
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+
+    if (this.x < 15) { this.x = 15; this.vx = Math.abs(this.vx); }
+    if (this.x > w - 15) { this.x = w - 15; this.vx = -Math.abs(this.vx); }
+    if (this.y < 12) { this.y = 12; this.vy = Math.abs(this.vy); }
+    if (this.y > h - 12) { this.y = h - 12; this.vy = -Math.abs(this.vy); }
+  }
+  draw(ctx) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    if (this.vx < 0) ctx.scale(-1, 1);
+    ctx.scale(this.scale, this.scale);
+
+    const tailWiggle = Math.sin(this.swimPhase) * 3.5;
+
+    // Tail fin
+    ctx.fillStyle = this.species.secondary || this.species.primary;
+    ctx.beginPath();
+    ctx.moveTo(-10, 0);
+    ctx.lineTo(-18, -6 + tailWiggle);
+    ctx.lineTo(-14, 0);
+    ctx.lineTo(-18, 6 + tailWiggle);
+    ctx.closePath();
+    ctx.fill();
+
+    // Body
+    ctx.fillStyle = this.species.primary;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 13, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Eye
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(6, -1.5, 1.8, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#06131c';
+    ctx.beginPath(); ctx.arc(6.5, -1.5, 1.0, 0, Math.PI * 2); ctx.fill();
+
+    // Distinctive touches
+    if (this.species.id === 'tuna') {
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath(); ctx.moveTo(-6, -5); ctx.lineTo(-4, -8); ctx.lineTo(-2, -5); ctx.fill();
+    } else if (this.species.id === 'gold_king') {
+      ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 8;
+    } else if (this.species.id === 'angler') {
+      ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(4, -4); ctx.quadraticCurveTo(8, -10, 10, -7); ctx.stroke();
+      ctx.fillStyle = '#22d3ee'; ctx.beginPath(); ctx.arc(10, -7, 1.5, 0, Math.PI * 2); ctx.fill();
+    }
+
+    ctx.restore();
+  }
+}
+
+class JellyTankManager {
+  constructor() {
+    this.fishes = [];
+    this.bubbles = [];
+    this.w = 250;
+    this.h = 130;
+    this.initCanvas();
+    window.addEventListener('resize', () => this.initCanvas());
+
+    // Clicking jelly tank opens the detailed catch bag modal
+    jellyTankEl.addEventListener('click', () => {
+      bagBtn.click();
+    });
+  }
+
+  initCanvas() {
+    const rect = jellyCanvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.w = rect.width || 250;
+    this.h = rect.height || 130;
+    jellyCanvas.width = Math.round(this.w * dpr);
+    jellyCanvas.height = Math.round(this.h * dpr);
+    jellyCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  receiveFish(item) {
+    this.fishes.push(new MiniJellyFish(item.species, item.len));
+    if (jellyEmptyEl) jellyEmptyEl.style.display = 'none';
+
+    // Jelly wobble animation
+    jellyTankEl.classList.remove('jelly-wobble');
+    void jellyTankEl.offsetWidth;
+    jellyTankEl.classList.add('jelly-wobble');
+
+    // Update count & latest info
+    const count = this.fishes.length;
+    jellyCountEl.textContent = `${count} FISH${count > 1 ? 'ES' : ''}`;
+    jellyLatestEl.textContent = `✨ ${item.species.name} (${item.len.toFixed(1)} cm) · ${item.weight} g`;
+
+    // Spawn tiny bubbles inside jelly tank
+    for (let i = 0; i < 8; i++) {
+      this.bubbles.push({
+        x: Math.random() * this.w,
+        y: this.h + Math.random() * 10,
+        r: 1.5 + Math.random() * 2.5,
+        vy: 20 + Math.random() * 30
+      });
+    }
+
+    sfx.jellyDrop();
+  }
+
+  updateAndDraw(dt) {
+    if (!jellyCtx) return;
+    jellyCtx.clearRect(0, 0, this.w, this.h);
+
+    // 1. Jelly Water Gradient & Caustic Glow
+    const bg = jellyCtx.createLinearGradient(0, 0, 0, this.h);
+    bg.addColorStop(0, 'rgba(34, 211, 238, 0.12)');
+    bg.addColorStop(0.6, 'rgba(6, 40, 65, 0.45)');
+    bg.addColorStop(1, 'rgba(2, 18, 30, 0.7)');
+    jellyCtx.fillStyle = bg;
+    jellyCtx.fillRect(0, 0, this.w, this.h);
+
+    // 2. Rising Jelly Tank Bubbles
+    jellyCtx.fillStyle = 'rgba(180, 255, 250, 0.45)';
+    for (let i = this.bubbles.length - 1; i >= 0; i--) {
+      const b = this.bubbles[i];
+      b.y -= b.vy * dt;
+      jellyCtx.beginPath();
+      jellyCtx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      jellyCtx.fill();
+      if (b.y < -5) this.bubbles.splice(i, 1);
+    }
+    // Ambient micro-bubble spawn
+    if (Math.random() < 0.1 && this.bubbles.length < 16) {
+      this.bubbles.push({
+        x: Math.random() * this.w,
+        y: this.h + 2,
+        r: 1 + Math.random() * 2,
+        vy: 15 + Math.random() * 20
+      });
+    }
+
+    // 3. Mini Swimming Caught Fishes
+    this.fishes.forEach(f => {
+      f.update(dt, this.w, this.h);
+      f.draw(jellyCtx);
+    });
+  }
+}
+const jellyTank = new JellyTankManager();
+
 class LeapingFish {
   constructor(fish, startX, startY) {
     this.species = fish.species;
@@ -630,19 +1133,19 @@ class LeapingFish {
     this.weight = Math.round(Math.pow(this.len, 2.6) * 0.14);
     this.points = fish.species.basePoints;
 
+    this.startX = startX;
+    this.startY = startY;
     this.x = startX;
     this.y = startY;
 
-    // Target: Bag button location on top-right
-    const bagRect = bagBtn.getBoundingClientRect();
-    this.tx = bagRect.left + bagRect.width * 0.5;
-    this.ty = bagRect.top + bagRect.height * 0.5;
+    // Target: Jelly Aquarium Box location on bottom-right!
+    const tankRect = jellyTankEl.getBoundingClientRect();
+    this.tx = tankRect.left + tankRect.width * 0.5;
+    this.ty = tankRect.top + tankRect.height * 0.35;
 
-    this.startX = startX;
-    this.startY = startY;
     this.t = 0;
-    this.dur = 0.65; // Seconds to fly into bag
-    this.peakY = Math.min(this.ty, this.startY) - 90;
+    this.dur = 0.85; // Slow, majestic acrobatic flight
+    this.peakY = Math.min(this.ty, this.startY) - 130;
     this.alive = true;
   }
 
@@ -650,45 +1153,63 @@ class LeapingFish {
     this.t += dt / this.dur;
     if (this.t >= 1.0) {
       this.alive = false;
-      // Bag receives fish!
-      catchBag.push({ species: this.species, len: this.len, weight: this.weight, points: this.points });
+
+      // Deliver fish directly into Jelly Aquarium Tank!
+      const item = { species: this.species, len: this.len, weight: this.weight, points: this.points };
+      catchBag.push(item);
       score += this.points;
       updateUI();
-      sfx.bagPlop();
 
-      // Bag wiggle effect
+      // Hand off to Jelly Livewell
+      jellyTank.receiveFish(item);
+
+      // Bag also wobbles
       bagBtn.classList.remove('shake');
       void bagBtn.offsetWidth;
       bagBtn.classList.add('shake');
 
-      floatingScores.push(new FloatingText(this.tx - 15, this.ty - 10, `+${this.points}`, '#ffb732'));
+      floatingScores.push(new FloatingText(this.tx - 25, this.ty - 15, `+${this.points} PTS!`, '#ffb732'));
       return;
     }
 
-    // Parabolic arc interpolation
+    // Smooth parabolic arc interpolation
     const ease = 1 - Math.pow(1 - this.t, 2);
     this.x = this.startX + (this.tx - this.startX) * ease;
     const arc = Math.sin(this.t * Math.PI) * (this.startY - this.peakY);
     this.y = (this.startY + (this.ty - this.startY) * ease) - arc;
+
+    // Emit water droplets trailing behind airborne fish
+    if (Math.random() < 0.6) {
+      splashParticles.push(new SplashParticle(this.x, this.y));
+    }
   }
 
   draw() {
     ctx.save();
     ctx.translate(this.x, this.y);
-    const angle = Math.sin(this.t * 12) * 0.6;
+    const angle = Math.sin(this.t * 8) * 0.8 - Math.PI * 0.2;
     ctx.rotate(angle);
 
-    // Draw compact flying fish
+    const scale = Math.min(1.4, 0.7 + (this.species.bodyL / 120) * 0.6);
+    ctx.scale(scale, scale);
+
+    // Glowing leaping fish silhouette
     ctx.fillStyle = this.species.primary;
     ctx.beginPath();
-    ctx.ellipse(0, 0, 16, 7, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 0, 18, 7.5, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Tail
+    // Caudal tail
     ctx.fillStyle = this.species.secondary || this.species.primary;
     ctx.beginPath();
-    ctx.moveTo(-14, 0); ctx.lineTo(-24, -9); ctx.lineTo(-20, 0); ctx.lineTo(-24, 9);
+    ctx.moveTo(-14, 0); ctx.lineTo(-26, -10); ctx.lineTo(-21, 0); ctx.lineTo(-26, 10);
     ctx.closePath(); ctx.fill();
+
+    // Eye
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(10, -2, 2.2, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#06131c';
+    ctx.beginPath(); ctx.arc(10.5, -2, 1.2, 0, Math.PI * 2); ctx.fill();
 
     ctx.restore();
   }
@@ -735,12 +1256,12 @@ class Pellet {
 class RealisticFish {
   constructor(species) {
     this.species = species;
-    this.numSegs = 9;
+    this.numSegs = (species.role === 'trophy' || species.id === 'shark') ? 11 : 9;
     this.segDist = species.bodyL / this.numSegs;
 
     // Start with smooth natural heading
     const fromLeft = Math.random() < 0.5;
-    this.x = fromLeft ? -60 : W + 60;
+    this.x = fromLeft ? -80 : W + 80;
     this.y = H * (species.depth[0] + Math.random() * (species.depth[1] - species.depth[0]));
     this.angle = fromLeft ? 0 : Math.PI;
     this.speed = (50 + Math.random() * 25) * species.speed;
@@ -766,15 +1287,17 @@ class RealisticFish {
   }
 
   update(dt, hook, allFishes, pellets) {
-    if (!this.alive) {
-      this.respawnTimer -= dt;
-      if (this.respawnTimer <= 0) {
-        this.alive = true;
-        const fromLeft = Math.random() < 0.5;
-        this.x = fromLeft ? -80 : W + 80;
-        this.y = H * (this.species.depth[0] + Math.random() * (this.species.depth[1] - this.species.depth[0]));
-        this.angle = fromLeft ? 0 : Math.PI;
-        this.state = 'cruise';
+    if (!this.alive || this.state === 'hooked') {
+      if (!this.alive && this.state !== 'hooked') {
+        this.respawnTimer -= dt;
+        if (this.respawnTimer <= 0) {
+          this.alive = true;
+          const fromLeft = Math.random() < 0.5;
+          this.x = fromLeft ? -90 : W + 90;
+          this.y = H * (this.species.depth[0] + Math.random() * (this.species.depth[1] - this.species.depth[0]));
+          this.angle = fromLeft ? 0 : Math.PI;
+          this.state = 'cruise';
+        }
       }
       return;
     }
@@ -787,7 +1310,7 @@ class RealisticFish {
       if (this.state === 'cruise') {
         let nearestPrey = null, minD = 180;
         for (const other of allFishes) {
-          if (other !== this && other.alive && (other.species.role === 'prey' || other.species.id === 'puffer')) {
+          if (other !== this && other.alive && other.state !== 'hooked' && (other.species.role === 'prey' || other.species.id === 'puffer')) {
             const d = Math.hypot(this.x - other.x, this.y - other.y);
             if (d < minD) { minD = d; nearestPrey = other; }
           }
@@ -798,7 +1321,7 @@ class RealisticFish {
           nearestPrey.state = 'panic';
         }
       } else if (this.state === 'hunt') {
-        if (!this.huntTarget || !this.huntTarget.alive) {
+        if (!this.huntTarget || !this.huntTarget.alive || this.huntTarget.state === 'hooked') {
           this.state = 'cruise';
         } else {
           const dx = this.huntTarget.x - this.x;
@@ -859,16 +1382,16 @@ class RealisticFish {
     // 4. NATURAL CRUISING & BOUNDARY CROSSING
     if (this.state === 'cruise') {
       this.speed = this.baseSpeed;
-      if (this.x < -100) { this.x = W + 90; this.angle = Math.PI; }
-      if (this.x > W + 100) { this.x = -90; this.angle = 0; }
+      if (this.x < -110) { this.x = W + 100; this.angle = Math.PI; }
+      if (this.x > W + 110) { this.x = -100; this.angle = 0; }
       if (this.y < 70) this.targetAngle = 0.4;
       if (this.y > H - 50) this.targetAngle = -0.4;
     }
 
-    // Hook collision check
-    if (hook.active && !hook.reelingFish && this.state !== 'panic' && this.alive) {
+    // Hook collision check: hook pierces mouth
+    if (hook.active && hook.state === 'IDLE' && this.state !== 'panic' && this.alive) {
       const d = Math.hypot(this.x - hook.x, this.y - hook.y);
-      if (d < 24) {
+      if (d < 28) {
         hook.catchFish(this);
       }
     }
@@ -888,7 +1411,7 @@ class RealisticFish {
     this.x += Math.cos(this.angle) * this.speed * dt;
     this.y += Math.sin(this.angle) * this.speed * dt;
 
-    // REAL FISH LOCOMOTION: Head stays firm, wave propagates to tail
+    // Head stays firm, wave propagates down spine to tail
     this.spine[0].x = this.x;
     this.spine[0].y = this.y;
 
@@ -899,7 +1422,6 @@ class RealisticFish {
       const dy = cur.y - prev.y;
       let segAngle = Math.atan2(dy, dx);
 
-      // Amplitude grows towards the tail
       const tailFlex = (i / this.numSegs);
       const wave = Math.sin(this.swimPhase - i * 0.55) * 4.2 * tailFlex;
       segAngle += wave * 0.08;
@@ -909,9 +1431,9 @@ class RealisticFish {
     }
   }
 
-  // Draw authentic fish with scales, fin rays, operculum and countershading
+  // Draw authentic fish with scales, fin rays, operculum, markings and countershading
   draw(ctx) {
-    if (!this.alive) return;
+    if (!this.alive && this.state !== 'hooked') return;
     ctx.save();
 
     const sp = this.species;
@@ -942,7 +1464,7 @@ class RealisticFish {
     const finPt = this.spine[2];
     const flap = Math.sin(this.swimPhase * 1.5) * 0.5;
     ctx.fillStyle = sp.secondary || sp.primary;
-    ctx.globalAlpha = 0.7;
+    ctx.globalAlpha = 0.75;
     [1, -1].forEach(side => {
       ctx.save();
       ctx.translate(finPt.x, finPt.y);
@@ -962,15 +1484,27 @@ class RealisticFish {
     ctx.translate(tailBase.x, tailBase.y);
     ctx.rotate(tailAngle);
     ctx.fillStyle = sp.secondary || sp.primary;
-    ctx.globalAlpha = 0.85;
+    ctx.globalAlpha = 0.88;
 
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(20, -14);
-    ctx.lineTo(14, 0);
-    ctx.lineTo(20, 14);
-    ctx.closePath();
-    ctx.fill();
+    if (sp.id === 'tuna') {
+      // High aspect ratio lunate crescent tail
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.quadraticCurveTo(15, -28, 30, -32);
+      ctx.lineTo(24, 0);
+      ctx.lineTo(30, 32);
+      ctx.quadraticCurveTo(15, 28, 0, 0);
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(22, -15);
+      ctx.lineTo(15, 0);
+      ctx.lineTo(22, 15);
+      ctx.closePath();
+      ctx.fill();
+    }
     ctx.restore();
 
     // 3. Fleshy Streamlined Fish Body
@@ -990,7 +1524,7 @@ class RealisticFish {
     }
     ctx.closePath();
 
-    // 3D Countershading Gradient (dark dorsal, bright belly)
+    // Countershading Gradient (dark dorsal, bright belly)
     const grad = ctx.createLinearGradient(this.spine[0].x, this.spine[0].y, tailBase.x, tailBase.y);
     grad.addColorStop(0, sp.primary);
     grad.addColorStop(0.7, sp.primary);
@@ -998,7 +1532,7 @@ class RealisticFish {
     ctx.fillStyle = grad;
     ctx.fill();
 
-    // 4. Species Markings (e.g. Clownfish stripes, Tang palette, Koi patches)
+    // 4. Species Markings & Custom Traits
     if (sp.id === 'clown') {
       ctx.fillStyle = '#ffffff';
       ctx.strokeStyle = '#111';
@@ -1010,14 +1544,12 @@ class RealisticFish {
         ctx.fill(); ctx.stroke();
       });
     } else if (sp.id === 'koi') {
-      // Golden Calico Spots
       ctx.fillStyle = sp.spot;
       const mid = this.spine[3];
       ctx.beginPath();
       ctx.ellipse(mid.x, mid.y, 10, 5, this.angle + 0.2, 0, Math.PI * 2);
       ctx.fill();
     } else if (sp.id === 'puffer' && puff > 0.1) {
-      // Defensive spines
       ctx.strokeStyle = '#fff';
       ctx.lineWidth = 1.8;
       for (let i = 0; i < leftSide.length; i += 2) {
@@ -1026,6 +1558,68 @@ class RealisticFish {
         ctx.lineTo(leftSide[i].x + Math.cos(this.angle - 1.2) * 8 * puff, leftSide[i].y + Math.sin(this.angle - 1.2) * 8 * puff);
         ctx.stroke();
       }
+    } else if (sp.id === 'tuna') {
+      // Golden finlet keels along peduncle
+      ctx.fillStyle = sp.finlet || '#facc15';
+      [6, 7, 8, 9].forEach(seg => {
+        if (seg < leftSide.length && seg < rightSide.length) {
+          const pL = leftSide[seg]; const pR = rightSide[seg];
+          ctx.beginPath();
+          ctx.moveTo(pL.x, pL.y);
+          ctx.lineTo(pL.x + Math.cos(this.angle - 1.7) * 8, pL.y + Math.sin(this.angle - 1.7) * 8);
+          ctx.lineTo(pL.x + Math.cos(this.angle - 2.4) * 4, pL.y + Math.sin(this.angle - 2.4) * 4);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(pR.x, pR.y);
+          ctx.lineTo(pR.x + Math.cos(this.angle + 1.7) * 8, pR.y + Math.sin(this.angle + 1.7) * 8);
+          ctx.lineTo(pR.x + Math.cos(this.angle + 2.4) * 4, pR.y + Math.sin(this.angle + 2.4) * 4);
+          ctx.fill();
+        }
+      });
+    } else if (sp.id === 'gold_king') {
+      // Dragon chin whiskers & royal golden aura
+      ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(this.spine[0].x, this.spine[0].y);
+      ctx.quadraticCurveTo(this.spine[0].x + Math.cos(this.angle + 0.6) * 18, this.spine[0].y + Math.sin(this.angle + 0.6) * 18, this.spine[0].x + Math.cos(this.angle + 0.9) * 28, this.spine[0].y + Math.sin(this.angle + 0.9) * 28);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(this.spine[0].x, this.spine[0].y);
+      ctx.quadraticCurveTo(this.spine[0].x + Math.cos(this.angle - 0.6) * 18, this.spine[0].y + Math.sin(this.angle - 0.6) * 18, this.spine[0].x + Math.cos(this.angle - 0.9) * 28, this.spine[0].y + Math.sin(this.angle - 0.9) * 28);
+      ctx.stroke();
+    } else if (sp.id === 'angler') {
+      // Jagged needle teeth on lower jaw
+      ctx.fillStyle = '#ffffff';
+      for (let t = -3; t <= 3; t += 2) {
+        const tx = this.spine[0].x + Math.cos(this.angle + 1.5) * t * 3.5;
+        const ty = this.spine[0].y + Math.sin(this.angle + 1.5) * t * 3.5;
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(tx + Math.cos(this.angle) * 7.5, ty + Math.sin(this.angle) * 7.5);
+        ctx.lineTo(tx + Math.cos(this.angle - 0.5) * 4.5, ty + Math.sin(this.angle - 0.5) * 4.5);
+        ctx.fill();
+      }
+
+      // Bioluminescent antenna & glowing esca lure
+      const antBase = this.spine[1];
+      const antTipX = antBase.x + Math.cos(this.angle - 0.85) * 32;
+      const antTipY = antBase.y + Math.sin(this.angle - 0.85) * 32;
+
+      ctx.strokeStyle = '#0f766e'; ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(antBase.x, antBase.y);
+      ctx.quadraticCurveTo(antBase.x + Math.cos(this.angle - 1.4) * 24, antBase.y + Math.sin(this.angle - 1.4) * 24, antTipX, antTipY);
+      ctx.stroke();
+
+      // Glowing cyan lure
+      const lureGrad = ctx.createRadialGradient(antTipX, antTipY, 1, antTipX, antTipY, 15);
+      lureGrad.addColorStop(0, '#ffffff');
+      lureGrad.addColorStop(0.35, '#22d3ee');
+      lureGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = lureGrad;
+      ctx.beginPath();
+      ctx.arc(antTipX, antTipY, 15, 0, Math.PI * 2);
+      ctx.fill();
     }
 
     // 5. Realistic Eye with Catch-light
@@ -1038,11 +1632,11 @@ class RealisticFish {
       const ex = eyeSeg.x + Math.cos(eyeNormal) * eyeDist * side;
       const ey = eyeSeg.y + Math.sin(eyeNormal) * eyeDist * side;
       ctx.fillStyle = '#ffffff';
-      ctx.beginPath(); ctx.arc(ex, ey, 3.2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(ex, ey, 3.4, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#06131c';
-      ctx.beginPath(); ctx.arc(ex, ey, 1.8, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(ex, ey, 2.0, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#ffffff';
-      ctx.beginPath(); ctx.arc(ex - 0.7, ey - 0.7, 0.7, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(ex - 0.7, ey - 0.7, 0.8, 0, Math.PI * 2); ctx.fill();
     });
 
     ctx.restore();
@@ -1056,77 +1650,223 @@ class FishingHook {
   constructor() {
     this.x = W * 0.5;
     this.y = 120;
+    this.targetX = this.x;
+    this.targetY = this.y;
+    this.state = 'IDLE'; // 'IDLE' | 'REELING' | 'LAUNCHING'
     this.active = true;
-    this.reelingFish = null;
+    this.fish = null;
+    this.reelTime = 0;
+    this.reelDuration = 1.8;
+    this.startY = 120;
+    this.lastRatchet = 0;
+    this.struggleWiggle = 0;
   }
 
   moveTo(x, y) {
-    this.x = x;
-    this.y = Math.max(70, Math.min(H - 40, y));
+    if (this.state === 'REELING') return; // Locked into reeling battle
+    this.targetX = x;
+    this.targetY = Math.max(70, Math.min(H - 40, y));
   }
 
   catchFish(fish) {
-    if (this.reelingFish) return;
-    this.reelingFish = fish;
+    if (this.state !== 'IDLE' || !fish.alive) return;
+    this.state = 'REELING';
+    this.fish = fish;
     fish.alive = false;
-    sfx.hookSnag();
+    fish.state = 'hooked';
+    this.startY = this.y;
 
-    // Pull fish up and launch into catch bag!
-    setTimeout(() => {
-      leapingFishes.push(new LeapingFish(fish, this.x, this.y));
-      this.reelingFish = null;
-      sfx.splash();
-      // Fish respawns naturally from horizon later
-      fish.respawnTimer = 4.5;
-    }, 180);
+    // Reel duration scales with fish weight & size:
+    // small fish = 1.4s, big tuna/angler/shark = 2.4 to 2.8s
+    const ratio = Math.min(1.0, Math.max(0, (fish.species.bodyL - 34) / 84));
+    this.reelDuration = 1.4 + ratio * 1.4;
+    this.reelTime = 0;
+
+    // Meaty hook piercing sound + blood burst
+    sfx.hookPierce();
+    if (fish.species.role === 'trophy' || fish.species.id === 'shark') {
+      sfx.bigFishTug();
+    }
+
+    // Spawn 28-35 Blood particles bursting out of the mouth
+    for (let i = 0; i < 30; i++) {
+      bloodParticles.push(new BloodParticle(fish.x, fish.y));
+    }
+
+    // Floating notification text
+    const label = (fish.species.role === 'trophy') ? '🔥 BIG TROPHY HOOKED!' : 'HOOKED!';
+    const col = (fish.species.role === 'trophy') ? '#ffd32a' : '#ff4757';
+    floatingScores.push(new FloatingText(fish.x, fish.y - 18, label, col));
   }
 
-  draw() {
+  update(dt, now) {
+    if (this.state === 'IDLE') {
+      this.x += (this.targetX - this.x) * 0.24;
+      this.y += (this.targetY - this.y) * 0.24;
+      return;
+    }
+
+    if (this.state === 'REELING' && this.fish) {
+      this.reelTime += dt;
+      const progress = Math.min(1.0, this.reelTime / this.reelDuration);
+
+      // Smooth steady pull upwards
+      const ease = 1 - Math.pow(1 - progress, 2);
+      const targetSurfaceY = 66; // Surface level
+      this.y = this.startY + (targetSurfaceY - this.startY) * ease;
+
+      // Realistic struggle wiggling (fish pulling against the line)
+      this.struggleWiggle = Math.sin(now * 0.024) * (7 + (1 - progress) * 11);
+      this.x = this.targetX + this.struggleWiggle;
+
+      // Make reel ratchet sound every 100ms
+      if (now - this.lastRatchet > 100) {
+        sfx.reelRatchet();
+        this.lastRatchet = now;
+      }
+
+      // Lock fish to hook
+      const f = this.fish;
+      f.x = this.x;
+      f.y = this.y + 6;
+      f.angle = -Math.PI * 0.5 + Math.sin(now * 0.02) * 0.35; // Head pointed straight up
+      f.targetAngle = f.angle;
+      f.speed = 0;
+      f.swimPhase += 35 * dt; // Frantic tail thrashing!
+
+      // Align spine segments vertically hanging beneath hook
+      f.spine[0].x = f.x;
+      f.spine[0].y = f.y;
+      for (let i = 1; i < f.numSegs; i++) {
+        const prev = f.spine[i - 1];
+        const cur = f.spine[i];
+        const tailWiggle = Math.sin(f.swimPhase - i * 0.65) * (5 + i * 2.2);
+        cur.x = prev.x + tailWiggle;
+        cur.y = prev.y + f.segDist;
+      }
+
+      // Emit rising struggle bubbles
+      if (Math.random() < 0.5) {
+        bubbleParticles.push(new BubbleParticle(f.x, f.y + 8));
+      }
+
+      // Continual slight blood seepage while reeling big fish
+      if (Math.random() < 0.18) {
+        bloodParticles.push(new BloodParticle(f.x, f.y));
+      }
+
+      // Check if surface reached
+      if (progress >= 1.0) {
+        // Surface breach!
+        this.state = 'LAUNCHING';
+        sfx.surfaceBreach();
+
+        // Spawn surface splash foam & droplets
+        for (let i = 0; i < 35; i++) {
+          splashParticles.push(new SplashParticle(this.x, 65));
+        }
+
+        // Launch acrobatic leaping fish targeting the Jelly Aquarium Box!
+        leapingFishes.push(new LeapingFish(this.fish, this.x, 65));
+
+        // Respawn original fish from horizon after delay
+        this.fish.respawnTimer = 5.0;
+
+        // Reset hook
+        setTimeout(() => {
+          this.state = 'IDLE';
+          this.fish = null;
+        }, 140);
+      }
+    }
+  }
+
+  draw(ctx, now) {
     const rodX = W * 0.5;
     const rodY = 0;
+    const isReeling = (this.state === 'REELING');
 
-    // Supple fishing line
+    // Flexible Fishing Line with tension vibration
     ctx.save();
-    ctx.strokeStyle = this.reelingFish ? 'rgba(255, 183, 50, 0.9)' : 'rgba(235, 255, 250, 0.65)';
-    ctx.lineWidth = this.reelingFish ? 2.0 : 1.2;
+    ctx.strokeStyle = isReeling ? 'rgba(255, 183, 50, 0.95)' : 'rgba(235, 255, 250, 0.65)';
+    ctx.lineWidth = isReeling ? 2.5 : 1.3;
     ctx.beginPath();
     ctx.moveTo(rodX, rodY);
 
-    const midX = (rodX + this.x) * 0.5;
-    const midY = (rodY + this.y) * 0.5 + 20;
-    ctx.quadraticCurveTo(midX, midY, this.x, this.y);
+    if (isReeling) {
+      const hum = Math.sin(now * 0.08) * 1.8;
+      ctx.lineTo(this.x + hum, this.y);
+    } else {
+      const midX = (rodX + this.x) * 0.5;
+      const midY = (rodY + this.y) * 0.5 + 20;
+      ctx.quadraticCurveTo(midX, midY, this.x, this.y);
+    }
     ctx.stroke();
 
-    // Shiny J-Hook & Wiggling Bait
+    // Steel J-Hook
     ctx.save();
     ctx.translate(this.x, this.y);
-    ctx.strokeStyle = '#c8d6e5';
-    ctx.lineWidth = 2.4;
-    ctx.beginPath();
-    ctx.moveTo(0, -9);
-    ctx.lineTo(0, 4);
-    ctx.arc(-4, 4, 4.5, 0, Math.PI);
-    ctx.lineTo(-8, 1); // Barb
-    ctx.stroke();
 
-    // Glowing bait
-    ctx.fillStyle = '#ff4757';
-    ctx.beginPath();
-    ctx.arc(-2, 4, 3.5, 0, Math.PI * 2);
-    ctx.fill();
+    if (isReeling && this.fish) {
+      // The hook penetrates through the mouth and jaw!
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 3.0;
+      ctx.beginPath();
+      ctx.moveTo(0, -14);
+      ctx.lineTo(0, 4); // enters upper lip
+      ctx.stroke();
+
+      // Hook bend looping through lower jaw
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.beginPath();
+      ctx.arc(-5, 4, 6, 0, Math.PI);
+      ctx.lineTo(-11, 0); // Barb punctures out of cheek!
+      ctx.stroke();
+
+      // Sharp Barb tip with blood drop!
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath();
+      ctx.arc(-11, 0, 2.4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Red puncture wound dot where hook pierces mouth
+      ctx.fillStyle = '#b91c1c';
+      ctx.beginPath();
+      ctx.arc(0, 3, 2.8, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      // Normal idle hook with bait
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      ctx.moveTo(0, -9);
+      ctx.lineTo(0, 4);
+      ctx.arc(-4, 4, 4.5, 0, Math.PI);
+      ctx.lineTo(-8, 1);
+      ctx.stroke();
+
+      // Wiggling red bait worm
+      ctx.fillStyle = '#ff4757';
+      ctx.beginPath();
+      ctx.arc(-2, 4, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
     ctx.restore();
-
     ctx.restore();
   }
 }
 
 /* --------------------------------------------------------------------------
-   SIMULATION RUNTIME
+   SIMULATION RUNTIME & ENTITY ARRAYS
    -------------------------------------------------------------------------- */
 let fishes = [];
 let leapingFishes = [];
 let floatingScores = [];
 let pellets = [];
+let bloodParticles = [];
+let bubbleParticles = [];
+let splashParticles = [];
 let hook = new FishingHook();
 
 function initWorld() {
@@ -1151,9 +1891,7 @@ canvas.addEventListener('pointerdown', e => {
   hook.moveTo(e.clientX, e.clientY);
 });
 canvas.addEventListener('pointermove', e => {
-  if (e.buttons > 0 || e.pointerType === 'touch') {
-    hook.moveTo(e.clientX, e.clientY);
-  }
+  hook.moveTo(e.clientX, e.clientY);
 });
 
 feedBtn.addEventListener('click', () => {
@@ -1226,10 +1964,35 @@ function animate(now) {
     f.draw(ctx);
   });
 
-  // 5. Fishing Hook & Line
-  hook.draw();
+  // 5. Blood Particles (Underwater Red Inks/Mists)
+  for (let i = bloodParticles.length - 1; i >= 0; i--) {
+    const bp = bloodParticles[i];
+    bp.update(dt);
+    bp.draw(ctx);
+    if (bp.alpha <= 0) bloodParticles.splice(i, 1);
+  }
 
-  // 6. Leaping Fishes into Catch Bag
+  // 6. Bubble Particles
+  for (let i = bubbleParticles.length - 1; i >= 0; i--) {
+    const bb = bubbleParticles[i];
+    bb.update(dt);
+    bb.draw(ctx);
+    if (!bb.alive) bubbleParticles.splice(i, 1);
+  }
+
+  // 7. Surface Splash Particles
+  for (let i = splashParticles.length - 1; i >= 0; i--) {
+    const sp = splashParticles[i];
+    sp.update(dt);
+    sp.draw(ctx);
+    if (!sp.alive) splashParticles.splice(i, 1);
+  }
+
+  // 8. Fishing Hook & Reeling Tackle
+  hook.update(dt, now);
+  hook.draw(ctx, now);
+
+  // 9. Leaping Fishes into Jelly Tank
   for (let i = leapingFishes.length - 1; i >= 0; i--) {
     const lf = leapingFishes[i];
     lf.update(dt);
@@ -1237,13 +2000,16 @@ function animate(now) {
     if (!lf.alive) leapingFishes.splice(i, 1);
   }
 
-  // 7. Floating Scores
+  // 10. Floating Scores
   for (let i = floatingScores.length - 1; i >= 0; i--) {
     const fs = floatingScores[i];
     fs.update(dt);
     fs.draw();
     if (fs.life <= 0) floatingScores.splice(i, 1);
   }
+
+  // 11. Jelly Livewell Aquarium Box Rendering
+  jellyTank.updateAndDraw(dt);
 
   requestAnimationFrame(animate);
 }
