@@ -16,7 +16,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 | **04** | [**Retro Laptop 2006 (ThinkRetro T42)**](wiggle.html) | Three.js WebGL, 2D Canvas Textures | Fully interactive 3D retro clamshell laptop with physical key depressions, mechanical keyboard clicks, 5400 RPM HDD seek rattling, XP startup chime, playable Minesweeper, MSN RetroChat, and Winamp chiptune synth. |
 | **05** | [**Quantum & Ultimate Tic Tac Toe**](tictactoe.html) | Minimax Engine, Alpha-Beta, Web Audio | Ultimate 9x9 Super Board where moves dictate the opponent's active quadrant, plus Classic 3x3 with a live Minimax Advantage Meter (+5.0 eval bar), real-time cyber AI commentary, hint engine, and laser win lines. |
 | **06** | [**NeuroLife 3D: Neural Evolution Simulator**](neuro.html) | Three.js WebGL, Real Neural Networks | 3D artificial life ecosystem powered by genuine feedforward neural networks (8 inputs, 8 hidden, 3 motor outputs). Inspect live firing neurons and synapses in real-time, trigger cosmic mutations, inject apex predators, or possess ("Mind-Jack") any organism directly. |
-| **07** | [**Royal Carrom Club 3D: Master Board Lounge**](carrom.html) | Three.js WebGL, 2D Disk Physics | Luxury 3D Indian Rosewood Carrom Board with talcum powder glide dynamics, tactile slingshot striker release, 19 wooden carrom men (White, Black, Red Queen), and acoustic wooden clacks. |
+| **07** | [**Royal Carrom Club 3D: Master Board Lounge**](carrom.html) | Three.js WebGL, 2D Disk Physics | Luxury 3D Indian Rosewood Carrom Board with regulation snug pockets, 1P-4P local multiplayer, dynamic player-seat camera, real Carrom extra-shot rules, talcum powder glide, and acoustic wooden clacks. |
 
 ---
 

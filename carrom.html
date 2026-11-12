@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Royal Carrom Club 3D — Master Board Lounge</title>
-<meta name="description" content="An authentic, genuine 3D Carrom Board simulation with talcum powder glide physics, tactile slingshot striker release, Sheesham wood frame, 19 wooden carrom men, and procedural acoustic wooden clacks.">
+<meta name="description" content="An authentic, genuine 3D Carrom Board simulation with regulation pocket sizes, 1-4 player multiplayer, automatic seating perspectives, talcum powder glide dynamics, and procedural acoustic wooden clacks.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@700;800&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,6 +16,8 @@
     --gold: #ffbe3b;
     --amber: #e69224;
     --cyan: #00f0ff;
+    --emerald: #10b981;
+    --rose: #f43f5e;
     --text: #f0f4f8;
     --muted: rgba(240, 244, 248, 0.6);
     --panel: rgba(12, 16, 26, 0.94);
@@ -41,18 +43,18 @@
 
   /* TOP HUD */
   .hud-top {
-    position: fixed; top: 16px; left: 20px; right: 20px;
+    position: fixed; top: 14px; left: 18px; right: 18px;
     display: flex; justify-content: space-between; align-items: center;
-    z-index: 30; pointer-events: none;
+    z-index: 30; pointer-events: none; gap: 12px;
   }
   .hud-top > * { pointer-events: auto; }
 
-  .brand-group { display: flex; align-items: center; gap: 12px; }
+  .brand-group { display: flex; align-items: center; gap: 10px; }
   .home-btn {
     display: inline-flex; align-items: center; gap: 8px;
     background: var(--panel); border: 1px solid var(--border);
-    padding: 8px 16px; border-radius: 999px; color: var(--text);
-    text-decoration: none; font: 600 13px/1 var(--body);
+    padding: 7px 15px; border-radius: 999px; color: var(--text);
+    text-decoration: none; font: 600 12px/1 var(--body);
     backdrop-filter: blur(16px); transition: all 0.2s;
   }
   .home-btn:hover { border-color: var(--gold); color: #fff; transform: translateY(-1px); }
@@ -60,52 +62,92 @@
 
   .club-tag {
     background: var(--panel); border: 1px solid var(--border);
-    padding: 7px 16px; border-radius: 999px; backdrop-filter: blur(16px);
-    display: flex; align-items: center; gap: 8px; font: 500 11px/1 var(--mono); color: var(--muted);
+    padding: 6px 14px; border-radius: 999px; backdrop-filter: blur(16px);
+    display: flex; align-items: center; gap: 7px; font: 500 11px/1 var(--mono); color: var(--muted);
   }
   .club-tag b { color: var(--gold); font-weight: 700; }
 
+  /* TOP CONTROLS: PLAYERS & MODES */
+  .top-selectors { display: flex; align-items: center; gap: 8px; }
+
+  /* PLAYER COUNT SELECTOR */
+  .player-tabs {
+    display: flex; gap: 4px; background: var(--panel);
+    border: 1px solid var(--border); padding: 4px; border-radius: 999px;
+    backdrop-filter: blur(16px);
+  }
+  .player-tab {
+    background: transparent; border: 0; color: var(--muted);
+    font: 600 11px/1 var(--mono); padding: 6px 12px; border-radius: 999px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .player-tab:hover { color: #fff; }
+  .player-tab.active {
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.35), rgba(0, 180, 216, 0.2));
+    border: 1px solid var(--cyan); color: #fff; box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
+  }
+
   /* GAME MODE TABS */
   .mode-tabs {
-    display: flex; gap: 6px; background: var(--panel);
-    border: 1px solid var(--border); padding: 5px; border-radius: 999px;
+    display: flex; gap: 4px; background: var(--panel);
+    border: 1px solid var(--border); padding: 4px; border-radius: 999px;
     backdrop-filter: blur(16px);
   }
   .mode-tab {
     background: transparent; border: 0; color: var(--muted);
-    font: 600 11px/1 var(--body); padding: 7px 15px; border-radius: 999px;
+    font: 600 11px/1 var(--body); padding: 6px 12px; border-radius: 999px;
     cursor: pointer; transition: all 0.2s;
   }
   .mode-tab:hover { color: #fff; }
   .mode-tab.active {
     background: linear-gradient(135deg, rgba(230, 184, 74, 0.35), rgba(198, 146, 40, 0.2));
-    border: 1px solid var(--gold); color: #fff; box-shadow: 0 0 14px rgba(230, 184, 74, 0.35);
+    border: 1px solid var(--gold); color: #fff; box-shadow: 0 0 12px rgba(230, 184, 74, 0.35);
   }
 
   /* TOP MATCH SCOREBOARD */
   .score-banner {
-    position: fixed; top: 74px; left: 50%; transform: translateX(-50%);
+    position: fixed; top: 68px; left: 50%; transform: translateX(-50%);
     background: var(--panel); border: 1px solid var(--border);
-    padding: 8px 22px; border-radius: 999px; backdrop-filter: blur(16px);
-    display: flex; align-items: center; gap: 18px; z-index: 25;
-    font: 600 12px/1 var(--mono); box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    padding: 6px 18px; border-radius: 999px; backdrop-filter: blur(18px);
+    display: flex; align-items: center; gap: 14px; z-index: 25;
+    font: 600 11px/1 var(--mono); box-shadow: 0 10px 30px rgba(0,0,0,0.7);
   }
-  .score-val { color: var(--gold); font-weight: 800; font-size: 15px; }
-  .pieces-summary { display: flex; align-items: center; gap: 12px; }
-  .piece-pill { display: flex; align-items: center; gap: 5px; font-size: 11px; }
-  .p-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .player-cards { display: flex; align-items: center; gap: 8px; }
+  .p-card {
+    display: flex; align-items: center; gap: 6px; padding: 4px 10px;
+    border-radius: 999px; background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.25s;
+  }
+  .p-card.active {
+    background: rgba(255, 190, 59, 0.2); border-color: var(--gold);
+    box-shadow: 0 0 14px rgba(255, 190, 59, 0.45); transform: scale(1.06);
+  }
+  .p-badge { font-weight: 800; font-size: 10px; padding: 2px 5px; border-radius: 4px; }
+  .p-card.p1 .p-badge { background: #ffbe3b; color: #0b0d14; }
+  .p-card.p2 .p-badge { background: #00f0ff; color: #0b0d14; }
+  .p-card.p3 .p-badge { background: #10b981; color: #0b0d14; }
+  .p-card.p4 .p-badge { background: #f43f5e; color: #fff; }
+  .p-card .p-score { font-weight: 800; font-size: 12px; color: #fff; }
+  .p-turn-tag {
+    font-size: 8px; font-weight: 800; color: var(--gold);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  .pieces-summary { display: flex; align-items: center; gap: 10px; padding-left: 6px; border-left: 1px solid rgba(255,255,255,0.15); }
+  .piece-pill { display: flex; align-items: center; gap: 4px; font-size: 11px; }
+  .p-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
   .p-white { background: #fdfaf2; border: 1px solid #999; }
   .p-black { background: #1c1917; border: 1px solid #555; }
   .p-queen { background: #dc2626; border: 1px solid #ffd700; box-shadow: 0 0 8px #dc2626; }
 
   /* CAMERA VIEW PRESETS */
   .view-presets {
-    position: fixed; top: 74px; left: 20px;
-    display: flex; flex-direction: column; gap: 6px; z-index: 25;
+    position: fixed; top: 68px; left: 18px;
+    display: flex; flex-direction: column; gap: 5px; z-index: 25;
   }
   .cam-btn {
     background: var(--panel); border: 1px solid var(--border);
-    padding: 7px 14px; border-radius: 999px; color: var(--muted);
+    padding: 6px 12px; border-radius: 999px; color: var(--muted);
     font: 600 11px/1 var(--body); cursor: pointer; backdrop-filter: blur(16px);
     transition: all 0.2s; text-align: left; display: flex; align-items: center; gap: 6px;
   }
@@ -114,7 +156,7 @@
 
   /* MASTER BOTTOM CONTROL CONSOLE */
   .console-dock {
-    position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
     background: var(--panel); border: 1px solid var(--border);
     padding: 9px 20px; border-radius: 999px; backdrop-filter: blur(20px);
     display: flex; align-items: center; gap: 14px; z-index: 35;
@@ -128,7 +170,7 @@
   .control-label { text-transform: uppercase; letter-spacing: 0.5px; font-size: 10px; }
   .val-badge {
     background: rgba(255, 255, 255, 0.08); padding: 3px 7px; border-radius: 6px;
-    color: var(--gold); font-weight: 700; min-width: 32px; text-align: center;
+    color: var(--gold); font-weight: 700; min-width: 34px; text-align: center;
   }
 
   .step-btn {
@@ -194,8 +236,8 @@
 
   /* ONBOARDING SLINGSHOT HINT */
   .slingshot-hint {
-    position: fixed; bottom: 82px; left: 50%; transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.75); border: 1px solid rgba(255, 190, 59, 0.35);
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.78); border: 1px solid rgba(255, 190, 59, 0.35);
     padding: 7px 22px; border-radius: 999px; pointer-events: none;
     font: 600 11px/1.4 var(--mono); color: var(--muted); backdrop-filter: blur(10px);
     z-index: 25; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.6);
@@ -205,7 +247,7 @@
 
   /* TOAST NOTIFICATION */
   .toast {
-    position: fixed; top: 122px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    position: fixed; top: 118px; left: 50%; transform: translateX(-50%) translateY(-20px);
     background: rgba(12, 16, 26, 0.96); border: 1px solid var(--gold);
     color: #fff; padding: 10px 24px; border-radius: 999px;
     font: 700 13px/1 var(--mono); backdrop-filter: blur(16px);
@@ -214,14 +256,42 @@
   }
   .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
+  /* GAME OVER VICTORY MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center;
+    z-index: 100;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: var(--panel); border: 2px solid var(--gold);
+    border-radius: 24px; padding: 32px 40px; text-align: center;
+    max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+  }
+  .modal-box h2 { font: 800 28px/1.1 var(--display); color: var(--gold); margin-bottom: 8px; }
+  .modal-box p { font: 500 13px/1.5 var(--mono); color: var(--muted); margin-bottom: 20px; }
+  .leaderboard { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+  .lb-row {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.06); padding: 8px 16px; border-radius: 12px;
+    font: 700 13px/1 var(--mono);
+  }
+  .lb-row.first { background: rgba(255, 190, 59, 0.2); border: 1px solid var(--gold); color: #fff; }
+  .rematch-btn {
+    background: linear-gradient(135deg, #ffbe3b, #e68a00); color: #0b0d14;
+    border: 0; padding: 12px 28px; border-radius: 999px;
+    font: 800 14px/1 var(--display); cursor: pointer; transition: transform 0.15s;
+  }
+  .rematch-btn:hover { transform: scale(1.05); }
+
   @media (max-width: 980px) {
     .hud-top { flex-direction: column; gap: 8px; align-items: flex-start; }
-    .mode-tabs { align-self: center; }
+    .top-selectors { width: 100%; justify-content: space-between; }
     .console-dock { width: calc(100% - 24px); padding: 8px 10px; gap: 8px; flex-wrap: wrap; justify-content: center; }
     .slider-input { width: 75px; }
     .view-presets { display: none; }
-    .score-banner { top: 110px; padding: 6px 14px; font-size: 11px; }
-    .slingshot-hint { bottom: 120px; font-size: 10px; padding: 5px 14px; }
+    .score-banner { top: 120px; padding: 5px 12px; font-size: 10px; max-width: 95vw; overflow-x: auto; }
+    .slingshot-hint { bottom: 116px; font-size: 10px; padding: 5px 14px; }
   }
 </style>
 
@@ -241,34 +311,47 @@
     </div>
   </div>
 
-  <!-- Mode Selector -->
-  <div class="mode-tabs">
-    <button class="mode-tab active" id="tab-points">🎯 Points Match</button>
-    <button class="mode-tab" id="tab-zen">🕊️ Board Clear (Zen)</button>
-    <button class="mode-tab" id="tab-trick">⭐ Trick Cuts</button>
+  <div class="top-selectors">
+    <!-- Player Count: 1P, 2P, 3P, 4P -->
+    <div class="player-tabs">
+      <button class="player-tab" id="p-tab-1">1P Solo</button>
+      <button class="player-tab active" id="p-tab-2">2P Match</button>
+      <button class="player-tab" id="p-tab-3">3P Cut</button>
+      <button class="player-tab" id="p-tab-4">4P Lounge</button>
+    </div>
+
+    <!-- Mode Selector -->
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="tab-points">🎯 Points</button>
+      <button class="mode-tab" id="tab-zen">🕊️ Zen</button>
+      <button class="mode-tab" id="tab-trick">⭐ Trick</button>
+    </div>
   </div>
 </header>
 
-<!-- MATCH SCOREBOARD -->
+<!-- MATCH SCOREBOARD (DYNAMIC MULTI-PLAYER) -->
 <div class="score-banner" id="score-banner">
-  <span>Score: <b class="score-val" id="score-val">0 pts</b></span>
+  <div class="player-cards" id="player-cards">
+    <!-- Populated dynamically via renderScoreboard() -->
+  </div>
+
   <div class="pieces-summary">
-    <div class="piece-pill"><span class="p-dot p-white"></span> White: <b id="white-count">9</b></div>
-    <div class="piece-pill"><span class="p-dot p-black"></span> Black: <b id="black-count">9</b></div>
-    <div class="piece-pill"><span class="p-dot p-queen"></span> Queen: <b id="queen-status">Center</b></div>
+    <div class="piece-pill"><span class="p-dot p-white"></span> <b id="white-count">9</b></div>
+    <div class="piece-pill"><span class="p-dot p-black"></span> <b id="black-count">9</b></div>
+    <div class="piece-pill"><span class="p-dot p-queen"></span> <b id="queen-status">Center</b></div>
   </div>
 </div>
 
 <!-- CAMERA VIEW PRESETS -->
 <div class="view-presets">
-  <button class="cam-btn active" id="cam-overhead">📐 Classic Overhead</button>
-  <button class="cam-btn" id="cam-player">🎯 3D Player View</button>
+  <button class="cam-btn active" id="cam-overhead">📐 Overhead View</button>
+  <button class="cam-btn" id="cam-player">🪑 Player Seat View</button>
   <button class="cam-btn" id="cam-orbit">🌐 3D Free Orbit</button>
 </div>
 
 <!-- INSTRUCTION HINT -->
 <div class="slingshot-hint" id="slingshot-hint">
-  🎯 <b>Set Aim & Baseline</b> · Click <span>⚡ FLICK STRIKER</span> (Space) or drag on board to shoot
+  🎯 <b>Slide Baseline & Aim</b> · Click <span>⚡ FLICK STRIKER</span> (Space) or drag on board to shoot!
 </div>
 
 <!-- MASTER BOTTOM CONSOLE -->
@@ -276,17 +359,17 @@
   <!-- Baseline Slider -->
   <div class="control-unit">
     <span class="control-label">Baseline:</span>
-    <input type="range" class="slider-input" id="baseline-slider" min="-6.2" max="6.2" step="0.1" value="0">
+    <input type="range" class="slider-input" id="baseline-slider" min="-6.0" max="6.0" step="0.1" value="0">
     <span id="baseline-pos" class="val-badge">0.0</span>
   </div>
 
-  <!-- Aim Angle Control -->
+  <!-- Relative Aim Angle Control (-75 deg to +75 deg) -->
   <div class="control-unit">
     <span class="control-label">Aim:</span>
     <button class="step-btn" id="aim-left-btn" title="Aim Left (A)">◀</button>
-    <input type="range" class="slider-input" id="aim-slider" min="-175" max="-5" step="1" value="-90">
+    <input type="range" class="slider-input" id="aim-slider" min="-75" max="75" step="1" value="0">
     <button class="step-btn" id="aim-right-btn" title="Aim Right (D)">▶</button>
-    <span id="aim-val" class="val-badge">90°</span>
+    <span id="aim-val" class="val-badge">0°</span>
   </div>
 
   <!-- Power Meter -->
@@ -299,7 +382,7 @@
   <!-- Big Tactile Strike Button -->
   <button class="strike-btn" id="strike-btn">
     <span>⚡</span>
-    <span>FLICK STRIKER</span>
+    <span id="strike-btn-text">FLICK STRIKER</span>
     <span class="strike-hint">SPACE</span>
   </button>
 
@@ -311,13 +394,19 @@
 <!-- TOAST NOTIFICATION -->
 <div class="toast" id="toast">✨ White Piece Potted (+20 pts)!</div>
 
+<!-- GAME OVER MODAL -->
+<div class="modal-overlay" id="game-over-modal">
+  <div class="modal-box">
+    <h2>🏆 MATCH COMPLETE!</h2>
+    <p>All Carrom pieces cleared! Here are the final scores:</p>
+    <div class="leaderboard" id="modal-leaderboard"></div>
+    <button class="rematch-btn" id="rematch-btn">🔄 Play Rematch</button>
+  </div>
+</div>
+
 <script>
 /* ==========================================================================
    AUTHENTIC PROCEDURAL CARROM ACOUSTICS (WEB AUDIO API)
-   - Resonant wooden disk-on-disk clacks (pitch & volume scale with velocity)
-   - Solid Sheesham wooden boundary rail rebound thuds
-   - Soft talcum powder friction swoosh
-   - Corner pocket drop clunks into crochet string nets
    ========================================================================== */
 class CarromAudio {
   constructor() {
@@ -332,7 +421,6 @@ class CarromAudio {
     if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
   }
 
-  // Wooden disk-on-disk strike (Crisp sheesham clack)
   woodClack(relVel = 1.0) {
     if (!this.enabled || !this.ctx) return;
     const now = this.ctx.currentTime;
@@ -351,7 +439,6 @@ class CarromAudio {
     osc.connect(g); g.connect(this.ctx.destination);
     osc.start(now); osc.stop(now + 0.03);
 
-    // Warm wooden hollow body resonance
     const osc2 = this.ctx.createOscillator();
     const g2 = this.ctx.createGain();
     osc2.type = 'sine';
@@ -363,7 +450,6 @@ class CarromAudio {
     osc2.start(now); osc2.stop(now + 0.05);
   }
 
-  // Heavy Striker Snap Release
   strikerFlick(power = 1.0) {
     if (!this.enabled || !this.ctx) return;
     const now = this.ctx.currentTime;
@@ -378,7 +464,6 @@ class CarromAudio {
     osc.start(now); osc.stop(now + 0.055);
   }
 
-  // Boundary Wood Rail Thud
   railBounce(vel = 1.0) {
     if (!this.enabled || !this.ctx) return;
     const now = this.ctx.currentTime;
@@ -394,7 +479,6 @@ class CarromAudio {
     osc.start(now); osc.stop(now + 0.07);
   }
 
-  // Dropping into Crochet Net Corner Pocket
   pocketDrop() {
     if (!this.enabled || !this.ctx) return;
     const now = this.ctx.currentTime;
@@ -410,7 +494,6 @@ class CarromAudio {
     osc.start(now + 0.02); osc.stop(now + 0.16);
   }
 
-  // Talcum Powder Shaker Sound
   powderShake() {
     if (!this.enabled || !this.ctx) return;
     const now = this.ctx.currentTime;
@@ -434,12 +517,12 @@ document.body.addEventListener('pointerdown', () => sfx.init(), { once: true });
 document.body.addEventListener('keydown', () => sfx.init(), { once: true });
 
 /* ==========================================================================
-   PHYSICS CONSTANTS & TALCUM POWDER FRICTION MODEL
+   REGULATION CARROM DIMENSIONS & PHYSICS MODEL
    - Board Surface: 20 x 20 units
-   - Carrom Men: radius = 0.62 units, mass = 5.5 grams
-   - Striker: radius = 0.86 units, mass = 15.0 grams (Heavy acrylic momentum!)
-   - Linear friction deceleration: v(t+dt) = max(0, v - a*dt)
-   - 4 Corner Pockets: (±8.85, ±8.85) with radius 1.38 units
+   - Carrom Men: radius = 0.62 units (diameter 1.24)
+   - Striker: radius = 0.86 units (diameter 1.72)
+   - REGULATION POCKET RADIUS: 0.98 units (diameter 1.96)
+     -> Perfectly snug: 1.58x piece diameter, 1.14x striker diameter!
    ========================================================================== */
 const BOARD_SIZE = 20.0;
 const HALF_BOARD = 10.0;
@@ -450,17 +533,43 @@ const STRIKER_MASS = 15.0;
 const RESTITUTION = 0.94;
 const RAIL_RESTITUTION = 0.84;
 let frictionDecel = 4.8;
-const POCKET_RADIUS = 1.38;
+const POCKET_RADIUS = 0.98; // Realistic regulation proportion
 
 const POCKETS = [
-  { x: -8.85, y: -8.85 }, // Top-Left
-  { x:  8.85, y: -8.85 }, // Top-Right
-  { x: -8.85, y:  8.85 }, // Bottom-Left
-  { x:  8.85, y:  8.85 }  // Bottom-Right
+  { x: -8.9, y: -8.9 }, // Top-Left
+  { x:  8.9, y: -8.9 }, // Top-Right
+  { x: -8.9, y:  8.9 }, // Bottom-Left
+  { x:  8.9, y:  8.9 }  // Bottom-Right
 ];
 
 /* ==========================================================================
-   BOARD MARKINGS TEXTURE (CENTRAL ROSETTE, BASELINES, ARROWS & 4 DEEP HOLES)
+   4 PLAYER SEATS & BASELINE DEFINITIONS
+   ========================================================================== */
+const SEATS = {
+  south: {
+    id: 'south', name: 'South', forward: -Math.PI / 2, // Facing North
+    getPos: v => new THREE.Vector2(v, 7.0),
+    camPos: [0, 16, 21], camLook: [0, 0, -2]
+  },
+  west: {
+    id: 'west', name: 'West', forward: 0, // Facing East
+    getPos: v => new THREE.Vector2(-7.0, v),
+    camPos: [-21, 16, 0], camLook: [2, 0, 0]
+  },
+  north: {
+    id: 'north', name: 'North', forward: Math.PI / 2, // Facing South
+    getPos: v => new THREE.Vector2(-v, -7.0),
+    camPos: [0, 16, -21], camLook: [0, 0, 2]
+  },
+  east: {
+    id: 'east', name: 'East', forward: Math.PI, // Facing West
+    getPos: v => new THREE.Vector2(7.0, -v),
+    camPos: [21, 16, 0], camLook: [-2, 0, 0]
+  }
+};
+
+/* ==========================================================================
+   BOARD MARKINGS TEXTURE (CENTRAL ROSETTE, BASELINES & AUTHENTIC POCKET HOLES)
    ========================================================================== */
 function makeCarromBoardTexture() {
   const c = document.createElement('canvas');
@@ -531,14 +640,14 @@ function makeCarromBoardTexture() {
     ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(baselineLen, baselineDist);
-    ctx.lineTo(435, 435);
+    ctx.lineTo(440, 440);
     ctx.stroke();
 
     ctx.restore();
   }
 
-  // 4. AUTHENTIC 4 CORNER POCKET HOLES ON THE BOARD TEXTURE
-  const pocketCenterDist = 453; // 8.85 * 51.2
+  // 4. REGULATION-SIZED CORNER POCKET HOLES (456px from center, ~50px radius)
+  const pocketCenterDist = 456;
   [
     [-pocketCenterDist, -pocketCenterDist],
     [ pocketCenterDist, -pocketCenterDist],
@@ -547,24 +656,24 @@ function makeCarromBoardTexture() {
   ].forEach(([px, py]) => {
     // Outer dark wood chamfer
     ctx.fillStyle = '#1c0e07';
-    ctx.beginPath(); ctx.arc(px, py, 74, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(px, py, 56, 0, Math.PI * 2); ctx.fill();
 
     // Polished Brass Rim
-    ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 5;
-    ctx.beginPath(); ctx.arc(px, py, 70, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(px, py, 52, 0, Math.PI * 2); ctx.stroke();
 
     // Deep Pitch-Black Pocket Hole
     ctx.fillStyle = '#06070a';
-    ctx.beginPath(); ctx.arc(px, py, 66, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(px, py, 48, 0, Math.PI * 2); ctx.fill();
 
-    // White woven crochet string net pattern
+    // Woven crochet string netting
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)'; ctx.lineWidth = 1.5;
-    for (let k = -40; k <= 40; k += 16) {
+    for (let k = -30; k <= 30; k += 12) {
       ctx.beginPath();
-      ctx.moveTo(px + k, py - 40); ctx.lineTo(px + k, py + 40);
+      ctx.moveTo(px + k, py - 30); ctx.lineTo(px + k, py + 30);
       ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo(px - 40, py + k); ctx.lineTo(px + 40, py + k);
+      ctx.moveTo(px - 30, py + k); ctx.lineTo(px + 30, py + k);
       ctx.stroke();
     }
   });
@@ -578,7 +687,7 @@ function makeCarromBoardTexture() {
    ========================================================================== */
 class CarromPiece {
   constructor(type, x, y) {
-    this.type = type; // 'white' | 'black' | 'queen' | 'striker'
+    this.type = type;
     this.pos = new THREE.Vector2(x, y);
     this.vel = new THREE.Vector2(0, 0);
     this.isPotted = false;
@@ -683,7 +792,6 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color('#07090f');
 scene.fog = new THREE.FogExp2('#07090f', 0.012);
 
-// Framed camera height: 35.0 gives complete view of the 24.4x24.4 board
 const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
 camera.position.set(0, 35, 1.0);
 camera.lookAt(0, 0, -0.6);
@@ -697,7 +805,7 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.35;
 container.appendChild(renderer.domElement);
 
-// Lighting: Warm Room Chandelier & Soft Ambient
+// Lighting
 const ambientLight = new THREE.AmbientLight(0xffffff, 1.45);
 scene.add(ambientLight);
 
@@ -718,7 +826,7 @@ floor.rotation.x = -Math.PI / 2; floor.position.y = -6.0;
 floor.receiveShadow = true; scene.add(floor);
 
 /* ==========================================================================
-   3D CARROM BOARD & CORNER RECESSED DROP POCKETS
+   3D CARROM BOARD & REGULATION RECESSED DROP POCKETS
    ========================================================================== */
 const boardGroup = new THREE.Group();
 scene.add(boardGroup);
@@ -734,42 +842,41 @@ const boardBed = new THREE.Mesh(new THREE.PlaneGeometry(BOARD_SIZE, BOARD_SIZE),
 boardBed.rotation.x = -Math.PI / 2; boardBed.receiveShadow = true;
 boardGroup.add(boardBed);
 
-// 2. 4 Corner Crochet Pocket Net Drop Holes with Visible Surface Rings
+// 2. 4 Corner Regulation Pocket Holes (Snug 0.98 units radius)
 POCKETS.forEach(p => {
-  // Visible Jet-Black Surface Hole Entrance Disc
+  // Surface entrance black disc
   const pocketDisc = new THREE.Mesh(
     new THREE.CircleGeometry(POCKET_RADIUS, 32),
     new THREE.MeshBasicMaterial({ color: 0x050608 })
   );
   pocketDisc.rotation.x = -Math.PI / 2;
-  pocketDisc.position.set(p.x, 0.004, p.y);
+  pocketDisc.position.set(p.x, 0.003, p.y);
   boardGroup.add(pocketDisc);
 
   // 3D Polished Brass Pocket Lip Ring
   const pocketRim = new THREE.Mesh(
-    new THREE.TorusGeometry(POCKET_RADIUS, 0.07, 12, 32),
+    new THREE.TorusGeometry(POCKET_RADIUS, 0.05, 12, 32),
     brassCornerMat
   );
   pocketRim.rotation.x = Math.PI / 2;
   pocketRim.position.set(p.x, 0.015, p.y);
   boardGroup.add(pocketRim);
 
-  // Deep crochet net well recessed below board
-  const well = new THREE.Mesh(new THREE.CylinderGeometry(POCKET_RADIUS, POCKET_RADIUS * 0.8, 1.4, 24, 1, true), pocketNetMat);
+  // Recessed net cylinder well
+  const well = new THREE.Mesh(new THREE.CylinderGeometry(POCKET_RADIUS, POCKET_RADIUS * 0.85, 1.4, 24, 1, true), pocketNetMat);
   well.position.set(p.x, -0.7, p.y);
   boardGroup.add(well);
 
-  const bottom = new THREE.Mesh(new THREE.CircleGeometry(POCKET_RADIUS * 0.8, 24), pocketNetMat);
+  const bottom = new THREE.Mesh(new THREE.CircleGeometry(POCKET_RADIUS * 0.85, 24), pocketNetMat);
   bottom.rotation.x = Math.PI / 2; bottom.position.set(p.x, -1.4, p.y);
   boardGroup.add(bottom);
 });
 
-// 3. Thick Solid Rosewood Border Rails (4 Sides)
+// 3. Rosewood Border Rails
 const borderThickness = 2.2;
 const borderH = 0.9;
 const outerSize = BOARD_SIZE + borderThickness * 2;
 
-// Top/Bottom Rails
 const railTBGeo = new THREE.BoxGeometry(outerSize, borderH, borderThickness);
 const railT = new THREE.Mesh(railTBGeo, woodBorderMat);
 railT.position.set(0, borderH * 0.5, -HALF_BOARD - borderThickness * 0.5);
@@ -779,7 +886,6 @@ const railB = new THREE.Mesh(railTBGeo, woodBorderMat);
 railB.position.set(0, borderH * 0.5, HALF_BOARD + borderThickness * 0.5);
 railB.castShadow = true; railB.receiveShadow = true; boardGroup.add(railB);
 
-// Left/Right Rails
 const railLRGeo = new THREE.BoxGeometry(borderThickness, borderH, BOARD_SIZE);
 const railL = new THREE.Mesh(railLRGeo, woodBorderMat);
 railL.position.set(-HALF_BOARD - borderThickness * 0.5, borderH * 0.5, 0);
@@ -789,7 +895,7 @@ const railR = new THREE.Mesh(railLRGeo, woodBorderMat);
 railR.position.set(HALF_BOARD + borderThickness * 0.5, borderH * 0.5, 0);
 railR.castShadow = true; railR.receiveShadow = true; boardGroup.add(railR);
 
-// Polished Brass Corner Reinforcements
+// Brass Corner Caps
 [
   [-HALF_BOARD - borderThickness * 0.5, -HALF_BOARD - borderThickness * 0.5],
   [ HALF_BOARD + borderThickness * 0.5, -HALF_BOARD - borderThickness * 0.5],
@@ -801,7 +907,7 @@ railR.castShadow = true; railR.receiveShadow = true; boardGroup.add(railR);
   boardGroup.add(cap);
 });
 
-// Sturdy Table Legs
+// Legs
 const legGeo = new THREE.CylinderGeometry(0.85, 0.6, 6.0, 16);
 [
   [-HALF_BOARD - 0.5, -HALF_BOARD - 0.5], [HALF_BOARD + 0.5, -HALF_BOARD - 0.5],
@@ -815,14 +921,12 @@ const legGeo = new THREE.CylinderGeometry(0.85, 0.6, 6.0, 16);
 /* ==========================================================================
    TACTILE AIMING LASER GUIDE & SLINGSHOT TENSION LINE
    ========================================================================== */
-// 1. Forward Trajectory Laser Guide
 const aimGeo = new THREE.BufferGeometry();
 const aimPos = new Float32Array(6);
 aimGeo.setAttribute('position', new THREE.BufferAttribute(aimPos, 3));
 const aimLine = new THREE.Line(aimGeo, new THREE.LineBasicMaterial({ color: 0x00f0ff, linewidth: 3 }));
 scene.add(aimLine);
 
-// Ghost Striker Target Reticle Indicator
 const ghostStrikerGeo = new THREE.RingGeometry(STRIKER_R * 0.85, STRIKER_R, 32);
 const ghostStrikerMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.6, side: THREE.DoubleSide });
 const ghostStriker = new THREE.Mesh(ghostStrikerGeo, ghostStrikerMat);
@@ -830,7 +934,6 @@ ghostStriker.rotation.x = -Math.PI / 2;
 ghostStriker.position.y = 0.05;
 scene.add(ghostStriker);
 
-// 2. Slingshot Tension Rubber Band
 const pullGeo = new THREE.BufferGeometry();
 const pullPos = new Float32Array(6);
 pullGeo.setAttribute('position', new THREE.BufferAttribute(pullPos, 3));
@@ -839,29 +942,91 @@ pullLine.visible = false;
 scene.add(pullLine);
 
 /* ==========================================================================
-   GAME STATE & RACKING (19 PIECES: 9 WHITE, 9 BLACK, 1 QUEEN + STRIKER)
+   MULTI-PLAYER GAME STATE & ENGINE (1P, 2P, 3P, 4P)
    ========================================================================== */
 let pieces = [];
 let striker = null;
-let currentScore = 0;
 let whiteRemaining = 9;
 let blackRemaining = 9;
 let queenPotted = false;
 let currentCamMode = 'overhead'; // 'overhead' | 'player' | 'orbit'
 let currentGameMode = 'points';   // 'points' | 'zen' | 'trick'
 
+let numPlayers = 2; // Default 2 Players (1v1)
+let activePlayerIndex = 0;
+let players = [];
+
 // Turn State: 'AIMING' | 'ROLLING' | 'RESETTING'
 let turnState = 'AIMING';
-let aimAngle = -Math.PI / 2; // -90 deg: straight up towards center
+let relativeAimDeg = 0; // Relative to active player's forward direction (-75 to +75 deg)
+let aimAngle = -Math.PI / 2; // Absolute radians
 
-// Striker Slingshot Dragging State
+// Shot outcome trackers
+let pottedThisShot = [];
+let foulThisShot = false;
+
+// Slingshot Drag State
 let isDragging = false;
 let dragOrigin = new THREE.Vector2();
 let dragCurrent = new THREE.Vector2();
 
+function getActiveSeat() {
+  if (numPlayers === 1) return SEATS.south;
+  if (numPlayers === 2) return activePlayerIndex === 0 ? SEATS.south : SEATS.north;
+  if (numPlayers === 3) return [SEATS.south, SEATS.west, SEATS.north][activePlayerIndex];
+  return [SEATS.south, SEATS.west, SEATS.north, SEATS.east][activePlayerIndex];
+}
+
+function initPlayers(count) {
+  numPlayers = count;
+  activePlayerIndex = 0;
+  players = [];
+
+  const playerConfigs = [
+    { name: 'Player 1', role: 'P1 (South)', color: '#ffbe3b', class: 'p1' },
+    { name: 'Player 2', role: count === 2 ? 'P2 (North)' : 'P2 (West)', color: '#00f0ff', class: 'p2' },
+    { name: 'Player 3', role: 'P3 (North)', color: '#10b981', class: 'p3' },
+    { name: 'Player 4', role: 'P4 (East)', color: '#f43f5e', class: 'p4' }
+  ];
+
+  for (let i = 0; i < count; i++) {
+    players.push({
+      ...playerConfigs[i],
+      score: 0,
+      pottedWhites: 0,
+      pottedBlacks: 0,
+      queenCovered: false
+    });
+  }
+
+  // Update Player Count Tabs
+  document.querySelectorAll('.player-tab').forEach(b => b.classList.remove('active'));
+  const activeTab = document.getElementById(`p-tab-${count}`);
+  if (activeTab) activeTab.classList.add('active');
+
+  renderScoreboard();
+}
+
+function renderScoreboard() {
+  const container = document.getElementById('player-cards');
+  container.innerHTML = players.map((p, idx) => `
+    <div class="p-card ${p.class} ${idx === activePlayerIndex ? 'active' : ''}">
+      <span class="p-badge">${p.name.replace('Player ', 'P')}</span>
+      <span class="p-score">${p.score} pts</span>
+      ${idx === activePlayerIndex ? '<span class="p-turn-tag">TURN</span>' : ''}
+    </div>
+  `).join('');
+
+  document.getElementById('white-count').textContent = whiteRemaining;
+  document.getElementById('black-count').textContent = blackRemaining;
+  document.getElementById('queen-status').textContent = queenPotted ? 'Potted 👑' : 'Center';
+}
+
 function rackCarrom(mode = 'points') {
   currentGameMode = mode;
   turnState = 'AIMING';
+  pottedThisShot = [];
+  foulThisShot = false;
 
   // Clear existing pieces
   pieces.forEach(p => {
@@ -869,14 +1034,16 @@ function rackCarrom(mode = 'points') {
     scene.remove(p.shadow);
   });
   pieces = [];
-  currentScore = 0;
   whiteRemaining = 9;
   blackRemaining = 9;
   queenPotted = false;
-  document.getElementById('score-val').textContent = '0 pts';
-  document.getElementById('white-count').textContent = '9';
-  document.getElementById('black-count').textContent = '9';
-  document.getElementById('queen-status').textContent = 'Center';
+
+  // Reset player scores
+  players.forEach(p => {
+    p.score = 0;
+    p.pottedWhites = 0;
+    p.pottedBlacks = 0;
+  });
 
   if (mode === 'points') {
     // 1. Red Queen in Exact Center
@@ -920,19 +1087,22 @@ function rackCarrom(mode = 'points') {
     pieces.push(new CarromPiece('black', 0, 4.5));
   }
 
-  // Create Striker on Baseline (y = 7.0)
+  // Create Striker on current active seat's baseline
   if (striker) {
     scene.remove(striker.mesh);
     scene.remove(striker.shadow);
   }
-  const initX = parseFloat(document.getElementById('baseline-slider').value) || 0;
-  striker = new CarromPiece('striker', initX, 7.0);
+  const seat = getActiveSeat();
+  const initSlider = parseFloat(document.getElementById('baseline-slider').value) || 0;
+  const initPos = seat.getPos(initSlider);
+  striker = new CarromPiece('striker', initPos.x, initPos.y);
 
   pullLine.visible = false;
-  setAimAngle(-90);
+  setAimRelative(0);
   updateAimGuide();
   updateUIState();
-  showToast(mode === 'points' ? '👑 Carrom Board Racked! Aim & Flick to Shoot' : `Game Mode: ${mode.toUpperCase()}`);
+  renderScoreboard();
+  showToast(`👑 ${numPlayers}P Match Racked! ${players[activePlayerIndex].name}'s Turn`);
 }
 
 /* ==========================================================================
@@ -959,7 +1129,7 @@ function updatePhysics(dt) {
         }
       }
 
-      // Corner Pocket Detection
+      // Snug Regulation Corner Pocket Detection
       for (let p of POCKETS) {
         const dx = d.pos.x - p.x;
         const dy = d.pos.y - p.y;
@@ -969,27 +1139,30 @@ function updatePhysics(dt) {
           sfx.pocketDrop();
 
           if (d === striker) {
-            showToast('⚠️ Foul! Striker Potted (-10 pts penalty)');
-            currentScore = Math.max(0, currentScore - 10);
-            document.getElementById('score-val').textContent = `${currentScore} pts`;
+            foulThisShot = true;
+            const pObj = players[activePlayerIndex];
+            pObj.score = Math.max(0, pObj.score - 10);
+            showToast(`⚠️ Foul! Striker Potted (-10 pts penalty for ${pObj.name})`);
           } else {
-            currentScore += d.points;
-            document.getElementById('score-val').textContent = `${currentScore} pts`;
+            pottedThisShot.push(d);
+            const pObj = players[activePlayerIndex];
+            pObj.score += d.points;
 
             if (d.type === 'white') {
               whiteRemaining--;
-              document.getElementById('white-count').textContent = `${whiteRemaining}`;
-              showToast('✨ White Potted (+20 pts)!');
+              pObj.pottedWhites++;
+              showToast(`✨ ${pObj.name} Potted White (+20 pts)!`);
             } else if (d.type === 'black') {
               blackRemaining--;
-              document.getElementById('black-count').textContent = `${blackRemaining}`;
-              showToast('✨ Black Potted (+10 pts)!');
+              pObj.pottedBlacks++;
+              showToast(`✨ ${pObj.name} Potted Black (+10 pts)!`);
             } else if (d.type === 'queen') {
               queenPotted = true;
-              document.getElementById('queen-status').textContent = 'Potted 👑';
-              showToast('👑 RED QUEEN POTTED (+50 PTS)!');
+              pObj.queenCovered = true;
+              showToast(`👑 ${pObj.name} POTTED RED QUEEN (+50 PTS)!`);
             }
           }
+          renderScoreboard();
           break;
         }
       }
@@ -998,7 +1171,6 @@ function updatePhysics(dt) {
       if (!d.isPotted) {
         const bound = HALF_BOARD - d.r;
 
-        // X Bounds (Left / Right)
         if (d.pos.x < -bound) {
           d.pos.x = -bound;
           d.vel.x = -d.vel.x * RAIL_RESTITUTION;
@@ -1009,7 +1181,6 @@ function updatePhysics(dt) {
           sfx.railBounce(d.vel.length());
         }
 
-        // Y Bounds (Top / Bottom)
         if (d.pos.y < -bound) {
           d.pos.y = -bound;
           d.vel.y = -d.vel.y * RAIL_RESTITUTION;
@@ -1042,7 +1213,7 @@ function updatePhysics(dt) {
           const invM2 = 1 / d2.mass;
           const invSum = invM1 + invM2;
 
-          // Positional overlap resolution (Three.js addScaledVector)
+          // Safe Three.js positional overlap resolution
           d1.pos.addScaledVector(normal, -overlap * (invM1 / invSum));
           d2.pos.addScaledVector(normal, overlap * (invM2 / invSum));
 
@@ -1072,7 +1243,7 @@ function areDisksMoving() {
 }
 
 /* ==========================================================================
-   VISUAL AIM & RETICLE GUIDE
+   AIM & RETICLE CALCULATOR
    ========================================================================== */
 function updateAimGuide() {
   if (!striker || turnState !== 'AIMING') {
@@ -1100,10 +1271,23 @@ function updateAimGuide() {
   ghostStriker.position.set(tx, 0.06, ty);
 }
 
+function setAimRelative(deg) {
+  const clampedDeg = Math.min(75, Math.max(-75, deg));
+  relativeAimDeg = clampedDeg;
+  const seat = getActiveSeat();
+  aimAngle = seat.forward + (clampedDeg * Math.PI / 180);
+
+  document.getElementById('aim-slider').value = Math.round(clampedDeg);
+  document.getElementById('aim-val').textContent = `${clampedDeg > 0 ? '+' : ''}${Math.round(clampedDeg)}°`;
+  updateAimGuide();
+}
+
 function updateUIState() {
   const strikeBtn = document.getElementById('strike-btn');
+  const btnText = document.getElementById('strike-btn-text');
   if (turnState === 'AIMING') {
     strikeBtn.classList.remove('disabled');
+    btnText.textContent = `FLICK (${players[activePlayerIndex].name.replace('Player ', 'P')})`;
     container.classList.add('aiming');
     container.classList.remove('dragging');
   } else {
@@ -1120,6 +1304,9 @@ function launchStriker(powerRatio, angle) {
 
   sfx.init();
   turnState = 'ROLLING';
+  pottedThisShot = [];
+  foulThisShot = false;
+
   aimLine.visible = false;
   ghostStriker.visible = false;
   pullLine.visible = false;
@@ -1134,34 +1321,22 @@ function launchStriker(powerRatio, angle) {
 }
 
 /* ==========================================================================
-   AIM ANGLE CONTROLLER HELPER
+   AIM CONTROLS LISTENERS
    ========================================================================== */
 const aimSlider = document.getElementById('aim-slider');
-const aimValLabel = document.getElementById('aim-val');
-
-function setAimAngle(deg) {
-  const clampedDeg = Math.min(-5, Math.max(-175, deg));
-  aimAngle = (clampedDeg * Math.PI) / 180;
-  aimSlider.value = Math.round(clampedDeg);
-  aimValLabel.textContent = `${Math.abs(Math.round(clampedDeg))}°`;
-  updateAimGuide();
-}
-
 aimSlider.addEventListener('input', e => {
-  setAimAngle(parseFloat(e.target.value));
+  setAimRelative(parseFloat(e.target.value));
 });
 
 document.getElementById('aim-left-btn').addEventListener('click', () => {
-  const cur = parseFloat(aimSlider.value);
-  setAimAngle(cur - 3);
+  setAimRelative(relativeAimDeg - 3);
 });
 document.getElementById('aim-right-btn').addEventListener('click', () => {
-  const cur = parseFloat(aimSlider.value);
-  setAimAngle(cur + 3);
+  setAimRelative(relativeAimDeg + 3);
 });
 
 /* ==========================================================================
-   TACTILE INPUT: SLINGSHOT DRAG, FORWARD FLICK & RAYCASTING
+   TACTILE INPUT: SLINGSHOT DRAG, FORWARD FLICK & BOARD INTERSECT
    ========================================================================== */
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
@@ -1179,7 +1354,7 @@ function getTableIntersect(e) {
 }
 
 container.addEventListener('pointerdown', e => {
-  if (e.target.closest('header, nav, .mode-tabs, .console-dock, .view-presets')) return;
+  if (e.target.closest('header, nav, .mode-tabs, .player-tabs, .console-dock, .view-presets, .modal-overlay')) return;
   sfx.init();
 
   if (turnState !== 'AIMING' || !striker || striker.isPotted) return;
@@ -1192,11 +1367,17 @@ container.addEventListener('pointerdown', e => {
   dragOrigin.set(striker.pos.x, striker.pos.y);
   dragCurrent.copy(hit);
 
-  // Directly adjust aim toward touch point if clicked forward
+  // Directly adjust aim toward touch point if clicked on playing field
   const dir = hit.clone().sub(striker.pos);
-  if (dir.length() > 0.4 && dir.y < 0) {
-    const deg = (Math.atan2(dir.y, dir.x) * 180) / Math.PI;
-    setAimAngle(deg);
+  const seat = getActiveSeat();
+  const forwardVec = new THREE.Vector2(Math.cos(seat.forward), Math.sin(seat.forward));
+
+  if (dir.length() > 0.4 && dir.dot(forwardVec) > 0) {
+    const rawAngle = Math.atan2(dir.y, dir.x);
+    let diff = (rawAngle - seat.forward) * 180 / Math.PI;
+    while (diff > 180) diff -= 360;
+    while (diff < -180) diff += 360;
+    setAimRelative(diff);
   }
 });
 
@@ -1209,21 +1390,24 @@ window.addEventListener('pointermove', e => {
   dragCurrent.copy(hit);
   const dragVec = dragCurrent.clone().sub(dragOrigin);
   const dragLen = dragVec.length();
+  const seat = getActiveSeat();
+  const forwardVec = new THREE.Vector2(Math.cos(seat.forward), Math.sin(seat.forward));
 
   if (dragLen > 0.4) {
-    if (dragVec.y > 0) {
-      // Slingshot Pull Back (User pulled downward behind baseline)
+    if (dragVec.dot(forwardVec) < 0) {
+      // Slingshot Pull Back (User pulled behind active player's baseline)
       const pullAngle = Math.atan2(dragVec.y, dragVec.x);
-      const shootAngle = pullAngle + Math.PI; // Opposite direction (forward)
-      const deg = (shootAngle * 180) / Math.PI;
-      setAimAngle(deg > 0 ? deg - 360 : deg);
+      const shootAngle = pullAngle + Math.PI;
+      let diff = (shootAngle - seat.forward) * 180 / Math.PI;
+      while (diff > 180) diff -= 360;
+      while (diff < -180) diff += 360;
+      setAimRelative(diff);
 
       const tensionLen = Math.min(6.0, dragLen);
       const powerPct = Math.round((tensionLen / 6.0) * 100);
       document.getElementById('power-slider').value = powerPct;
       document.getElementById('power-val').textContent = `${powerPct}%`;
 
-      // Render red slingshot tension line behind striker
       const pPos = pullGeo.attributes.position;
       pPos.setXYZ(0, striker.pos.x, 0.2, striker.pos.y);
       pPos.setXYZ(1, dragCurrent.x, 0.2, dragCurrent.y);
@@ -1231,8 +1415,11 @@ window.addEventListener('pointermove', e => {
       pullLine.visible = true;
     } else {
       // Direct Forward Swipe
-      const deg = (Math.atan2(dragVec.y, dragVec.x) * 180) / Math.PI;
-      setAimAngle(deg);
+      const rawAngle = Math.atan2(dragVec.y, dragVec.x);
+      let diff = (rawAngle - seat.forward) * 180 / Math.PI;
+      while (diff > 180) diff -= 360;
+      while (diff < -180) diff += 360;
+      setAimRelative(diff);
       pullLine.visible = false;
 
       const powerPct = Math.min(100, Math.round((dragLen / 5.0) * 100));
@@ -1270,14 +1457,15 @@ strikeBtn.addEventListener('click', () => {
   launchStriker(power, aimAngle);
 });
 
-// 2. Baseline Slider
+// 2. Baseline Slider (Moves along active player's baseline)
 const baselineSlider = document.getElementById('baseline-slider');
 const baselinePosLabel = document.getElementById('baseline-pos');
 baselineSlider.addEventListener('input', e => {
   if (turnState !== 'AIMING' || !striker || striker.isPotted) return;
   const val = parseFloat(e.target.value);
-  striker.pos.x = val;
-  striker.pos.y = 7.0;
+  const seat = getActiveSeat();
+  const newPos = seat.getPos(val);
+  striker.pos.copy(newPos);
   striker.updateVisuals();
   baselinePosLabel.textContent = val.toFixed(1);
   updateAimGuide();
@@ -1312,48 +1500,24 @@ soundBtn.addEventListener('click', () => {
   soundBtn.textContent = sfx.enabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
 });
 
-// 7. Keyboard Shortcuts (Space, Arrows, A/D, R, P)
-window.addEventListener('keydown', e => {
-  if (e.code === 'Space') {
-    e.preventDefault();
-    if (turnState === 'AIMING') {
-      const power = parseFloat(document.getElementById('power-slider').value) / 100;
-      launchStriker(power, aimAngle);
-    }
-  } else if (e.key === 'ArrowLeft' || e.key === 'Left') {
-    if (turnState === 'AIMING') {
-      const newVal = Math.max(-6.2, parseFloat(baselineSlider.value) - 0.3);
-      baselineSlider.value = newVal;
-      baselinePosLabel.textContent = newVal.toFixed(1);
-      striker.pos.x = newVal;
-      striker.updateVisuals();
-      updateAimGuide();
-    }
-  } else if (e.key === 'ArrowRight' || e.key === 'Right') {
-    if (turnState === 'AIMING') {
-      const newVal = Math.min(6.2, parseFloat(baselineSlider.value) + 0.3);
-      baselineSlider.value = newVal;
-      baselinePosLabel.textContent = newVal.toFixed(1);
-      striker.pos.x = newVal;
-      striker.updateVisuals();
-      updateAimGuide();
-    }
-  } else if (e.key === 'a' || e.key === 'A') {
-    const cur = parseFloat(aimSlider.value);
-    setAimAngle(cur - 2);
-  } else if (e.key === 'd' || e.key === 'D') {
-    const cur = parseFloat(aimSlider.value);
-    setAimAngle(cur + 2);
-  } else if (e.key === 'r' || e.key === 'R') {
+// 7. Player Count Selector (1P, 2P, 3P, 4P)
+[1, 2, 3, 4].forEach(count => {
+  document.getElementById(`p-tab-${count}`).addEventListener('click', () => {
+    initPlayers(count);
     rackCarrom(currentGameMode);
-  } else if (e.key === 'p' || e.key === 'P') {
-    sfx.powderShake();
-    frictionDecel = Math.max(2.8, frictionDecel - 0.5);
-    showToast('✨ Powder Sprinkled!');
-  }
+  });
 });
 
-// 8. Camera Views Switching
+// 8. Mode Tabs
+document.querySelectorAll('.mode-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.mode-tab').forEach(b => b.classList.remove('active'));
+    t.classList.add('active');
+    rackCarrom(t.id.replace('tab-', ''));
+  });
+});
+
+// 9. Camera View Presets
 function setCameraView(mode) {
   document.querySelectorAll('.cam-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(`cam-${mode}`).classList.add('active');
@@ -1363,13 +1527,59 @@ document.getElementById('cam-overhead').addEventListener('click', () => setCamer
 document.getElementById('cam-player').addEventListener('click', () => setCameraView('player'));
 document.getElementById('cam-orbit').addEventListener('click', () => setCameraView('orbit'));
 
-// 9. Mode Tabs
-document.querySelectorAll('.mode-tab').forEach(t => {
-  t.addEventListener('click', () => {
-    document.querySelectorAll('.mode-tab').forEach(b => b.classList.remove('active'));
-    t.classList.add('active');
-    rackCarrom(t.id.replace('tab-', ''));
-  });
+// 10. Rematch Button
+document.getElementById('rematch-btn').addEventListener('click', () => {
+  document.getElementById('game-over-modal').classList.remove('show');
+  rackCarrom(currentGameMode);
+});
+
+// 11. Keyboard Shortcuts (Space, Arrows, A/D, R, P)
+window.addEventListener('keydown', e => {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (turnState === 'AIMING') {
+      const power = parseFloat(document.getElementById('power-slider').value) / 100;
+      launchStriker(power, aimAngle);
+    }
+  } else if (e.key === 'ArrowLeft' || e.key === 'Left') {
+    if (turnState === 'AIMING') {
+      const newVal = Math.max(-6.0, parseFloat(baselineSlider.value) - 0.3);
+      baselineSlider.value = newVal;
+      baselinePosLabel.textContent = newVal.toFixed(1);
+      const seat = getActiveSeat();
+      striker.pos.copy(seat.getPos(newVal));
+      striker.updateVisuals();
+      updateAimGuide();
+    }
+  } else if (e.key === 'ArrowRight' || e.key === 'Right') {
+    if (turnState === 'AIMING') {
+      const newVal = Math.min(6.0, parseFloat(baselineSlider.value) + 0.3);
+      baselineSlider.value = newVal;
+      baselinePosLabel.textContent = newVal.toFixed(1);
+      const seat = getActiveSeat();
+      striker.pos.copy(seat.getPos(newVal));
+      striker.updateVisuals();
+      updateAimGuide();
+    }
+  } else if (e.key === 'a' || e.key === 'A') {
+    setAimRelative(relativeAimDeg - 2);
+  } else if (e.key === 'd' || e.key === 'D') {
+    setAimRelative(relativeAimDeg + 2);
+  } else if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') {
+    const curP = Math.min(100, parseInt(powerSlider.value) + 5);
+    powerSlider.value = curP;
+    powerValLabel.textContent = `${curP}%`;
+  } else if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') {
+    const curP = Math.max(25, parseInt(powerSlider.value) - 5);
+    powerSlider.value = curP;
+    powerValLabel.textContent = `${curP}%`;
+  } else if (e.key === 'r' || e.key === 'R') {
+    rackCarrom(currentGameMode);
+  } else if (e.key === 'p' || e.key === 'P') {
+    sfx.powderShake();
+    frictionDecel = Math.max(2.8, frictionDecel - 0.5);
+    showToast('✨ Powder Sprinkled!');
+  }
 });
 
 // Toast Helper
@@ -1382,11 +1592,33 @@ function showToast(msg) {
   toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
 }
 
+function checkGameOver() {
+  const piecesLeft = pieces.filter(p => !p.isPotted && p.type !== 'striker').length;
+  if (piecesLeft === 0) {
+    // Show GameOver Leaderboard
+    const sorted = [...players].sort((a, b) => b.score - a.score);
+    const lbEl = document.getElementById('modal-leaderboard');
+    lbEl.innerHTML = sorted.map((p, rank) => `
+      <div class="lb-row ${rank === 0 ? 'first' : ''}">
+        <span>${rank === 0 ? '🥇' : (rank === 1 ? '🥈' : '🥉')} ${p.name}</span>
+        <span>${p.score} pts</span>
+      </div>
+    `).join('');
+    document.getElementById('game-over-modal').classList.add('show');
+    showToast(`🏆 Game Over! Winner: ${sorted[0].name} (${sorted[0].score} pts)!`);
+    return true;
+  }
+  return false;
+}
+
 /* ==========================================================================
    MAIN RENDER & ANIMATION LOOP
    ========================================================================== */
 let clock = new THREE.Clock();
 let freeOrbitYaw = 0, freeOrbitPitch = 0.65, freeOrbitDist = 32;
+const targetCamPos = new THREE.Vector3();
+const targetCamLook = new THREE.Vector3();
+const currentCamLook = new THREE.Vector3(0, 0, -1);
 
 function animate() {
   requestAnimationFrame(animate);
@@ -1394,19 +1626,38 @@ function animate() {
 
   updatePhysics(dt);
 
-  // Turn State Transition & Settling
+  // Turn State Transition & Real Carrom Multi-Player Progression
   if (turnState === 'ROLLING') {
     if (!areDisksMoving()) {
       turnState = 'RESETTING';
       setTimeout(() => {
-        if (striker) {
-          const sliderVal = parseFloat(baselineSlider.value) || 0;
-          striker.reset(sliderVal, 7.0);
+        if (!checkGameOver()) {
+          const curP = players[activePlayerIndex];
+
+          // Real Carrom Rule: Potting piece without foul awards an EXTRA SHOT!
+          if (pottedThisShot.length > 0 && !foulThisShot) {
+            showToast(`🎯 Extra Shot! Strike Again, ${curP.name}!`);
+          } else {
+            // Pass turn to next player
+            activePlayerIndex = (activePlayerIndex + 1) % numPlayers;
+            showToast(`🎯 ${players[activePlayerIndex].name}'s Turn!`);
+          }
+
+          // Reset striker on active player's baseline
+          if (striker) {
+            const seat = getActiveSeat();
+            const sliderVal = parseFloat(baselineSlider.value) || 0;
+            const newPos = seat.getPos(sliderVal);
+            striker.reset(newPos.x, newPos.y);
+          }
+
+          setAimRelative(0);
+          renderScoreboard();
+          turnState = 'AIMING';
+          updateAimGuide();
+          updateUIState();
         }
-        turnState = 'AIMING';
-        updateAimGuide();
-        updateUIState();
-      }, 350);
+      }, 400);
     }
   }
 
@@ -1415,8 +1666,13 @@ function animate() {
     camera.position.lerp(new THREE.Vector3(0, 35, 1.0), 0.08);
     camera.lookAt(0, 0, -0.6);
   } else if (currentCamMode === 'player') {
-    camera.position.lerp(new THREE.Vector3(0, 16, 21), 0.08);
-    camera.lookAt(0, 0, -2);
+    // Dynamic perspective matching the active player's seat!
+    const seat = getActiveSeat();
+    targetCamPos.set(seat.camPos[0], seat.camPos[1], seat.camPos[2]);
+    targetCamLook.set(seat.camLook[0], seat.camLook[1], seat.camLook[2]);
+    camera.position.lerp(targetCamPos, 0.06);
+    currentCamLook.lerp(targetCamLook, 0.06);
+    camera.lookAt(currentCamLook);
   } else if (currentCamMode === 'orbit') {
     const cx = Math.sin(freeOrbitYaw) * Math.cos(freeOrbitPitch) * freeOrbitDist;
     const cy = Math.sin(freeOrbitPitch) * freeOrbitDist;
@@ -1441,6 +1697,7 @@ function bootCarrom() {
     setTimeout(bootCarrom, 40);
     return;
   }
+  initPlayers(2); // Default 2 Players (1v1)
   rackCarrom('points');
   animate();
 }
