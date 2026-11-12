@@ -6,7 +6,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 
 ---
 
-## 🎮 The 12 Experiments
+## 🎮 The 13 Experiments
 
 | # | Experiment | Technology | Highlights |
 |---|---|---|---|
@@ -22,6 +22,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 | **10** | [**Angry Bird Hunt**](birds.html) | Canvas 2D, Web Audio API | Fast-paced arcade clay & bird shooting game with cartoonish angry bird emojis, dynamic rotating shotgun with recoil & muzzle flash, custom glowing crosshair with target-lock brackets, feather particle explosions, combo multipliers, speed selector (Slow/Normal/Fast/Turbo), 8-round magazine reload mechanics, and 60-second tournament timer. |
 | **11** | [**Fruit Slash**](fruit.html) | Canvas 2D, Web Audio API, Segment Slicing | Fast-paced neon blade arcade featuring unlimited recursive slicing, parabolic fruit trajectories, glowing cyan blade trails with velocity swish, explosive bombs, golden slow-mo mangoes, combo multipliers, and live speed switching. |
 | **12** | [**Foosball Pro**](foosball.html) | Canvas 2D, 240Hz Sub-step CCD, Web Audio | Tournament table soccer simulation with continuous collision detection, 8 regulation interleaved rods (GK, DEF, MID, ATT), realistic figure trapping and bank shots, 3-tier bot AI, instant slow-motion goal replay, and local 2P multiplayer. |
+| **13** | [**BodyScope 3D: Interactive Human Anatomy Explorer**](bodyscope.html) | Three.js WebGL, Procedural 3D Geometry, Web Audio | Medical-grade 3D human anatomy explorer featuring a glowing blue translucent X-ray silhouette, full skeleton (100+ clickable bones), organs, muscles, continuous vascular network with pulsating blood flow particles, nervous pathways, real-time beating 4-chambered heart with synced dual-tone lub-dub audio and live scrolling PQRST ECG monitor, interactive physiology lab (heart rate and blood glucose sliders, insulin clearance simulation, adrenaline surge), axial cross-section slice tool, bilingual English/Urdu details, and anatomy quiz. |
 
 ---
 
