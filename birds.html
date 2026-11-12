@@ -1,0 +1,1526 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Angry Bird Hunt — AI Smarts</title>
+<meta name="description" content="A fun, fast-paced arcade shooting game featuring cartoonish angry birds, custom crosshairs, recoil, combos, and Web Audio sound effects.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@700;800&family=Bricolage+Grotesque:opsz,wght@12..96,500;700;800&family=Geist+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0c10;
+    --card: rgba(18, 22, 31, 0.92);
+    --border: rgba(53, 243, 223, 0.28);
+    --text: #f0ebe1;
+    --muted: #8c93a4;
+    --cyan: #35f3df;
+    --cyan-glow: rgba(53, 243, 223, 0.45);
+    --amber: #ffb732;
+    --coral: #ff4757;
+    --gold: #ffd32a;
+    --mono: "Geist Mono", ui-monospace, "SF Mono", monospace;
+    --display: "Funnel Display", "Bricolage Grotesque", sans-serif;
+    --body: "Bricolage Grotesque", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: var(--bg); color: var(--text);
+    font-family: var(--body);
+    touch-action: none;
+    cursor: none; /* Custom in-canvas crosshair */
+  }
+  canvas {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    display: block; z-index: 1;
+  }
+
+  /* TOP HUD */
+  .hud {
+    position: fixed; inset: 0; pointer-events: none; z-index: 10;
+    font: 12px/1.4 var(--mono); color: var(--muted);
+  }
+  .hud > * { pointer-events: auto; }
+
+  .top-bar {
+    position: absolute; top: 16px; left: 18px; right: 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 10px;
+  }
+  .hud-left, .hud-right { display: flex; align-items: center; gap: 10px; }
+
+  .home-link {
+    color: var(--text); text-decoration: none; font: 700 12px/1 var(--body);
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(14, 18, 26, 0.85); border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 7px 13px; border-radius: 999px; backdrop-filter: blur(12px);
+    transition: all 0.2s ease;
+  }
+  .home-link:hover { border-color: var(--cyan); color: #fff; }
+  .home-link span { color: var(--cyan); font-weight: 800; }
+
+  .hud-chip {
+    background: rgba(14, 18, 26, 0.85); border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 6px 14px; border-radius: 999px; backdrop-filter: blur(12px);
+    display: flex; align-items: baseline; gap: 7px;
+  }
+  .hud-chip-label { font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .hud-chip-val { font: 800 17px/1 var(--mono); color: #fff; letter-spacing: -0.02em; }
+  .hud-chip-val.gold { color: var(--gold); }
+  .hud-chip-val.cyan { color: var(--cyan); }
+  .hud-chip-val.coral { color: var(--coral); }
+
+  /* Center: Countdown Timer */
+  .hud-center {
+    position: absolute; left: 50%; transform: translateX(-50%);
+  }
+  .timer-pill {
+    background: rgba(14, 18, 26, 0.9);
+    border: 1.5px solid rgba(53, 243, 223, 0.45);
+    padding: 6px 18px; border-radius: 999px;
+    display: flex; align-items: center; gap: 8px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 15px rgba(53, 243, 223, 0.15);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .timer-pill.urgent {
+    border-color: var(--coral);
+    animation: urgentPulse 0.6s infinite alternate ease-in-out;
+  }
+  @keyframes urgentPulse {
+    from { box-shadow: 0 0 10px rgba(255, 71, 87, 0.4); }
+    to { box-shadow: 0 0 26px rgba(255, 71, 87, 0.85); }
+  }
+  .timer-pill .t-num { font: 800 18px/1 var(--mono); color: #fff; }
+  .timer-pill .t-sub { font: 700 9px/1 var(--mono); color: var(--muted); text-transform: uppercase; }
+
+  /* Ammo Indicator & Reload bar */
+  .ammo-wrap {
+    background: rgba(14, 18, 26, 0.85); border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 5px 12px; border-radius: 999px; backdrop-filter: blur(12px);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ammo-bullets { display: flex; align-items: center; gap: 3px; }
+  .bullet-pip {
+    width: 6px; height: 14px; border-radius: 2px 2px 1px 1px;
+    background: var(--cyan); box-shadow: 0 0 6px var(--cyan-glow);
+    transition: background 0.15s, opacity 0.15s;
+  }
+  .bullet-pip.spent {
+    background: rgba(255, 255, 255, 0.14); box-shadow: none;
+  }
+  .ammo-text { font: 800 12px/1 var(--mono); color: #fff; margin-left: 3px; }
+
+  /* Reload bar */
+  .reload-overlay {
+    position: fixed; left: 50%; bottom: 95px; transform: translateX(-50%);
+    background: rgba(11, 14, 20, 0.94); border: 1.5px solid var(--amber);
+    border-radius: 12px; padding: 6px 14px; text-align: center;
+    box-shadow: 0 8px 25px rgba(255, 183, 50, 0.35);
+    z-index: 15; pointer-events: none; opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+  .reload-overlay.show { opacity: 1; }
+  .reload-label { font: 800 10px/1 var(--mono); color: var(--amber); letter-spacing: 0.1em; margin-bottom: 4px; }
+  .reload-track {
+    width: 130px; height: 6px; background: rgba(255, 255, 255, 0.12);
+    border-radius: 999px; overflow: hidden;
+  }
+  .reload-fill {
+    height: 100%; width: 0%; background: linear-gradient(90deg, #ffb732, #ffd32a);
+    border-radius: 999px;
+  }
+
+  /* Bottom Controls / Keys Hint */
+  .bottom-bar {
+    position: absolute; bottom: 16px; left: 0; right: 0;
+    display: flex; justify-content: center; align-items: center; gap: 12px;
+    pointer-events: none;
+  }
+  .hint-pill {
+    background: rgba(14, 18, 26, 0.85); border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px; padding: 7px 18px;
+    font: 500 11px/1 var(--mono); color: var(--muted);
+    backdrop-filter: blur(14px); pointer-events: auto;
+  }
+  .hint-pill b { color: var(--cyan); font-weight: 700; }
+  .hint-pill span { color: var(--amber); font-weight: 700; }
+
+  /* MODAL OVERLAYS (START, PAUSE, GAMEOVER) */
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 50;
+    background: rgba(5, 7, 10, 0.88); backdrop-filter: blur(14px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+    cursor: default;
+  }
+  .modal-backdrop.show { opacity: 1; pointer-events: auto; }
+
+  .menu-card {
+    width: min(92vw, 480px);
+    background: radial-gradient(circle at 50% 0%, #1a2233 0%, #0d121c 85%);
+    border: 1.5px solid rgba(53, 243, 223, 0.4);
+    border-radius: 26px; padding: 30px 26px; text-align: center;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 45px rgba(53, 243, 223, 0.18);
+    transform: scale(0.95); transition: transform 0.25s cubic-bezier(0.18, 1, 0.22, 1);
+  }
+  .modal-backdrop.show .menu-card { transform: scale(1); }
+
+  .menu-logo-tag {
+    font: 800 10.5px/1 var(--mono); color: var(--cyan);
+    letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 4px;
+  }
+  .menu-title {
+    font: 800 36px/1 var(--display); color: #fff;
+    letter-spacing: -0.04em; margin-bottom: 8px;
+  }
+  .menu-title em { font-style: normal; color: var(--cyan); text-shadow: 0 0 20px var(--cyan-glow); }
+  .menu-desc { font: 500 13px/1.45 var(--body); color: var(--muted); margin-bottom: 22px; }
+
+  /* Option Section */
+  .opt-section { margin-bottom: 18px; text-align: left; }
+  .opt-label {
+    font: 700 11px/1 var(--mono); color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+    display: flex; justify-content: space-between;
+  }
+  .btn-group {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  }
+  .btn-group.four { grid-template-columns: repeat(4, 1fr); }
+
+  .select-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px; color: var(--text); padding: 10px 6px;
+    font: 700 12px/1 var(--mono); cursor: pointer;
+    transition: all 0.18s ease; text-align: center;
+  }
+  .select-btn:hover { border-color: rgba(53, 243, 223, 0.5); background: rgba(53, 243, 223, 0.08); }
+  .select-btn.active {
+    background: linear-gradient(135deg, rgba(53, 243, 223, 0.22), rgba(14, 165, 233, 0.25));
+    border-color: var(--cyan); color: #fff;
+    box-shadow: 0 0 15px rgba(53, 243, 223, 0.35);
+  }
+
+  .primary-btn {
+    width: 100%; background: linear-gradient(135deg, #35f3df, #0ea5e9);
+    border: 0; border-radius: 999px; color: #05101a;
+    font: 800 15px/1 var(--body); padding: 15px 24px; cursor: pointer;
+    box-shadow: 0 8px 25px rgba(53, 243, 223, 0.4); margin-top: 8px;
+    transition: transform 0.18s, box-shadow 0.18s;
+  }
+  .primary-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(53, 243, 223, 0.6); }
+
+  /* GAMEOVER STATS */
+  .gameover-grade {
+    font: 800 68px/1 var(--display); color: var(--gold);
+    text-shadow: 0 0 28px rgba(255, 215, 0, 0.6); margin: 6px 0;
+  }
+  .stats-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0 20px;
+  }
+  .stat-card {
+    background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px; padding: 12px; text-align: left;
+  }
+  .stat-card .s-lbl { font: 700 9.5px/1 var(--mono); color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+  .stat-card .s-val { font: 800 18px/1 var(--mono); color: #fff; }
+  .stat-card .s-val.gold { color: var(--gold); }
+  .stat-card .s-val.cyan { color: var(--cyan); }
+
+  .high-record-tag {
+    display: inline-block; background: var(--amber); color: #020c15;
+    font: 800 10px/1 var(--mono); padding: 3px 8px; border-radius: 999px;
+    margin-left: 6px; letter-spacing: 0.05em; vertical-align: middle;
+  }
+
+  @media (max-width: 640px) {
+    .top-bar { top: 10px; left: 10px; right: 10px; }
+    .hud-chip.extra { display: none; }
+    .btn-group.four { grid-template-columns: repeat(2, 1fr); }
+    .menu-card { padding: 22px 18px; }
+    .menu-title { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="game-canvas"></canvas>
+
+<div class="hud">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="hud-left">
+      <a class="home-link" href="index.html">← <span>AI Smarts</span></a>
+      <div class="hud-chip">
+        <span class="hud-chip-label">Score</span>
+        <span class="hud-chip-val" id="hud-score">0</span>
+      </div>
+      <div class="hud-chip extra">
+        <span class="hud-chip-label">High</span>
+        <span class="hud-chip-val gold" id="hud-high">0</span>
+      </div>
+    </div>
+
+    <!-- Center Timer -->
+    <div class="hud-center">
+      <div class="timer-pill" id="hud-timer-pill">
+        <span style="font-size:15px;">⏱️</span>
+        <span class="t-num" id="hud-timer">01:00</span>
+        <span class="t-sub" id="hud-level-tag">Easy</span>
+      </div>
+    </div>
+
+    <!-- Right HUD: Combo, Speed & Ammo -->
+    <div class="hud-right">
+      <div class="hud-chip">
+        <span class="hud-chip-label">Combo</span>
+        <span class="hud-chip-val cyan" id="hud-combo">1x</span>
+      </div>
+      <div class="hud-chip extra">
+        <span class="hud-chip-label">Speed</span>
+        <span class="hud-chip-val" id="hud-speed-badge">1.0x</span>
+      </div>
+      <div class="ammo-wrap">
+        <div class="ammo-bullets" id="ammo-bullets"></div>
+        <span class="ammo-text" id="ammo-text">8/8</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reloading Floating Progress Bar -->
+  <div class="reload-overlay" id="reload-overlay">
+    <div class="reload-label">RELOADING... [R]</div>
+    <div class="reload-track">
+      <div class="reload-fill" id="reload-fill"></div>
+    </div>
+  </div>
+
+  <!-- Bottom Hint -->
+  <div class="bottom-bar">
+    <div class="hint-pill">
+      aim & <b>click to shoot</b> · <span>[R]</span> reload · <span>[P]</span> pause · <span>[1-4]</span> live speed
+    </div>
+  </div>
+</div>
+
+<!-- START MENU MODAL -->
+<div class="modal-backdrop show" id="start-modal">
+  <div class="menu-card">
+    <div class="menu-logo-tag">Arcade Clay & Feather Hunt</div>
+    <h1 class="menu-title">Angry <em>Bird Hunt</em></h1>
+    <p class="menu-desc">Shoot angry cartoon birds before the 60-second timer expires. Chain hits for massive combos!</p>
+
+    <!-- Level Selector -->
+    <div class="opt-section">
+      <div class="opt-label">
+        <span>Select Level</span>
+        <span id="level-desc" style="color:var(--cyan);">Slow birds, big hitboxes</span>
+      </div>
+      <div class="btn-group" id="level-group">
+        <button class="select-btn active" data-level="easy">Easy</button>
+        <button class="select-btn" data-level="medium">Medium</button>
+        <button class="select-btn" data-level="hard">Hard</button>
+      </div>
+    </div>
+
+    <!-- Speed Selector -->
+    <div class="opt-section">
+      <div class="opt-label">
+        <span>Flight Speed Multiplier</span>
+        <span id="speed-desc" style="color:var(--amber);">1.0x Normal</span>
+      </div>
+      <div class="btn-group four" id="speed-group">
+        <button class="select-btn" data-speed="0.6">Slow</button>
+        <button class="select-btn active" data-speed="1.0">Normal</button>
+        <button class="select-btn" data-speed="1.6">Fast</button>
+        <button class="select-btn" data-speed="2.4">Turbo</button>
+      </div>
+    </div>
+
+    <button class="primary-btn" id="start-btn">Start 60-Second Hunt 🎯</button>
+  </div>
+</div>
+
+<!-- PAUSE MODAL -->
+<div class="modal-backdrop" id="pause-modal">
+  <div class="menu-card">
+    <div class="menu-logo-tag">Game Paused</div>
+    <h2 class="menu-title">Hunt <em>Paused</em></h2>
+    <p class="menu-desc">Take a breather. Press [P] or click Resume to continue.</p>
+    <button class="primary-btn" id="resume-btn" style="margin-bottom:10px;">Resume Hunt 🏹</button>
+    <button class="select-btn" id="quit-btn" style="width:100%; padding:12px;">Quit to Menu</button>
+  </div>
+</div>
+
+<!-- GAMEOVER MODAL -->
+<div class="modal-backdrop" id="gameover-modal">
+  <div class="menu-card">
+    <div class="menu-logo-tag">Round Completed</div>
+    <div class="gameover-grade" id="go-grade">S</div>
+    <h2 class="menu-title" style="margin-bottom:4px;">Hunt Finished!</h2>
+    <p class="menu-desc" id="go-subtitle">Outstanding marksmanship!</p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="s-lbl">Final Score</div>
+        <div class="s-val cyan" id="go-score">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-lbl">High Score <span class="high-record-tag" id="go-record-badge" style="display:none;">NEW!</span></div>
+        <div class="s-val gold" id="go-high">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-lbl">Accuracy</div>
+        <div class="s-val" id="go-accuracy">0%</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-lbl">Best Combo</div>
+        <div class="s-val gold" id="go-combo">x1</div>
+      </div>
+    </div>
+
+    <button class="primary-btn" id="restart-btn">Play Again ↺</button>
+  </div>
+</div>
+
+<script>
+/* ==========================================================================
+   CONFIG
+   ========================================================================== */
+const CONFIG = {
+  maxAmmo: 8,
+  reloadDuration: 1.0, // seconds
+  comboWindow: 1.6,    // seconds to chain combos
+  roundDuration: 60,   // seconds per round
+  levels: {
+    easy: {
+      name: 'Easy',
+      desc: 'Slow birds, big hitboxes, relaxing',
+      birdCount: 6,
+      baseSpeed: 70,
+      scale: 1.25,
+      zigzagChance: 0.05
+    },
+    medium: {
+      name: 'Medium',
+      desc: 'Medium speed, bustling sky',
+      birdCount: 9,
+      baseSpeed: 110,
+      scale: 1.0,
+      zigzagChance: 0.15
+    },
+    hard: {
+      name: 'Hard',
+      desc: 'Fast, zig-zag darts, sudden turns',
+      birdCount: 12,
+      baseSpeed: 165,
+      scale: 0.85,
+      zigzagChance: 0.35
+    }
+  },
+  speeds: {
+    '0.6': { label: 'Slow', mult: 0.6 },
+    '1.0': { label: 'Normal', mult: 1.0 },
+    '1.6': { label: 'Fast', mult: 1.6 },
+    '2.4': { label: 'Turbo', mult: 2.4 }
+  },
+  birdSpecies: [
+    { type: 'normal', emoji: '🐦', points: 10, bonusTime: 0, weight: 35, colors: ['#38bdf8', '#0284c7', '#e0f2fe'] },
+    { type: 'normal', emoji: '🦜', points: 10, bonusTime: 0, weight: 25, colors: ['#10b981', '#059669', '#ef4444'] },
+    { type: 'normal', emoji: '🐓', points: 10, bonusTime: 0, weight: 20, colors: ['#ea580c', '#c2410c', '#fde047'] },
+    { type: 'fast',   emoji: '🐤', points: 20, bonusTime: 0, weight: 15, colors: ['#facc15', '#eab308', '#fef08a'] },
+    { type: 'fast',   emoji: '🦅', points: 20, bonusTime: 0, weight: 12, colors: ['#78716c', '#44403c', '#d6d3d1'] },
+    { type: 'golden', emoji: '🦚', points: 50, bonusTime: 3, weight: 6,  colors: ['#ffd700', '#fbbf24', '#ffffff'] }
+  ]
+};
+
+/* ==========================================================================
+   STATE
+   ========================================================================== */
+const STATE = {
+  activeScreen: 'start', // 'start' | 'playing' | 'paused' | 'gameover'
+  level: 'easy',
+  speedMultiplier: 1.0,
+  timeLeft: 60,
+  score: 0,
+  shotsFired: 0,
+  shotsHit: 0,
+  combo: 1,
+  bestCombo: 1,
+  comboTimer: 0,
+  ammo: CONFIG.maxAmmo,
+  isReloading: false,
+  reloadTimer: 0,
+  gunRecoil: 0,
+  muzzleFlash: 0,
+  crosshairBloom: 0,
+  screenShake: 0
+};
+
+/* ==========================================================================
+   AUDIO SYNTHESIZER (WEB AUDIO API - ZERO EXTERNAL ASSETS)
+   ========================================================================== */
+let audioCtx = null;
+let soundEnabled = true;
+
+function initAudio() {
+  if (audioCtx) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return;
+  }
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioContextClass();
+  } catch(e) {}
+}
+
+const sfx = {
+  gunshot() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+
+    // 1. Explosive noise crack
+    const dur = 0.18;
+    const buf = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * dur), audioCtx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (d.length * 0.18));
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buf;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(1400, t);
+    filter.Q.value = 1.8;
+
+    const gNoise = audioCtx.createGain();
+    gNoise.gain.setValueAtTime(0.3, t);
+    gNoise.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+    noise.connect(filter);
+    filter.connect(gNoise);
+    gNoise.connect(audioCtx.destination);
+    noise.start(t);
+
+    // 2. Heavy sub-bass body thump
+    const osc = audioCtx.createOscillator();
+    const gOsc = audioCtx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(180, t);
+    osc.frequency.exponentialRampToValueAtTime(35, t + 0.14);
+    gOsc.gain.setValueAtTime(0.35, t);
+    gOsc.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+
+    osc.connect(gOsc);
+    gOsc.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 0.18);
+  },
+
+  emptyClick() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(950, t);
+    osc.frequency.exponentialRampToValueAtTime(200, t + 0.04);
+    g.gain.setValueAtTime(0.12, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+    osc.connect(g);
+    g.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 0.06);
+  },
+
+  reloadRack() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+
+    // Slide ejection click
+    const osc1 = audioCtx.createOscillator();
+    const g1 = audioCtx.createGain();
+    osc1.type = 'sawtooth';
+    osc1.frequency.setValueAtTime(500, t);
+    osc1.frequency.exponentialRampToValueAtTime(1400, t + 0.08);
+    g1.gain.setValueAtTime(0.08, t);
+    g1.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+    osc1.connect(g1);
+    g1.connect(audioCtx.destination);
+    osc1.start(t);
+    osc1.stop(t + 0.11);
+
+    // Solid bolt rack snap clack!
+    const osc2 = audioCtx.createOscillator();
+    const g2 = audioCtx.createGain();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(280, t + 0.16);
+    osc2.frequency.exponentialRampToValueAtTime(70, t + 0.28);
+    g2.gain.setValueAtTime(0.18, t + 0.16);
+    g2.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+    osc2.connect(g2);
+    g2.connect(audioCtx.destination);
+    osc2.start(t + 0.16);
+    osc2.stop(t + 0.32);
+  },
+
+  birdPop() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    // Funny cartoon pop & comedic squawk
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(550, t);
+    osc.frequency.exponentialRampToValueAtTime(160, t + 0.12);
+    g.gain.setValueAtTime(0.2, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+    osc.connect(g);
+    g.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 0.15);
+  },
+
+  goldenChime() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    // Sparkling arpeggio chime (C6 - E6 - G6 - C7)
+    const freqs = [1046.5, 1318.5, 1567.98, 2093.0];
+    freqs.forEach((f, idx) => {
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(f, t + idx * 0.05);
+      g.gain.setValueAtTime(0.12, t + idx * 0.05);
+      g.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.05 + 0.35);
+      osc.connect(g);
+      g.connect(audioCtx.destination);
+      osc.start(t + idx * 0.05);
+      osc.stop(t + idx * 0.05 + 0.38);
+    });
+  },
+
+  whistle() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, t);
+    osc.frequency.setValueAtTime(1200, t + 0.12);
+    osc.frequency.setValueAtTime(950, t + 0.28);
+    g.gain.setValueAtTime(0.09, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+    osc.connect(g);
+    g.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 0.48);
+  }
+};
+
+/* ==========================================================================
+   ENTITIES: BIRD, PARTICLES, FLOATING TEXT
+   ========================================================================== */
+class Bird {
+  constructor(levelCfg, speedMult) {
+    this.reset(levelCfg, speedMult, true);
+  }
+
+  reset(levelCfg, speedMult, initialScatter = false) {
+    // Pick random bird species based on weights
+    const totalWeight = CONFIG.birdSpecies.reduce((sum, s) => sum + s.weight, 0);
+    let r = Math.random() * totalWeight;
+    let chosen = CONFIG.birdSpecies[0];
+    for (const sp of CONFIG.birdSpecies) {
+      if (r < sp.weight) { chosen = sp; break; }
+      r -= sp.weight;
+    }
+    this.species = chosen;
+
+    this.dir = Math.random() < 0.5 ? 1 : -1;
+    this.baseSpeed = (levelCfg.baseSpeed + (Math.random() - 0.5) * 30) * speedMult;
+    if (this.species.type === 'fast') this.baseSpeed *= 1.35;
+    if (this.species.type === 'golden') this.baseSpeed *= 1.25;
+
+    this.size = Math.round(44 * levelCfg.scale * (this.species.type === 'fast' ? 0.8 : (this.species.type === 'golden' ? 1.15 : 1.0)));
+    this.hitRadius = this.size * 0.72;
+
+    const minY = 90;
+    const maxY = H - 180;
+    this.y = minY + Math.random() * (maxY - minY);
+    this.targetY = this.y;
+
+    if (initialScatter) {
+      this.x = 40 + Math.random() * (W - 80);
+    } else {
+      this.x = this.dir === 1 ? -this.size - 20 : W + this.size + 20;
+    }
+
+    this.flapPhase = Math.random() * Math.PI * 2;
+    this.zigzagTimer = Math.random() * 2;
+    this.zigzagInterval = 1.0 + Math.random() * 1.5;
+    this.zigzagChance = levelCfg.zigzagChance;
+
+    this.state = 'flying'; // 'flying' | 'hit'
+    this.rotation = 0;
+    this.vy = 0;
+    this.vx = this.dir * this.baseSpeed;
+    this.alive = true;
+  }
+
+  update(dt, levelCfg, speedMult) {
+    if (!this.alive) return;
+
+    if (this.state === 'flying') {
+      this.flapPhase += 14 * dt;
+      this.x += this.vx * dt;
+
+      // Vertical sway
+      this.y += (this.targetY - this.y) * 4 * dt + Math.sin(this.flapPhase) * 1.8;
+
+      // Zigzag logic
+      this.zigzagTimer -= dt;
+      if (this.zigzagTimer <= 0) {
+        this.zigzagTimer = this.zigzagInterval;
+        if (Math.random() < this.zigzagChance) {
+          // Change vertical layer or dart sharply
+          const minY = 90;
+          const maxY = H - 180;
+          this.targetY = minY + Math.random() * (maxY - minY);
+
+          // Hard mode: occasional sudden horizontal reverse!
+          if (STATE.level === 'hard' && Math.random() < 0.28) {
+            this.dir = -this.dir;
+            this.vx = this.dir * this.baseSpeed;
+          }
+        }
+      }
+
+      // Screen edge boundary wrap
+      if (this.dir === 1 && this.x > W + this.size + 40) {
+        this.reset(levelCfg, speedMult, false);
+      } else if (this.dir === -1 && this.x < -this.size - 40) {
+        this.reset(levelCfg, speedMult, false);
+      }
+    } else if (this.state === 'hit') {
+      // Spinning plummet with gravity
+      this.vy += 850 * dt;
+      this.y += this.vy * dt;
+      this.x += this.vx * 0.3 * dt;
+      this.rotation += 14 * dt * this.dir;
+
+      if (this.y > H + 50) {
+        this.reset(levelCfg, speedMult, false);
+      }
+    }
+  }
+
+  hit() {
+    this.state = 'hit';
+    this.vy = -220; // Pop up slightly before falling
+    sfx.birdPop();
+    if (this.species.type === 'golden') {
+      sfx.goldenChime();
+    }
+  }
+
+  draw(ctx) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
+    ctx.scale(this.dir, 1);
+
+    // Golden Bird Aura Glow
+    if (this.species.type === 'golden') {
+      ctx.save();
+      const glowGrad = ctx.createRadialGradient(0, 0, 5, 0, 0, this.size * 0.9);
+      glowGrad.addColorStop(0, 'rgba(255, 215, 0, 0.45)');
+      glowGrad.addColorStop(0.7, 'rgba(255, 215, 0, 0.2)');
+      glowGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = glowGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, this.size * 0.9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Bird Emoji
+    ctx.font = `${this.size}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(this.species.emoji, 0, 0);
+
+    // ANGRY EYEBROW OVERLAY (Makes any emoji look hilariously furious!)
+    ctx.save();
+    ctx.strokeStyle = '#05070a';
+    ctx.lineWidth = Math.max(2.2, this.size * 0.08);
+    ctx.lineCap = 'round';
+
+    const browY = -this.size * 0.16;
+    const browW = this.size * 0.22;
+    // Left angry eyebrow slanting aggressively downward towards center
+    ctx.beginPath();
+    ctx.moveTo(-browW * 1.3, browY - 3);
+    ctx.lineTo(-browW * 0.2, browY + 4);
+    ctx.stroke();
+
+    // Right angry eyebrow slanting aggressively downward towards center
+    ctx.beginPath();
+    ctx.moveTo(browW * 0.2, browY + 4);
+    ctx.lineTo(browW * 1.3, browY - 3);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.restore();
+  }
+}
+
+class FeatherParticle {
+  constructor(x, y, color) {
+    this.x = x;
+    this.y = y;
+    const ang = Math.random() * Math.PI * 2;
+    const spd = 60 + Math.random() * 160;
+    this.vx = Math.cos(ang) * spd;
+    this.vy = Math.sin(ang) * spd - 60;
+    this.color = color;
+    this.r = 4 + Math.random() * 4;
+    this.rot = Math.random() * Math.PI * 2;
+    this.rotSpeed = (Math.random() - 0.5) * 12;
+    this.life = 1.0 + Math.random() * 0.5;
+    this.maxLife = this.life;
+  }
+  update(dt) {
+    this.vy += 220 * dt; // Soft float gravity
+    this.vx *= Math.pow(0.5, dt);
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    this.rot += this.rotSpeed * dt;
+    this.life -= dt;
+  }
+  draw(ctx) {
+    if (this.life <= 0) return;
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rot);
+    ctx.globalAlpha = Math.max(0, this.life / this.maxLife);
+    ctx.fillStyle = this.color;
+
+    // Feather quill shape
+    ctx.beginPath();
+    ctx.ellipse(0, 0, this.r * 1.6, this.r * 0.7, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-this.r * 1.4, 0);
+    ctx.lineTo(this.r * 1.4, 0);
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+class FloatingText {
+  constructor(x, y, text, color = '#35f3df') {
+    this.x = x;
+    this.y = y;
+    this.text = text;
+    this.color = color;
+    this.life = 1.1;
+    this.maxLife = this.life;
+  }
+  update(dt) {
+    this.y -= 45 * dt;
+    this.life -= dt;
+  }
+  draw(ctx) {
+    if (this.life <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, this.life / this.maxLife);
+    ctx.font = '800 18px "Geist Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = this.color;
+    ctx.shadowColor = this.color;
+    ctx.shadowBlur = 10;
+    ctx.fillText(this.text, this.x, this.y);
+    ctx.restore();
+  }
+}
+
+/* ==========================================================================
+   INPUT & MOUSE / TOUCH HANDLING
+   ========================================================================== */
+const mouse = { x: -100, y: -100, isHoveringBird: false };
+let birds = [];
+let feathers = [];
+let floatingTexts = [];
+
+window.addEventListener('mousemove', e => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+
+window.addEventListener('touchmove', e => {
+  if (e.touches.length > 0) {
+    mouse.x = e.touches[0].clientX;
+    mouse.y = e.touches[0].clientY;
+  }
+}, { passive: true });
+
+window.addEventListener('pointerdown', e => {
+  if (STATE.activeScreen !== 'playing') return;
+  // If clicking on UI overlay buttons, ignore canvas shoot
+  if (e.target.closest('.modal-backdrop') || e.target.closest('.home-link') || e.target.closest('.select-btn')) return;
+
+  initAudio();
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+  shoot();
+});
+
+// Keyboard controls
+window.addEventListener('keydown', e => {
+  if (e.repeat) return;
+  const k = e.key.toLowerCase();
+
+  // Reload key [R]
+  if (k === 'r') {
+    triggerReload();
+  }
+  // Pause key [P] or Escape
+  else if (k === 'p' || k === 'escape') {
+    if (STATE.activeScreen === 'playing') {
+      pauseGame();
+    } else if (STATE.activeScreen === 'paused') {
+      resumeGame();
+    }
+  }
+  // Live speed switching [1-4]
+  else if (k === '1') setSpeedMultiplier('0.6');
+  else if (k === '2') setSpeedMultiplier('1.0');
+  else if (k === '3') setSpeedMultiplier('1.6');
+  else if (k === '4') setSpeedMultiplier('2.4');
+});
+
+function shoot() {
+  if (STATE.isReloading) {
+    sfx.emptyClick();
+    return;
+  }
+
+  if (STATE.ammo <= 0) {
+    sfx.emptyClick();
+    triggerReload();
+    return;
+  }
+
+  // Fire Gun!
+  STATE.ammo--;
+  STATE.shotsFired++;
+  STATE.gunRecoil = 14;
+  STATE.muzzleFlash = 1.0;
+  STATE.crosshairBloom = 10;
+  STATE.screenShake = 3.5;
+
+  sfx.gunshot();
+  updateAmmoUI();
+
+  // Check Hit on Birds
+  let hitDetected = false;
+  // Sort by z/size so closest gets hit first
+  for (let i = birds.length - 1; i >= 0; i--) {
+    const b = birds[i];
+    if (b.state === 'flying' && b.alive) {
+      const d = Math.hypot(mouse.x - b.x, mouse.y - b.y);
+      if (d < b.hitRadius) {
+        hitDetected = true;
+        STATE.shotsHit++;
+        b.hit();
+
+        // Combo system
+        STATE.comboTimer = CONFIG.comboWindow;
+        STATE.combo++;
+        if (STATE.combo > STATE.bestCombo) STATE.bestCombo = STATE.combo;
+
+        // Scoring calculation
+        const pts = b.species.points * Math.min(STATE.combo, 8);
+        STATE.score += pts;
+
+        // Golden bird time bonus
+        if (b.species.bonusTime > 0) {
+          STATE.timeLeft = Math.min(CONFIG.roundDuration, STATE.timeLeft + b.species.bonusTime);
+          floatingTexts.push(new FloatingText(b.x, b.y - 28, `+${pts} & +${b.species.bonusTime}s!`, '#ffd32a'));
+        } else {
+          const comboTxt = STATE.combo > 1 ? ` (x${STATE.combo})` : '';
+          floatingTexts.push(new FloatingText(b.x, b.y - 18, `+${pts}${comboTxt}`, b.species.type === 'fast' ? '#35f3df' : '#ffb732'));
+        }
+
+        // Spawn Feather Particles
+        for (let f = 0; f < 16; f++) {
+          const col = b.species.colors[Math.floor(Math.random() * b.species.colors.length)];
+          feathers.push(new FeatherParticle(b.x, b.y, col));
+        }
+
+        break; // Only hit one bird per bullet
+      }
+    }
+  }
+
+  // Missed shot breaks combo
+  if (!hitDetected) {
+    STATE.combo = 1;
+    STATE.comboTimer = 0;
+  }
+
+  updateHUD();
+
+  // Auto-reload when ammo empties
+  if (STATE.ammo <= 0) {
+    triggerReload();
+  }
+}
+
+function triggerReload() {
+  if (STATE.isReloading || STATE.ammo === CONFIG.maxAmmo) return;
+  STATE.isReloading = true;
+  STATE.reloadTimer = CONFIG.reloadDuration;
+  reloadOverlay.classList.add('show');
+  sfx.reloadRack();
+}
+
+/* ==========================================================================
+   GAME LIFECYCLE & STATE TRANSITIONS
+   ========================================================================== */
+function startGame() {
+  initAudio();
+  STATE.activeScreen = 'playing';
+  STATE.timeLeft = CONFIG.roundDuration;
+  STATE.score = 0;
+  STATE.shotsFired = 0;
+  STATE.shotsHit = 0;
+  STATE.combo = 1;
+  STATE.bestCombo = 1;
+  STATE.comboTimer = 0;
+  STATE.ammo = CONFIG.maxAmmo;
+  STATE.isReloading = false;
+  STATE.reloadTimer = 0;
+  reloadOverlay.classList.remove('show');
+
+  // Spawn Birds for selected level
+  const lvlCfg = CONFIG.levels[STATE.level];
+  birds = [];
+  feathers = [];
+  floatingTexts = [];
+  for (let i = 0; i < lvlCfg.birdCount; i++) {
+    birds.push(new Bird(lvlCfg, STATE.speedMultiplier));
+  }
+
+  hideAllModals();
+  updateHUD();
+  updateAmmoUI();
+}
+
+function pauseGame() {
+  STATE.activeScreen = 'paused';
+  pauseModal.classList.add('show');
+}
+
+function resumeGame() {
+  STATE.activeScreen = 'playing';
+  pauseModal.classList.remove('show');
+}
+
+function finishGame() {
+  STATE.activeScreen = 'gameover';
+  sfx.whistle();
+
+  // High score handling per level
+  const storageKey = `birdhunt_high_${STATE.level}`;
+  const prevHigh = parseInt(localStorage.getItem(storageKey) || '0', 10);
+  let isNewRecord = false;
+  if (STATE.score > prevHigh) {
+    localStorage.setItem(storageKey, STATE.score);
+    isNewRecord = true;
+  }
+  const currentHigh = Math.max(STATE.score, prevHigh);
+
+  // Grade calculation
+  let grade = 'C';
+  let sub = 'Keep practicing your aim!';
+  if (STATE.score >= 1200) { grade = 'S+'; sub = 'Legendary Marksman! Unbelievable precision!'; }
+  else if (STATE.score >= 800) { grade = 'A'; sub = 'Superb accuracy & hawk-like reflexes!'; }
+  else if (STATE.score >= 450) { grade = 'B'; sub = 'Great shooting, solid combo streaks!'; }
+
+  const accuracy = STATE.shotsFired > 0 ? ((STATE.shotsHit / STATE.shotsFired) * 100).toFixed(1) : '0.0';
+
+  goGrade.textContent = grade;
+  goSubtitle.textContent = sub;
+  goScore.textContent = STATE.score.toLocaleString();
+  goHigh.textContent = currentHigh.toLocaleString();
+  goAccuracy.textContent = `${accuracy}%`;
+  goCombo.textContent = `x${STATE.bestCombo}`;
+  goRecordBadge.style.display = isNewRecord ? 'inline-block' : 'none';
+
+  gameoverModal.classList.add('show');
+}
+
+function hideAllModals() {
+  startModal.classList.remove('show');
+  pauseModal.classList.remove('show');
+  gameoverModal.classList.remove('show');
+}
+
+function setSpeedMultiplier(spdKey) {
+  const opt = CONFIG.speeds[spdKey];
+  if (!opt) return;
+  STATE.speedMultiplier = opt.mult;
+
+  // Update UI buttons
+  speedGroup.querySelectorAll('.select-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.speed === spdKey);
+  });
+  speedDesc.textContent = `${opt.mult}x ${opt.label}`;
+  hudSpeedBadge.textContent = `${opt.mult}x`;
+
+  // Dynamically update active birds speeds
+  const lvlCfg = CONFIG.levels[STATE.level];
+  birds.forEach(b => {
+    b.baseSpeed = lvlCfg.baseSpeed * STATE.speedMultiplier;
+    b.vx = b.dir * b.baseSpeed;
+  });
+}
+
+function getStoredHigh(lvlKey) {
+  return parseInt(localStorage.getItem(`birdhunt_high_${lvlKey}`) || '0', 10);
+}
+
+/* ==========================================================================
+   UI BINDINGS & DOM HOOKS
+   ========================================================================== */
+const startModal = document.getElementById('start-modal');
+const pauseModal = document.getElementById('pause-modal');
+const gameoverModal = document.getElementById('gameover-modal');
+
+const startBtn = document.getElementById('start-btn');
+const resumeBtn = document.getElementById('resume-btn');
+const quitBtn = document.getElementById('quit-btn');
+const restartBtn = document.getElementById('restart-btn');
+
+const levelGroup = document.getElementById('level-group');
+const speedGroup = document.getElementById('speed-group');
+const levelDesc = document.getElementById('level-desc');
+const speedDesc = document.getElementById('speed-desc');
+
+const hudScore = document.getElementById('hud-score');
+const hudHigh = document.getElementById('hud-high');
+const hudTimer = document.getElementById('hud-timer');
+const hudTimerPill = document.getElementById('hud-timer-pill');
+const hudLevelTag = document.getElementById('hud-level-tag');
+const hudCombo = document.getElementById('hud-combo');
+const hudSpeedBadge = document.getElementById('hud-speed-badge');
+const ammoBullets = document.getElementById('ammo-bullets');
+const ammoText = document.getElementById('ammo-text');
+
+const reloadOverlay = document.getElementById('reload-overlay');
+const reloadFill = document.getElementById('reload-fill');
+
+const goGrade = document.getElementById('go-grade');
+const goSubtitle = document.getElementById('go-subtitle');
+const goScore = document.getElementById('go-score');
+const goHigh = document.getElementById('go-high');
+const goAccuracy = document.getElementById('go-accuracy');
+const goCombo = document.getElementById('go-combo');
+const goRecordBadge = document.getElementById('go-record-badge');
+
+// Level buttons
+levelGroup.addEventListener('click', e => {
+  const btn = e.target.closest('.select-btn');
+  if (!btn) return;
+  levelGroup.querySelectorAll('.select-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  STATE.level = btn.dataset.level;
+  levelDesc.textContent = CONFIG.levels[STATE.level].desc;
+  updateHUD();
+});
+
+// Speed buttons
+speedGroup.addEventListener('click', e => {
+  const btn = e.target.closest('.select-btn');
+  if (!btn) return;
+  setSpeedMultiplier(btn.dataset.speed);
+});
+
+startBtn.addEventListener('click', startGame);
+resumeBtn.addEventListener('click', resumeGame);
+quitBtn.addEventListener('click', () => {
+  hideAllModals();
+  STATE.activeScreen = 'start';
+  startModal.classList.add('show');
+});
+restartBtn.addEventListener('click', startGame);
+
+function updateHUD() {
+  hudScore.textContent = STATE.score.toLocaleString();
+  hudHigh.textContent = getStoredHigh(STATE.level).toLocaleString();
+  hudCombo.textContent = `${STATE.combo}x`;
+  hudLevelTag.textContent = CONFIG.levels[STATE.level].name;
+
+  const m = Math.floor(Math.max(0, STATE.timeLeft) / 60);
+  const s = Math.floor(Math.max(0, STATE.timeLeft) % 60);
+  hudTimer.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+  if (STATE.timeLeft <= 10 && STATE.activeScreen === 'playing') {
+    hudTimerPill.classList.add('urgent');
+  } else {
+    hudTimerPill.classList.remove('urgent');
+  }
+}
+
+function updateAmmoUI() {
+  ammoBullets.innerHTML = '';
+  for (let i = 0; i < CONFIG.maxAmmo; i++) {
+    const pip = document.createElement('div');
+    pip.className = 'bullet-pip' + (i >= STATE.ammo ? ' spent' : '');
+    ammoBullets.appendChild(pip);
+  }
+  ammoText.textContent = `${STATE.ammo}/${CONFIG.maxAmmo}`;
+}
+
+/* ==========================================================================
+   UPDATE LOOP
+   ========================================================================== */
+function update(dt) {
+  // Screen recoil and bloom recovery
+  STATE.gunRecoil = Math.max(0, STATE.gunRecoil - dt * 45);
+  STATE.muzzleFlash = Math.max(0, STATE.muzzleFlash - dt * 8);
+  STATE.crosshairBloom = Math.max(0, STATE.crosshairBloom - dt * 35);
+  STATE.screenShake = Math.max(0, STATE.screenShake - dt * 18);
+
+  if (STATE.activeScreen !== 'playing') return;
+
+  // 60-Second Round Countdown
+  STATE.timeLeft -= dt;
+  if (STATE.timeLeft <= 0) {
+    STATE.timeLeft = 0;
+    finishGame();
+    return;
+  }
+  updateHUD();
+
+  // Combo Timer Decay
+  if (STATE.combo > 1) {
+    STATE.comboTimer -= dt;
+    if (STATE.comboTimer <= 0) {
+      STATE.combo = 1;
+      updateHUD();
+    }
+  }
+
+  // Reload progress
+  if (STATE.isReloading) {
+    STATE.reloadTimer -= dt;
+    const progress = 1 - Math.max(0, STATE.reloadTimer / CONFIG.reloadDuration);
+    reloadFill.style.width = `${Math.round(progress * 100)}%`;
+
+    if (STATE.reloadTimer <= 0) {
+      STATE.isReloading = false;
+      STATE.ammo = CONFIG.maxAmmo;
+      reloadOverlay.classList.remove('show');
+      updateAmmoUI();
+    }
+  }
+
+  // Check if hovering over any bird for reticle lock
+  mouse.isHoveringBird = false;
+  for (const b of birds) {
+    if (b.state === 'flying' && b.alive) {
+      if (Math.hypot(mouse.x - b.x, mouse.y - b.y) < b.hitRadius) {
+        mouse.isHoveringBird = true;
+        break;
+      }
+    }
+  }
+
+  // Update Birds
+  const lvlCfg = CONFIG.levels[STATE.level];
+  birds.forEach(b => b.update(dt, lvlCfg, STATE.speedMultiplier));
+
+  // Update Feathers
+  for (let i = feathers.length - 1; i >= 0; i--) {
+    const f = feathers[i];
+    f.update(dt);
+    if (f.life <= 0) feathers.splice(i, 1);
+  }
+
+  // Update Floating Texts
+  for (let i = floatingTexts.length - 1; i >= 0; i--) {
+    const ft = floatingTexts[i];
+    ft.update(dt);
+    if (ft.life <= 0) floatingTexts.splice(i, 1);
+  }
+}
+
+/* ==========================================================================
+   RENDER / DRAW LOOP
+   ========================================================================== */
+function draw() {
+  ctx.save();
+
+  // Screen shake
+  if (STATE.screenShake > 0) {
+    const sx = (Math.random() - 0.5) * STATE.screenShake;
+    const sy = (Math.random() - 0.5) * STATE.screenShake;
+    ctx.translate(sx, sy);
+  }
+
+  // 1. Atmosphere Gradient Sky
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
+  skyGrad.addColorStop(0, '#070b12');
+  skyGrad.addColorStop(0.5, '#121a29');
+  skyGrad.addColorStop(0.85, '#221832');
+  skyGrad.addColorStop(1, '#2d1b38');
+  ctx.fillStyle = skyGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // 2. Distant Horizon Glow & Silhouette Hills
+  drawHills();
+
+  // 3. Birds
+  birds.forEach(b => b.draw(ctx));
+
+  // 4. Feather Particles
+  feathers.forEach(f => f.draw(ctx));
+
+  // 5. Floating Score Texts
+  floatingTexts.forEach(ft => ft.draw(ctx));
+
+  // 6. Gun & Crosshair (only when mouse is inside window)
+  if (mouse.x > 0 && mouse.y > 0) {
+    drawGun();
+    drawCrosshair();
+  }
+
+  ctx.restore();
+}
+
+function drawHills() {
+  ctx.save();
+
+  // Distant glowing moon / sun
+  ctx.fillStyle = 'rgba(255, 230, 180, 0.12)';
+  ctx.beginPath();
+  ctx.arc(W * 0.78, H * 0.35, 65, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Far Layer Hills
+  ctx.fillStyle = '#0f1422';
+  ctx.beginPath();
+  ctx.moveTo(0, H);
+  ctx.lineTo(0, H - 120);
+  ctx.quadraticCurveTo(W * 0.25, H - 180, W * 0.55, H - 110);
+  ctx.quadraticCurveTo(W * 0.8, H - 60, W, H - 140);
+  ctx.lineTo(W, H);
+  ctx.closePath();
+  ctx.fill();
+
+  // Near Layer Hills & Grass Crest
+  ctx.fillStyle = '#080a10';
+  ctx.beginPath();
+  ctx.moveTo(0, H);
+  ctx.lineTo(0, H - 75);
+  ctx.quadraticCurveTo(W * 0.35, H - 110, W * 0.7, H - 65);
+  ctx.quadraticCurveTo(W * 0.88, H - 45, W, H - 85);
+  ctx.lineTo(W, H);
+  ctx.closePath();
+  ctx.fill();
+
+  // Neon subtle rim light on top edge of near hill
+  ctx.strokeStyle = 'rgba(53, 243, 223, 0.25)';
+  ctx.lineWidth = 1.8;
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawGun() {
+  const gunBaseX = W * 0.5;
+  const gunBaseY = H + 10;
+
+  const dx = mouse.x - gunBaseX;
+  const dy = mouse.y - gunBaseY;
+  const aimAngle = Math.atan2(dy, dx);
+
+  ctx.save();
+  ctx.translate(gunBaseX, gunBaseY);
+  ctx.rotate(aimAngle);
+
+  // Recoil translation along barrel axis
+  ctx.translate(-STATE.gunRecoil, 0);
+
+  // Gun Dimensions
+  const barrelLen = 95;
+  const barrelH = 14;
+
+  // 1. Bullet Tracer & Muzzle Flash
+  if (STATE.muzzleFlash > 0.05) {
+    ctx.save();
+    // Muzzle blast star
+    const muzzleX = barrelLen + 6;
+    const flashGrad = ctx.createRadialGradient(muzzleX, 0, 2, muzzleX, 0, 42 * STATE.muzzleFlash);
+    flashGrad.addColorStop(0, '#ffffff');
+    flashGrad.addColorStop(0.35, '#ffb732');
+    flashGrad.addColorStop(0.7, '#ff4757');
+    flashGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = flashGrad;
+    ctx.beginPath();
+    ctx.arc(muzzleX, 0, 42 * STATE.muzzleFlash, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // 2. Blued Steel Barrel
+  const barrelGrad = ctx.createLinearGradient(0, -barrelH * 0.5, 0, barrelH * 0.5);
+  barrelGrad.addColorStop(0, '#334155');
+  barrelGrad.addColorStop(0.4, '#1e293b');
+  barrelGrad.addColorStop(0.7, '#0f172a');
+  barrelGrad.addColorStop(1, '#020617');
+
+  ctx.fillStyle = barrelGrad;
+  ctx.beginPath();
+  ctx.roundRect(15, -barrelH * 0.5, barrelLen, barrelH, 3);
+  ctx.fill();
+
+  // Ventilated Rib on top of barrel
+  ctx.strokeStyle = '#35f3df';
+  ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  ctx.moveTo(25, -barrelH * 0.5);
+  ctx.lineTo(barrelLen + 10, -barrelH * 0.5);
+  ctx.stroke();
+
+  // Muzzle brake tip
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(barrelLen + 10, -barrelH * 0.5 - 1, 6, barrelH + 2);
+
+  // 3. Receiver & Handgrip Base
+  ctx.fillStyle = '#1e293b';
+  ctx.beginPath();
+  ctx.roundRect(-25, -barrelH * 0.8, 45, barrelH * 1.6, 6);
+  ctx.fill();
+
+  // Glowing neon indicator light on receiver
+  ctx.fillStyle = STATE.ammo > 0 ? '#35f3df' : '#ff4757';
+  ctx.shadowColor = ctx.fillStyle;
+  ctx.shadowBlur = 8;
+  ctx.beginPath();
+  ctx.arc(-5, 0, 3, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawCrosshair() {
+  const cx = mouse.x;
+  const cy = mouse.y;
+  const isLocked = mouse.isHoveringBird;
+  const bloom = STATE.crosshairBloom;
+
+  ctx.save();
+  ctx.translate(cx, cy);
+
+  const mainColor = isLocked ? '#ff4757' : (STATE.ammo <= 0 ? '#ffb732' : '#35f3df');
+  ctx.strokeStyle = mainColor;
+  ctx.fillStyle = mainColor;
+  ctx.shadowColor = mainColor;
+  ctx.shadowBlur = isLocked ? 14 : 7;
+
+  // Center pip
+  ctx.beginPath();
+  ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Outer Crosshair Ring
+  const ringR = 18 + bloom;
+  ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  ctx.arc(0, 0, ringR, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // 4 Directional Reticle Ticks
+  const tickInner = 8;
+  const tickOuter = 26 + bloom;
+  ctx.lineWidth = 2.0;
+
+  [0, Math.PI * 0.5, Math.PI, Math.PI * 1.5].forEach(ang => {
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(ang) * tickInner, Math.sin(ang) * tickInner);
+    ctx.lineTo(Math.cos(ang) * tickOuter, Math.sin(ang) * tickOuter);
+    ctx.stroke();
+  });
+
+  // Target Lock Corner Brackets when over bird
+  if (isLocked) {
+    const bSize = ringR + 8;
+    ctx.lineWidth = 2.2;
+    // 4 Corner Brackets
+    [-1, 1].forEach(sx => {
+      [-1, 1].forEach(sy => {
+        ctx.beginPath();
+        ctx.moveTo(sx * bSize, sy * (bSize - 6));
+        ctx.lineTo(sx * bSize, sy * bSize);
+        ctx.lineTo(sx * (bSize - 6), sy * bSize);
+        ctx.stroke();
+      });
+    });
+  }
+
+  // Ammo Empty Reminder at Reticle
+  if (STATE.ammo <= 0 && STATE.activeScreen === 'playing') {
+    ctx.font = '800 10px "Geist Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('RELOAD [R]', 0, ringR + 18);
+  }
+
+  ctx.restore();
+}
+
+/* ==========================================================================
+   WINDOW SIZING & MAIN ENGINE LOOP
+   ========================================================================== */
+let W = window.innerWidth;
+let H = window.innerHeight;
+let DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+function resizeCanvas() {
+  W = window.innerWidth;
+  H = window.innerHeight;
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(W * DPR);
+  canvas.height = Math.round(H * DPR);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+// Initial Setup
+updateAmmoUI();
+updateHUD();
+
+let lastTime = performance.now();
+function gameLoop(now) {
+  const dt = Math.min(0.05, (now - lastTime) / 1000 || 0);
+  lastTime = now;
+
+  update(dt);
+  draw();
+
+  requestAnimationFrame(gameLoop);
+}
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>
