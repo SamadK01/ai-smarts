@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Reef Angler — AI Smarts</title>
-<meta name="description" content="A fast-paced, lifelike 1-minute arcade fishing game and living marine ecosystem. Hook authentic fishes, drop them into your catch bag, and watch predators hunt.">
+<meta name="description" content="A fast-paced, lifelike 1-minute arcade fishing game and living marine ecosystem. Hook authentic fishes and apex sharks, watch visceral blood plumes, and haul them into your live side catch tank.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@700;800&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -131,6 +131,70 @@
   }
   .icon-btn:hover { border-color: var(--cyan); color: #fff; transform: translateY(-1px); }
 
+  /* SIDE CATCH AQUARIUM TANK */
+  .side-catch-box {
+    position: fixed; right: 24px; top: 86px;
+    width: 275px; height: 195px;
+    background: radial-gradient(135deg, rgba(34, 211, 238, 0.16) 0%, rgba(4, 24, 38, 0.95) 100%);
+    border: 2px solid rgba(53, 243, 223, 0.5);
+    border-radius: 20px;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.85), 0 0 35px rgba(53, 243, 223, 0.22);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    overflow: hidden; z-index: 25; display: flex; flex-direction: column;
+    cursor: pointer; pointer-events: auto;
+    transition: transform 0.2s cubic-bezier(0.18, 1, 0.22, 1), border-color 0.2s, box-shadow 0.2s;
+  }
+  .side-catch-box:hover {
+    border-color: var(--cyan);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 20px 55px rgba(0, 0, 0, 0.9), 0 0 45px rgba(53, 243, 223, 0.35);
+  }
+  .side-catch-box.box-wobble {
+    animation: sideJellyWobble 0.65s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  @keyframes sideJellyWobble {
+    0% { transform: scale(1, 1); }
+    25% { transform: scale(1.12, 0.88) rotate(-2deg); }
+    50% { transform: scale(0.92, 1.1) rotate(1.5deg); }
+    75% { transform: scale(1.04, 0.97); }
+    100% { transform: scale(1, 1); }
+  }
+
+  .side-box-header {
+    padding: 7px 12px; background: rgba(2, 14, 24, 0.8);
+    border-bottom: 1px solid rgba(53, 243, 223, 0.25);
+    display: flex; justify-content: space-between; align-items: center;
+    font: 800 11px/1 var(--mono); color: var(--cyan); letter-spacing: 0.05em;
+  }
+  .side-box-title { display: flex; align-items: center; gap: 6px; }
+  .side-box-icon { font-size: 13px; animation: bubbleFloat 2s infinite ease-in-out; }
+  @keyframes bubbleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+  .side-box-badge {
+    background: var(--amber); color: #020d17;
+    padding: 2px 8px; border-radius: 999px; font: 800 10px/1 var(--mono);
+  }
+
+  .side-box-canvas-wrap {
+    flex: 1; position: relative; overflow: hidden;
+  }
+  #side-catch-canvas { width: 100%; height: 100%; display: block; }
+  .side-box-empty {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    text-align: center; color: rgba(220, 240, 245, 0.5); font: 600 11px/1.4 var(--mono);
+    padding: 10px; pointer-events: none;
+  }
+
+  .side-box-footer {
+    padding: 6px 12px; background: rgba(2, 14, 24, 0.8);
+    border-top: 1px solid rgba(53, 243, 223, 0.2);
+    display: flex; justify-content: space-between; align-items: center;
+    font: 700 9.5px/1 var(--mono); color: var(--muted);
+  }
+  .side-box-footer span { color: #fff; }
+
   /* Bottom Controls / Feed button / Instructions */
   .bottom-bar {
     position: absolute; bottom: 22px; left: 0; right: 0;
@@ -226,131 +290,17 @@
     box-shadow: 0 8px 25px rgba(53, 243, 223, 0.35); margin-bottom: 8px;
   }
 
-  :root {
-    --tank-w: 420px;
-    --tank-h: 112px;
-  }
-
-  /* TOP EXPANDING ELASTIC JELLY TANK */
-  .top-jelly-dock {
-    position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
-    width: var(--tank-w); height: var(--tank-h);
-    background: radial-gradient(135deg, rgba(34, 211, 238, 0.22) 0%, rgba(4, 24, 38, 0.94) 100%);
-    border: 2px solid rgba(53, 243, 223, 0.55);
-    border-radius: 20px;
-    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.85), 0 0 40px rgba(53, 243, 223, 0.28), inset 0 0 25px rgba(53, 243, 223, 0.15);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    overflow: hidden; z-index: 28; display: flex; flex-direction: column;
-    pointer-events: auto; cursor: pointer;
-    transition: width 0.4s cubic-bezier(0.18, 1, 0.22, 1), height 0.4s cubic-bezier(0.18, 1, 0.22, 1), border-color 0.2s, box-shadow 0.2s;
-  }
-  .top-jelly-dock:hover {
-    border-color: var(--cyan);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 50px rgba(53, 243, 223, 0.45);
-  }
-  .top-jelly-dock.jelly-expand {
-    animation: jellyGulpStretch 0.75s cubic-bezier(0.25, 1, 0.5, 1);
-  }
-  @keyframes jellyGulpStretch {
-    0% { transform: translateX(-50%) scale(1, 1); }
-    25% { transform: translateX(-50%) scale(1.15, 0.82); }
-    50% { transform: translateX(-50%) scale(0.92, 1.18); }
-    75% { transform: translateX(-50%) scale(1.06, 0.96); }
-    100% { transform: translateX(-50%) scale(1, 1); }
-  }
-
-  .jelly-dock-bar {
-    padding: 6px 12px; background: rgba(2, 14, 24, 0.75);
-    border-bottom: 1px solid rgba(53, 243, 223, 0.25);
-    display: flex; justify-content: space-between; align-items: center;
-    font: 800 10px/1 var(--mono); color: var(--cyan);
-  }
-  .jelly-status-tag { display: flex; align-items: center; gap: 6px; }
-  .jelly-blob-icon { font-size: 13px; animation: bubbleFloat 2s infinite ease-in-out; }
-  .jelly-specimen-badge {
-    background: var(--amber); color: #020d17;
-    padding: 2px 8px; border-radius: 999px; font-weight: 800;
-  }
-  .jelly-capacity-tag { color: var(--muted); }
-  .jelly-capacity-tag span { color: #fff; font-weight: 700; }
-
-  .jelly-aquarium-frame {
-    flex: 1; position: relative; overflow: hidden;
-  }
-  #top-jelly-canvas { width: 100%; height: 100%; display: block; }
-  .jelly-dock-empty {
-    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    text-align: center; color: rgba(220, 240, 245, 0.5); font: 600 10px/1.3 var(--mono);
-    padding: 6px 16px; pointer-events: none;
-  }
-
-  .jelly-intake-lip {
-    padding: 3px 8px; background: rgba(53, 243, 223, 0.12);
-    border-top: 1px dashed rgba(53, 243, 223, 0.35);
-    text-align: center; font: 700 8.5px/1 var(--mono); color: var(--cyan);
-    letter-spacing: 0.12em;
-  }
-
-  /* ADVANCED SHARK HUNT BATTLE HUD */
-  .battle-hud {
-    position: fixed; top: 140px; left: 50%; transform: translateX(-50%) translateY(-10px);
-    width: min(92vw, 420px);
-    background: rgba(3, 14, 24, 0.94); border: 2px solid var(--coral);
-    border-radius: 18px; padding: 14px 18px;
-    box-shadow: 0 16px 45px rgba(255, 71, 87, 0.35), 0 0 30px rgba(0,0,0,0.85);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    z-index: 35; pointer-events: none; opacity: 0;
-    transition: opacity 0.25s ease, transform 0.25s ease;
-  }
-  .battle-hud.active {
-    opacity: 1; transform: translateX(-50%) translateY(0);
-  }
-  .battle-hud.critical {
-    animation: battleAlarm 0.4s infinite alternate;
-  }
-  @keyframes battleAlarm {
-    from { border-color: var(--coral); box-shadow: 0 0 15px rgba(255, 71, 87, 0.4); }
-    to { border-color: #ff0033; box-shadow: 0 0 35px rgba(255, 0, 51, 0.9); }
-  }
-  .battle-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 6px;
-  }
-  .battle-title { font: 800 12px/1 var(--mono); color: var(--gold); letter-spacing: 0.05em; }
-  .battle-stamina-val { font: 700 11px/1 var(--mono); color: #fff; }
-  .battle-bar-track {
-    width: 100%; height: 10px; background: rgba(255, 255, 255, 0.1);
-    border-radius: 999px; overflow: hidden; margin-bottom: 8px; position: relative;
-  }
-  .battle-bar-track.tension { height: 12px; margin-bottom: 6px; }
-  .battle-bar-fill.stamina {
-    height: 100%; width: 100%; background: linear-gradient(90deg, #10b981, #059669);
-    border-radius: 999px; transition: width 0.1s linear;
-  }
-  .battle-bar-fill.tension {
-    height: 100%; width: 30%; background: linear-gradient(90deg, #35f3df, #ffb732, #ff4757);
-    border-radius: 999px; transition: width 0.08s linear;
-  }
-  .battle-sub {
-    display: flex; justify-content: space-between; font: 600 10px/1 var(--mono);
-    color: var(--muted); margin-bottom: 4px;
-  }
-  .battle-hint {
-    text-align: center; font: 800 10px/1.2 var(--mono); color: var(--cyan);
-    margin-top: 4px; letter-spacing: 0.05em;
-  }
-
-  @media (max-width: 900px) {
-    .top-jelly-dock { top: 65px; --tank-w: 360px; --tank-h: 96px; }
-    .battle-hud { top: 175px; }
+  @media (max-width: 820px) {
+    .side-catch-box {
+      right: 14px; top: auto; bottom: 74px;
+      width: 200px; height: 145px;
+    }
   }
   @media (max-width: 640px) {
     .top-bar { top: 10px; left: 10px; right: 10px; }
     .score-label { display: none; }
-    .top-jelly-dock { top: 58px; --tank-w: min(92vw, 340px); --tank-h: 90px; }
-    .battle-hud { top: 160px; }
-    .bottom-bar { bottom: 14px; }
-    .hint-pill { font-size: 10.5px; padding: 6px 14px; }
+    .bottom-bar { bottom: 12px; }
+    .hint-pill { font-size: 10px; padding: 6px 14px; }
   }
 </style>
 </head>
@@ -369,13 +319,17 @@
       </div>
     </div>
 
-    <!-- Right: Timer, Catch Bag & Sound -->
-    <div class="hud-right">
+    <!-- Center 1-Minute Countdown -->
+    <div class="hud-center">
       <div class="timer-badge" id="timer-badge">
         <span class="timer-icon">⏱️</span>
         <span class="timer-text" id="timer-text">01:00</span>
         <span class="timer-sub">Round</span>
       </div>
+    </div>
+
+    <!-- Right: Catch Bag & Sound -->
+    <div class="hud-right">
       <button class="bag-btn" id="bag-btn" title="Open Catch Bag">
         <span>🎒 Catch Bag</span>
         <span class="bag-count" id="bag-count">0</span>
@@ -384,52 +338,31 @@
     </div>
   </div>
 
-  <!-- TOP EXPANDING ELASTIC JELLY TANK -->
-  <div class="top-jelly-dock" id="top-jelly-dock" title="Elastic Live Jelly Tank — Catches are stored here live! Click to open haul log">
-    <div class="jelly-dock-bar">
-      <div class="jelly-status-tag">
-        <span class="jelly-blob-icon">🫧</span>
-        <b>ELASTIC JELLY TANK</b>
-        <span class="jelly-specimen-badge" id="top-jelly-badge">0 CAGED</span>
+  <!-- SIDE CATCH AQUARIUM BOX -->
+  <div class="side-catch-box" id="side-catch-box" title="Live Catch Aquarium — Catches land here! Click to open catch log">
+    <div class="side-box-header">
+      <div class="side-box-title">
+        <span class="side-box-icon">🫧</span>
+        <span>CATCH TANK</span>
       </div>
-      <div class="jelly-capacity-tag">
-        SIZE: <span id="jelly-size-val">100%</span> · <span id="jelly-mass-val">0 kg</span>
-      </div>
+      <div class="side-box-badge" id="side-catch-badge">0 FISH</div>
     </div>
-    <div class="jelly-aquarium-frame">
-      <canvas id="top-jelly-canvas"></canvas>
-      <div class="jelly-dock-empty" id="top-jelly-empty">
-        Hook giant sharks & fishes below!<br>Catches are reeled directly into this top elastic jelly chamber.
+    <div class="side-box-canvas-wrap">
+      <canvas id="side-catch-canvas"></canvas>
+      <div class="side-box-empty" id="side-box-empty">
+        Hook fish with your rod!<br>Catches leap into this side tank live.
       </div>
     </div>
-    <div class="jelly-intake-lip">
-      <span>▲ ELASTIC SUCTION INTAKE PORT ▲</span>
+    <div class="side-box-footer">
+      <div>HAUL: <span id="side-mass">0 kg</span></div>
+      <div>SCORE: <span id="side-points">0 PTS</span></div>
     </div>
-  </div>
-
-  <!-- SHARK HUNT & TENSION BATTLE HUD -->
-  <div class="battle-hud" id="battle-hud">
-    <div class="battle-header">
-      <span class="battle-title" id="battle-title">⚔️ SHARK BATTLE IN PROGRESS!</span>
-      <span class="battle-stamina-val" id="battle-stamina-val">STAMINA: 100%</span>
-    </div>
-    <div class="battle-bar-track">
-      <div class="battle-bar-fill stamina" id="stamina-fill"></div>
-    </div>
-    <div class="battle-sub">
-      <span>LINE TENSION:</span>
-      <span id="tension-label" style="color:var(--cyan);">NORMAL</span>
-    </div>
-    <div class="battle-bar-track tension">
-      <div class="battle-bar-fill tension" id="tension-fill"></div>
-    </div>
-    <div class="battle-hint" id="battle-hint">DRAG MOUSE UP / HOLD CLICK TO WINCH SHARK!</div>
   </div>
 
   <!-- Bottom Bar -->
   <div class="bottom-bar">
     <div class="hint-pill">
-      move hook to <b>pierce fish & sharks</b> · win the tension struggle · hauled directly into <b>top elastic jelly box</b>
+      guide hook to <b>pierce fish mouth</b> · arterial blood plumes · reels up & leaps into <b>side catch tank</b>!
     </div>
     <button class="feed-btn" id="feed-btn">🥖 Drop Food</button>
   </div>
@@ -479,7 +412,7 @@
 
 <script>
 /* ==========================================================================
-   AUTHENTIC REEF ANGLER ENGINE: REALISTIC FISH SWIMMING & VISCERAL FISHING
+   AUTHENTIC REEF ANGLER ENGINE: NATURAL FISH MOTION & VISCERAL FISHING
    ========================================================================== */
 
 const canvas = document.getElementById('reef');
@@ -489,7 +422,7 @@ let W = window.innerWidth;
 let H = window.innerHeight;
 let DPR = Math.min(window.devicePixelRatio || 1, 2);
 
-// UI elements
+// UI references
 const scoreNum = document.getElementById('score-num');
 const timerBadge = document.getElementById('timer-badge');
 const timerText = document.getElementById('timer-text');
@@ -509,6 +442,15 @@ const roundCatches = document.getElementById('round-catches');
 const roundTrophy = document.getElementById('round-trophy');
 const roundWeight = document.getElementById('round-weight');
 const roundRestartBtn = document.getElementById('round-restart-btn');
+
+// Side Catch Tank references
+const sideCatchBox = document.getElementById('side-catch-box');
+const sideCatchCanvas = document.getElementById('side-catch-canvas');
+const sideCatchCtx = sideCatchCanvas.getContext('2d');
+const sideCatchBadge = document.getElementById('side-catch-badge');
+const sideBoxEmpty = document.getElementById('side-box-empty');
+const sideMass = document.getElementById('side-mass');
+const sidePoints = document.getElementById('side-points');
 
 /* --------------------------------------------------------------------------
    AUDIO SYNTHESIZER
@@ -547,21 +489,6 @@ const sfx = {
     node.start(t);
   },
 
-  hookSnag() {
-    if (!soundEnabled || !audioCtx) return;
-    const t = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(180, t);
-    osc.frequency.exponentialRampToValueAtTime(420, t + 0.16);
-    g.gain.setValueAtTime(0.09, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
-    osc.connect(g); g.connect(audioCtx.destination);
-    osc.start(t); osc.stop(t + 0.25);
-    sfx.splash();
-  },
-
   hookPierce() {
     if (!soundEnabled || !audioCtx) return;
     const t = audioCtx.currentTime;
@@ -569,9 +496,9 @@ const sfx = {
     const osc = audioCtx.createOscillator();
     const g = audioCtx.createGain();
     osc.type = 'triangle';
-    osc.frequency.setValueAtTime(340, t);
-    osc.frequency.exponentialRampToValueAtTime(65, t + 0.14);
-    g.gain.setValueAtTime(0.2, t);
+    osc.frequency.setValueAtTime(320, t);
+    osc.frequency.exponentialRampToValueAtTime(60, t + 0.14);
+    g.gain.setValueAtTime(0.24, t);
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
     osc.connect(g); g.connect(audioCtx.destination);
     osc.start(t); osc.stop(t + 0.18);
@@ -586,9 +513,23 @@ const sfx = {
     const fn = audioCtx.createBiquadFilter();
     fn.type = 'bandpass'; fn.frequency.setValueAtTime(1900, t); fn.Q.value = 4.2;
     const gn = audioCtx.createGain();
-    gn.gain.setValueAtTime(0.16, t); gn.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    gn.gain.setValueAtTime(0.18, t); gn.gain.exponentialRampToValueAtTime(0.001, t + dur);
     n.connect(fn); fn.connect(gn); gn.connect(audioCtx.destination);
     n.start(t);
+  },
+
+  bigFishTug() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(95, t);
+    osc.frequency.exponentialRampToValueAtTime(40, t + 0.4);
+    g.gain.setValueAtTime(0.26, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.42);
+    osc.connect(g); g.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t + 0.45);
   },
 
   reelRatchet() {
@@ -597,8 +538,8 @@ const sfx = {
     const osc = audioCtx.createOscillator();
     const g = audioCtx.createGain();
     osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(420 + Math.random() * 180, t);
-    g.gain.setValueAtTime(0.042, t);
+    osc.frequency.setValueAtTime(440 + Math.random() * 160, t);
+    g.gain.setValueAtTime(0.045, t);
     g.gain.exponentialRampToValueAtTime(0.0001, t + 0.024);
     osc.connect(g); g.connect(audioCtx.destination);
     osc.start(t); osc.stop(t + 0.028);
@@ -607,7 +548,6 @@ const sfx = {
   surfaceBreach() {
     if (!soundEnabled || !audioCtx) return;
     const t = audioCtx.currentTime;
-    // Explosive water breach eruption
     const dur = 0.48;
     const node = audioCtx.createBufferSource();
     const buf = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * dur), audioCtx.sampleRate);
@@ -621,7 +561,6 @@ const sfx = {
     node.connect(f); f.connect(g); g.connect(audioCtx.destination);
     node.start(t);
 
-    // High splash droplet sparkle
     const osc = audioCtx.createOscillator();
     const go = audioCtx.createGain();
     osc.type = 'sine'; osc.frequency.setValueAtTime(860, t); osc.frequency.exponentialRampToValueAtTime(220, t + 0.24);
@@ -630,140 +569,19 @@ const sfx = {
     osc.start(t); osc.stop(t + 0.26);
   },
 
-  jellyDrop() {
-    if (!soundEnabled || !audioCtx) return;
-    const t = audioCtx.currentTime;
-    // Bouncy cartoon gelatinous water plop
-    const osc = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(170, t);
-    osc.frequency.exponentialRampToValueAtTime(620, t + 0.07);
-    osc.frequency.exponentialRampToValueAtTime(290, t + 0.17);
-    g.gain.setValueAtTime(0.18, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.26);
-    osc.connect(g); g.connect(audioCtx.destination);
-    osc.start(t); osc.stop(t + 0.27);
-  },
-
-  bigFishTug() {
-    if (!soundEnabled || !audioCtx) return;
-    const t = audioCtx.currentTime;
-    // Heavy deep sub-bass tug rumble
-    const osc = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(95, t);
-    osc.frequency.exponentialRampToValueAtTime(45, t + 0.35);
-    g.gain.setValueAtTime(0.22, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
-    osc.connect(g); g.connect(audioCtx.destination);
-    osc.start(t); osc.stop(t + 0.4);
-  },
-
-  dragScreech() {
-    if (!soundEnabled || !audioCtx) return;
-    const t = audioCtx.currentTime;
-    // Screeching high-friction drag ratchet
-    const osc = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(750, t);
-    osc.frequency.linearRampToValueAtTime(950, t + 0.12);
-    g.gain.setValueAtTime(0.07, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
-    osc.connect(g); g.connect(audioCtx.destination);
-    osc.start(t); osc.stop(t + 0.15);
-  },
-
-  sharkRoar() {
-    if (!soundEnabled || !audioCtx) return;
-    const t = audioCtx.currentTime;
-    // Deep underwater apex predator thrash growl
-    const osc = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(65, t);
-    osc.frequency.exponentialRampToValueAtTime(35, t + 0.5);
-    const f = audioCtx.createBiquadFilter();
-    f.type = 'lowpass'; f.frequency.setValueAtTime(140, t);
-    g.gain.setValueAtTime(0.3, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
-    osc.connect(f); f.connect(g); g.connect(audioCtx.destination);
-    osc.start(t); osc.stop(t + 0.6);
-  },
-
   jellyGulp() {
     if (!soundEnabled || !audioCtx) return;
     const t = audioCtx.currentTime;
-    // Thick gooey vacuum suction swallow
     const osc = audioCtx.createOscillator();
     const g = audioCtx.createGain();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(110, t);
-    osc.frequency.exponentialRampToValueAtTime(320, t + 0.12);
-    osc.frequency.exponentialRampToValueAtTime(85, t + 0.28);
-    g.gain.setValueAtTime(0.24, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+    osc.frequency.setValueAtTime(120, t);
+    osc.frequency.exponentialRampToValueAtTime(480, t + 0.08);
+    osc.frequency.exponentialRampToValueAtTime(180, t + 0.22);
+    g.gain.setValueAtTime(0.22, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
     osc.connect(g); g.connect(audioCtx.destination);
-    osc.start(t); osc.stop(t + 0.36);
-
-    // Wet squishy bloop
-    const osc2 = audioCtx.createOscillator();
-    const g2 = audioCtx.createGain();
-    osc2.type = 'triangle';
-    osc2.frequency.setValueAtTime(380, t + 0.08);
-    osc2.frequency.exponentialRampToValueAtTime(140, t + 0.24);
-    g2.gain.setValueAtTime(0.15, t + 0.08);
-    g2.gain.exponentialRampToValueAtTime(0.001, t + 0.26);
-    osc2.connect(g2); g2.connect(audioCtx.destination);
-    osc2.start(t + 0.08); osc2.stop(t + 0.27);
-  },
-
-  snap() {
-    if (!soundEnabled || !audioCtx) return;
-    const t = audioCtx.currentTime;
-    // Extreme tension line whip crack
-    const n = audioCtx.createBufferSource();
-    const dur = 0.12;
-    const buf = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * dur), audioCtx.sampleRate);
-    const d = buf.getChannelData(0);
-    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (d.length * 0.1));
-    n.buffer = buf;
-    const f = audioCtx.createBiquadFilter();
-    f.type = 'highpass'; f.frequency.setValueAtTime(2800, t);
-    const g = audioCtx.createGain();
-    g.gain.setValueAtTime(0.25, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-    n.connect(f); f.connect(g); g.connect(audioCtx.destination);
-    n.start(t);
-  },
-
-  bagPlop() {
-    if (!soundEnabled || !audioCtx) return;
-    const t = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(260, t);
-    osc.frequency.exponentialRampToValueAtTime(580, t + 0.14);
-    g.gain.setValueAtTime(0.08, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
-    osc.connect(g); g.connect(audioCtx.destination);
-    osc.start(t); osc.stop(t + 0.22);
-  },
-
-  chomp() {
-    if (!soundEnabled || !audioCtx) return;
-    const t = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(240, t);
-    osc.frequency.exponentialRampToValueAtTime(80, t + 0.12);
-    g.gain.setValueAtTime(0.08, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
-    osc.connect(g); g.connect(audioCtx.destination);
-    osc.start(t); osc.stop(t + 0.15);
+    osc.start(t); osc.stop(t + 0.32);
   },
 
   bloop() {
@@ -772,9 +590,9 @@ const sfx = {
     const osc = audioCtx.createOscillator();
     const g = audioCtx.createGain();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(350, t);
-    osc.frequency.exponentialRampToValueAtTime(700, t + 0.12);
-    g.gain.setValueAtTime(0.06, t);
+    osc.frequency.setValueAtTime(320, t);
+    osc.frequency.exponentialRampToValueAtTime(680, t + 0.12);
+    g.gain.setValueAtTime(0.08, t);
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
     osc.connect(g); g.connect(audioCtx.destination);
     osc.start(t); osc.stop(t + 0.15);
@@ -786,9 +604,9 @@ const sfx = {
     const osc = audioCtx.createOscillator();
     const g = audioCtx.createGain();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(900, t);
-    osc.frequency.setValueAtTime(1200, t + 0.12);
-    osc.frequency.setValueAtTime(950, t + 0.28);
+    osc.frequency.setValueAtTime(850, t);
+    osc.frequency.setValueAtTime(1180, t + 0.12);
+    osc.frequency.setValueAtTime(920, t + 0.28);
     g.gain.setValueAtTime(0.08, t);
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
     osc.connect(g); g.connect(audioCtx.destination);
@@ -797,138 +615,72 @@ const sfx = {
 };
 
 /* --------------------------------------------------------------------------
-   REALISTIC SPECIES MATRIX
+   REALISTIC SPECIES MATRIX (AUTHENTIC MARINE SPECIES)
    -------------------------------------------------------------------------- */
 const SPECIES = [
   {
-    id: 'koi',
-    name: 'Nishikigoi Carp',
-    role: 'grazer',
-    basePoints: 240,
-    len: [30, 48],
-    bodyL: 56, bodyW: 18,
-    primary: '#f39c12', secondary: '#ffffff', spot: '#e74c3c',
-    speed: 1.0, depth: [0.35, 0.9]
+    id: 'great_white',
+    name: 'Apex Great White Shark',
+    role: 'apex',
+    basePoints: 3500,
+    len: [280, 390],
+    bodyL: 142, bodyH: 38,
+    speed: 55, depth: [0.38, 0.92]
+  },
+  {
+    id: 'tuna',
+    name: 'Giant Bluefin Tuna',
+    role: 'trophy',
+    basePoints: 2200,
+    len: [140, 220],
+    bodyL: 105, bodyH: 32,
+    speed: 68, depth: [0.35, 0.85]
+  },
+  {
+    id: 'mahi',
+    name: 'Mahi-Mahi (Dorado)',
+    role: 'trophy',
+    basePoints: 1500,
+    len: [90, 130],
+    bodyL: 85, bodyH: 26,
+    speed: 62, depth: [0.22, 0.75]
+  },
+  {
+    id: 'snapper',
+    name: 'Crimson Red Snapper',
+    role: 'prey',
+    basePoints: 800,
+    len: [50, 75],
+    bodyL: 65, bodyH: 24,
+    speed: 48, depth: [0.3, 0.85]
+  },
+  {
+    id: 'tang',
+    name: 'Royal Blue Tang',
+    role: 'prey',
+    basePoints: 350,
+    len: [22, 30],
+    bodyL: 45, bodyH: 22,
+    speed: 52, depth: [0.2, 0.7]
   },
   {
     id: 'clown',
     name: 'Ocellaris Clownfish',
     role: 'prey',
-    basePoints: 120,
-    len: [8, 14],
-    bodyL: 34, bodyW: 16,
-    primary: '#ff6314', secondary: '#ffffff',
-    speed: 1.25, depth: [0.25, 0.85]
-  },
-  {
-    id: 'blue_tang',
-    name: 'Regal Blue Tang',
-    role: 'prey',
-    basePoints: 150,
-    len: [18, 26],
-    bodyL: 42, bodyW: 22,
-    primary: '#185a9d', secondary: '#f1c40f', pattern: '#081726',
-    speed: 1.35, depth: [0.2, 0.75]
-  },
-  {
-    id: 'angelfish',
-    name: 'Emperor Angelfish',
-    role: 'grazer',
-    basePoints: 320,
-    len: [24, 38],
-    bodyL: 48, bodyW: 30,
-    primary: '#093687', stripe: '#f1c40f',
-    speed: 0.95, depth: [0.3, 0.85]
-  },
-  {
-    id: 'lionfish',
-    name: 'Red Fire Lionfish',
-    role: 'predator',
-    basePoints: 600,
-    len: [26, 38],
-    bodyL: 52, bodyW: 20,
-    primary: '#b02a1a', secondary: '#fff5e6',
-    speed: 1.05, depth: [0.4, 0.92]
-  },
-  {
-    id: 'shark',
-    name: 'Reef Shark',
-    role: 'predator',
-    basePoints: 1200,
-    len: [70, 110],
-    bodyL: 82, bodyW: 28,
-    primary: '#47535e', secondary: '#ecf0f1',
-    speed: 1.5, depth: [0.25, 0.9]
-  },
-  {
-    id: 'puffer',
-    name: 'Spotted Puffer',
-    role: 'defender',
-    basePoints: 400,
-    len: [14, 22],
-    bodyL: 36, bodyW: 24,
-    primary: '#d4b334', belly: '#fffde0',
-    speed: 0.9, depth: [0.35, 0.9]
-  },
-  {
-    id: 'tuna',
-    name: 'Grand Bluefin Tuna',
-    role: 'trophy',
-    basePoints: 2400,
-    len: [130, 210],
-    bodyL: 118, bodyW: 42,
-    primary: '#0e2a47', secondary: '#94a3b8', finlet: '#eab308',
-    speed: 1.45, depth: [0.4, 0.92]
-  },
-  {
-    id: 'gold_king',
-    name: 'Golden Emperor Arowana',
-    role: 'trophy',
-    basePoints: 3400,
-    len: [100, 160],
-    bodyL: 110, bodyW: 36,
-    primary: '#f59e0b', secondary: '#fef3c7', glow: '#fbbf24',
-    speed: 1.15, depth: [0.25, 0.82]
-  },
-  {
-    id: 'angler',
-    name: 'Colossal Abyssal Angler',
-    role: 'trophy',
-    basePoints: 4200,
-    len: [85, 140],
-    bodyL: 96, bodyW: 52,
-    primary: '#1e293b', secondary: '#0f766e', lure: '#22d3ee',
-    speed: 0.88, depth: [0.55, 0.95]
-  },
-  {
-    id: 'great_white',
-    name: 'Megalodon Apex Shark',
-    role: 'boss',
-    basePoints: 4800,
-    len: [280, 420],
-    bodyL: 165, bodyW: 56,
-    primary: '#1e293b', secondary: '#f8fafc',
-    speed: 1.55, depth: [0.35, 0.95]
-  },
-  {
-    id: 'hammerhead',
-    name: 'Titan Hammerhead Shark',
-    role: 'boss',
-    basePoints: 3600,
-    len: [230, 350],
-    bodyL: 145, bodyW: 46,
-    primary: '#334155', secondary: '#e2e8f0',
-    speed: 1.38, depth: [0.25, 0.9]
+    basePoints: 200,
+    len: [10, 16],
+    bodyL: 34, bodyH: 16,
+    speed: 44, depth: [0.25, 0.8]
   }
 ];
 
 /* --------------------------------------------------------------------------
    ROUND STATE & CATCH BAG INVENTORY
    -------------------------------------------------------------------------- */
-let roundTime = 60; // Exact 1-Minute Round
+let roundTime = 60;
 let roundActive = true;
 let score = 0;
-let catchBag = []; // Fishes collected in the bag
+let catchBag = [];
 
 function updateUI() {
   scoreNum.textContent = score.toLocaleString();
@@ -965,7 +717,7 @@ function finishRound() {
   });
 
   roundTrophy.textContent = bestName;
-  roundWeight.textContent = `${totWeight} g`;
+  roundWeight.textContent = totWeight >= 1000 ? `${(totWeight / 1000).toFixed(1)} kg` : `${totWeight} g`;
   roundModal.classList.add('show');
 }
 
@@ -987,12 +739,13 @@ bagBtn.addEventListener('click', () => {
   if (!catchBag.length) {
     bagBody.innerHTML = '<div class="bag-empty-msg">Your catch bag is empty.<br>Cast your hook into the water to catch fresh fish!</div>';
   } else {
-    catchBag.forEach((item, idx) => {
+    catchBag.forEach(item => {
       const card = document.createElement('div');
       card.className = 'haul-card';
+      const weightStr = item.weight >= 1000 ? `${(item.weight / 1000).toFixed(1)} kg` : `${item.weight} g`;
       card.innerHTML = `
         <div class="haul-card-title">${item.species.name}</div>
-        <div class="haul-card-stat">${item.len.toFixed(1)} cm · ${item.weight} g</div>
+        <div class="haul-card-stat">${item.len.toFixed(1)} cm · ${weightStr}</div>
         <div class="haul-card-pts">+${item.points} PTS</div>
       `;
       bagBody.appendChild(card);
@@ -1003,21 +756,21 @@ bagBtn.addEventListener('click', () => {
 bagClose.addEventListener('click', () => bagModal.classList.remove('show'));
 
 /* --------------------------------------------------------------------------
-   PARTICLES, AIRBORNE LEAPING FISH & JELLY AQUARIUM TANK
+   PARTICLES: BLOOD PLUMES, BUBBLES, SPLASHES
    -------------------------------------------------------------------------- */
 class BloodParticle {
   constructor(x, y) {
     this.x = x;
     this.y = y;
     const ang = Math.random() * Math.PI * 2;
-    const spd = 20 + Math.random() * 85;
+    const spd = 25 + Math.random() * 95;
     this.vx = Math.cos(ang) * spd;
-    this.vy = Math.sin(ang) * spd - 12; // Slight upward buoyancy
-    this.r = 3.0 + Math.random() * 3.5;
-    this.maxR = this.r * (2.6 + Math.random() * 1.5); // Expands into soft water cloud
+    this.vy = Math.sin(ang) * spd - 14;
+    this.r = 3.2 + Math.random() * 3.8;
+    this.maxR = this.r * (2.8 + Math.random() * 1.6);
     this.life = 1.3 + Math.random() * 0.6;
     this.maxLife = this.life;
-    const colors = ['#dc2626', '#b91c1c', '#991b1b', '#7f1d1d', '#e11d48'];
+    const colors = ['#dc2626', '#b91c1c', '#991b1b', '#7f1d1d', '#ef4444'];
     this.color = colors[Math.floor(Math.random() * colors.length)];
   }
   update(dt) {
@@ -1025,11 +778,10 @@ class BloodParticle {
     this.y += this.vy * dt;
     this.vx *= Math.pow(0.25, dt);
     this.vy *= Math.pow(0.25, dt);
-    this.vy -= 8 * dt; // Soft upward plume drift
-
+    this.vy -= 9 * dt; // Upward ink plume drift
     this.life -= dt;
     this.r += (this.maxR - this.r) * dt * 2.8;
-    this.alpha = Math.max(0, (this.life / this.maxLife) * 0.88);
+    this.alpha = Math.max(0, (this.life / this.maxLife) * 0.9);
   }
   draw(ctx) {
     if (this.alpha <= 0) return;
@@ -1072,7 +824,6 @@ class BubbleParticle {
     ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
-    // Shiny highlight
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
     ctx.arc(this.x - this.r * 0.35, this.y - this.r * 0.35, this.r * 0.35, 0, Math.PI * 2);
@@ -1094,7 +845,7 @@ class SplashParticle {
     this.alive = true;
   }
   update(dt) {
-    this.vy += 320 * dt; // Gravity
+    this.vy += 320 * dt;
     this.x += this.vx * dt;
     this.y += this.vy * dt;
     this.alpha -= 1.6 * dt;
@@ -1111,229 +862,121 @@ class SplashParticle {
   }
 }
 
-// TOP EXPANDING ELASTIC JELLY DOCK DOM References
-const topJellyDock = document.getElementById('top-jelly-dock');
-const topJellyCanvas = document.getElementById('top-jelly-canvas');
-const topJellyCtx = topJellyCanvas.getContext('2d');
-const topJellyBadge = document.getElementById('top-jelly-badge');
-const topJellyEmpty = document.getElementById('top-jelly-empty');
-const jellySizeVal = document.getElementById('jelly-size-val');
-const jellyMassVal = document.getElementById('jelly-mass-val');
-
-// SHARK HUNT & TENSION BATTLE HUD References
-const battleHud = document.getElementById('battle-hud');
-const battleTitle = document.getElementById('battle-title');
-const battleStaminaVal = document.getElementById('battle-stamina-val');
-const staminaFill = document.getElementById('stamina-fill');
-const tensionLabel = document.getElementById('tension-label');
-const tensionFill = document.getElementById('tension-fill');
-const battleHint = document.getElementById('battle-hint');
-
-let isPointerDown = false;
-let lastPointerY = 0;
-
-class MiniJellyFish {
+/* --------------------------------------------------------------------------
+   SIDE CATCH TANK MANAGER (LIVE AQUARIUM AT SIDE OF SCREEN)
+   -------------------------------------------------------------------------- */
+class MiniLiveFish {
   constructor(species, len) {
     this.species = species;
     this.len = len;
-    const rect = topJellyCanvas.getBoundingClientRect();
-    const w = rect.width || 380;
-    const h = rect.height || 90;
+    const rect = sideCatchCanvas.getBoundingClientRect();
+    const w = rect.width || 250;
+    const h = rect.height || 140;
     this.x = 25 + Math.random() * Math.max(20, w - 50);
-    this.y = 15 + Math.random() * Math.max(15, h - 30);
-    this.vx = (Math.random() < 0.5 ? 1 : -1) * (18 + Math.random() * 20);
-    this.vy = (Math.random() - 0.5) * 8;
-    this.scale = Math.min(1.22, 0.42 + (species.bodyL / 140) * 0.42);
+    this.y = 20 + Math.random() * Math.max(20, h - 40);
+    this.dir = Math.random() < 0.5 ? 1 : -1;
+    this.speed = 18 + Math.random() * 18;
+    this.scale = Math.min(1.15, 0.45 + (species.bodyL / 140) * 0.45);
     this.swimPhase = Math.random() * Math.PI * 2;
   }
   update(dt, w, h) {
-    this.swimPhase += 6.5 * dt;
-    this.x += this.vx * dt;
-    this.y += this.vy * dt;
+    this.swimPhase += 7.0 * dt;
+    this.x += this.dir * this.speed * dt;
+    this.y += Math.sin(this.swimPhase * 0.5) * 6 * dt;
 
-    if (this.x < 18) { this.x = 18; this.vx = Math.abs(this.vx); }
-    if (this.x > w - 18) { this.x = w - 18; this.vx = -Math.abs(this.vx); }
-    if (this.y < 10) { this.y = 10; this.vy = Math.abs(this.vy); }
-    if (this.y > h - 10) { this.y = h - 10; this.vy = -Math.abs(this.vy); }
+    if (this.dir > 0 && this.x > w - 20) {
+      this.dir = -1;
+    } else if (this.dir < 0 && this.x < 20) {
+      this.dir = 1;
+    }
   }
   draw(ctx) {
     ctx.save();
     ctx.translate(this.x, this.y);
-    if (this.vx < 0) ctx.scale(-1, 1);
-    ctx.scale(this.scale, this.scale);
-
+    ctx.scale(this.dir * this.scale, this.scale);
     const tailWiggle = Math.sin(this.swimPhase) * 3.5;
 
-    // Apex Sharks mini rendering
     if (this.species.id === 'great_white') {
-      // Megalodon Great White Shark
-      ctx.fillStyle = '#f8fafc'; // White belly
-      ctx.beginPath();
-      ctx.ellipse(0, 2, 22, 6, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#1e293b'; // Dark dorsal
-      ctx.beginPath();
-      ctx.ellipse(0, -1, 22, 7, 0, Math.PI, Math.PI * 2);
-      ctx.fill();
-
-      // Sharp dorsal fin
-      ctx.beginPath();
-      ctx.moveTo(-3, -7); ctx.lineTo(4, -16); ctx.lineTo(10, -7);
-      ctx.closePath(); ctx.fill();
-
-      // Heterocercal shark tail
-      ctx.beginPath();
-      ctx.moveTo(-18, 0); ctx.lineTo(-30, -12 + tailWiggle); ctx.lineTo(-24, 0); ctx.lineTo(-29, 7 + tailWiggle);
-      ctx.closePath(); ctx.fill();
-
-      // Menacing dark eye
-      ctx.fillStyle = '#0f172a';
-      ctx.beginPath(); ctx.arc(12, -2, 1.8, 0, Math.PI * 2); ctx.fill();
-    } else if (this.species.id === 'hammerhead') {
-      // Titan Hammerhead Shark
-      ctx.fillStyle = '#334155';
-      ctx.beginPath();
-      ctx.ellipse(0, 0, 20, 6, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Cephalofoil T-head
-      ctx.beginPath();
-      ctx.ellipse(16, 0, 4, 12, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Lateral wide-set eyes
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath(); ctx.arc(16, -10, 1.3, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(16, 10, 1.3, 0, Math.PI * 2); ctx.fill();
-
-      // Tall dorsal fin
-      ctx.beginPath();
-      ctx.moveTo(-2, -6); ctx.lineTo(3, -15); ctx.lineTo(8, -6);
-      ctx.closePath(); ctx.fill();
-
-      // Heterocercal tail
-      ctx.beginPath();
-      ctx.moveTo(-17, 0); ctx.lineTo(-28, -10 + tailWiggle); ctx.lineTo(-22, 0); ctx.lineTo(-27, 6 + tailWiggle);
-      ctx.closePath(); ctx.fill();
+      // Mini Great White Shark
+      ctx.fillStyle = '#f8fafc';
+      ctx.beginPath(); ctx.ellipse(0, 2, 22, 6, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath(); ctx.ellipse(0, -1, 22, 7, 0, Math.PI, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-3, -7); ctx.lineTo(4, -16); ctx.lineTo(10, -7); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-18, 0); ctx.lineTo(-30, -12 + tailWiggle); ctx.lineTo(-24, 0); ctx.lineTo(-29, 7 + tailWiggle); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(12, -2, 1.8, 0, Math.PI * 2); ctx.fill();
+    } else if (this.species.id === 'tuna') {
+      ctx.fillStyle = '#0f2942';
+      ctx.beginPath(); ctx.ellipse(0, 0, 18, 7, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath(); ctx.moveTo(-6, -6); ctx.lineTo(-3, -11); ctx.lineTo(0, -6); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-15, 0); ctx.lineTo(-25, -9 + tailWiggle); ctx.lineTo(-20, 0); ctx.lineTo(-25, 9 + tailWiggle); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(10, -2, 1.8, 0, Math.PI * 2); ctx.fill();
     } else {
-      // Normal species
-      ctx.fillStyle = this.species.secondary || this.species.primary;
-      ctx.beginPath();
-      ctx.moveTo(-10, 0);
-      ctx.lineTo(-18, -6 + tailWiggle);
-      ctx.lineTo(-14, 0);
-      ctx.lineTo(-18, 6 + tailWiggle);
-      ctx.closePath();
-      ctx.fill();
-
-      // Body
-      ctx.fillStyle = this.species.primary;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, 13, 6, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Eye
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath(); ctx.arc(6, -1.5, 1.8, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#06131c';
-      ctx.beginPath(); ctx.arc(6.5, -1.5, 1.0, 0, Math.PI * 2); ctx.fill();
-
-      if (this.species.id === 'tuna') {
-        ctx.fillStyle = '#facc15';
-        ctx.beginPath(); ctx.moveTo(-6, -5); ctx.lineTo(-4, -8); ctx.lineTo(-2, -5); ctx.fill();
-      } else if (this.species.id === 'gold_king') {
-        ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 8;
-      } else if (this.species.id === 'angler') {
-        ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(4, -4); ctx.quadraticCurveTo(8, -10, 10, -7); ctx.stroke();
-        ctx.fillStyle = '#22d3ee'; ctx.beginPath(); ctx.arc(10, -7, 1.5, 0, Math.PI * 2); ctx.fill();
-      }
+      const col = this.species.id === 'snapper' ? '#ef4444' : (this.species.id === 'tang' ? '#2563eb' : (this.species.id === 'mahi' ? '#10b981' : '#f97316'));
+      ctx.fillStyle = col;
+      ctx.beginPath(); ctx.ellipse(0, 0, 13, 6, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-10, 0); ctx.lineTo(-18, -6 + tailWiggle); ctx.lineTo(-14, 0); ctx.lineTo(-18, 6 + tailWiggle); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(6, -1.5, 1.8, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#06131c'; ctx.beginPath(); ctx.arc(6.5, -1.5, 1.0, 0, Math.PI * 2); ctx.fill();
     }
-
     ctx.restore();
   }
 }
 
-class TopJellyTankManager {
+class SideCatchTankManager {
   constructor() {
     this.fishes = [];
     this.bubbles = [];
-    this.bursts = [];
-    this.baseW = 420;
-    this.baseH = 112;
-    this.w = this.baseW;
-    this.h = this.baseH;
-    this.totalMassGrams = 0;
-    this.stretchRatio = 1.0;
+    this.totalWeight = 0;
+    this.totalScore = 0;
+    this.w = 275;
+    this.h = 145;
 
     this.initCanvas();
     window.addEventListener('resize', () => this.initCanvas());
 
-    // Clicking top jelly dock opens detailed haul bag modal
-    topJellyDock.addEventListener('click', () => {
+    sideCatchBox.addEventListener('click', () => {
       bagBtn.click();
     });
   }
 
   initCanvas() {
-    const isMobile = window.innerWidth <= 640;
-    const isTablet = window.innerWidth <= 900;
-    this.baseW = isMobile ? Math.min(window.innerWidth * 0.92, 340) : (isTablet ? 360 : 420);
-    this.baseH = isMobile ? 90 : (isTablet ? 96 : 112);
-
-    const targetW = Math.round(this.baseW * this.stretchRatio);
-    const targetH = Math.round(this.baseH * Math.min(1.42, 1.0 + (this.stretchRatio - 1.0) * 0.65));
-
-    document.documentElement.style.setProperty('--tank-w', `${targetW}px`);
-    document.documentElement.style.setProperty('--tank-h', `${targetH}px`);
-
-    const rect = topJellyCanvas.getBoundingClientRect();
+    const rect = sideCatchCanvas.getBoundingClientRect();
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    this.w = rect.width || targetW;
-    this.h = rect.height || targetH;
-    topJellyCanvas.width = Math.round(this.w * dpr);
-    topJellyCanvas.height = Math.round(this.h * dpr);
-    topJellyCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    this.w = rect.width || 275;
+    this.h = rect.height || 145;
+    sideCatchCanvas.width = Math.round(this.w * dpr);
+    sideCatchCanvas.height = Math.round(this.h * dpr);
+    sideCatchCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
-  gulpFish(item) {
-    this.fishes.push(new MiniJellyFish(item.species, item.len));
-    if (topJellyEmpty) topJellyEmpty.style.display = 'none';
+  addCatch(item) {
+    this.fishes.push(new MiniLiveFish(item.species, item.len));
+    if (sideBoxEmpty) sideBoxEmpty.style.display = 'none';
 
-    this.totalMassGrams += item.weight;
-    const massKg = this.totalMassGrams / 1000;
+    this.totalWeight += item.weight;
+    this.totalScore += item.points;
+
+    // Jelly wobble animation on side container
+    sideCatchBox.classList.remove('box-wobble');
+    void sideCatchBox.offsetWidth;
+    sideCatchBox.classList.add('box-wobble');
+
+    // Update badges
     const count = this.fishes.length;
+    sideCatchBadge.textContent = `${count} FISH${count > 1 ? 'ES' : ''}`;
+    const weightStr = this.totalWeight >= 1000 ? `${(this.totalWeight / 1000).toFixed(1)} kg` : `${this.totalWeight} g`;
+    sideMass.textContent = weightStr;
+    sidePoints.textContent = `${this.totalScore.toLocaleString()} PTS`;
 
-    // ELASTIC STRETCH PHYSICS:
-    // Expands and stretches in width and height as monster sharks & fish are caged
-    this.stretchRatio = 1.0 + Math.min(0.65, (count * 0.035) + (massKg / 140) * 0.45);
-    const newW = Math.round(this.baseW * this.stretchRatio);
-    const newH = Math.round(this.baseH * Math.min(1.42, 1.0 + (this.stretchRatio - 1.0) * 0.65));
-
-    document.documentElement.style.setProperty('--tank-w', `${newW}px`);
-    document.documentElement.style.setProperty('--tank-h', `${newH}px`);
-
-    // Jelly suction gulp stretch wobble animation
-    topJellyDock.classList.remove('jelly-expand');
-    void topJellyDock.offsetWidth;
-    topJellyDock.classList.add('jelly-expand');
-
-    // Update dock HUD badges
-    topJellyBadge.textContent = `${count} CAGED`;
-    const expandPercent = Math.round(this.stretchRatio * 100);
-    jellySizeVal.textContent = `${expandPercent}%`;
-    jellyMassVal.textContent = massKg >= 1 ? `${massKg.toFixed(1)} kg` : `${this.totalMassGrams} g`;
-
-    // Internal fluid suction burst particles
-    for (let i = 0; i < 16; i++) {
-      this.bursts.push({
-        x: this.w * 0.5 + (Math.random() - 0.5) * 45,
-        y: this.h - 4,
-        vx: (Math.random() - 0.5) * 80,
-        vy: -25 - Math.random() * 55,
-        r: 2 + Math.random() * 3,
-        alpha: 1.0
+    // Splash bubbles inside tank
+    for (let i = 0; i < 10; i++) {
+      this.bubbles.push({
+        x: Math.random() * this.w,
+        y: this.h + Math.random() * 8,
+        r: 1.5 + Math.random() * 2.5,
+        vy: 20 + Math.random() * 30
       });
     }
 
@@ -1341,62 +984,126 @@ class TopJellyTankManager {
   }
 
   updateAndDraw(dt) {
-    if (!topJellyCtx) return;
-    const rect = topJellyCanvas.getBoundingClientRect();
-    if (Math.abs(this.w - rect.width) > 2 || Math.abs(this.h - rect.height) > 2) {
-      this.initCanvas();
-    }
+    if (!sideCatchCtx) return;
+    sideCatchCtx.clearRect(0, 0, this.w, this.h);
 
-    topJellyCtx.clearRect(0, 0, this.w, this.h);
-
-    // 1. Elastic Jelly Chamber Liquid Background
-    const bg = topJellyCtx.createLinearGradient(0, 0, 0, this.h);
-    bg.addColorStop(0, 'rgba(34, 211, 238, 0.18)');
-    bg.addColorStop(0.5, 'rgba(6, 40, 65, 0.5)');
+    // Liquid background
+    const bg = sideCatchCtx.createLinearGradient(0, 0, 0, this.h);
+    bg.addColorStop(0, 'rgba(34, 211, 238, 0.14)');
+    bg.addColorStop(0.6, 'rgba(6, 40, 65, 0.5)');
     bg.addColorStop(1, 'rgba(2, 22, 38, 0.88)');
-    topJellyCtx.fillStyle = bg;
-    topJellyCtx.fillRect(0, 0, this.w, this.h);
+    sideCatchCtx.fillStyle = bg;
+    sideCatchCtx.fillRect(0, 0, this.w, this.h);
 
-    // 2. Rising Internal Jelly Bubbles
-    topJellyCtx.fillStyle = 'rgba(180, 255, 250, 0.45)';
+    // Rising bubbles
+    sideCatchCtx.fillStyle = 'rgba(180, 255, 250, 0.45)';
     for (let i = this.bubbles.length - 1; i >= 0; i--) {
       const b = this.bubbles[i];
       b.y -= b.vy * dt;
-      topJellyCtx.beginPath();
-      topJellyCtx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-      topJellyCtx.fill();
+      sideCatchCtx.beginPath();
+      sideCatchCtx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      sideCatchCtx.fill();
       if (b.y < -5) this.bubbles.splice(i, 1);
     }
-    if (Math.random() < 0.14 && this.bubbles.length < 22) {
+    if (Math.random() < 0.1 && this.bubbles.length < 18) {
       this.bubbles.push({
         x: Math.random() * this.w,
         y: this.h + 2,
-        r: 1 + Math.random() * 2.5,
+        r: 1 + Math.random() * 2,
         vy: 16 + Math.random() * 24
       });
     }
 
-    // 3. Suction Gulp Bursts
-    for (let i = this.bursts.length - 1; i >= 0; i--) {
-      const p = this.bursts[i];
-      p.x += p.vx * dt;
-      p.y += p.vy * dt;
-      p.alpha -= 1.8 * dt;
-      topJellyCtx.fillStyle = `rgba(53, 243, 223, ${Math.max(0, p.alpha)})`;
-      topJellyCtx.beginPath();
-      topJellyCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      topJellyCtx.fill();
-      if (p.alpha <= 0) this.bursts.splice(i, 1);
-    }
-
-    // 4. Mini Live Swimming Fishes & Apex Sharks
+    // Mini Live Caught Fishes Swimming
     this.fishes.forEach(f => {
       f.update(dt, this.w, this.h);
-      f.draw(topJellyCtx);
+      f.draw(sideCatchCtx);
     });
   }
 }
-const topJellyTank = new TopJellyTankManager();
+const sideCatchTank = new SideCatchTankManager();
+
+/* --------------------------------------------------------------------------
+   LEAPING FISH: ACROBATIC PARABOLIC FLIGHT INTO SIDE CATCH BOX
+   -------------------------------------------------------------------------- */
+class LeapingFish {
+  constructor(fish, startX, startY) {
+    this.species = fish.species;
+    this.len = fish.species.len[0] + Math.random() * (fish.species.len[1] - fish.species.len[0]);
+    this.weight = Math.round(Math.pow(this.len, 2.7) * 0.16);
+    this.points = fish.species.basePoints;
+
+    this.startX = startX;
+    this.startY = startY;
+    this.x = startX;
+    this.y = startY;
+
+    // Target: Center of Side Catch Box
+    const rect = sideCatchBox.getBoundingClientRect();
+    this.tx = rect.left + rect.width * 0.45;
+    this.ty = rect.top + rect.height * 0.45;
+
+    this.t = 0;
+    this.dur = 0.82; // Majestic, visible flight
+    this.peakY = Math.min(this.ty, this.startY) - 130;
+    this.alive = true;
+  }
+
+  update(dt) {
+    this.t += dt / this.dur;
+    if (this.t >= 1.0) {
+      this.alive = false;
+
+      // Deliver fish directly into Side Catch Tank!
+      const item = { species: this.species, len: this.len, weight: this.weight, points: this.points };
+      catchBag.push(item);
+      score += this.points;
+      updateUI();
+
+      sideCatchTank.addCatch(item);
+
+      bagBtn.classList.remove('shake');
+      void bagBtn.offsetWidth;
+      bagBtn.classList.add('shake');
+
+      floatingScores.push(new FloatingText(this.tx - 20, this.ty - 16, `+${this.points} PTS!`, '#ffb732'));
+      return;
+    }
+
+    const ease = 1 - Math.pow(1 - this.t, 2);
+    this.x = this.startX + (this.tx - this.startX) * ease;
+    const arc = Math.sin(this.t * Math.PI) * (this.startY - this.peakY);
+    this.y = (this.startY + (this.ty - this.startY) * ease) - arc;
+
+    if (Math.random() < 0.6) {
+      splashParticles.push(new SplashParticle(this.x, this.y));
+    }
+  }
+
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    const angle = Math.sin(this.t * 8) * 0.6 - Math.PI * 0.2;
+    ctx.rotate(angle);
+
+    const scale = Math.min(1.3, 0.65 + (this.species.bodyL / 140) * 0.55);
+    ctx.scale(scale, scale);
+
+    if (this.species.id === 'great_white') {
+      ctx.fillStyle = '#f8fafc';
+      ctx.beginPath(); ctx.ellipse(0, 3, 26, 8, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath(); ctx.ellipse(0, -2, 26, 9, 0, Math.PI, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-4, -9); ctx.lineTo(5, -20); ctx.lineTo(12, -9); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-22, 0); ctx.lineTo(-36, -14); ctx.lineTo(-30, 0); ctx.lineTo(-35, 9); ctx.closePath(); ctx.fill();
+    } else {
+      ctx.fillStyle = this.species.id === 'snapper' ? '#ef4444' : (this.species.id === 'tang' ? '#2563eb' : (this.species.id === 'tuna' ? '#0f2942' : '#f97316'));
+      ctx.beginPath(); ctx.ellipse(0, 0, 20, 8, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-16, 0); ctx.lineTo(-28, -10); ctx.lineTo(-23, 0); ctx.lineTo(-28, 10); ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+  }
+}
 
 class FloatingText {
   constructor(x, y, text, col = '#35f3df') {
@@ -1404,7 +1111,7 @@ class FloatingText {
     this.life = 1.0;
   }
   update(dt) {
-    this.y -= 38 * dt;
+    this.y -= 36 * dt;
     this.life -= 1.2 * dt;
   }
   draw() {
@@ -1434,112 +1141,64 @@ class Pellet {
 }
 
 /* --------------------------------------------------------------------------
-   REALISTIC FISH & APEX SHARKS CLASS
+   REALISTIC FISH CLASS (NATURAL HORIZONTAL SWIMMING — ZERO 360 SPINS!)
    -------------------------------------------------------------------------- */
 class RealisticFish {
   constructor(species) {
     this.species = species;
-    this.numSegs = (species.role === 'boss' || species.role === 'trophy') ? 12 : 9;
-    this.segDist = species.bodyL / this.numSegs;
-
-    const fromLeft = Math.random() < 0.5;
-    this.x = fromLeft ? -90 : W + 90;
-    this.y = H * (species.depth[0] + Math.random() * (species.depth[1] - species.depth[0]));
-    this.angle = fromLeft ? 0 : Math.PI;
-    this.speed = (50 + Math.random() * 25) * species.speed;
-    this.baseSpeed = this.speed;
-
-    this.spine = [];
-    for (let i = 0; i < this.numSegs; i++) {
-      this.spine.push({
-        x: this.x - Math.cos(this.angle) * i * this.segDist,
-        y: this.y - Math.sin(this.angle) * i * this.segDist
-      });
-    }
+    this.dir = Math.random() < 0.5 ? 1 : -1;
+    this.x = this.dir === 1 ? -120 - Math.random() * 200 : W + 120 + Math.random() * 200;
+    this.baseY = H * (species.depth[0] + Math.random() * (species.depth[1] - species.depth[0]));
+    this.y = this.baseY;
+    this.speed = species.speed * (0.85 + Math.random() * 0.3);
 
     this.swimPhase = Math.random() * Math.PI * 2;
-    this.targetAngle = this.angle;
-    this.turnSpeed = (species.role === 'boss') ? 0.028 : 0.04;
-    this.state = 'cruise'; // 'cruise' | 'hunt' | 'panic' | 'hooked'
-    this.huntTarget = null;
-    this.puff = 0;
+    this.driftPhase = Math.random() * Math.PI * 2;
+    this.pitch = 0; // Strictly clamped pitch — NEVER spins in 360!
+    this.state = 'cruise'; // 'cruise' | 'hooked'
     this.alive = true;
     this.respawnTimer = 0;
   }
 
-  update(dt, hook, allFishes, pellets) {
+  update(dt, hook, pellets) {
     if (!this.alive || this.state === 'hooked') {
       if (!this.alive && this.state !== 'hooked') {
         this.respawnTimer -= dt;
         if (this.respawnTimer <= 0) {
           this.alive = true;
-          const fromLeft = Math.random() < 0.5;
-          this.x = fromLeft ? -100 : W + 100;
-          this.y = H * (this.species.depth[0] + Math.random() * (this.species.depth[1] - this.species.depth[0]));
-          this.angle = fromLeft ? 0 : Math.PI;
+          this.dir = Math.random() < 0.5 ? 1 : -1;
+          this.x = this.dir === 1 ? -120 : W + 120;
+          this.baseY = H * (this.species.depth[0] + Math.random() * (this.species.depth[1] - this.species.depth[0]));
+          this.y = this.baseY;
           this.state = 'cruise';
         }
       }
       return;
     }
 
-    this.swimPhase += 5.5 * dt * (this.speed / 50);
+    // 1. Natural Sinusoidal Swimming Cadence
+    this.swimPhase += 6.5 * dt * (this.speed / 50);
+    this.driftPhase += 1.4 * dt;
 
-    // 1. PREDATOR & SHARK HUNTING LOGIC
-    if (this.species.role === 'predator' || this.species.role === 'boss') {
-      if (this.state === 'cruise') {
-        let nearestPrey = null, minD = (this.species.role === 'boss') ? 240 : 180;
-        for (const other of allFishes) {
-          if (other !== this && other.alive && other.state !== 'hooked' && (other.species.role === 'prey' || other.species.id === 'puffer')) {
-            const d = Math.hypot(this.x - other.x, this.y - other.y);
-            if (d < minD) { minD = d; nearestPrey = other; }
-          }
-        }
-        if (nearestPrey) {
-          this.state = 'hunt';
-          this.huntTarget = nearestPrey;
-          nearestPrey.state = 'panic';
-        }
-      } else if (this.state === 'hunt') {
-        if (!this.huntTarget || !this.huntTarget.alive || this.huntTarget.state === 'hooked') {
-          this.state = 'cruise';
-        } else {
-          const dx = this.huntTarget.x - this.x;
-          const dy = this.huntTarget.y - this.y;
-          const dist = Math.hypot(dx, dy);
-          this.targetAngle = Math.atan2(dy, dx);
-          this.speed = this.baseSpeed * 1.5;
+    // 2. Smooth Horizontal Swimming (Strictly left or right)
+    this.x += this.dir * this.speed * dt;
+    this.y = this.baseY + Math.sin(this.driftPhase) * 12;
 
-          // Puffer defense!
-          if (this.huntTarget.species.id === 'puffer' && dist < 60) {
-            this.huntTarget.puff = 1.0;
-            sfx.bloop();
-            this.targetAngle += Math.PI;
-            this.state = 'cruise';
-            this.huntTarget = null;
-          }
-          // Chomp!
-          else if (dist < 22) {
-            this.huntTarget.alive = false;
-            this.huntTarget.respawnTimer = 4.5;
-            sfx.chomp();
-            floatingScores.push(new FloatingText(this.x, this.y - 14, 'CHOMP!', '#ff4757'));
-            this.state = 'cruise';
-            this.huntTarget = null;
-          }
-        }
-      }
+    // Pitch angle remains almost flat (max ~6 degrees vertical sway)
+    this.pitch = Math.sin(this.driftPhase) * 0.1;
+
+    // 3. Screen Edge Wrap / Turn Around
+    if (this.dir === 1 && this.x > W + 140) {
+      this.dir = -1;
+      this.baseY = H * (this.species.depth[0] + Math.random() * (this.species.depth[1] - this.species.depth[0]));
+    } else if (this.dir === -1 && this.x < -140) {
+      this.dir = 1;
+      this.baseY = H * (this.species.depth[0] + Math.random() * (this.species.depth[1] - this.species.depth[0]));
     }
 
-    // 2. PREY EVASION
-    if (this.state === 'panic') {
-      this.speed = this.baseSpeed * 1.9;
-      if (Math.random() < 0.03) this.state = 'cruise';
-    }
-
-    // 3. FOOD PELLETS
-    if (this.state === 'cruise' && pellets.length > 0) {
-      let nearestP = null, minD = 140;
+    // 4. Food Pellets: gentle attraction
+    if (pellets.length > 0) {
+      let nearestP = null, minD = 120;
       for (const p of pellets) {
         if (p.alive) {
           const d = Math.hypot(this.x - p.x, this.y - p.y);
@@ -1547,9 +1206,9 @@ class RealisticFish {
         }
       }
       if (nearestP) {
-        this.targetAngle = Math.atan2(nearestP.y - this.y, nearestP.x - this.x);
-        this.speed = this.baseSpeed * 1.3;
-        if (Math.hypot(nearestP.x - this.x, nearestP.y - this.y) < 16) {
+        const dy = nearestP.y - this.y;
+        this.baseY += Math.sign(dy) * 35 * dt;
+        if (Math.hypot(nearestP.x - this.x, nearestP.y - this.y) < 18) {
           nearestP.alive = false;
           sfx.bloop();
           score += 20;
@@ -1559,342 +1218,309 @@ class RealisticFish {
       }
     }
 
-    // 4. NATURAL CRUISING & BOUNDARY CROSSING
-    if (this.state === 'cruise') {
-      this.speed = this.baseSpeed;
-      if (this.x < -130) { this.x = W + 120; this.angle = Math.PI; }
-      if (this.x > W + 130) { this.x = -120; this.angle = 0; }
-      if (this.y < 80) this.targetAngle = 0.4;
-      if (this.y > H - 50) this.targetAngle = -0.4;
-    }
-
-    // Hook collision check: hook pierces mouth
-    if (hook.active && hook.state === 'IDLE' && this.state !== 'panic' && this.alive) {
-      const hitRadius = (this.species.role === 'boss') ? 38 : 28;
-      const d = Math.hypot(this.x - hook.x, this.y - hook.y);
-      if (d < hitRadius) {
+    // 5. Hook Collision Check (Visceral mouth bite puncture)
+    if (hook.active && hook.state === 'IDLE' && this.alive) {
+      const mouthX = this.x + this.dir * (this.species.bodyL * 0.46);
+      const mouthY = this.y;
+      const hitRadius = (this.species.role === 'apex') ? 34 : 24;
+      if (Math.hypot(hook.x - mouthX, hook.y - mouthY) < hitRadius) {
         hook.catchFish(this);
       }
-    }
-
-    // Puffer deflation
-    if (this.species.id === 'puffer' && this.puff > 0) {
-      this.puff = Math.max(0, this.puff - 0.4 * dt);
-    }
-
-    // Steer angle smoothly
-    let diff = this.targetAngle - this.angle;
-    while (diff < -Math.PI) diff += Math.PI * 2;
-    while (diff > Math.PI) diff -= Math.PI * 2;
-    this.angle += diff * this.turnSpeed;
-
-    this.x += Math.cos(this.angle) * this.speed * dt;
-    this.y += Math.sin(this.angle) * this.speed * dt;
-
-    this.spine[0].x = this.x;
-    this.spine[0].y = this.y;
-
-    for (let i = 1; i < this.numSegs; i++) {
-      const prev = this.spine[i - 1];
-      const cur = this.spine[i];
-      const dx = cur.x - prev.x;
-      const dy = cur.y - prev.y;
-      let segAngle = Math.atan2(dy, dx);
-
-      const tailFlex = (i / this.numSegs);
-      const wave = Math.sin(this.swimPhase - i * 0.55) * 4.2 * tailFlex;
-      segAngle += wave * 0.08;
-
-      cur.x = prev.x + Math.cos(segAngle) * this.segDist;
-      cur.y = prev.y + Math.sin(segAngle) * this.segDist;
     }
   }
 
   draw(ctx) {
     if (!this.alive && this.state !== 'hooked') return;
     ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.pitch * this.dir);
+    ctx.scale(this.dir, 1);
 
     const sp = this.species;
-    const puff = this.puff;
-    const bodyW = sp.bodyW * (1 + puff * 1.6);
+    const L = sp.bodyL;
+    const Hw = sp.bodyH;
+    const tailWiggle = Math.sin(this.swimPhase) * 4.0;
 
-    const leftSide = [];
-    const rightSide = [];
-
-    for (let i = 0; i < this.numSegs; i++) {
-      const pt = this.spine[i];
-      const nextPt = this.spine[Math.min(this.numSegs - 1, i + 1)];
-      const prevPt = this.spine[Math.max(0, i - 1)];
-      const tangent = Math.atan2(nextPt.y - prevPt.y, nextPt.x - prevPt.x);
-      const normal = tangent + Math.PI * 0.5;
-
-      const ratio = i / (this.numSegs - 1);
-      const profile = Math.sin(ratio * Math.PI) * (1 - ratio * 0.35);
-      const halfW = (bodyW * 0.5) * profile;
-
-      leftSide.push({ x: pt.x + Math.cos(normal) * halfW, y: pt.y + Math.sin(normal) * halfW });
-      rightSide.push({ x: pt.x - Math.cos(normal) * halfW, y: pt.y - Math.sin(normal) * halfW });
-    }
-
-    // 1. Pectoral Fins
-    const finPt = this.spine[2];
-    const flap = Math.sin(this.swimPhase * 1.5) * 0.5;
-    ctx.fillStyle = sp.secondary || sp.primary;
-    ctx.globalAlpha = 0.8;
-    const finW = (sp.role === 'boss') ? 22 : 13;
-    const finH = (sp.role === 'boss') ? 8 : 5;
-    [1, -1].forEach(side => {
-      ctx.save();
-      ctx.translate(finPt.x, finPt.y);
-      ctx.rotate(this.angle + side * (Math.PI * 0.45 + flap));
-      ctx.beginPath();
-      ctx.ellipse(finW * 0.7, 0, finW, finH, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    });
-
-    // 2. Caudal Tail Fin
-    const tailBase = this.spine[this.numSegs - 1];
-    const tailPrev = this.spine[this.numSegs - 2];
-    const tailAngle = Math.atan2(tailBase.y - tailPrev.y, tailBase.x - tailPrev.x);
-
-    ctx.save();
-    ctx.translate(tailBase.x, tailBase.y);
-    ctx.rotate(tailAngle);
-    ctx.fillStyle = sp.secondary || sp.primary;
-    ctx.globalAlpha = 0.9;
-
-    if (sp.id === 'tuna') {
-      ctx.beginPath();
-      ctx.moveTo(0, 0); ctx.quadraticCurveTo(15, -28, 30, -32);
-      ctx.lineTo(24, 0); ctx.lineTo(30, 32);
-      ctx.quadraticCurveTo(15, 28, 0, 0);
-      ctx.closePath(); ctx.fill();
-    } else if (sp.role === 'boss' || sp.id === 'great_white' || sp.id === 'hammerhead') {
-      // Apex Heterocercal Shark Tail
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.quadraticCurveTo(24, -34, 46, -42);
-      ctx.lineTo(36, -14); ctx.lineTo(28, 0);
-      ctx.lineTo(35, 24); ctx.quadraticCurveTo(18, 16, 0, 0);
-      ctx.closePath(); ctx.fill();
-    } else {
-      ctx.beginPath();
-      ctx.moveTo(0, 0); ctx.lineTo(22, -15); ctx.lineTo(15, 0); ctx.lineTo(22, 15);
-      ctx.closePath(); ctx.fill();
-    }
-    ctx.restore();
-
-    // 3. Fleshy Fish/Shark Body
-    ctx.globalAlpha = 1.0;
-    ctx.beginPath();
-    ctx.moveTo(this.spine[0].x, this.spine[0].y);
-    for (let i = 0; i < leftSide.length - 1; i++) {
-      const xc = (leftSide[i].x + leftSide[i + 1].x) * 0.5;
-      const yc = (leftSide[i].y + leftSide[i + 1].y) * 0.5;
-      ctx.quadraticCurveTo(leftSide[i].x, leftSide[i].y, xc, yc);
-    }
-    ctx.lineTo(tailBase.x, tailBase.y);
-    for (let i = rightSide.length - 1; i > 0; i--) {
-      const xc = (rightSide[i].x + rightSide[i - 1].x) * 0.5;
-      const yc = (rightSide[i].y + rightSide[i - 1].y) * 0.5;
-      ctx.quadraticCurveTo(rightSide[i].x, rightSide[i].y, xc, yc);
-    }
-    ctx.closePath();
-
-    const grad = ctx.createLinearGradient(this.spine[0].x, this.spine[0].y, tailBase.x, tailBase.y);
-    grad.addColorStop(0, sp.primary);
-    grad.addColorStop(0.7, sp.primary);
-    grad.addColorStop(1, sp.secondary || sp.primary);
-    ctx.fillStyle = grad;
-    ctx.fill();
-
-    // 4. Species Markings, Shark Dorsals, Teeth & Anatomical Profiles
+    // ----------------------------------------------------
+    // APEX GREAT WHITE SHARK
+    // ----------------------------------------------------
     if (sp.id === 'great_white') {
-      // Megalodon Great White: Tall Dorsal Fin
-      const dSeg = this.spine[3];
-      const dAngle = this.angle - Math.PI * 0.5;
-      ctx.fillStyle = '#0f172a';
-      ctx.beginPath();
-      ctx.moveTo(dSeg.x + Math.cos(this.angle) * 16, dSeg.y + Math.sin(this.angle) * 16);
-      ctx.lineTo(dSeg.x + Math.cos(dAngle) * 40 - Math.cos(this.angle) * 8, dSeg.y + Math.sin(dAngle) * 40 - Math.sin(this.angle) * 8);
-      ctx.lineTo(dSeg.x - Math.cos(this.angle) * 18, dSeg.y - Math.sin(this.angle) * 18);
-      ctx.closePath();
-      ctx.fill();
-
-      // Gill Slits
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.65)';
-      ctx.lineWidth = 2.0;
-      for (let g = 0; g < 5; g++) {
-        const gx = this.spine[2].x - Math.cos(this.angle) * (g * 4 - 8);
-        const gy = this.spine[2].y - Math.sin(this.angle) * (g * 4 - 8);
-        ctx.beginPath();
-        ctx.moveTo(gx - Math.sin(this.angle) * 12, gy + Math.cos(this.angle) * 12);
-        ctx.lineTo(gx + Math.sin(this.angle) * 12, gy - Math.cos(this.angle) * 12);
-        ctx.stroke();
-      }
-
-      // Serrated triangular shark teeth
-      ctx.fillStyle = '#ffffff';
-      for (let t = -4; t <= 4; t += 2) {
-        const tx = this.spine[0].x + Math.cos(this.angle + 1.57) * t * 3.8;
-        const ty = this.spine[0].y + Math.sin(this.angle + 1.57) * t * 3.8;
-        ctx.beginPath();
-        ctx.moveTo(tx, ty);
-        ctx.lineTo(tx + Math.cos(this.angle) * 9, ty + Math.sin(this.angle) * 9);
-        ctx.lineTo(tx + Math.cos(this.angle - 0.7) * 5, ty + Math.sin(this.angle - 0.7) * 5);
-        ctx.closePath();
-        ctx.fill();
-      }
-
-      // White belly countershading
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
-      ctx.lineWidth = 2.4;
-      ctx.beginPath();
-      ctx.moveTo(this.spine[0].x, this.spine[0].y + 4);
-      for (let i = 1; i < this.numSegs - 2; i++) {
-        ctx.lineTo(this.spine[i].x, this.spine[i].y + 3);
-      }
-      ctx.stroke();
-    } else if (sp.id === 'hammerhead') {
-      // Titan Hammerhead: Cephalofoil T-bar head
-      const hSeg = this.spine[0];
-      const hNormal = this.angle + Math.PI * 0.5;
-      const barLen = 30;
-
-      ctx.save();
-      ctx.fillStyle = '#334155';
-      ctx.strokeStyle = '#1e293b';
-      ctx.lineWidth = 2.2;
-      ctx.beginPath();
-      ctx.ellipse(hSeg.x, hSeg.y, barLen, 8.5, this.angle + Math.PI * 0.5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-
-      // Wide-set lateral eyes on the ends of the hammerhead
-      const eyeL_x = hSeg.x + Math.cos(hNormal) * (barLen - 4);
-      const eyeL_y = hSeg.y + Math.sin(hNormal) * (barLen - 4);
-      const eyeR_x = hSeg.x - Math.cos(hNormal) * (barLen - 4);
-      const eyeR_y = hSeg.y - Math.sin(hNormal) * (barLen - 4);
-
-      [{ x: eyeL_x, y: eyeL_y }, { x: eyeR_x, y: eyeR_y }].forEach(eye => {
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath(); ctx.arc(eye.x, eye.y, 3.4, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#0f172a';
-        ctx.beginPath(); ctx.arc(eye.x, eye.y, 2.0, 0, Math.PI * 2); ctx.fill();
-      });
-      ctx.restore();
-
-      // Tall curved hammerhead dorsal fin
-      const dSeg = this.spine[3];
-      const dAngle = this.angle - Math.PI * 0.5;
+      // 1. Shark Dorsal Fin (Towering sharp triangle at shoulder)
       ctx.fillStyle = '#1e293b';
       ctx.beginPath();
-      ctx.moveTo(dSeg.x + Math.cos(this.angle) * 14, dSeg.y + Math.sin(this.angle) * 14);
-      ctx.quadraticCurveTo(dSeg.x + Math.cos(dAngle) * 38, dSeg.y + Math.sin(dAngle) * 38, dSeg.x + Math.cos(dAngle) * 34 - Math.cos(this.angle) * 12, dSeg.y + Math.sin(dAngle) * 34 - Math.sin(this.angle) * 12);
-      ctx.lineTo(dSeg.x - Math.cos(this.angle) * 14, dSeg.y - Math.sin(this.angle) * 14);
+      ctx.moveTo(-4, -14);
+      ctx.lineTo(14, -42);
+      ctx.lineTo(26, -14);
       ctx.closePath();
       ctx.fill();
-    } else if (sp.id === 'clown') {
-      ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = '#111';
-      ctx.lineWidth = 1.2;
-      [2, 5, 8].forEach(seg => {
-        const pL = leftSide[seg]; const pR = rightSide[seg];
-        ctx.beginPath();
-        ctx.ellipse((pL.x + pR.x) * 0.5, (pL.y + pR.y) * 0.5, 3.8, Math.hypot(pL.x - pR.x, pL.y - pR.y) * 0.48, this.angle, 0, Math.PI * 2);
-        ctx.fill(); ctx.stroke();
-      });
-    } else if (sp.id === 'koi') {
-      ctx.fillStyle = sp.spot;
-      const mid = this.spine[3];
+
+      // 2. Pectoral Fins
+      ctx.fillStyle = '#334155';
       ctx.beginPath();
-      ctx.ellipse(mid.x, mid.y, 10, 5, this.angle + 0.2, 0, Math.PI * 2);
+      ctx.moveTo(12, 4);
+      ctx.lineTo(-4, 28);
+      ctx.lineTo(22, 10);
+      ctx.closePath();
       ctx.fill();
-    } else if (sp.id === 'puffer' && puff > 0.1) {
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 1.8;
-      for (let i = 0; i < leftSide.length; i += 2) {
+
+      // 3. Torpedo Shark Body with Countershading
+      const grad = ctx.createLinearGradient(0, -Hw * 0.5, 0, Hw * 0.5);
+      grad.addColorStop(0, '#0f172a');
+      grad.addColorStop(0.52, '#334155');
+      grad.addColorStop(0.58, '#f8fafc');
+      grad.addColorStop(1, '#e2e8f0');
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(L * 0.5, 0); // Snout tip
+      ctx.quadraticCurveTo(L * 0.25, -Hw * 0.52, -L * 0.1, -Hw * 0.48);
+      ctx.quadraticCurveTo(-L * 0.35, -Hw * 0.3, -L * 0.5, -4);
+      ctx.lineTo(-L * 0.5, 4);
+      ctx.quadraticCurveTo(-L * 0.35, Hw * 0.35, -L * 0.1, Hw * 0.5);
+      ctx.quadraticCurveTo(L * 0.25, Hw * 0.45, L * 0.5, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // 4. Heterocercal Shark Tail
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.moveTo(-L * 0.5, 0);
+      ctx.quadraticCurveTo(-L * 0.5 - 18, -26 + tailWiggle, -L * 0.5 - 38, -34 + tailWiggle);
+      ctx.lineTo(-L * 0.5 - 28, -8 + tailWiggle);
+      ctx.lineTo(-L * 0.5 - 20, 0);
+      ctx.lineTo(-L * 0.5 - 28, 18 + tailWiggle);
+      ctx.quadraticCurveTo(-L * 0.5 - 14, 12 + tailWiggle, -L * 0.5, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // 5. 5 Gill Slits
+      ctx.strokeStyle = 'rgba(15, 23, 42, 0.7)';
+      ctx.lineWidth = 1.6;
+      for (let g = 0; g < 5; g++) {
+        const gx = 10 - g * 5;
         ctx.beginPath();
-        ctx.moveTo(leftSide[i].x, leftSide[i].y);
-        ctx.lineTo(leftSide[i].x + Math.cos(this.angle - 1.2) * 8 * puff, leftSide[i].y + Math.sin(this.angle - 1.2) * 8 * puff);
+        ctx.moveTo(gx, -6); ctx.lineTo(gx - 2, 7);
         ctx.stroke();
       }
-    } else if (sp.id === 'tuna') {
-      ctx.fillStyle = sp.finlet || '#facc15';
-      [6, 7, 8, 9].forEach(seg => {
-        if (seg < leftSide.length && seg < rightSide.length) {
-          const pL = leftSide[seg]; const pR = rightSide[seg];
-          ctx.beginPath();
-          ctx.moveTo(pL.x, pL.y);
-          ctx.lineTo(pL.x + Math.cos(this.angle - 1.7) * 8, pL.y + Math.sin(this.angle - 1.7) * 8);
-          ctx.lineTo(pL.x + Math.cos(this.angle - 2.4) * 4, pL.y + Math.sin(this.angle - 2.4) * 4);
-          ctx.fill();
-          ctx.beginPath();
-          ctx.moveTo(pR.x, pR.y);
-          ctx.lineTo(pR.x + Math.cos(this.angle + 1.7) * 8, pR.y + Math.sin(this.angle + 1.7) * 8);
-          ctx.lineTo(pR.x + Math.cos(this.angle + 2.4) * 4, pR.y + Math.sin(this.angle + 2.4) * 4);
-          ctx.fill();
-        }
-      });
-    } else if (sp.id === 'gold_king') {
-      ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 2.2;
-      ctx.beginPath();
-      ctx.moveTo(this.spine[0].x, this.spine[0].y);
-      ctx.quadraticCurveTo(this.spine[0].x + Math.cos(this.angle + 0.6) * 18, this.spine[0].y + Math.sin(this.angle + 0.6) * 18, this.spine[0].x + Math.cos(this.angle + 0.9) * 28, this.spine[0].y + Math.sin(this.angle + 0.9) * 28);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(this.spine[0].x, this.spine[0].y);
-      ctx.quadraticCurveTo(this.spine[0].x + Math.cos(this.angle - 0.6) * 18, this.spine[0].y + Math.sin(this.angle - 0.6) * 18, this.spine[0].x + Math.cos(this.angle - 0.9) * 28, this.spine[0].y + Math.sin(this.angle - 0.9) * 28);
-      ctx.stroke();
-    } else if (sp.id === 'angler') {
+
+      // 6. Black Predator Eye with catch-light
+      ctx.fillStyle = '#020617';
+      ctx.beginPath(); ctx.arc(L * 0.36, -4, 3.4, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#ffffff';
-      for (let t = -3; t <= 3; t += 2) {
-        const tx = this.spine[0].x + Math.cos(this.angle + 1.5) * t * 3.5;
-        const ty = this.spine[0].y + Math.sin(this.angle + 1.5) * t * 3.5;
-        ctx.beginPath();
-        ctx.moveTo(tx, ty);
-        ctx.lineTo(tx + Math.cos(this.angle) * 7.5, ty + Math.sin(this.angle) * 7.5);
-        ctx.lineTo(tx + Math.cos(this.angle - 0.5) * 4.5, ty + Math.sin(this.angle - 0.5) * 4.5);
-        ctx.fill();
-      }
+      ctx.beginPath(); ctx.arc(L * 0.36 - 0.8, -4.8, 1.0, 0, Math.PI * 2); ctx.fill();
 
-      const antBase = this.spine[1];
-      const antTipX = antBase.x + Math.cos(this.angle - 0.85) * 32;
-      const antTipY = antBase.y + Math.sin(this.angle - 0.85) * 32;
-      ctx.strokeStyle = '#0f766e'; ctx.lineWidth = 2.2;
+      // Subtle jawline
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.2;
       ctx.beginPath();
-      ctx.moveTo(antBase.x, antBase.y);
-      ctx.quadraticCurveTo(antBase.x + Math.cos(this.angle - 1.4) * 24, antBase.y + Math.sin(this.angle - 1.4) * 24, antTipX, antTipY);
+      ctx.moveTo(L * 0.44, 4);
+      ctx.quadraticCurveTo(L * 0.28, 8, L * 0.15, 6);
       ctx.stroke();
-
-      const lureGrad = ctx.createRadialGradient(antTipX, antTipY, 1, antTipX, antTipY, 15);
-      lureGrad.addColorStop(0, '#ffffff');
-      lureGrad.addColorStop(0.35, '#22d3ee');
-      lureGrad.addColorStop(1, 'transparent');
-      ctx.fillStyle = lureGrad;
-      ctx.beginPath();
-      ctx.arc(antTipX, antTipY, 15, 0, Math.PI * 2);
-      ctx.fill();
     }
 
-    // 5. Realistic Eye (except hammerhead which has lateral eyes)
-    if (sp.id !== 'hammerhead') {
-      const eyeSeg = this.spine[1];
-      const eyeTangent = Math.atan2(this.spine[2].y - this.spine[0].y, this.spine[2].x - this.spine[0].x);
-      const eyeNormal = eyeTangent + Math.PI * 0.5;
-      const eyeDist = bodyW * 0.32;
+    // ----------------------------------------------------
+    // GIANT BLUEFIN TUNA
+    // ----------------------------------------------------
+    else if (sp.id === 'tuna') {
+      // Body gradient (midnight navy to silver flanks)
+      const grad = ctx.createLinearGradient(0, -Hw * 0.5, 0, Hw * 0.5);
+      grad.addColorStop(0, '#0a233a');
+      grad.addColorStop(0.48, '#1e3a5f');
+      grad.addColorStop(0.55, '#cbd5e1');
+      grad.addColorStop(1, '#f1f5f9');
 
-      [1, -1].forEach(side => {
-        const ex = eyeSeg.x + Math.cos(eyeNormal) * eyeDist * side;
-        const ey = eyeSeg.y + Math.sin(eyeNormal) * eyeDist * side;
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath(); ctx.arc(ex, ey, (sp.role === 'boss') ? 3.8 : 3.4, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#06131c';
-        ctx.beginPath(); ctx.arc(ex, ey, (sp.role === 'boss') ? 2.4 : 2.0, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath(); ctx.arc(ex - 0.7, ey - 0.7, 0.8, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(L * 0.5, 0);
+      ctx.quadraticCurveTo(L * 0.2, -Hw * 0.55, -L * 0.1, -Hw * 0.5);
+      ctx.quadraticCurveTo(-L * 0.38, -Hw * 0.25, -L * 0.5, 0);
+      ctx.quadraticCurveTo(-L * 0.38, Hw * 0.25, -L * 0.1, Hw * 0.5);
+      ctx.quadraticCurveTo(L * 0.2, Hw * 0.55, L * 0.5, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // Golden Dorsal Finlets along peduncle
+      ctx.fillStyle = '#facc15';
+      [-L * 0.25, -L * 0.32, -L * 0.39, -L * 0.45].forEach(fx => {
+        ctx.beginPath(); ctx.moveTo(fx, -6); ctx.lineTo(fx - 3, -13); ctx.lineTo(fx + 2, -6); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(fx, 6); ctx.lineTo(fx - 3, 13); ctx.lineTo(fx + 2, 6); ctx.fill();
       });
+
+      // Crescent Lunate Tail
+      ctx.fillStyle = '#0a233a';
+      ctx.beginPath();
+      ctx.moveTo(-L * 0.5, 0);
+      ctx.quadraticCurveTo(-L * 0.5 - 14, -26 + tailWiggle, -L * 0.5 - 28, -30 + tailWiggle);
+      ctx.lineTo(-L * 0.5 - 22, 0);
+      ctx.lineTo(-L * 0.5 - 28, 30 + tailWiggle);
+      ctx.quadraticCurveTo(-L * 0.5 - 14, 26 + tailWiggle, -L * 0.5, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // Pectoral fin
+      ctx.fillStyle = '#1e3a5f';
+      ctx.beginPath(); ctx.ellipse(8, 2, 14, 4, -0.2, 0, Math.PI * 2); ctx.fill();
+
+      // Eye
+      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(L * 0.36, -3, 3.2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#030712'; ctx.beginPath(); ctx.arc(L * 0.36, -3, 2.0, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // ----------------------------------------------------
+    // MAHI-MAHI (DORADO)
+    // ----------------------------------------------------
+    else if (sp.id === 'mahi') {
+      const grad = ctx.createLinearGradient(0, -Hw * 0.5, 0, Hw * 0.5);
+      grad.addColorStop(0, '#059669');
+      grad.addColorStop(0.35, '#10b981');
+      grad.addColorStop(0.7, '#fbbf24');
+      grad.addColorStop(1, '#f59e0b');
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(L * 0.48, -Hw * 0.3); // High blunt forehead
+      ctx.lineTo(L * 0.44, Hw * 0.2);
+      ctx.quadraticCurveTo(L * 0.2, Hw * 0.5, -L * 0.1, Hw * 0.45);
+      ctx.quadraticCurveTo(-L * 0.35, Hw * 0.2, -L * 0.5, 0);
+      ctx.quadraticCurveTo(-L * 0.35, -Hw * 0.4, -L * 0.1, -Hw * 0.5);
+      ctx.lineTo(L * 0.35, -Hw * 0.5);
+      ctx.closePath();
+      ctx.fill();
+
+      // Long dorsal crest fin
+      ctx.fillStyle = '#06b6d4';
+      ctx.beginPath();
+      ctx.moveTo(L * 0.35, -Hw * 0.5);
+      ctx.lineTo(L * 0.32, -Hw * 0.5 - 9);
+      ctx.lineTo(-L * 0.45, -Hw * 0.3 - 4);
+      ctx.lineTo(-L * 0.45, -Hw * 0.2);
+      ctx.closePath();
+      ctx.fill();
+
+      // Forked tail
+      ctx.fillStyle = '#0ea5e9';
+      ctx.beginPath();
+      ctx.moveTo(-L * 0.5, 0);
+      ctx.lineTo(-L * 0.5 - 22, -18 + tailWiggle);
+      ctx.lineTo(-L * 0.5 - 16, 0);
+      ctx.lineTo(-L * 0.5 - 22, 18 + tailWiggle);
+      ctx.closePath();
+      ctx.fill();
+
+      // Eye
+      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(L * 0.34, -4, 2.8, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(L * 0.34, -4, 1.8, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // ----------------------------------------------------
+    // CRIMSON RED SNAPPER
+    // ----------------------------------------------------
+    else if (sp.id === 'snapper') {
+      const grad = ctx.createLinearGradient(0, -Hw * 0.5, 0, Hw * 0.5);
+      grad.addColorStop(0, '#b91c1c');
+      grad.addColorStop(0.5, '#ef4444');
+      grad.addColorStop(1, '#fca5a5');
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(L * 0.5, 0);
+      ctx.quadraticCurveTo(L * 0.2, -Hw * 0.55, -L * 0.1, -Hw * 0.5);
+      ctx.quadraticCurveTo(-L * 0.35, -Hw * 0.25, -L * 0.5, 0);
+      ctx.quadraticCurveTo(-L * 0.35, Hw * 0.25, -L * 0.1, Hw * 0.5);
+      ctx.quadraticCurveTo(L * 0.2, Hw * 0.55, L * 0.5, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // Spiny dorsal fin
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath();
+      ctx.moveTo(L * 0.15, -Hw * 0.5);
+      ctx.lineTo(0, -Hw * 0.5 - 10);
+      ctx.lineTo(-L * 0.3, -Hw * 0.4);
+      ctx.closePath();
+      ctx.fill();
+
+      // Tail
+      ctx.beginPath();
+      ctx.moveTo(-L * 0.5, 0);
+      ctx.lineTo(-L * 0.5 - 18, -14 + tailWiggle);
+      ctx.lineTo(-L * 0.5 - 13, 0);
+      ctx.lineTo(-L * 0.5 - 18, 14 + tailWiggle);
+      ctx.closePath();
+      ctx.fill();
+
+      // Eye
+      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(L * 0.32, -3, 3.0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#450a0a'; ctx.beginPath(); ctx.arc(L * 0.32, -3, 1.8, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // ----------------------------------------------------
+    // ROYAL BLUE TANG
+    // ----------------------------------------------------
+    else if (sp.id === 'tang') {
+      ctx.fillStyle = '#1d4ed8';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, L * 0.5, Hw * 0.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Black artist palette swoop
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.ellipse(-L * 0.1, -2, L * 0.28, Hw * 0.28, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#1d4ed8';
+      ctx.beginPath();
+      ctx.ellipse(-L * 0.1, -2, L * 0.18, Hw * 0.16, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Vibrant yellow tail
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath();
+      ctx.moveTo(-L * 0.45, 0);
+      ctx.lineTo(-L * 0.5 - 14, -12 + tailWiggle);
+      ctx.lineTo(-L * 0.5 - 10, 0);
+      ctx.lineTo(-L * 0.5 - 14, 12 + tailWiggle);
+      ctx.closePath();
+      ctx.fill();
+
+      // Eye
+      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(L * 0.3, -2, 2.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#020617'; ctx.beginPath(); ctx.arc(L * 0.3, -2, 1.5, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // ----------------------------------------------------
+    // OCELLARIS CLOWNFISH
+    // ----------------------------------------------------
+    else if (sp.id === 'clown') {
+      ctx.fillStyle = '#ea580c';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, L * 0.5, Hw * 0.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 3 Iconic White Vertical Bands with crisp black borders
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#020617';
+      ctx.lineWidth = 1.0;
+      [L * 0.2, -L * 0.05, -L * 0.35].forEach(bx => {
+        ctx.beginPath();
+        ctx.ellipse(bx, 0, 3.2, Hw * 0.48, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      });
+
+      // Orange Tail
+      ctx.fillStyle = '#ea580c';
+      ctx.beginPath();
+      ctx.moveTo(-L * 0.48, 0);
+      ctx.lineTo(-L * 0.5 - 12, -9 + tailWiggle);
+      ctx.lineTo(-L * 0.5 - 9, 0);
+      ctx.lineTo(-L * 0.5 - 12, 9 + tailWiggle);
+      ctx.closePath();
+      ctx.fill();
+
+      // Eye
+      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(L * 0.32, -1.8, 2.2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(L * 0.32, -1.8, 1.3, 0, Math.PI * 2); ctx.fill();
     }
 
     ctx.restore();
@@ -1902,7 +1528,7 @@ class RealisticFish {
 }
 
 /* --------------------------------------------------------------------------
-   VISCERAL FISHING HOOK & SHARK BATTLE ENGINE
+   VISCERAL FISHING HOOK & TACKLE SYSTEM
    -------------------------------------------------------------------------- */
 class FishingHook {
   constructor() {
@@ -1912,270 +1538,99 @@ class FishingHook {
     this.targetY = this.y;
     this.startX = this.x;
     this.startY = 120;
-    this.state = 'IDLE'; // 'IDLE' | 'REELING' | 'BATTLING'
+    this.state = 'IDLE'; // 'IDLE' | 'REELING'
     this.active = true;
     this.fish = null;
     this.reelTime = 0;
-    this.reelDuration = 1.8;
+    this.reelDuration = 1.3;
     this.lastRatchet = 0;
-    this.struggleWiggle = 0;
-
-    // Advanced Shark Battle State
-    this.stamina = 1.0;
-    this.tension = 0.35;
-    this.battleTimer = 0;
-    this.isThrashing = false;
-    this.thrashTimer = 1.8;
-    this.overTensionTime = 0;
   }
 
   moveTo(x, y) {
+    if (this.state === 'REELING') return;
     this.targetX = x;
-    if (this.state === 'IDLE') {
-      this.targetY = Math.max(70, Math.min(H - 40, y));
-    }
+    this.targetY = Math.max(70, Math.min(H - 40, y));
   }
 
   catchFish(fish) {
     if (this.state !== 'IDLE' || !fish.alive) return;
+    this.state = 'REELING';
     this.fish = fish;
     fish.alive = false;
     fish.state = 'hooked';
     this.startX = this.x;
     this.startY = this.y;
 
-    const isBoss = (fish.species.role === 'boss');
-    const isTrophy = (fish.species.role === 'trophy');
+    // Apex Shark is a heavier pull, smaller fish is snappy
+    const isApex = (fish.species.role === 'apex');
+    this.reelDuration = isApex ? 1.75 : 1.25;
+    this.reelTime = 0;
 
-    if (isBoss || isTrophy) {
-      this.state = 'BATTLING';
-      this.stamina = 1.0;
-      this.tension = 0.35;
-      this.battleTimer = 0;
-      this.isThrashing = false;
-      this.thrashTimer = 1.6;
-      this.overTensionTime = 0;
+    sfx.hookPierce();
+    if (isApex) sfx.bigFishTug();
 
-      sfx.sharkRoar();
-      sfx.hookPierce();
-      sfx.bigFishTug();
-
-      battleHud.classList.add('active');
-      battleHud.classList.remove('critical');
-      battleTitle.textContent = `⚔️ ${fish.species.name.toUpperCase()} HOOKED!`;
-      battleHint.textContent = 'PULL UP / HOLD CLICK TO WINCH SHARK!';
-
-      for (let i = 0; i < 40; i++) {
-        bloodParticles.push(new BloodParticle(fish.x, fish.y));
-      }
-      floatingScores.push(new FloatingText(fish.x, fish.y - 20, `🔥 ${fish.species.name} HOOKED!`, '#ff4757'));
-    } else {
-      this.state = 'REELING';
-      const ratio = Math.min(1.0, Math.max(0, (fish.species.bodyL - 34) / 84));
-      this.reelDuration = 1.3 + ratio * 1.2;
-      this.reelTime = 0;
-
-      sfx.hookPierce();
-      for (let i = 0; i < 28; i++) {
-        bloodParticles.push(new BloodParticle(fish.x, fish.y));
-      }
-      floatingScores.push(new FloatingText(fish.x, fish.y - 18, 'HOOKED!', '#35f3df'));
-    }
-  }
-
-  deliverCatchToJellyDock() {
-    const f = this.fish;
-    if (!f) return;
-
-    sfx.surfaceBreach();
-
-    for (let i = 0; i < 28; i++) {
-      splashParticles.push(new SplashParticle(W * 0.5 + (Math.random() - 0.5) * 30, 72));
+    // Spawn 35 Arterial Blood Particles bursting outward from the mouth!
+    const mouthX = fish.x + fish.dir * (fish.species.bodyL * 0.46);
+    const mouthY = fish.y;
+    for (let i = 0; i < 35; i++) {
+      bloodParticles.push(new BloodParticle(mouthX, mouthY));
     }
 
-    const len = f.species.len[0] + Math.random() * (f.species.len[1] - f.species.len[0]);
-    const weight = Math.round(Math.pow(len, 2.7) * 0.16);
-    const item = { species: f.species, len, weight, points: f.species.basePoints };
-
-    catchBag.push(item);
-    score += item.points;
-    updateUI();
-
-    // DELIVER DIRECTLY INTO TOP ELASTIC JELLY TANK!
-    topJellyTank.gulpFish(item);
-
-    bagBtn.classList.remove('shake');
-    void bagBtn.offsetWidth;
-    bagBtn.classList.add('shake');
-
-    floatingScores.push(new FloatingText(W * 0.5 - 40, 95, `+${item.points} PTS!`, '#ffb732'));
-
-    battleHud.classList.remove('active', 'critical');
-    f.respawnTimer = 6.0;
-    this.fish = null;
-    this.state = 'IDLE';
-    this.targetY = 120;
+    floatingScores.push(new FloatingText(fish.x, fish.y - 18, `🎣 HOOKED ${fish.species.name}!`, isApex ? '#ff4757' : '#35f3df'));
   }
 
   update(dt, now) {
     if (this.state === 'IDLE') {
-      this.x += (this.targetX - this.x) * 0.24;
-      this.y += (this.targetY - this.y) * 0.24;
+      this.x += (this.targetX - this.x) * 0.25;
+      this.y += (this.targetY - this.y) * 0.25;
       return;
     }
 
-    // 1. ADVANCED SHARK TUG-OF-WAR BATTLE
-    if (this.state === 'BATTLING' && this.fish) {
-      this.battleTimer += dt;
-      this.thrashTimer -= dt;
-
-      if (this.thrashTimer <= 0) {
-        this.isThrashing = !this.isThrashing;
-        this.thrashTimer = this.isThrashing ? (1.3 + Math.random() * 1.2) : (1.6 + Math.random() * 1.4);
-        if (this.isThrashing) {
-          sfx.dragScreech();
-        }
-      }
-
-      const isPlayerPulling = isPointerDown || (this.targetY < this.y - 4);
-
-      if (this.isThrashing) {
-        // SHARK FRENZY SURGE
-        const diveSpeed = (this.fish.species.role === 'boss') ? 160 : 110;
-        this.y = Math.min(H - 60, this.y + diveSpeed * dt);
-        this.struggleWiggle = Math.sin(now * 0.035) * 16;
-        this.x = W * 0.5 + this.struggleWiggle;
-
-        if (isPlayerPulling) {
-          this.tension = Math.min(1.0, this.tension + 0.65 * dt);
-        } else {
-          this.tension = Math.max(0.3, this.tension - 0.28 * dt);
-        }
-
-        battleHint.textContent = '⚠️ SHARK THRASHING! EASE OFF TO PREVENT SNAP!';
-        battleHint.style.color = '#ff4757';
-      } else {
-        // EXHAUSTION / REEL WINDOW
-        this.struggleWiggle = Math.sin(now * 0.015) * 6;
-        this.x = W * 0.5 + this.struggleWiggle;
-
-        if (isPlayerPulling) {
-          const winchSpeed = 95;
-          this.y = Math.max(75, this.y - winchSpeed * dt);
-          this.stamina = Math.max(0, this.stamina - 0.38 * dt);
-          this.tension = Math.min(0.84, this.tension + 0.22 * dt);
-
-          if (now - this.lastRatchet > 110) {
-            sfx.reelRatchet();
-            this.lastRatchet = now;
-          }
-        } else {
-          this.tension = Math.max(0.2, this.tension - 0.35 * dt);
-        }
-
-        battleHint.textContent = '🎣 SHARK EXHAUSTED! DRAG UP / HOLD CLICK TO WINCH!';
-        battleHint.style.color = '#35f3df';
-      }
-
-      // Update battle HUD
-      staminaFill.style.width = `${Math.round(this.stamina * 100)}%`;
-      battleStaminaVal.textContent = `STAMINA: ${Math.round(this.stamina * 100)}%`;
-      tensionFill.style.width = `${Math.round(this.tension * 100)}%`;
-
-      if (this.tension > 0.88) {
-        battleHud.classList.add('critical');
-        tensionLabel.textContent = 'CRITICAL OVER-TENSION!';
-        tensionLabel.style.color = '#ff4757';
-        this.overTensionTime += dt;
-
-        if (this.overTensionTime > 1.35) {
-          sfx.snap();
-          floatingScores.push(new FloatingText(this.x, this.y, '💥 LINE SNAPPED! SHARK ESCAPED!', '#ff0033'));
-
-          const f = this.fish;
-          f.alive = true;
-          f.state = 'cruise';
-          f.speed = f.baseSpeed * 2.8;
-          f.angle = Math.PI * 0.5;
-
-          battleHud.classList.remove('active', 'critical');
-          this.state = 'IDLE';
-          this.fish = null;
-          return;
-        }
-      } else {
-        battleHud.classList.remove('critical');
-        tensionLabel.textContent = (this.tension > 0.6) ? 'HIGH' : 'NORMAL';
-        tensionLabel.style.color = (this.tension > 0.6) ? '#ffb732' : '#35f3df';
-        this.overTensionTime = Math.max(0, this.overTensionTime - dt * 2);
-      }
-
-      // Lock fish to hook
-      const f = this.fish;
-      f.x = this.x;
-      f.y = this.y + 10;
-      f.angle = -Math.PI * 0.5 + Math.sin(now * 0.02) * 0.3;
-      f.targetAngle = f.angle;
-      f.swimPhase += 35 * dt;
-
-      f.spine[0].x = f.x;
-      f.spine[0].y = f.y;
-      for (let i = 1; i < f.numSegs; i++) {
-        const prev = f.spine[i - 1];
-        const cur = f.spine[i];
-        const tailWiggle = Math.sin(f.swimPhase - i * 0.6) * (6 + i * 2.5);
-        cur.x = prev.x + tailWiggle;
-        cur.y = prev.y + f.segDist;
-      }
-
-      if (Math.random() < 0.6) bubbleParticles.push(new BubbleParticle(f.x, f.y + 10));
-      if (Math.random() < 0.2) bloodParticles.push(new BloodParticle(f.x, f.y));
-
-      if (this.y <= 85 || this.stamina <= 0.02) {
-        this.deliverCatchToJellyDock();
-      }
-      return;
-    }
-
-    // 2. STANDARD REELING DIRECTLY INTO TOP JELLY INTAKE PORT
     if (this.state === 'REELING' && this.fish) {
       this.reelTime += dt;
       const progress = Math.min(1.0, this.reelTime / this.reelDuration);
-      const ease = 1 - Math.pow(1 - progress, 2);
-      const targetDockY = 78;
 
-      this.y = this.startY + (targetDockY - this.startY) * ease;
-      this.struggleWiggle = Math.sin(now * 0.025) * (7 + (1 - progress) * 10);
-      this.x = W * 0.5 + (this.startX - W * 0.5) * (1 - ease) + this.struggleWiggle;
+      // Smooth mechanical winch pull up to surface
+      const ease = 1 - Math.pow(1 - progress, 2);
+      const targetSurfaceY = 68;
+      this.y = this.startY + (targetSurfaceY - this.startY) * ease;
+
+      const struggleWiggle = Math.sin(now * 0.025) * (6 + (1 - progress) * 8);
+      this.x = this.startX + struggleWiggle;
 
       if (now - this.lastRatchet > 105) {
         sfx.reelRatchet();
         this.lastRatchet = now;
       }
 
+      // Lock fish to hook mouth-first
       const f = this.fish;
-      f.x = this.x;
-      f.y = this.y + 6;
-      f.angle = -Math.PI * 0.5 + Math.sin(now * 0.02) * 0.35;
-      f.targetAngle = f.angle;
-      f.speed = 0;
-      f.swimPhase += 32 * dt;
+      f.x = this.x - f.dir * (f.species.bodyL * 0.45);
+      f.y = this.y + 4;
+      f.swimPhase += 32 * dt; // Frantic struggle wiggling
 
-      f.spine[0].x = f.x;
-      f.spine[0].y = f.y;
-      for (let i = 1; i < f.numSegs; i++) {
-        const prev = f.spine[i - 1];
-        const cur = f.spine[i];
-        const tailWiggle = Math.sin(f.swimPhase - i * 0.65) * (4 + i * 2.0);
-        cur.x = prev.x + tailWiggle;
-        cur.y = prev.y + f.segDist;
+      if (Math.random() < 0.4) {
+        bubbleParticles.push(new BubbleParticle(f.x, f.y + 6));
+      }
+      if (Math.random() < 0.16) {
+        bloodParticles.push(new BloodParticle(this.x, this.y + 2));
       }
 
-      if (Math.random() < 0.45) bubbleParticles.push(new BubbleParticle(f.x, f.y + 8));
-      if (Math.random() < 0.16) bloodParticles.push(new BloodParticle(f.x, f.y));
+      // Surface Breach & Flight into Side Box!
+      if (progress >= 1.0 || this.y <= 70) {
+        sfx.surfaceBreach();
 
-      if (progress >= 1.0 || this.y <= 80) {
-        this.deliverCatchToJellyDock();
+        for (let i = 0; i < 28; i++) {
+          splashParticles.push(new SplashParticle(this.x, 68));
+        }
+
+        // Launch majestic leap into the Side Catch Tank!
+        leapingFishes.push(new LeapingFish(this.fish, this.x, 68));
+
+        this.fish.respawnTimer = 5.0;
+        this.fish = null;
+        this.state = 'IDLE';
+        this.targetY = 120;
       }
     }
   }
@@ -2183,26 +1638,17 @@ class FishingHook {
   draw(ctx, now) {
     const rodX = W * 0.5;
     const rodY = 0;
-    const isBattling = (this.state === 'BATTLING');
     const isReeling = (this.state === 'REELING');
 
+    // Flexible Fishing Line
     ctx.save();
-    if (isBattling) {
-      ctx.strokeStyle = (this.tension > 0.85) ? '#ff4757' : (this.tension > 0.6 ? '#ffb732' : '#35f3df');
-      ctx.lineWidth = 3.0;
-    } else if (isReeling) {
-      ctx.strokeStyle = 'rgba(255, 183, 50, 0.95)';
-      ctx.lineWidth = 2.4;
-    } else {
-      ctx.strokeStyle = 'rgba(235, 255, 250, 0.65)';
-      ctx.lineWidth = 1.3;
-    }
-
+    ctx.strokeStyle = isReeling ? 'rgba(255, 183, 50, 0.95)' : 'rgba(235, 255, 250, 0.65)';
+    ctx.lineWidth = isReeling ? 2.6 : 1.3;
     ctx.beginPath();
     ctx.moveTo(rodX, rodY);
 
-    if (isBattling || isReeling) {
-      const hum = Math.sin(now * 0.08) * (isBattling ? 2.5 : 1.5);
+    if (isReeling) {
+      const hum = Math.sin(now * 0.08) * 1.6;
       ctx.lineTo(this.x + hum, this.y);
     } else {
       const midX = (rodX + this.x) * 0.5;
@@ -2215,9 +1661,10 @@ class FishingHook {
     ctx.save();
     ctx.translate(this.x, this.y);
 
-    if ((isBattling || isReeling) && this.fish) {
+    if (isReeling && this.fish) {
+      // Hook penetrating mouth
       ctx.strokeStyle = '#e2e8f0';
-      ctx.lineWidth = (isBattling ? 3.6 : 3.0);
+      ctx.lineWidth = 3.2;
       ctx.beginPath();
       ctx.moveTo(0, -14);
       ctx.lineTo(0, 4);
@@ -2229,18 +1676,15 @@ class FishingHook {
       ctx.lineTo(-11, 0);
       ctx.stroke();
 
-      // Sharp Barb tip with blood
+      // Sharp Barb tip with blood drop
       ctx.fillStyle = '#dc2626';
-      ctx.beginPath();
-      ctx.arc(-11, 0, 2.6, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(-11, 0, 2.6, 0, Math.PI * 2); ctx.fill();
 
-      // Puncture wound dot
-      ctx.fillStyle = '#b91c1c';
-      ctx.beginPath();
-      ctx.arc(0, 3, 3.0, 0, Math.PI * 2);
-      ctx.fill();
+      // Wound puncture dot
+      ctx.fillStyle = '#991b1b';
+      ctx.beginPath(); ctx.arc(0, 3, 3.0, 0, Math.PI * 2); ctx.fill();
     } else {
+      // Normal hook with wiggling bait worm
       ctx.strokeStyle = '#cbd5e1';
       ctx.lineWidth = 2.4;
       ctx.beginPath();
@@ -2250,11 +1694,8 @@ class FishingHook {
       ctx.lineTo(-8, 1);
       ctx.stroke();
 
-      // Red bait worm
       ctx.fillStyle = '#ff4757';
-      ctx.beginPath();
-      ctx.arc(-2, 4, 3.5, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(-2, 4, 3.5, 0, Math.PI * 2); ctx.fill();
     }
 
     ctx.restore();
@@ -2266,6 +1707,7 @@ class FishingHook {
    SIMULATION RUNTIME & ENTITY ARRAYS
    -------------------------------------------------------------------------- */
 let fishes = [];
+let leapingFishes = [];
 let floatingScores = [];
 let pellets = [];
 let bloodParticles = [];
@@ -2289,25 +1731,14 @@ function initWorld() {
 }
 window.addEventListener('resize', initWorld);
 
-// Pointer drag & casting listeners
+// Pointer drag & casting
 canvas.addEventListener('pointerdown', e => {
   initAudio();
-  isPointerDown = true;
-  lastPointerY = e.clientY;
   hook.moveTo(e.clientX, e.clientY);
 });
 canvas.addEventListener('pointermove', e => {
-  if (isPointerDown && e.clientY < lastPointerY) {
-    // Winch pull upward motion
-    if (hook.state === 'BATTLING') {
-      hook.y = Math.max(75, hook.y - (lastPointerY - e.clientY));
-    }
-  }
-  lastPointerY = e.clientY;
   hook.moveTo(e.clientX, e.clientY);
 });
-window.addEventListener('pointerup', () => { isPointerDown = false; });
-window.addEventListener('pointercancel', () => { isPointerDown = false; });
 
 feedBtn.addEventListener('click', () => {
   initAudio();
@@ -2375,11 +1806,11 @@ function animate(now) {
 
   // 4. Fishes & Apex Sharks
   fishes.forEach(f => {
-    f.update(dt, hook, fishes, pellets);
+    f.update(dt, hook, pellets);
     f.draw(ctx);
   });
 
-  // 5. Blood Particles
+  // 5. Blood Particles (Vivid Arterial Plumes)
   for (let i = bloodParticles.length - 1; i >= 0; i--) {
     const bp = bloodParticles[i];
     bp.update(dt);
@@ -2403,11 +1834,19 @@ function animate(now) {
     if (!sp.alive) splashParticles.splice(i, 1);
   }
 
-  // 8. Fishing Hook, Reeling & Shark Battle
+  // 8. Fishing Hook & Reeling Line
   hook.update(dt, now);
   hook.draw(ctx, now);
 
-  // 9. Floating Scores
+  // 9. Leaping Fishes Flying into Side Catch Tank
+  for (let i = leapingFishes.length - 1; i >= 0; i--) {
+    const lf = leapingFishes[i];
+    lf.update(dt);
+    lf.draw();
+    if (!lf.alive) leapingFishes.splice(i, 1);
+  }
+
+  // 10. Floating Scores
   for (let i = floatingScores.length - 1; i >= 0; i--) {
     const fs = floatingScores[i];
     fs.update(dt);
@@ -2415,8 +1854,8 @@ function animate(now) {
     if (fs.life <= 0) floatingScores.splice(i, 1);
   }
 
-  // 10. Top Elastic Jelly Live Dock Rendering
-  topJellyTank.updateAndDraw(dt);
+  // 11. Side Catch Aquarium Tank Rendering
+  sideCatchTank.updateAndDraw(dt);
 
   requestAnimationFrame(animate);
 }
@@ -2425,7 +1864,6 @@ function animate(now) {
 initWorld();
 updateUI();
 requestAnimationFrame(animate);
-
 </script>
 </body>
 </html>
