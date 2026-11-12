@@ -6,7 +6,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 
 ---
 
-## 🎮 The 7 Experiments
+## 🎮 The 8 Experiments
 
 | # | Experiment | Technology | Highlights |
 |---|---|---|---|
@@ -17,6 +17,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 | **05** | [**Quantum & Ultimate Tic Tac Toe**](tictactoe.html) | Minimax Engine, Alpha-Beta, Web Audio | Ultimate 9x9 Super Board where moves dictate the opponent's active quadrant, plus Classic 3x3 with a live Minimax Advantage Meter (+5.0 eval bar), real-time cyber AI commentary, hint engine, and laser win lines. |
 | **06** | [**NeuroLife 3D: Neural Evolution Simulator**](neuro.html) | Three.js WebGL, Real Neural Networks | 3D artificial life ecosystem powered by genuine feedforward neural networks (8 inputs, 8 hidden, 3 motor outputs). Inspect live firing neurons and synapses in real-time, trigger cosmic mutations, inject apex predators, or possess ("Mind-Jack") any organism directly. |
 | **07** | [**Royal Carrom Club 3D: Master Board Lounge**](carrom.html) | Three.js WebGL, 2D Disk Physics | Luxury 3D Indian Rosewood Carrom Board with regulation snug pockets, 1P-4P local multiplayer, dynamic player-seat camera, real Carrom extra-shot rules, talcum powder glide, and acoustic wooden clacks. |
+| **08** | [**Slingshot Smash: Antique Tabletop Alley**](smash.html) | Canvas 2D, 120Hz Sub-step Physics | Ultra-smooth physical destruction toy sharing the beloved tactile slingshot feel of Slingshot Lamp. Shatter crystal bottles, trigger domino cascades, ring tuned pentatonic brass bells, and fire river pebbles, steel bearings, glowing orbs, or superballs. |
 
 ---
 

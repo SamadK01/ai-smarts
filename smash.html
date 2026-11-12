@@ -1,0 +1,1267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Slingshot Smash — Antique Tabletop Physics Alley</title>
+<meta name="description" content="An ultra-smooth 120Hz tactile slingshot physics toy: smash crystal glass bottles, topple wooden domino towers, ring resonant brass chime bells, and trigger chain reactions.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@700;800&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07080c;
+    --panel: rgba(14, 16, 24, 0.92);
+    --border: rgba(230, 184, 74, 0.32);
+    --gold: #ffbe3b;
+    --amber: #e69224;
+    --cyan: #00f0ff;
+    --text: #f0f4f8;
+    --muted: rgba(240, 244, 248, 0.55);
+    --mono: "Geist Mono", ui-monospace, monospace;
+    --display: "Funnel Display", sans-serif;
+    --body: "Bricolage Grotesque", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: var(--bg); color: var(--text);
+    font-family: var(--body); touch-action: none;
+  }
+
+  canvas {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    display: block; cursor: default;
+  }
+
+  /* TOP HUD */
+  .hud-top {
+    position: fixed; top: 16px; left: 18px; right: 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 30; pointer-events: none; gap: 12px;
+  }
+  .hud-top > * { pointer-events: auto; }
+
+  .brand-group { display: flex; align-items: center; gap: 10px; }
+  .home-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 7px 15px; border-radius: 999px; color: var(--text);
+    text-decoration: none; font: 600 12px/1 var(--body);
+    backdrop-filter: blur(16px); transition: all 0.2s;
+  }
+  .home-btn:hover { border-color: var(--gold); color: #fff; transform: translateY(-1px); }
+  .home-btn span { color: var(--gold); font-weight: 700; }
+
+  .alley-tag {
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 6px 14px; border-radius: 999px; backdrop-filter: blur(16px);
+    display: flex; align-items: center; gap: 7px; font: 500 11px/1 var(--mono); color: var(--muted);
+  }
+  .alley-tag b { color: var(--gold); font-weight: 700; }
+
+  /* STAGE TABS */
+  .stage-tabs {
+    display: flex; gap: 4px; background: var(--panel);
+    border: 1px solid var(--border); padding: 4px; border-radius: 999px;
+    backdrop-filter: blur(16px);
+  }
+  .stage-tab {
+    background: transparent; border: 0; color: var(--muted);
+    font: 600 11px/1 var(--body); padding: 6px 12px; border-radius: 999px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .stage-tab:hover { color: #fff; }
+  .stage-tab.active {
+    background: linear-gradient(135deg, rgba(230, 184, 74, 0.35), rgba(198, 146, 40, 0.2));
+    border: 1px solid var(--gold); color: #fff; box-shadow: 0 0 12px rgba(230, 184, 74, 0.35);
+  }
+
+  /* TOP STATS BANNER */
+  .stats-banner {
+    position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 6px 20px; border-radius: 999px; backdrop-filter: blur(18px);
+    display: flex; align-items: center; gap: 16px; z-index: 25;
+    font: 600 11px/1 var(--mono); box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+  }
+  .stat-pill { display: flex; align-items: center; gap: 5px; }
+  .stat-pill b { color: var(--gold); font-weight: 700; font-size: 13px; }
+
+  /* TOP RIGHT UTILITY BUTTONS */
+  .top-tools { display: flex; align-items: center; gap: 6px; }
+  .tool-btn {
+    background: var(--panel); border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 7px 13px; border-radius: 999px; color: var(--text);
+    font: 600 11px/1 var(--body); cursor: pointer; backdrop-filter: blur(16px);
+    transition: all 0.2s; display: flex; align-items: center; gap: 5px;
+  }
+  .tool-btn:hover { background: rgba(255, 255, 255, 0.16); border-color: var(--gold); color: #fff; }
+  .tool-btn.active { background: rgba(0, 240, 255, 0.25); border-color: var(--cyan); color: #fff; }
+
+  /* BOTTOM CONSOLE: AMMO SELECTOR */
+  .ammo-dock {
+    position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 8px 18px; border-radius: 999px; backdrop-filter: blur(20px);
+    display: flex; align-items: center; gap: 10px; z-index: 35;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.85);
+  }
+  .ammo-label { font: 700 10px/1 var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .ammo-btn {
+    background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 7px 14px; border-radius: 999px; color: var(--muted);
+    font: 600 11px/1 var(--mono); cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .ammo-btn:hover { color: #fff; border-color: var(--gold); background: rgba(255, 255, 255, 0.12); }
+  .ammo-btn.active {
+    background: linear-gradient(135deg, rgba(255, 190, 59, 0.3), rgba(230, 146, 36, 0.15));
+    border: 1px solid var(--gold); color: #fff; box-shadow: 0 0 12px rgba(255, 190, 59, 0.35);
+  }
+
+  /* ONBOARDING INSTRUCTION HINT */
+  .slingshot-hint {
+    position: fixed; bottom: 78px; left: 50%; transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.78); border: 1px solid rgba(255, 190, 59, 0.35);
+    padding: 7px 22px; border-radius: 999px; pointer-events: none;
+    font: 600 11px/1.4 var(--mono); color: var(--muted); backdrop-filter: blur(10px);
+    z-index: 25; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  }
+  .slingshot-hint b { color: var(--gold); }
+  .slingshot-hint span { color: var(--cyan); }
+
+  /* FLOATING HIT TOAST */
+  .toast {
+    position: fixed; top: 116px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: rgba(12, 16, 26, 0.96); border: 1px solid var(--gold);
+    color: #fff; padding: 9px 22px; border-radius: 999px;
+    font: 700 12px/1 var(--mono); backdrop-filter: blur(16px);
+    opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 40; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  @media (max-width: 900px) {
+    .hud-top { flex-direction: column; gap: 8px; align-items: flex-start; }
+    .stage-tabs { align-self: center; }
+    .ammo-dock { width: calc(100% - 24px); padding: 7px 12px; gap: 6px; flex-wrap: wrap; justify-content: center; }
+    .ammo-btn { padding: 6px 10px; font-size: 10px; }
+    .stats-banner { top: 120px; font-size: 10px; gap: 10px; padding: 5px 14px; }
+    .slingshot-hint { bottom: 120px; font-size: 10px; padding: 5px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stage"></canvas>
+
+<!-- TOP HUD -->
+<header class="hud-top">
+  <div class="brand-group">
+    <a href="index.html" class="home-btn">← <span>AI Smarts</span></a>
+    <div class="alley-tag">
+      <span>🎪 <b>Antique Shooting Alley</b> · 120Hz Physics</span>
+    </div>
+  </div>
+
+  <!-- Stage Presets -->
+  <div class="stage-tabs">
+    <button class="stage-tab active" id="stg-pyramid">🍾 Bottles</button>
+    <button class="stage-tab" id="stg-domino">🧱 Dominoes</button>
+    <button class="stage-tab" id="stg-chimes">🔔 Chime Bells</button>
+    <button class="stage-tab" id="stg-carnival">🎪 Grand Carnival</button>
+  </div>
+
+  <!-- Tools -->
+  <div class="top-tools">
+    <button class="tool-btn" id="slowmo-btn">⏱️ Slow-Mo: OFF</button>
+    <button class="tool-btn" id="reset-btn">🔄 Reset Shelf</button>
+    <button class="tool-btn" id="sound-btn">🔊 Sound: ON</button>
+  </div>
+</header>
+
+<!-- STATS BANNER -->
+<div class="stats-banner">
+  <div class="stat-pill">Score: <b id="stat-score">0</b></div>
+  <div class="stat-pill">Smashed: <b id="stat-smashed">0</b></div>
+  <div class="stat-pill">Chimes: <b id="stat-chimes">0</b></div>
+  <div class="stat-pill">Shots: <b id="stat-shots">0</b></div>
+</div>
+
+<!-- INSTRUCTION HINT -->
+<div class="slingshot-hint" id="slingshot-hint">
+  🏹 <b>Pull back the slingshot pouch & release</b> · Grab any bottle or bell directly to toss it!
+</div>
+
+<!-- AMMO DOCK -->
+<nav class="ammo-dock">
+  <span class="ammo-label">Ammo:</span>
+  <button class="ammo-btn active" id="ammo-pebble"><span>🪨</span> Pebble</button>
+  <button class="ammo-btn" id="ammo-steel"><span>⚡</span> Steel Bearing</button>
+  <button class="ammo-btn" id="ammo-glow"><span>🔮</span> Glow Orb</button>
+  <button class="ammo-btn" id="ammo-bouncer"><span>💣</span> Superball</button>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast">🍾 Direct Hit! Glass Shattered (+50 pts)</div>
+
+<script>
+/* ==========================================================================
+   AUTHENTIC PROCEDURAL ACOUSTICS (WEB AUDIO API)
+   ========================================================================== */
+class AlleyAudio {
+  constructor() {
+    this.ctx = null;
+    this.enabled = true;
+    this.noise = null;
+  }
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) {
+        this.ctx = new AudioCtx();
+        this.noise = this.ctx.createBuffer(1, this.ctx.sampleRate, this.ctx.sampleRate);
+        const d = this.noise.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      }
+    }
+    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+  }
+
+  // Slingshot Leather Pouch Snap
+  snap(power = 1.0) {
+    if (!this.enabled || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(320, now);
+    osc.frequency.exponentialRampToValueAtTime(50, now + 0.04);
+    g.gain.setValueAtTime(0.2 * power, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+    osc.connect(g); g.connect(this.ctx.destination);
+    osc.start(now); osc.stop(now + 0.055);
+
+    // Band whoosh
+    const src = this.ctx.createBufferSource();
+    src.buffer = this.noise;
+    const f = this.ctx.createBiquadFilter();
+    f.type = 'bandpass'; f.frequency.value = 1800; f.Q.value = 2.5;
+    const g2 = this.ctx.createGain();
+    g2.gain.setValueAtTime(0.08 * power, now);
+    g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+    src.connect(f); f.connect(g2); g2.connect(this.ctx.destination);
+    src.start(now); src.stop(now + 0.07);
+  }
+
+  // Rubber Band Pull Creak
+  creak() {
+    if (!this.enabled || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(120 + Math.random() * 60, now);
+    osc.frequency.exponentialRampToValueAtTime(80, now + 0.03);
+    g.gain.setValueAtTime(0.025, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.03);
+    osc.connect(g); g.connect(this.ctx.destination);
+    osc.start(now); osc.stop(now + 0.035);
+  }
+
+  // Glass Bottle Shatter (Crisp high-frequency cluster + noise crunch)
+  glassShatter(strength = 1.0) {
+    if (!this.enabled || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const s = Math.min(1.5, Math.max(0.3, strength));
+
+    // High crystalline pings
+    [2400, 3100, 4200, 5600].forEach((freq, idx) => {
+      const osc = this.ctx.createOscillator();
+      const g = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq + Math.random() * 300, now + idx * 0.004);
+      osc.frequency.exponentialRampToValueAtTime(900, now + 0.08);
+      g.gain.setValueAtTime(0.12 * s, now + idx * 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+      osc.connect(g); g.connect(this.ctx.destination);
+      osc.start(now + idx * 0.004); osc.stop(now + 0.13);
+    });
+
+    // Crunch noise
+    const src = this.ctx.createBufferSource();
+    src.buffer = this.noise;
+    const f = this.ctx.createBiquadFilter();
+    f.type = 'highpass'; f.frequency.value = 2200;
+    const gNoise = this.ctx.createGain();
+    gNoise.gain.setValueAtTime(0.18 * s, now);
+    gNoise.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+    src.connect(f); f.connect(gNoise); gNoise.connect(this.ctx.destination);
+    src.start(now); src.stop(now + 0.18);
+  }
+
+  // Wooden Domino / Brick Clack
+  woodClack(vel = 1.0) {
+    if (!this.enabled || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const v = Math.min(2.0, Math.max(0.1, vel));
+    const osc = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(900 + Math.random() * 250, now);
+    osc.frequency.exponentialRampToValueAtTime(220, now + 0.025);
+    g.gain.setValueAtTime(Math.min(0.24, 0.05 + v * 0.1), now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+    osc.connect(g); g.connect(this.ctx.destination);
+    osc.start(now); osc.stop(now + 0.04);
+  }
+
+  // Tuned Brass Bell Musical Chime (Harmonious Pentatonic Scale)
+  bellChime(pitchIndex = 0) {
+    if (!this.enabled || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const scale = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50]; // C5, D5, E5, G5, A5, C6
+    const baseFreq = scale[pitchIndex % scale.length];
+
+    [1, 2.76, 5.4].forEach((harmonic, idx) => {
+      const osc = this.ctx.createOscillator();
+      const g = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(baseFreq * harmonic, now);
+      const vol = (idx === 0 ? 0.25 : 0.08);
+      g.gain.setValueAtTime(vol, now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.9 + idx * 0.2);
+      osc.connect(g); g.connect(this.ctx.destination);
+      osc.start(now); osc.stop(now + 1.2);
+    });
+  }
+
+  // Metal Ricochet Ping
+  metalPing() {
+    if (!this.enabled || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1800, now);
+    osc.frequency.exponentialRampToValueAtTime(4200, now + 0.06);
+    g.gain.setValueAtTime(0.12, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+    osc.connect(g); g.connect(this.ctx.destination);
+    osc.start(now); osc.stop(now + 0.1);
+  }
+}
+const sfx = new AlleyAudio();
+document.body.addEventListener('pointerdown', () => sfx.init(), { once: true });
+document.body.addEventListener('keydown', () => sfx.init(), { once: true });
+
+/* ==========================================================================
+   2D 120HZ SUB-STEP PHYSICS ENGINE (BOTTLES, BRICKS, BELLS & SLINGSHOT)
+   ========================================================================== */
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+
+let W = window.innerWidth;
+let H = window.innerHeight;
+let DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+const G = 1750; // Gravity
+let timeScale = 1.0; // 1.0 = normal, 0.3 = slow-mo
+
+// Score & Stats
+let score = 0;
+let smashedCount = 0;
+let chimesCount = 0;
+let shotsCount = 0;
+let currentStage = 'pyramid'; // 'pyramid' | 'domino' | 'chimes' | 'carnival'
+let currentAmmoType = 'pebble'; // 'pebble' | 'steel' | 'glow' | 'bouncer'
+
+// Slingshot State
+const slingshot = {
+  x: 180, y: 0,
+  forkL: { x: 0, y: 0 },
+  forkR: { x: 0, y: 0 },
+  rest: { x: 0, y: 0 },
+  pouch: { x: 0, y: 0 },
+  vel: { x: 0, y: 0 },
+  isLoaded: true,
+  maxPull: 135,
+  launchMult: 13.5
+};
+
+// Physical World Objects
+let projectiles = [];
+let bottles = [];
+let dominoes = [];
+let bells = [];
+let shards = [];
+let sparks = [];
+let shelves = [];
+
+// Drag & Interaction State
+let activeGrab = null; // { type: 'slingshot' | 'domino' | 'bottle' | 'bell', item, offset }
+let lastMousePos = { x: 0, y: 0 };
+let lastCreakTime = 0;
+
+/* ==========================================================================
+   PHYSICAL ENTITY CLASSES
+   ========================================================================== */
+// 1. Crystal Glass Bottle
+class GlassBottle {
+  constructor(x, y, color = '#2dd4bf') {
+    this.x = x; this.y = y;
+    this.w = 26; this.h = 64;
+    this.vx = 0; this.vy = 0;
+    this.angle = 0; this.vAngle = 0;
+    this.color = color;
+    this.isBroken = false;
+    this.health = 1.0;
+  }
+  shatter(impactVel) {
+    if (this.isBroken) return;
+    this.isBroken = true;
+    smashedCount++;
+    score += 50;
+    updateStatsHUD();
+    sfx.glassShatter(impactVel / 400);
+    showToast('🍾 Glass Bottle Shattered (+50 pts)!');
+
+    // Spawn 22 realistic flying glass shards
+    for (let i = 0; i < 22; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const spd = 60 + Math.random() * (impactVel * 0.7);
+      shards.push({
+        x: this.x + (Math.random() - 0.5) * this.w,
+        y: this.y + (Math.random() - 0.5) * this.h,
+        vx: Math.cos(ang) * spd + this.vx * 0.3,
+        vy: Math.sin(ang) * spd - 60,
+        angle: Math.random() * Math.PI * 2,
+        vAngle: (Math.random() - 0.5) * 16,
+        size: 3 + Math.random() * 6,
+        color: this.color,
+        life: 1.0
+      });
+    }
+  }
+}
+
+// 2. Wooden Domino Brick
+class DominoBrick {
+  constructor(x, y, w = 14, h = 60, color = '#d97706') {
+    this.x = x; this.y = y;
+    this.w = w; this.h = h;
+    this.vx = 0; this.vy = 0;
+    this.angle = 0; this.vAngle = 0;
+    this.color = color;
+    this.isSleeping = false;
+  }
+}
+
+// 3. Resonant Brass Chime Bell (Hanging Pendulum)
+class ChimeBell {
+  constructor(ax, ay, len = 110, pitchIdx = 0) {
+    this.ax = ax; this.ay = ay;
+    this.len = len;
+    this.theta = 0; this.omega = 0;
+    this.r = 22;
+    this.pitchIdx = pitchIdx;
+    this.lastDing = 0;
+  }
+  strike(impulse) {
+    this.omega += impulse * 0.003;
+    const now = Date.now();
+    if (now - this.lastDing > 120) {
+      sfx.bellChime(this.pitchIdx);
+      chimesCount++;
+      score += 25;
+      updateStatsHUD();
+      this.lastDing = now;
+      showToast('🔔 Tuned Brass Bell Chimed (+25 pts)!');
+    }
+  }
+  getPos() {
+    return {
+      x: this.ax + Math.sin(this.theta) * this.len,
+      y: this.ay + Math.cos(this.theta) * this.len
+    };
+  }
+}
+
+// 4. Projectile (Pebble, Steel, Glow, Bouncer)
+class Projectile {
+  constructor(x, y, vx, vy, type = 'pebble') {
+    this.x = x; this.y = y;
+    this.vx = vx; this.vy = vy;
+    this.type = type;
+    this.trail = [];
+    this.bounces = 0;
+    this.alive = true;
+
+    if (type === 'steel') {
+      this.r = 8; this.mass = 3.5; this.restitution = 0.55; this.color = '#cbd5e1';
+    } else if (type === 'glow') {
+      this.r = 9; this.mass = 1.8; this.restitution = 0.7; this.color = '#38bdf8';
+    } else if (type === 'bouncer') {
+      this.r = 8; this.mass = 1.2; this.restitution = 0.92; this.color = '#f43f5e';
+    } else {
+      // Pebble
+      this.r = 7.5; this.mass = 2.0; this.restitution = 0.6; this.color = '#e2e8f0';
+    }
+  }
+}
+
+/* ==========================================================================
+   STAGE / SHELF GENERATOR
+   ========================================================================== */
+function buildStage(stageName) {
+  currentStage = stageName;
+  projectiles = [];
+  bottles = [];
+  dominoes = [];
+  bells = [];
+  shards = [];
+  sparks = [];
+
+  // Update tabs
+  document.querySelectorAll('.stage-tab').forEach(b => b.classList.remove('active'));
+  const t = document.getElementById(`stg-${stageName}`);
+  if (t) t.classList.add('active');
+
+  const shelfX = W * 0.52;
+  const shelfW = Math.min(680, W * 0.55);
+
+  shelves = [
+    { x: shelfX, y: H * 0.42, w: shelfW, h: 16 },
+    { x: shelfX, y: H * 0.68, w: shelfW, h: 16 }
+  ];
+
+  if (stageName === 'pyramid') {
+    // Stage 1: Pyramid of Glass Bottles on lower and upper shelves
+    const colors = ['#2dd4bf', '#38bdf8', '#fbbf24', '#f87171', '#a78bfa'];
+
+    // Lower Shelf: 6 Bottles
+    const startX1 = shelves[1].x - shelfW * 0.38;
+    for (let i = 0; i < 6; i++) {
+      bottles.push(new GlassBottle(startX1 + i * 55, shelves[1].y - 32, colors[i % colors.length]));
+    }
+
+    // Upper Shelf: 4 Bottles + 1 Top
+    const startX0 = shelves[0].x - shelfW * 0.28;
+    for (let i = 0; i < 4; i++) {
+      bottles.push(new GlassBottle(startX0 + i * 55, shelves[0].y - 32, colors[(i + 2) % colors.length]));
+    }
+    // 2 Chime bells overhead
+    bells.push(new ChimeBell(shelves[0].x - 120, H * 0.14, 110, 0));
+    bells.push(new ChimeBell(shelves[0].x + 120, H * 0.14, 110, 2));
+
+  } else if (stageName === 'domino') {
+    // Stage 2: Dense Domino Run on both shelves with glass targets at the ends
+    const startX1 = shelves[1].x - shelfW * 0.44;
+    for (let i = 0; i < 14; i++) {
+      dominoes.push(new DominoBrick(startX1 + i * 36, shelves[1].y - 30, 14, 60, i % 2 === 0 ? '#d97706' : '#b45309'));
+    }
+    bottles.push(new GlassBottle(shelves[1].x + shelfW * 0.42, shelves[1].y - 32, '#fbbf24'));
+
+    const startX0 = shelves[0].x - shelfW * 0.35;
+    for (let i = 0; i < 9; i++) {
+      dominoes.push(new DominoBrick(startX0 + i * 36, shelves[0].y - 30, 14, 60, '#eab308'));
+    }
+    bottles.push(new GlassBottle(shelves[0].x + shelfW * 0.32, shelves[0].y - 32, '#2dd4bf'));
+
+  } else if (stageName === 'chimes') {
+    // Stage 3: Row of 5 Tuned Brass Chimes (Pentatonic Scale)
+    const bellSpacing = shelfW / 6;
+    for (let i = 0; i < 5; i++) {
+      bells.push(new ChimeBell(shelves[0].x - shelfW * 0.38 + i * bellSpacing, H * 0.14, 100 + (i % 3) * 18, i));
+    }
+    // Tumbling blocks on lower shelf
+    const startX1 = shelves[1].x - shelfW * 0.35;
+    for (let i = 0; i < 8; i++) {
+      dominoes.push(new DominoBrick(startX1 + i * 44, shelves[1].y - 30, 16, 60, '#f59e0b'));
+    }
+
+  } else if (stageName === 'carnival') {
+    // Stage 4: Grand Carnival (Everything: bottles, bells, dominoes!)
+    const bellSpacing = shelfW / 4;
+    for (let i = 0; i < 3; i++) {
+      bells.push(new ChimeBell(shelves[0].x - shelfW * 0.28 + i * bellSpacing, H * 0.14, 105, i * 2));
+    }
+    bottles.push(new GlassBottle(shelves[0].x - shelfW * 0.38, shelves[0].y - 32, '#f87171'));
+    bottles.push(new GlassBottle(shelves[0].x + shelfW * 0.38, shelves[0].y - 32, '#38bdf8'));
+    for (let i = 0; i < 6; i++) {
+      dominoes.push(new DominoBrick(shelves[0].x - 90 + i * 36, shelves[0].y - 30, 14, 60, '#d97706'));
+    }
+
+    // Lower Shelf
+    for (let i = 0; i < 8; i++) {
+      dominoes.push(new DominoBrick(shelves[1].x - shelfW * 0.35 + i * 36, shelves[1].y - 30, 14, 60, '#b45309'));
+    }
+    bottles.push(new GlassBottle(shelves[1].x + shelfW * 0.26, shelves[1].y - 32, '#2dd4bf'));
+    bottles.push(new GlassBottle(shelves[1].x + shelfW * 0.38, shelves[1].y - 32, '#fbbf24'));
+  }
+
+  showToast(`🎪 Stage Ready: ${stageName.toUpperCase()}`);
+}
+
+/* ==========================================================================
+   RESIZE & SETUP
+   ========================================================================== */
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = Math.round(W * DPR);
+  canvas.height = Math.round(H * DPR);
+
+  // Slingshot Placement (Bottom Left)
+  slingshot.x = Math.max(140, Math.min(260, W * 0.18));
+  slingshot.y = H - 60;
+  slingshot.forkL = { x: slingshot.x - 38, y: H - 150 };
+  slingshot.forkR = { x: slingshot.x + 38, y: H - 150 };
+  slingshot.rest = { x: slingshot.x, y: H - 142 };
+
+  if (!activeGrab || activeGrab.type !== 'slingshot') {
+    slingshot.pouch = { ...slingshot.rest };
+  }
+
+  buildStage(currentStage);
+}
+window.addEventListener('resize', resize);
+
+function updateStatsHUD() {
+  document.getElementById('stat-score').textContent = score;
+  document.getElementById('stat-smashed').textContent = smashedCount;
+  document.getElementById('stat-chimes').textContent = chimesCount;
+  document.getElementById('stat-shots').textContent = shotsCount;
+}
+
+/* ==========================================================================
+   PHYSICS UPDATE LOOP (120HZ SUB-STEPPED)
+   ========================================================================== */
+function updatePhysics(rawDt) {
+  const dt = Math.min(rawDt, 0.04) * timeScale;
+  const SUB_STEPS = 6;
+  const subDt = dt / SUB_STEPS;
+
+  for (let step = 0; step < SUB_STEPS; step++) {
+    // 1. Update Projectiles
+    projectiles.forEach(p => {
+      if (!p.alive) return;
+      p.x += p.vx * subDt;
+      p.y += p.vy * subDt;
+      p.vy += G * subDt;
+
+      // Floor & Wall Bounces
+      if (p.x < p.r) { p.x = p.r; p.vx = -p.vx * p.restitution; sfx.metalPing(); }
+      if (p.x > W - p.r) { p.x = W - p.r; p.vx = -p.vx * p.restitution; sfx.metalPing(); }
+      if (p.y > H - p.r - 20) {
+        p.y = H - p.r - 20;
+        p.vy = -p.vy * p.restitution;
+        p.vx *= 0.94;
+        p.bounces++;
+        if (Math.abs(p.vy) < 40 && Math.abs(p.vx) < 40) p.alive = false;
+      }
+
+      // Shelf Collisions
+      shelves.forEach(shelf => {
+        const hx = shelf.x - shelf.w * 0.5;
+        const hy = shelf.y - shelf.h * 0.5;
+        if (p.x > hx && p.x < hx + shelf.w && p.y + p.r > hy && p.y - p.r < hy + shelf.h) {
+          if (p.vy > 0 && p.y < hy + 10) {
+            p.y = hy - p.r;
+            p.vy = -p.vy * p.restitution;
+            p.vx *= 0.94;
+            p.bounces++;
+          }
+        }
+      });
+
+      // Hit Glass Bottles
+      bottles.forEach(b => {
+        if (b.isBroken) return;
+        const bx = b.x - b.w * 0.5;
+        const by = b.y - b.h * 0.5;
+        if (p.x + p.r > bx && p.x - p.r < bx + b.w && p.y + p.r > by && p.y - p.r < by + b.h) {
+          const impact = Math.hypot(p.vx, p.vy);
+          b.shatter(impact);
+          p.vx *= 0.65;
+          p.vy *= 0.65;
+        }
+      });
+
+      // Hit Dominoes
+      dominoes.forEach(d => {
+        const dx = d.x - d.w * 0.5;
+        const dy = d.y - d.h * 0.5;
+        if (p.x + p.r > dx && p.x - p.r < dx + d.w && p.y + p.r > dy && p.y - p.r < dy + d.h) {
+          const impact = Math.hypot(p.vx, p.vy);
+          d.vAngle += (p.vx > 0 ? 1 : -1) * (impact * 0.015);
+          d.vx += p.vx * 0.35;
+          p.vx *= -0.4;
+          sfx.woodClack(impact / 300);
+          score += 10;
+          updateStatsHUD();
+        }
+      });
+
+      // Hit Brass Chime Bells
+      bells.forEach(bell => {
+        const bp = bell.getPos();
+        const dist = Math.hypot(p.x - bp.x, p.y - bp.y);
+        if (dist < p.r + bell.r) {
+          bell.strike(p.vx);
+          p.vx = -p.vx * 0.5;
+          p.vy = -p.vy * 0.5;
+        }
+      });
+    });
+
+    // 2. Update Domino Bricks Physics & Chain Reaction
+    dominoes.forEach((d, idx) => {
+      d.angle += d.vAngle * subDt;
+      d.vAngle *= 0.985; // damping
+      d.x += d.vx * subDt;
+      d.vx *= 0.94;
+
+      // Gravity torque if tilted
+      if (Math.abs(d.angle) > 0.08) {
+        d.vAngle += (d.angle > 0 ? 1 : -1) * 38.0 * subDt;
+      }
+
+      // Ground / Shelf Clamp (max tilt ~78 deg)
+      const maxTilt = 1.36;
+      if (d.angle > maxTilt) { d.angle = maxTilt; d.vAngle = -d.vAngle * 0.25; }
+      if (d.angle < -maxTilt) { d.angle = -maxTilt; d.vAngle = -d.vAngle * 0.25; }
+
+      // Check Domino-to-Domino Cascade
+      for (let j = idx + 1; j < dominoes.length; j++) {
+        const d2 = dominoes[j];
+        const dist = Math.abs(d.x - d2.x);
+        if (dist < d.h * 0.85 && Math.abs(d.y - d2.y) < 15) {
+          // If d tilted into d2
+          if (d.x < d2.x && d.angle > 0.2) {
+            d2.vAngle += d.vAngle * 0.8 + 6.0;
+            sfx.woodClack(0.8);
+          } else if (d.x > d2.x && d.angle < -0.2) {
+            d2.vAngle += d.vAngle * 0.8 - 6.0;
+            sfx.woodClack(0.8);
+          }
+        }
+      }
+
+      // Domino knocks into bottle
+      bottles.forEach(b => {
+        if (b.isBroken) return;
+        if (Math.abs(d.x - b.x) < d.h * 0.75 && Math.abs(d.y - b.y) < 20) {
+          if (Math.abs(d.angle) > 0.5) {
+            b.shatter(350);
+          }
+        }
+      });
+    });
+
+    // 3. Update Chime Bells (Pendulum Harmonic Motion)
+    bells.forEach(bell => {
+      const gComp = (-1800 / bell.len) * Math.sin(bell.theta);
+      bell.omega += gComp * subDt;
+      bell.omega *= 0.995; // very light damping for long resonant swing
+      bell.theta += bell.omega * subDt;
+    });
+
+    // 4. Update Glass Shards
+    shards.forEach(sh => {
+      sh.x += sh.vx * subDt;
+      sh.y += sh.vy * subDt;
+      sh.vy += G * 0.9 * subDt;
+      sh.angle += sh.vAngle * subDt;
+      sh.life -= subDt * 0.15;
+
+      if (sh.y > H - 25) {
+        sh.y = H - 25;
+        sh.vy = -sh.vy * 0.4;
+        sh.vx *= 0.85;
+      }
+    });
+
+    // 5. Slingshot Spring Oscillation (when released)
+    if (!activeGrab || activeGrab.type !== 'slingshot') {
+      const k = 580;
+      const damp = 24;
+      const dx = slingshot.rest.x - slingshot.pouch.x;
+      const dy = slingshot.rest.y - slingshot.pouch.y;
+      slingshot.vel.x += (dx * k - slingshot.vel.x * damp) * subDt;
+      slingshot.vel.y += (dy * k - slingshot.vel.y * damp) * subDt;
+      slingshot.pouch.x += slingshot.vel.x * subDt;
+      slingshot.pouch.y += slingshot.vel.y * subDt;
+    }
+  }
+
+  // Cleanup dead entities
+  projectiles = projectiles.filter(p => p.alive && p.x > -50 && p.x < W + 100);
+  shards = shards.filter(sh => sh.life > 0);
+}
+
+/* ==========================================================================
+   RENDER LOOP (ATMOSPHERIC WARM AMBIENT LIGHTING & CRISP CANVAS 2D)
+   ========================================================================== */
+function draw() {
+  ctx.save();
+  ctx.scale(DPR, DPR);
+  ctx.clearRect(0, 0, W, H);
+
+  // 1. Warm Workshop Background & Wood Grain Table
+  const bgGrad = ctx.createRadialGradient(W * 0.45, H * 0.25, 60, W * 0.5, H * 0.5, W * 0.85);
+  bgGrad.addColorStop(0, '#1a181e');
+  bgGrad.addColorStop(0.5, '#0d0e14');
+  bgGrad.addColorStop(1, '#050608');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Floor / Table Base
+  ctx.fillStyle = '#18100a';
+  ctx.fillRect(0, H - 24, W, 24);
+  ctx.fillStyle = 'rgba(217, 119, 6, 0.15)';
+  ctx.fillRect(0, H - 24, W, 2);
+
+  // 2. Draw Shelves (Solid Mahogany with Brass Supports)
+  shelves.forEach(sh => {
+    ctx.save();
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.fillRect(sh.x - sh.w * 0.5, sh.y + sh.h * 0.5, sh.w, 14);
+
+    // Wood Shelf
+    const woodGrad = ctx.createLinearGradient(0, sh.y - sh.h * 0.5, 0, sh.y + sh.h * 0.5);
+    woodGrad.addColorStop(0, '#3e1d10');
+    woodGrad.addColorStop(1, '#231109');
+    ctx.fillStyle = woodGrad;
+    ctx.fillRect(sh.x - sh.w * 0.5, sh.y - sh.h * 0.5, sh.w, sh.h);
+
+    // Brass Bevel Edge
+    ctx.fillStyle = '#d4af37';
+    ctx.fillRect(sh.x - sh.w * 0.5, sh.y - sh.h * 0.5, sh.w, 2);
+
+    // Wall brackets
+    [-sh.w * 0.38, sh.w * 0.38].forEach(bx => {
+      ctx.fillStyle = '#d4af37';
+      ctx.fillRect(sh.x + bx - 4, sh.y + sh.h * 0.5, 8, 22);
+    });
+    ctx.restore();
+  });
+
+  // 3. Draw Chime Bells
+  bells.forEach(bell => {
+    ctx.save();
+    // Cord
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(bell.ax, bell.ay);
+    const bp = bell.getPos();
+    ctx.lineTo(bp.x, bp.y);
+    ctx.stroke();
+
+    // Brass Bell Head
+    ctx.translate(bp.x, bp.y);
+    ctx.rotate(bell.theta);
+
+    const bGrad = ctx.createRadialGradient(-4, -6, 2, 0, 0, bell.r);
+    bGrad.addColorStop(0, '#fef08a');
+    bGrad.addColorStop(0.4, '#eab308');
+    bGrad.addColorStop(1, '#854d0e');
+    ctx.fillStyle = bGrad;
+
+    ctx.beginPath();
+    ctx.arc(0, 0, bell.r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Bell rim & clapper
+    ctx.strokeStyle = '#fef08a'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = '#78350f';
+    ctx.beginPath(); ctx.arc(0, bell.r * 0.8, 5, 0, Math.PI * 2); ctx.fill();
+
+    ctx.restore();
+  });
+
+  // 4. Draw Domino Bricks
+  dominoes.forEach(d => {
+    ctx.save();
+    ctx.translate(d.x, d.y + d.h * 0.5);
+    ctx.rotate(d.angle);
+
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fillRect(-d.w * 0.5 + 4, -d.h + 4, d.w, d.h);
+
+    // Brick
+    const dGrad = ctx.createLinearGradient(-d.w * 0.5, 0, d.w * 0.5, 0);
+    dGrad.addColorStop(0, '#f59e0b');
+    dGrad.addColorStop(1, d.color);
+    ctx.fillStyle = dGrad;
+    ctx.fillRect(-d.w * 0.5, -d.h, d.w, d.h);
+
+    // Inner bevel
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-d.w * 0.5 + 1, -d.h + 1, d.w - 2, d.h - 2);
+
+    ctx.restore();
+  });
+
+  // 5. Draw Glass Bottles
+  bottles.forEach(b => {
+    if (b.isBroken) return;
+    ctx.save();
+    ctx.translate(b.x, b.y);
+
+    // Glow under bottle
+    const gGrad = ctx.createRadialGradient(0, 0, 4, 0, 0, 32);
+    gGrad.addColorStop(0, b.color);
+    gGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = gGrad;
+    ctx.globalAlpha = 0.25;
+    ctx.fillRect(-b.w, -b.h * 0.5, b.w * 2, b.h);
+    ctx.globalAlpha = 1.0;
+
+    // Glass Body
+    ctx.fillStyle = b.color;
+    ctx.globalAlpha = 0.75;
+    ctx.beginPath();
+    ctx.roundRect(-b.w * 0.5, -b.h * 0.5 + 14, b.w, b.h - 14, [4, 4, 8, 8]);
+    ctx.fill();
+
+    // Bottle Neck
+    ctx.fillRect(-b.w * 0.22, -b.h * 0.5, b.w * 0.44, 16);
+    // Cork
+    ctx.fillStyle = '#b45309';
+    ctx.fillRect(-b.w * 0.18, -b.h * 0.5 - 4, b.w * 0.36, 5);
+
+    // Specular Highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.fillRect(-b.w * 0.35, -b.h * 0.5 + 18, 3, b.h - 22);
+
+    ctx.restore();
+  });
+
+  // 6. Draw Glass Shards
+  shards.forEach(sh => {
+    ctx.save();
+    ctx.translate(sh.x, sh.y);
+    ctx.rotate(sh.angle);
+    ctx.globalAlpha = Math.max(0, sh.life);
+    ctx.fillStyle = sh.color;
+    ctx.beginPath();
+    ctx.moveTo(0, -sh.size);
+    ctx.lineTo(sh.size * 0.8, sh.size);
+    ctx.lineTo(-sh.size * 0.8, sh.size * 0.4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  });
+
+  // 7. Draw Flying Projectiles & Trails
+  projectiles.forEach(p => {
+    // Glow trail
+    if (p.type === 'glow') {
+      const g = ctx.createRadialGradient(p.x, p.y, 2, p.x, p.y, 24);
+      g.addColorStop(0, '#38bdf8');
+      g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 24, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // Ball
+    ctx.save();
+    const pGrad = ctx.createRadialGradient(p.x - 2, p.y - 2, 1, p.x, p.y, p.r);
+    pGrad.addColorStop(0, '#ffffff');
+    pGrad.addColorStop(0.5, p.color);
+    pGrad.addColorStop(1, '#0f172a');
+    ctx.fillStyle = pGrad;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+
+  // 8. Draw Ballistic Trajectory Prediction Dot Guide (when pulling slingshot)
+  if (activeGrab && activeGrab.type === 'slingshot') {
+    const pullVec = {
+      x: slingshot.rest.x - slingshot.pouch.x,
+      y: slingshot.rest.y - slingshot.pouch.y
+    };
+    const pullLen = Math.hypot(pullVec.x, pullVec.y);
+
+    if (pullLen > 10) {
+      const clampedLen = Math.min(pullLen, slingshot.maxPull);
+      const nx = pullVec.x / pullLen;
+      const ny = pullVec.y / pullLen;
+      let simX = slingshot.rest.x;
+      let simY = slingshot.rest.y;
+      let simVx = nx * clampedLen * slingshot.launchMult;
+      let simVy = ny * clampedLen * slingshot.launchMult;
+      const simDt = 0.024;
+
+      ctx.save();
+      for (let i = 0; i < 28; i++) {
+        simX += simVx * simDt;
+        simY += simVy * simDt;
+        simVy += G * simDt;
+
+        const alpha = Math.max(0.1, 1 - i / 28);
+        ctx.fillStyle = i % 2 === 0 ? `rgba(0, 240, 255, ${alpha})` : `rgba(255, 190, 59, ${alpha})`;
+        ctx.beginPath();
+        ctx.arc(simX, simY, 2.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+  }
+
+  // 9. Draw Slingshot Fork, Rubber Bands & Loaded Pouch
+  drawSlingshot();
+
+  ctx.restore();
+}
+
+function drawSlingshot() {
+  const { forkL, forkR, pouch, rest } = slingshot;
+
+  // Back Rubber Band (Behind Pouch)
+  ctx.save();
+  ctx.strokeStyle = '#c2410c'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(forkL.x, forkL.y);
+  ctx.lineTo(pouch.x, pouch.y);
+  ctx.stroke();
+
+  // Loaded Ball in Pouch
+  if (slingshot.isLoaded) {
+    const pColor = currentAmmoType === 'steel' ? '#cbd5e1' : (currentAmmoType === 'glow' ? '#38bdf8' : (currentAmmoType === 'bouncer' ? '#f43f5e' : '#e2e8f0'));
+    const bGrad = ctx.createRadialGradient(pouch.x - 2, pouch.y - 2, 1, pouch.x, pouch.y, 8);
+    bGrad.addColorStop(0, '#fff');
+    bGrad.addColorStop(0.6, pColor);
+    bGrad.addColorStop(1, '#1e293b');
+    ctx.fillStyle = bGrad;
+    ctx.beginPath();
+    ctx.arc(pouch.x, pouch.y, 7.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Leather Pouch
+  ctx.fillStyle = '#78350f';
+  ctx.beginPath();
+  ctx.arc(pouch.x, pouch.y, 11, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#d97706'; ctx.lineWidth = 2; ctx.stroke();
+
+  // Front Rubber Band (In front of pouch)
+  ctx.strokeStyle = '#ea580c'; ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(forkR.x, forkR.y);
+  ctx.lineTo(pouch.x, pouch.y);
+  ctx.stroke();
+
+  // Wooden Slingshot Handle & Prongs
+  ctx.strokeStyle = '#451a03'; ctx.lineWidth = 14; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(forkL.x, forkL.y);
+  ctx.lineTo(slingshot.x, slingshot.y - 45);
+  ctx.lineTo(forkR.x, forkR.y);
+  ctx.stroke();
+
+  // Handle Base
+  ctx.beginPath();
+  ctx.moveTo(slingshot.x, slingshot.y - 45);
+  ctx.lineTo(slingshot.x, slingshot.y + 20);
+  ctx.stroke();
+
+  // Brass Band Ties & Rivets
+  ctx.fillStyle = '#d4af37';
+  [forkL, forkR].forEach(f => {
+    ctx.beginPath(); ctx.arc(f.x, f.y, 6, 0, Math.PI * 2); ctx.fill();
+  });
+  ctx.restore();
+}
+
+/* ==========================================================================
+   INPUT HANDLING (POINTER GRAB, AIM & FIRE)
+   ========================================================================== */
+function getPointerPos(e) {
+  return { x: e.clientX, y: e.clientY };
+}
+
+canvas.addEventListener('pointerdown', e => {
+  sfx.init();
+  const p = getPointerPos(e);
+  lastMousePos = p;
+
+  // Check Slingshot Pouch Grab
+  const distToPouch = Math.hypot(p.x - slingshot.pouch.x, p.y - slingshot.pouch.y);
+  if (distToPouch < 38) {
+    activeGrab = { type: 'slingshot' };
+    return;
+  }
+
+  // Check Direct Object Grabbing (Dominoes, Bottles, Bells)
+  for (let b of bottles) {
+    if (!b.isBroken && Math.hypot(p.x - b.x, p.y - b.y) < 32) {
+      activeGrab = { type: 'bottle', item: b };
+      return;
+    }
+  }
+
+  for (let bell of bells) {
+    const bp = bell.getPos();
+    if (Math.hypot(p.x - bp.x, p.y - bp.y) < bell.r + 14) {
+      activeGrab = { type: 'bell', item: bell };
+      return;
+    }
+  }
+
+  for (let d of dominoes) {
+    if (Math.hypot(p.x - d.x, p.y - d.y) < 36) {
+      activeGrab = { type: 'domino', item: d };
+      return;
+    }
+  }
+});
+
+window.addEventListener('pointermove', e => {
+  const p = getPointerPos(e);
+  const dx = p.x - lastMousePos.x;
+  const dy = p.y - lastMousePos.y;
+  lastMousePos = p;
+
+  if (!activeGrab) return;
+
+  if (activeGrab.type === 'slingshot') {
+    // Pull Pouch
+    const pullVec = { x: p.x - slingshot.rest.x, y: p.y - slingshot.rest.y };
+    const len = Math.hypot(pullVec.x, pullVec.y);
+
+    if (len > slingshot.maxPull) {
+      slingshot.pouch.x = slingshot.rest.x + (pullVec.x / len) * slingshot.maxPull;
+      slingshot.pouch.y = slingshot.rest.y + (pullVec.y / len) * slingshot.maxPull;
+    } else {
+      slingshot.pouch.x = p.x;
+      slingshot.pouch.y = p.y;
+    }
+
+    const now = Date.now();
+    if (now - lastCreakTime > 90 && len > 20) {
+      sfx.creak();
+      lastCreakTime = now;
+    }
+  } else if (activeGrab.type === 'bottle') {
+    activeGrab.item.x += dx;
+    activeGrab.item.y += dy;
+  } else if (activeGrab.type === 'bell') {
+    activeGrab.item.omega += dx * 0.05;
+  } else if (activeGrab.type === 'domino') {
+    activeGrab.item.angle += dx * 0.05;
+  }
+});
+
+window.addEventListener('pointerup', () => {
+  if (!activeGrab) return;
+
+  if (activeGrab.type === 'slingshot') {
+    const pullVec = {
+      x: slingshot.rest.x - slingshot.pouch.x,
+      y: slingshot.rest.y - slingshot.pouch.y
+    };
+    const pullLen = Math.hypot(pullVec.x, pullVec.y);
+
+    if (pullLen > 18) {
+      const clampedLen = Math.min(pullLen, slingshot.maxPull);
+      const nx = pullVec.x / pullLen;
+      const ny = pullVec.y / pullLen;
+      const speed = clampedLen * slingshot.launchMult;
+
+      // Launch!
+      projectiles.push(new Projectile(
+        slingshot.pouch.x, slingshot.pouch.y,
+        nx * speed, ny * speed,
+        currentAmmoType
+      ));
+
+      shotsCount++;
+      updateStatsHUD();
+      sfx.snap(clampedLen / slingshot.maxPull);
+    }
+  }
+
+  activeGrab = null;
+});
+
+/* ==========================================================================
+   UI CONTROLS & HUD LISTENERS
+   ========================================================================== */
+// 1. Stage Selectors
+['pyramid', 'domino', 'chimes', 'carnival'].forEach(name => {
+  document.getElementById(`stg-${name}`).addEventListener('click', () => {
+    buildStage(name);
+  });
+});
+
+// 2. Ammo Selectors
+['pebble', 'steel', 'glow', 'bouncer'].forEach(name => {
+  document.getElementById(`ammo-${name}`).addEventListener('click', () => {
+    document.querySelectorAll('.ammo-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`ammo-${name}`).classList.add('active');
+    currentAmmoType = name;
+  });
+});
+
+// 3. Reset Shelf Button
+document.getElementById('reset-btn').addEventListener('click', () => {
+  buildStage(currentStage);
+  showToast('🔄 Shelf Targets Reset!');
+});
+
+// 4. Slow-Mo Toggle
+const slowMoBtn = document.getElementById('slowmo-btn');
+slowMoBtn.addEventListener('click', () => {
+  timeScale = timeScale === 1.0 ? 0.32 : 1.0;
+  slowMoBtn.classList.toggle('active', timeScale < 1.0);
+  slowMoBtn.textContent = timeScale < 1.0 ? '⏱️ Slow-Mo: ON (0.3x)' : '⏱️ Slow-Mo: OFF';
+});
+
+// 5. Sound Toggle
+const soundBtn = document.getElementById('sound-btn');
+soundBtn.addEventListener('click', () => {
+  sfx.init();
+  sfx.enabled = !sfx.enabled;
+  soundBtn.textContent = sfx.enabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+});
+
+// Toast Helper
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+}
+
+/* ==========================================================================
+   ANIMATION & TICK LOOP
+   ========================================================================== */
+let lastFrameTime = performance.now();
+function loop(now) {
+  requestAnimationFrame(loop);
+  const dt = (now - lastFrameTime) / 1000;
+  lastFrameTime = now;
+
+  updatePhysics(dt);
+  draw();
+}
+
+resize();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
