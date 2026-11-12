@@ -6,7 +6,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 
 ---
 
-## 🎮 The 11 Experiments
+## 🎮 The 12 Experiments
 
 | # | Experiment | Technology | Highlights |
 |---|---|---|---|
@@ -21,6 +21,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 | **09** | [**The Focus Candle: Atmospheric Melting Timer**](candle.html) | Canvas 2D, Dynamic Wax Physics, Web Audio | Realistic beeswax candle timer with smooth real-time melting, organic multi-harmonic flame flickering, interactive wind flutter, dripping wax tear rivulets, cotton wick crackle, wooden matchstick strike, and dual-tone digital beep alarm. |
 | **10** | [**Angry Bird Hunt**](birds.html) | Canvas 2D, Web Audio API | Fast-paced arcade clay & bird shooting game with cartoonish angry bird emojis, dynamic rotating shotgun with recoil & muzzle flash, custom glowing crosshair with target-lock brackets, feather particle explosions, combo multipliers, speed selector (Slow/Normal/Fast/Turbo), 8-round magazine reload mechanics, and 60-second tournament timer. |
 | **11** | [**Fruit Slash**](fruit.html) | Canvas 2D, Web Audio API, Segment Slicing | Fast-paced neon blade arcade featuring unlimited recursive slicing, parabolic fruit trajectories, glowing cyan blade trails with velocity swish, explosive bombs, golden slow-mo mangoes, combo multipliers, and live speed switching. |
+| **12** | [**Foosball Pro**](foosball.html) | Canvas 2D, 240Hz Sub-step CCD, Web Audio | Tournament table soccer simulation with continuous collision detection, 8 regulation interleaved rods (GK, DEF, MID, ATT), realistic figure trapping and bank shots, 3-tier bot AI, instant slow-motion goal replay, and local 2P multiplayer. |
 
 ---
 
