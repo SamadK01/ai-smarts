@@ -226,90 +226,131 @@
     box-shadow: 0 8px 25px rgba(53, 243, 223, 0.35); margin-bottom: 8px;
   }
 
-  /* JELLY AQUARIUM TANK (FLOATING LIVEWELL) */
-  .jelly-tank-container {
-    position: fixed; right: 22px; bottom: 22px;
-    width: 250px; height: 185px;
-    background: radial-gradient(135deg, rgba(34, 211, 238, 0.16) 0%, rgba(4, 20, 33, 0.9) 100%);
-    border: 2px solid rgba(53, 243, 223, 0.45);
-    border-radius: 20px;
-    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.8), 0 0 35px rgba(53, 243, 223, 0.22), inset 0 0 25px rgba(53, 243, 223, 0.12);
-    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-    overflow: hidden; z-index: 25; display: flex; flex-direction: column;
-    pointer-events: auto; cursor: pointer;
-    transition: transform 0.2s cubic-bezier(0.18, 1, 0.22, 1), border-color 0.2s, box-shadow 0.2s;
-  }
-  .jelly-tank-container:hover {
-    border-color: var(--cyan);
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.85), 0 0 45px rgba(53, 243, 223, 0.38);
-  }
-  .jelly-tank-container.jelly-wobble {
-    animation: jellyWobble 0.65s cubic-bezier(0.25, 1, 0.5, 1);
-  }
-  @keyframes jellyWobble {
-    0% { transform: scale(1, 1); }
-    20% { transform: scale(1.16, 0.84) rotate(-3deg); }
-    40% { transform: scale(0.88, 1.14) rotate(2deg); }
-    60% { transform: scale(1.06, 0.95) rotate(-1deg); }
-    80% { transform: scale(0.97, 1.02) rotate(0.5deg); }
-    100% { transform: scale(1, 1); }
+  :root {
+    --tank-w: 420px;
+    --tank-h: 112px;
   }
 
-  .jelly-tank-header {
-    padding: 8px 12px; background: rgba(2, 14, 24, 0.7);
+  /* TOP EXPANDING ELASTIC JELLY TANK */
+  .top-jelly-dock {
+    position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+    width: var(--tank-w); height: var(--tank-h);
+    background: radial-gradient(135deg, rgba(34, 211, 238, 0.22) 0%, rgba(4, 24, 38, 0.94) 100%);
+    border: 2px solid rgba(53, 243, 223, 0.55);
+    border-radius: 20px;
+    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.85), 0 0 40px rgba(53, 243, 223, 0.28), inset 0 0 25px rgba(53, 243, 223, 0.15);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    overflow: hidden; z-index: 28; display: flex; flex-direction: column;
+    pointer-events: auto; cursor: pointer;
+    transition: width 0.4s cubic-bezier(0.18, 1, 0.22, 1), height 0.4s cubic-bezier(0.18, 1, 0.22, 1), border-color 0.2s, box-shadow 0.2s;
+  }
+  .top-jelly-dock:hover {
+    border-color: var(--cyan);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 50px rgba(53, 243, 223, 0.45);
+  }
+  .top-jelly-dock.jelly-expand {
+    animation: jellyGulpStretch 0.75s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  @keyframes jellyGulpStretch {
+    0% { transform: translateX(-50%) scale(1, 1); }
+    25% { transform: translateX(-50%) scale(1.15, 0.82); }
+    50% { transform: translateX(-50%) scale(0.92, 1.18); }
+    75% { transform: translateX(-50%) scale(1.06, 0.96); }
+    100% { transform: translateX(-50%) scale(1, 1); }
+  }
+
+  .jelly-dock-bar {
+    padding: 6px 12px; background: rgba(2, 14, 24, 0.75);
     border-bottom: 1px solid rgba(53, 243, 223, 0.25);
     display: flex; justify-content: space-between; align-items: center;
+    font: 800 10px/1 var(--mono); color: var(--cyan);
   }
-  .jelly-tank-title {
-    display: flex; align-items: center; gap: 6px;
-    font: 800 11px/1 var(--mono); color: var(--cyan); letter-spacing: 0.05em;
+  .jelly-status-tag { display: flex; align-items: center; gap: 6px; }
+  .jelly-blob-icon { font-size: 13px; animation: bubbleFloat 2s infinite ease-in-out; }
+  .jelly-specimen-badge {
+    background: var(--amber); color: #020d17;
+    padding: 2px 8px; border-radius: 999px; font-weight: 800;
   }
-  .jelly-icon { font-size: 13px; animation: bubbleFloat 2s infinite ease-in-out; }
-  @keyframes bubbleFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-3px); }
-  }
-  .jelly-tank-badge {
-    background: var(--amber); color: #030d17;
-    padding: 2px 8px; border-radius: 999px;
-    font: 800 10px/1 var(--mono);
-  }
+  .jelly-capacity-tag { color: var(--muted); }
+  .jelly-capacity-tag span { color: #fff; font-weight: 700; }
 
-  .jelly-canvas-wrap {
+  .jelly-aquarium-frame {
     flex: 1; position: relative; overflow: hidden;
   }
-  #jelly-canvas {
-    width: 100%; height: 100%; display: block;
-  }
-  .jelly-empty-prompt {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center; text-align: center;
-    color: rgba(220, 240, 245, 0.45); font: 600 11px/1.4 var(--mono);
-    pointer-events: none; padding: 10px;
+  #top-jelly-canvas { width: 100%; height: 100%; display: block; }
+  .jelly-dock-empty {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    text-align: center; color: rgba(220, 240, 245, 0.5); font: 600 10px/1.3 var(--mono);
+    padding: 6px 16px; pointer-events: none;
   }
 
-  .jelly-tank-footer {
-    padding: 6px 12px 8px; background: rgba(2, 14, 24, 0.75);
-    border-top: 1px solid rgba(53, 243, 223, 0.2);
-  }
-  .jelly-latest {
-    font: 700 10px/1.2 var(--body); color: #fff;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .jelly-sub {
-    font: 600 9px/1.2 var(--mono); color: var(--muted); margin-top: 2px;
+  .jelly-intake-lip {
+    padding: 3px 8px; background: rgba(53, 243, 223, 0.12);
+    border-top: 1px dashed rgba(53, 243, 223, 0.35);
+    text-align: center; font: 700 8.5px/1 var(--mono); color: var(--cyan);
+    letter-spacing: 0.12em;
   }
 
+  /* ADVANCED SHARK HUNT BATTLE HUD */
+  .battle-hud {
+    position: fixed; top: 140px; left: 50%; transform: translateX(-50%) translateY(-10px);
+    width: min(92vw, 420px);
+    background: rgba(3, 14, 24, 0.94); border: 2px solid var(--coral);
+    border-radius: 18px; padding: 14px 18px;
+    box-shadow: 0 16px 45px rgba(255, 71, 87, 0.35), 0 0 30px rgba(0,0,0,0.85);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    z-index: 35; pointer-events: none; opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .battle-hud.active {
+    opacity: 1; transform: translateX(-50%) translateY(0);
+  }
+  .battle-hud.critical {
+    animation: battleAlarm 0.4s infinite alternate;
+  }
+  @keyframes battleAlarm {
+    from { border-color: var(--coral); box-shadow: 0 0 15px rgba(255, 71, 87, 0.4); }
+    to { border-color: #ff0033; box-shadow: 0 0 35px rgba(255, 0, 51, 0.9); }
+  }
+  .battle-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 6px;
+  }
+  .battle-title { font: 800 12px/1 var(--mono); color: var(--gold); letter-spacing: 0.05em; }
+  .battle-stamina-val { font: 700 11px/1 var(--mono); color: #fff; }
+  .battle-bar-track {
+    width: 100%; height: 10px; background: rgba(255, 255, 255, 0.1);
+    border-radius: 999px; overflow: hidden; margin-bottom: 8px; position: relative;
+  }
+  .battle-bar-track.tension { height: 12px; margin-bottom: 6px; }
+  .battle-bar-fill.stamina {
+    height: 100%; width: 100%; background: linear-gradient(90deg, #10b981, #059669);
+    border-radius: 999px; transition: width 0.1s linear;
+  }
+  .battle-bar-fill.tension {
+    height: 100%; width: 30%; background: linear-gradient(90deg, #35f3df, #ffb732, #ff4757);
+    border-radius: 999px; transition: width 0.08s linear;
+  }
+  .battle-sub {
+    display: flex; justify-content: space-between; font: 600 10px/1 var(--mono);
+    color: var(--muted); margin-bottom: 4px;
+  }
+  .battle-hint {
+    text-align: center; font: 800 10px/1.2 var(--mono); color: var(--cyan);
+    margin-top: 4px; letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 900px) {
+    .top-jelly-dock { top: 65px; --tank-w: 360px; --tank-h: 96px; }
+    .battle-hud { top: 175px; }
+  }
   @media (max-width: 640px) {
-    .top-bar { top: 12px; left: 12px; right: 12px; }
+    .top-bar { top: 10px; left: 10px; right: 10px; }
     .score-label { display: none; }
-    .hud-center { position: static; transform: none; order: 2; }
-    .top-bar { flex-wrap: wrap; gap: 10px; }
-    .bottom-bar { bottom: 14px; left: 12px; right: auto; max-width: calc(100% - 190px); }
-    .hint-pill { font-size: 10px; padding: 6px 12px; }
-    .jelly-tank-container { width: 175px; height: 135px; right: 12px; bottom: 12px; }
-    .jelly-sub { display: none; }
+    .top-jelly-dock { top: 58px; --tank-w: min(92vw, 340px); --tank-h: 90px; }
+    .battle-hud { top: 160px; }
+    .bottom-bar { bottom: 14px; }
+    .hint-pill { font-size: 10.5px; padding: 6px 14px; }
   }
 </style>
 </head>
@@ -328,17 +369,13 @@
       </div>
     </div>
 
-    <!-- Center 1-Minute Countdown -->
-    <div class="hud-center">
+    <!-- Right: Timer, Catch Bag & Sound -->
+    <div class="hud-right">
       <div class="timer-badge" id="timer-badge">
         <span class="timer-icon">⏱️</span>
         <span class="timer-text" id="timer-text">01:00</span>
         <span class="timer-sub">Round</span>
       </div>
-    </div>
-
-    <!-- Right: Catch Bag & Sound -->
-    <div class="hud-right">
       <button class="bag-btn" id="bag-btn" title="Open Catch Bag">
         <span>🎒 Catch Bag</span>
         <span class="bag-count" id="bag-count">0</span>
@@ -347,33 +384,54 @@
     </div>
   </div>
 
+  <!-- TOP EXPANDING ELASTIC JELLY TANK -->
+  <div class="top-jelly-dock" id="top-jelly-dock" title="Elastic Live Jelly Tank — Catches are stored here live! Click to open haul log">
+    <div class="jelly-dock-bar">
+      <div class="jelly-status-tag">
+        <span class="jelly-blob-icon">🫧</span>
+        <b>ELASTIC JELLY TANK</b>
+        <span class="jelly-specimen-badge" id="top-jelly-badge">0 CAGED</span>
+      </div>
+      <div class="jelly-capacity-tag">
+        SIZE: <span id="jelly-size-val">100%</span> · <span id="jelly-mass-val">0 kg</span>
+      </div>
+    </div>
+    <div class="jelly-aquarium-frame">
+      <canvas id="top-jelly-canvas"></canvas>
+      <div class="jelly-dock-empty" id="top-jelly-empty">
+        Hook giant sharks & fishes below!<br>Catches are reeled directly into this top elastic jelly chamber.
+      </div>
+    </div>
+    <div class="jelly-intake-lip">
+      <span>▲ ELASTIC SUCTION INTAKE PORT ▲</span>
+    </div>
+  </div>
+
+  <!-- SHARK HUNT & TENSION BATTLE HUD -->
+  <div class="battle-hud" id="battle-hud">
+    <div class="battle-header">
+      <span class="battle-title" id="battle-title">⚔️ SHARK BATTLE IN PROGRESS!</span>
+      <span class="battle-stamina-val" id="battle-stamina-val">STAMINA: 100%</span>
+    </div>
+    <div class="battle-bar-track">
+      <div class="battle-bar-fill stamina" id="stamina-fill"></div>
+    </div>
+    <div class="battle-sub">
+      <span>LINE TENSION:</span>
+      <span id="tension-label" style="color:var(--cyan);">NORMAL</span>
+    </div>
+    <div class="battle-bar-track tension">
+      <div class="battle-bar-fill tension" id="tension-fill"></div>
+    </div>
+    <div class="battle-hint" id="battle-hint">DRAG MOUSE UP / HOLD CLICK TO WINCH SHARK!</div>
+  </div>
+
   <!-- Bottom Bar -->
   <div class="bottom-bar">
     <div class="hint-pill">
-      guide hook to <b>pierce fish</b> · reels up slowly & leaps into <b>jelly aquarium</b>
+      move hook to <b>pierce fish & sharks</b> · win the tension struggle · hauled directly into <b>top elastic jelly box</b>
     </div>
     <button class="feed-btn" id="feed-btn">🥖 Drop Food</button>
-  </div>
-
-  <!-- FLOATING JELLY AQUARIUM BOX -->
-  <div class="jelly-tank-container" id="jelly-tank" title="Jelly Live Aquarium — Click to view catch log">
-    <div class="jelly-tank-header">
-      <div class="jelly-tank-title">
-        <span class="jelly-icon">🫧</span>
-        <span>JELLY AQUARIUM</span>
-      </div>
-      <div class="jelly-tank-badge" id="jelly-count">0 FISH</div>
-    </div>
-    <div class="jelly-canvas-wrap">
-      <canvas id="jelly-canvas"></canvas>
-      <div class="jelly-empty-prompt" id="jelly-empty">
-        Hook fishes to fill<br>jelly aquarium live!
-      </div>
-    </div>
-    <div class="jelly-tank-footer">
-      <div class="jelly-latest" id="jelly-latest">Awaiting first catch...</div>
-      <div class="jelly-sub">CLICK TO EXPAND HAUL ↗</div>
-    </div>
   </div>
 </div>
 
@@ -603,6 +661,83 @@ const sfx = {
     osc.start(t); osc.stop(t + 0.4);
   },
 
+  dragScreech() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    // Screeching high-friction drag ratchet
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(750, t);
+    osc.frequency.linearRampToValueAtTime(950, t + 0.12);
+    g.gain.setValueAtTime(0.07, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+    osc.connect(g); g.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t + 0.15);
+  },
+
+  sharkRoar() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    // Deep underwater apex predator thrash growl
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(65, t);
+    osc.frequency.exponentialRampToValueAtTime(35, t + 0.5);
+    const f = audioCtx.createBiquadFilter();
+    f.type = 'lowpass'; f.frequency.setValueAtTime(140, t);
+    g.gain.setValueAtTime(0.3, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+    osc.connect(f); f.connect(g); g.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t + 0.6);
+  },
+
+  jellyGulp() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    // Thick gooey vacuum suction swallow
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(110, t);
+    osc.frequency.exponentialRampToValueAtTime(320, t + 0.12);
+    osc.frequency.exponentialRampToValueAtTime(85, t + 0.28);
+    g.gain.setValueAtTime(0.24, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+    osc.connect(g); g.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t + 0.36);
+
+    // Wet squishy bloop
+    const osc2 = audioCtx.createOscillator();
+    const g2 = audioCtx.createGain();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(380, t + 0.08);
+    osc2.frequency.exponentialRampToValueAtTime(140, t + 0.24);
+    g2.gain.setValueAtTime(0.15, t + 0.08);
+    g2.gain.exponentialRampToValueAtTime(0.001, t + 0.26);
+    osc2.connect(g2); g2.connect(audioCtx.destination);
+    osc2.start(t + 0.08); osc2.stop(t + 0.27);
+  },
+
+  snap() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    // Extreme tension line whip crack
+    const n = audioCtx.createBufferSource();
+    const dur = 0.12;
+    const buf = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * dur), audioCtx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (d.length * 0.1));
+    n.buffer = buf;
+    const f = audioCtx.createBiquadFilter();
+    f.type = 'highpass'; f.frequency.setValueAtTime(2800, t);
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.25, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    n.connect(f); f.connect(g); g.connect(audioCtx.destination);
+    n.start(t);
+  },
+
   bagPlop() {
     if (!soundEnabled || !audioCtx) return;
     const t = audioCtx.currentTime;
@@ -764,6 +899,26 @@ const SPECIES = [
     bodyL: 96, bodyW: 52,
     primary: '#1e293b', secondary: '#0f766e', lure: '#22d3ee',
     speed: 0.88, depth: [0.55, 0.95]
+  },
+  {
+    id: 'great_white',
+    name: 'Megalodon Apex Shark',
+    role: 'boss',
+    basePoints: 4800,
+    len: [280, 420],
+    bodyL: 165, bodyW: 56,
+    primary: '#1e293b', secondary: '#f8fafc',
+    speed: 1.55, depth: [0.35, 0.95]
+  },
+  {
+    id: 'hammerhead',
+    name: 'Titan Hammerhead Shark',
+    role: 'boss',
+    basePoints: 3600,
+    len: [230, 350],
+    bodyL: 145, bodyW: 46,
+    primary: '#334155', secondary: '#e2e8f0',
+    speed: 1.38, depth: [0.25, 0.9]
   }
 ];
 
@@ -956,25 +1111,39 @@ class SplashParticle {
   }
 }
 
-// Jelly Tank DOM references & Livewell Manager
-const jellyTankEl = document.getElementById('jelly-tank');
-const jellyCanvas = document.getElementById('jelly-canvas');
-const jellyCtx = jellyCanvas.getContext('2d');
-const jellyCountEl = document.getElementById('jelly-count');
-const jellyEmptyEl = document.getElementById('jelly-empty');
-const jellyLatestEl = document.getElementById('jelly-latest');
+// TOP EXPANDING ELASTIC JELLY DOCK DOM References
+const topJellyDock = document.getElementById('top-jelly-dock');
+const topJellyCanvas = document.getElementById('top-jelly-canvas');
+const topJellyCtx = topJellyCanvas.getContext('2d');
+const topJellyBadge = document.getElementById('top-jelly-badge');
+const topJellyEmpty = document.getElementById('top-jelly-empty');
+const jellySizeVal = document.getElementById('jelly-size-val');
+const jellyMassVal = document.getElementById('jelly-mass-val');
+
+// SHARK HUNT & TENSION BATTLE HUD References
+const battleHud = document.getElementById('battle-hud');
+const battleTitle = document.getElementById('battle-title');
+const battleStaminaVal = document.getElementById('battle-stamina-val');
+const staminaFill = document.getElementById('stamina-fill');
+const tensionLabel = document.getElementById('tension-label');
+const tensionFill = document.getElementById('tension-fill');
+const battleHint = document.getElementById('battle-hint');
+
+let isPointerDown = false;
+let lastPointerY = 0;
 
 class MiniJellyFish {
   constructor(species, len) {
     this.species = species;
     this.len = len;
-    const w = jellyCanvas.width / (window.devicePixelRatio || 1);
-    const h = jellyCanvas.height / (window.devicePixelRatio || 1);
+    const rect = topJellyCanvas.getBoundingClientRect();
+    const w = rect.width || 380;
+    const h = rect.height || 90;
     this.x = 25 + Math.random() * Math.max(20, w - 50);
-    this.y = 20 + Math.random() * Math.max(20, h - 40);
-    this.vx = (Math.random() < 0.5 ? 1 : -1) * (20 + Math.random() * 15);
-    this.vy = (Math.random() - 0.5) * 12;
-    this.scale = Math.min(1.2, 0.45 + (species.bodyL / 120) * 0.4);
+    this.y = 15 + Math.random() * Math.max(15, h - 30);
+    this.vx = (Math.random() < 0.5 ? 1 : -1) * (18 + Math.random() * 20);
+    this.vy = (Math.random() - 0.5) * 8;
+    this.scale = Math.min(1.22, 0.42 + (species.bodyL / 140) * 0.42);
     this.swimPhase = Math.random() * Math.PI * 2;
   }
   update(dt, w, h) {
@@ -982,10 +1151,10 @@ class MiniJellyFish {
     this.x += this.vx * dt;
     this.y += this.vy * dt;
 
-    if (this.x < 15) { this.x = 15; this.vx = Math.abs(this.vx); }
-    if (this.x > w - 15) { this.x = w - 15; this.vx = -Math.abs(this.vx); }
-    if (this.y < 12) { this.y = 12; this.vy = Math.abs(this.vy); }
-    if (this.y > h - 12) { this.y = h - 12; this.vy = -Math.abs(this.vy); }
+    if (this.x < 18) { this.x = 18; this.vx = Math.abs(this.vx); }
+    if (this.x > w - 18) { this.x = w - 18; this.vx = -Math.abs(this.vx); }
+    if (this.y < 10) { this.y = 10; this.vy = Math.abs(this.vy); }
+    if (this.y > h - 10) { this.y = h - 10; this.vy = -Math.abs(this.vy); }
   }
   draw(ctx) {
     ctx.save();
@@ -995,225 +1164,239 @@ class MiniJellyFish {
 
     const tailWiggle = Math.sin(this.swimPhase) * 3.5;
 
-    // Tail fin
-    ctx.fillStyle = this.species.secondary || this.species.primary;
-    ctx.beginPath();
-    ctx.moveTo(-10, 0);
-    ctx.lineTo(-18, -6 + tailWiggle);
-    ctx.lineTo(-14, 0);
-    ctx.lineTo(-18, 6 + tailWiggle);
-    ctx.closePath();
-    ctx.fill();
+    // Apex Sharks mini rendering
+    if (this.species.id === 'great_white') {
+      // Megalodon Great White Shark
+      ctx.fillStyle = '#f8fafc'; // White belly
+      ctx.beginPath();
+      ctx.ellipse(0, 2, 22, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
 
-    // Body
-    ctx.fillStyle = this.species.primary;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 13, 6, 0, 0, Math.PI * 2);
-    ctx.fill();
+      ctx.fillStyle = '#1e293b'; // Dark dorsal
+      ctx.beginPath();
+      ctx.ellipse(0, -1, 22, 7, 0, Math.PI, Math.PI * 2);
+      ctx.fill();
 
-    // Eye
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath(); ctx.arc(6, -1.5, 1.8, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#06131c';
-    ctx.beginPath(); ctx.arc(6.5, -1.5, 1.0, 0, Math.PI * 2); ctx.fill();
+      // Sharp dorsal fin
+      ctx.beginPath();
+      ctx.moveTo(-3, -7); ctx.lineTo(4, -16); ctx.lineTo(10, -7);
+      ctx.closePath(); ctx.fill();
 
-    // Distinctive touches
-    if (this.species.id === 'tuna') {
-      ctx.fillStyle = '#facc15';
-      ctx.beginPath(); ctx.moveTo(-6, -5); ctx.lineTo(-4, -8); ctx.lineTo(-2, -5); ctx.fill();
-    } else if (this.species.id === 'gold_king') {
-      ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 8;
-    } else if (this.species.id === 'angler') {
-      ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(4, -4); ctx.quadraticCurveTo(8, -10, 10, -7); ctx.stroke();
-      ctx.fillStyle = '#22d3ee'; ctx.beginPath(); ctx.arc(10, -7, 1.5, 0, Math.PI * 2); ctx.fill();
+      // Heterocercal shark tail
+      ctx.beginPath();
+      ctx.moveTo(-18, 0); ctx.lineTo(-30, -12 + tailWiggle); ctx.lineTo(-24, 0); ctx.lineTo(-29, 7 + tailWiggle);
+      ctx.closePath(); ctx.fill();
+
+      // Menacing dark eye
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath(); ctx.arc(12, -2, 1.8, 0, Math.PI * 2); ctx.fill();
+    } else if (this.species.id === 'hammerhead') {
+      // Titan Hammerhead Shark
+      ctx.fillStyle = '#334155';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 20, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cephalofoil T-head
+      ctx.beginPath();
+      ctx.ellipse(16, 0, 4, 12, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Lateral wide-set eyes
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.arc(16, -10, 1.3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(16, 10, 1.3, 0, Math.PI * 2); ctx.fill();
+
+      // Tall dorsal fin
+      ctx.beginPath();
+      ctx.moveTo(-2, -6); ctx.lineTo(3, -15); ctx.lineTo(8, -6);
+      ctx.closePath(); ctx.fill();
+
+      // Heterocercal tail
+      ctx.beginPath();
+      ctx.moveTo(-17, 0); ctx.lineTo(-28, -10 + tailWiggle); ctx.lineTo(-22, 0); ctx.lineTo(-27, 6 + tailWiggle);
+      ctx.closePath(); ctx.fill();
+    } else {
+      // Normal species
+      ctx.fillStyle = this.species.secondary || this.species.primary;
+      ctx.beginPath();
+      ctx.moveTo(-10, 0);
+      ctx.lineTo(-18, -6 + tailWiggle);
+      ctx.lineTo(-14, 0);
+      ctx.lineTo(-18, 6 + tailWiggle);
+      ctx.closePath();
+      ctx.fill();
+
+      // Body
+      ctx.fillStyle = this.species.primary;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 13, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Eye
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.arc(6, -1.5, 1.8, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#06131c';
+      ctx.beginPath(); ctx.arc(6.5, -1.5, 1.0, 0, Math.PI * 2); ctx.fill();
+
+      if (this.species.id === 'tuna') {
+        ctx.fillStyle = '#facc15';
+        ctx.beginPath(); ctx.moveTo(-6, -5); ctx.lineTo(-4, -8); ctx.lineTo(-2, -5); ctx.fill();
+      } else if (this.species.id === 'gold_king') {
+        ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 8;
+      } else if (this.species.id === 'angler') {
+        ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(4, -4); ctx.quadraticCurveTo(8, -10, 10, -7); ctx.stroke();
+        ctx.fillStyle = '#22d3ee'; ctx.beginPath(); ctx.arc(10, -7, 1.5, 0, Math.PI * 2); ctx.fill();
+      }
     }
 
     ctx.restore();
   }
 }
 
-class JellyTankManager {
+class TopJellyTankManager {
   constructor() {
     this.fishes = [];
     this.bubbles = [];
-    this.w = 250;
-    this.h = 130;
+    this.bursts = [];
+    this.baseW = 420;
+    this.baseH = 112;
+    this.w = this.baseW;
+    this.h = this.baseH;
+    this.totalMassGrams = 0;
+    this.stretchRatio = 1.0;
+
     this.initCanvas();
     window.addEventListener('resize', () => this.initCanvas());
 
-    // Clicking jelly tank opens the detailed catch bag modal
-    jellyTankEl.addEventListener('click', () => {
+    // Clicking top jelly dock opens detailed haul bag modal
+    topJellyDock.addEventListener('click', () => {
       bagBtn.click();
     });
   }
 
   initCanvas() {
-    const rect = jellyCanvas.getBoundingClientRect();
+    const isMobile = window.innerWidth <= 640;
+    const isTablet = window.innerWidth <= 900;
+    this.baseW = isMobile ? Math.min(window.innerWidth * 0.92, 340) : (isTablet ? 360 : 420);
+    this.baseH = isMobile ? 90 : (isTablet ? 96 : 112);
+
+    const targetW = Math.round(this.baseW * this.stretchRatio);
+    const targetH = Math.round(this.baseH * Math.min(1.42, 1.0 + (this.stretchRatio - 1.0) * 0.65));
+
+    document.documentElement.style.setProperty('--tank-w', `${targetW}px`);
+    document.documentElement.style.setProperty('--tank-h', `${targetH}px`);
+
+    const rect = topJellyCanvas.getBoundingClientRect();
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    this.w = rect.width || 250;
-    this.h = rect.height || 130;
-    jellyCanvas.width = Math.round(this.w * dpr);
-    jellyCanvas.height = Math.round(this.h * dpr);
-    jellyCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    this.w = rect.width || targetW;
+    this.h = rect.height || targetH;
+    topJellyCanvas.width = Math.round(this.w * dpr);
+    topJellyCanvas.height = Math.round(this.h * dpr);
+    topJellyCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
-  receiveFish(item) {
+  gulpFish(item) {
     this.fishes.push(new MiniJellyFish(item.species, item.len));
-    if (jellyEmptyEl) jellyEmptyEl.style.display = 'none';
+    if (topJellyEmpty) topJellyEmpty.style.display = 'none';
 
-    // Jelly wobble animation
-    jellyTankEl.classList.remove('jelly-wobble');
-    void jellyTankEl.offsetWidth;
-    jellyTankEl.classList.add('jelly-wobble');
-
-    // Update count & latest info
+    this.totalMassGrams += item.weight;
+    const massKg = this.totalMassGrams / 1000;
     const count = this.fishes.length;
-    jellyCountEl.textContent = `${count} FISH${count > 1 ? 'ES' : ''}`;
-    jellyLatestEl.textContent = `✨ ${item.species.name} (${item.len.toFixed(1)} cm) · ${item.weight} g`;
 
-    // Spawn tiny bubbles inside jelly tank
-    for (let i = 0; i < 8; i++) {
-      this.bubbles.push({
-        x: Math.random() * this.w,
-        y: this.h + Math.random() * 10,
-        r: 1.5 + Math.random() * 2.5,
-        vy: 20 + Math.random() * 30
+    // ELASTIC STRETCH PHYSICS:
+    // Expands and stretches in width and height as monster sharks & fish are caged
+    this.stretchRatio = 1.0 + Math.min(0.65, (count * 0.035) + (massKg / 140) * 0.45);
+    const newW = Math.round(this.baseW * this.stretchRatio);
+    const newH = Math.round(this.baseH * Math.min(1.42, 1.0 + (this.stretchRatio - 1.0) * 0.65));
+
+    document.documentElement.style.setProperty('--tank-w', `${newW}px`);
+    document.documentElement.style.setProperty('--tank-h', `${newH}px`);
+
+    // Jelly suction gulp stretch wobble animation
+    topJellyDock.classList.remove('jelly-expand');
+    void topJellyDock.offsetWidth;
+    topJellyDock.classList.add('jelly-expand');
+
+    // Update dock HUD badges
+    topJellyBadge.textContent = `${count} CAGED`;
+    const expandPercent = Math.round(this.stretchRatio * 100);
+    jellySizeVal.textContent = `${expandPercent}%`;
+    jellyMassVal.textContent = massKg >= 1 ? `${massKg.toFixed(1)} kg` : `${this.totalMassGrams} g`;
+
+    // Internal fluid suction burst particles
+    for (let i = 0; i < 16; i++) {
+      this.bursts.push({
+        x: this.w * 0.5 + (Math.random() - 0.5) * 45,
+        y: this.h - 4,
+        vx: (Math.random() - 0.5) * 80,
+        vy: -25 - Math.random() * 55,
+        r: 2 + Math.random() * 3,
+        alpha: 1.0
       });
     }
 
-    sfx.jellyDrop();
+    sfx.jellyGulp();
   }
 
   updateAndDraw(dt) {
-    if (!jellyCtx) return;
-    jellyCtx.clearRect(0, 0, this.w, this.h);
+    if (!topJellyCtx) return;
+    const rect = topJellyCanvas.getBoundingClientRect();
+    if (Math.abs(this.w - rect.width) > 2 || Math.abs(this.h - rect.height) > 2) {
+      this.initCanvas();
+    }
 
-    // 1. Jelly Water Gradient & Caustic Glow
-    const bg = jellyCtx.createLinearGradient(0, 0, 0, this.h);
-    bg.addColorStop(0, 'rgba(34, 211, 238, 0.12)');
-    bg.addColorStop(0.6, 'rgba(6, 40, 65, 0.45)');
-    bg.addColorStop(1, 'rgba(2, 18, 30, 0.7)');
-    jellyCtx.fillStyle = bg;
-    jellyCtx.fillRect(0, 0, this.w, this.h);
+    topJellyCtx.clearRect(0, 0, this.w, this.h);
 
-    // 2. Rising Jelly Tank Bubbles
-    jellyCtx.fillStyle = 'rgba(180, 255, 250, 0.45)';
+    // 1. Elastic Jelly Chamber Liquid Background
+    const bg = topJellyCtx.createLinearGradient(0, 0, 0, this.h);
+    bg.addColorStop(0, 'rgba(34, 211, 238, 0.18)');
+    bg.addColorStop(0.5, 'rgba(6, 40, 65, 0.5)');
+    bg.addColorStop(1, 'rgba(2, 22, 38, 0.88)');
+    topJellyCtx.fillStyle = bg;
+    topJellyCtx.fillRect(0, 0, this.w, this.h);
+
+    // 2. Rising Internal Jelly Bubbles
+    topJellyCtx.fillStyle = 'rgba(180, 255, 250, 0.45)';
     for (let i = this.bubbles.length - 1; i >= 0; i--) {
       const b = this.bubbles[i];
       b.y -= b.vy * dt;
-      jellyCtx.beginPath();
-      jellyCtx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-      jellyCtx.fill();
+      topJellyCtx.beginPath();
+      topJellyCtx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      topJellyCtx.fill();
       if (b.y < -5) this.bubbles.splice(i, 1);
     }
-    // Ambient micro-bubble spawn
-    if (Math.random() < 0.1 && this.bubbles.length < 16) {
+    if (Math.random() < 0.14 && this.bubbles.length < 22) {
       this.bubbles.push({
         x: Math.random() * this.w,
         y: this.h + 2,
-        r: 1 + Math.random() * 2,
-        vy: 15 + Math.random() * 20
+        r: 1 + Math.random() * 2.5,
+        vy: 16 + Math.random() * 24
       });
     }
 
-    // 3. Mini Swimming Caught Fishes
+    // 3. Suction Gulp Bursts
+    for (let i = this.bursts.length - 1; i >= 0; i--) {
+      const p = this.bursts[i];
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.alpha -= 1.8 * dt;
+      topJellyCtx.fillStyle = `rgba(53, 243, 223, ${Math.max(0, p.alpha)})`;
+      topJellyCtx.beginPath();
+      topJellyCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      topJellyCtx.fill();
+      if (p.alpha <= 0) this.bursts.splice(i, 1);
+    }
+
+    // 4. Mini Live Swimming Fishes & Apex Sharks
     this.fishes.forEach(f => {
       f.update(dt, this.w, this.h);
-      f.draw(jellyCtx);
+      f.draw(topJellyCtx);
     });
   }
 }
-const jellyTank = new JellyTankManager();
-
-class LeapingFish {
-  constructor(fish, startX, startY) {
-    this.species = fish.species;
-    this.len = fish.species.len[0] + Math.random() * (fish.species.len[1] - fish.species.len[0]);
-    this.weight = Math.round(Math.pow(this.len, 2.6) * 0.14);
-    this.points = fish.species.basePoints;
-
-    this.startX = startX;
-    this.startY = startY;
-    this.x = startX;
-    this.y = startY;
-
-    // Target: Jelly Aquarium Box location on bottom-right!
-    const tankRect = jellyTankEl.getBoundingClientRect();
-    this.tx = tankRect.left + tankRect.width * 0.5;
-    this.ty = tankRect.top + tankRect.height * 0.35;
-
-    this.t = 0;
-    this.dur = 0.85; // Slow, majestic acrobatic flight
-    this.peakY = Math.min(this.ty, this.startY) - 130;
-    this.alive = true;
-  }
-
-  update(dt) {
-    this.t += dt / this.dur;
-    if (this.t >= 1.0) {
-      this.alive = false;
-
-      // Deliver fish directly into Jelly Aquarium Tank!
-      const item = { species: this.species, len: this.len, weight: this.weight, points: this.points };
-      catchBag.push(item);
-      score += this.points;
-      updateUI();
-
-      // Hand off to Jelly Livewell
-      jellyTank.receiveFish(item);
-
-      // Bag also wobbles
-      bagBtn.classList.remove('shake');
-      void bagBtn.offsetWidth;
-      bagBtn.classList.add('shake');
-
-      floatingScores.push(new FloatingText(this.tx - 25, this.ty - 15, `+${this.points} PTS!`, '#ffb732'));
-      return;
-    }
-
-    // Smooth parabolic arc interpolation
-    const ease = 1 - Math.pow(1 - this.t, 2);
-    this.x = this.startX + (this.tx - this.startX) * ease;
-    const arc = Math.sin(this.t * Math.PI) * (this.startY - this.peakY);
-    this.y = (this.startY + (this.ty - this.startY) * ease) - arc;
-
-    // Emit water droplets trailing behind airborne fish
-    if (Math.random() < 0.6) {
-      splashParticles.push(new SplashParticle(this.x, this.y));
-    }
-  }
-
-  draw() {
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    const angle = Math.sin(this.t * 8) * 0.8 - Math.PI * 0.2;
-    ctx.rotate(angle);
-
-    const scale = Math.min(1.4, 0.7 + (this.species.bodyL / 120) * 0.6);
-    ctx.scale(scale, scale);
-
-    // Glowing leaping fish silhouette
-    ctx.fillStyle = this.species.primary;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 18, 7.5, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Caudal tail
-    ctx.fillStyle = this.species.secondary || this.species.primary;
-    ctx.beginPath();
-    ctx.moveTo(-14, 0); ctx.lineTo(-26, -10); ctx.lineTo(-21, 0); ctx.lineTo(-26, 10);
-    ctx.closePath(); ctx.fill();
-
-    // Eye
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath(); ctx.arc(10, -2, 2.2, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#06131c';
-    ctx.beginPath(); ctx.arc(10.5, -2, 1.2, 0, Math.PI * 2); ctx.fill();
-
-    ctx.restore();
-  }
-}
+const topJellyTank = new TopJellyTankManager();
 
 class FloatingText {
   constructor(x, y, text, col = '#35f3df') {
@@ -1251,23 +1434,21 @@ class Pellet {
 }
 
 /* --------------------------------------------------------------------------
-   REALISTIC FISH CLASS WITH ANATOMICAL PROFILES & NATURAL SWIMMING
+   REALISTIC FISH & APEX SHARKS CLASS
    -------------------------------------------------------------------------- */
 class RealisticFish {
   constructor(species) {
     this.species = species;
-    this.numSegs = (species.role === 'trophy' || species.id === 'shark') ? 11 : 9;
+    this.numSegs = (species.role === 'boss' || species.role === 'trophy') ? 12 : 9;
     this.segDist = species.bodyL / this.numSegs;
 
-    // Start with smooth natural heading
     const fromLeft = Math.random() < 0.5;
-    this.x = fromLeft ? -80 : W + 80;
+    this.x = fromLeft ? -90 : W + 90;
     this.y = H * (species.depth[0] + Math.random() * (species.depth[1] - species.depth[0]));
     this.angle = fromLeft ? 0 : Math.PI;
     this.speed = (50 + Math.random() * 25) * species.speed;
     this.baseSpeed = this.speed;
 
-    // Vertebrae spine nodes
     this.spine = [];
     for (let i = 0; i < this.numSegs; i++) {
       this.spine.push({
@@ -1278,7 +1459,7 @@ class RealisticFish {
 
     this.swimPhase = Math.random() * Math.PI * 2;
     this.targetAngle = this.angle;
-    this.turnSpeed = 0.04;
+    this.turnSpeed = (species.role === 'boss') ? 0.028 : 0.04;
     this.state = 'cruise'; // 'cruise' | 'hunt' | 'panic' | 'hooked'
     this.huntTarget = null;
     this.puff = 0;
@@ -1293,7 +1474,7 @@ class RealisticFish {
         if (this.respawnTimer <= 0) {
           this.alive = true;
           const fromLeft = Math.random() < 0.5;
-          this.x = fromLeft ? -90 : W + 90;
+          this.x = fromLeft ? -100 : W + 100;
           this.y = H * (this.species.depth[0] + Math.random() * (this.species.depth[1] - this.species.depth[0]));
           this.angle = fromLeft ? 0 : Math.PI;
           this.state = 'cruise';
@@ -1302,13 +1483,12 @@ class RealisticFish {
       return;
     }
 
-    // Swimming wave frequency matches speed
     this.swimPhase += 5.5 * dt * (this.speed / 50);
 
-    // 1. PREDATOR-PREY FOOD CHAIN
-    if (this.species.role === 'predator') {
+    // 1. PREDATOR & SHARK HUNTING LOGIC
+    if (this.species.role === 'predator' || this.species.role === 'boss') {
       if (this.state === 'cruise') {
-        let nearestPrey = null, minD = 180;
+        let nearestPrey = null, minD = (this.species.role === 'boss') ? 240 : 180;
         for (const other of allFishes) {
           if (other !== this && other.alive && other.state !== 'hooked' && (other.species.role === 'prey' || other.species.id === 'puffer')) {
             const d = Math.hypot(this.x - other.x, this.y - other.y);
@@ -1328,10 +1508,10 @@ class RealisticFish {
           const dy = this.huntTarget.y - this.y;
           const dist = Math.hypot(dx, dy);
           this.targetAngle = Math.atan2(dy, dx);
-          this.speed = this.baseSpeed * 1.6;
+          this.speed = this.baseSpeed * 1.5;
 
           // Puffer defense!
-          if (this.huntTarget.species.id === 'puffer' && dist < 55) {
+          if (this.huntTarget.species.id === 'puffer' && dist < 60) {
             this.huntTarget.puff = 1.0;
             sfx.bloop();
             this.targetAngle += Math.PI;
@@ -1339,9 +1519,9 @@ class RealisticFish {
             this.huntTarget = null;
           }
           // Chomp!
-          else if (dist < 18) {
+          else if (dist < 22) {
             this.huntTarget.alive = false;
-            this.huntTarget.respawnTimer = 4.0;
+            this.huntTarget.respawnTimer = 4.5;
             sfx.chomp();
             floatingScores.push(new FloatingText(this.x, this.y - 14, 'CHOMP!', '#ff4757'));
             this.state = 'cruise';
@@ -1369,7 +1549,7 @@ class RealisticFish {
       if (nearestP) {
         this.targetAngle = Math.atan2(nearestP.y - this.y, nearestP.x - this.x);
         this.speed = this.baseSpeed * 1.3;
-        if (Math.hypot(nearestP.x - this.x, nearestP.y - this.y) < 14) {
+        if (Math.hypot(nearestP.x - this.x, nearestP.y - this.y) < 16) {
           nearestP.alive = false;
           sfx.bloop();
           score += 20;
@@ -1382,16 +1562,17 @@ class RealisticFish {
     // 4. NATURAL CRUISING & BOUNDARY CROSSING
     if (this.state === 'cruise') {
       this.speed = this.baseSpeed;
-      if (this.x < -110) { this.x = W + 100; this.angle = Math.PI; }
-      if (this.x > W + 110) { this.x = -100; this.angle = 0; }
-      if (this.y < 70) this.targetAngle = 0.4;
+      if (this.x < -130) { this.x = W + 120; this.angle = Math.PI; }
+      if (this.x > W + 130) { this.x = -120; this.angle = 0; }
+      if (this.y < 80) this.targetAngle = 0.4;
       if (this.y > H - 50) this.targetAngle = -0.4;
     }
 
     // Hook collision check: hook pierces mouth
     if (hook.active && hook.state === 'IDLE' && this.state !== 'panic' && this.alive) {
+      const hitRadius = (this.species.role === 'boss') ? 38 : 28;
       const d = Math.hypot(this.x - hook.x, this.y - hook.y);
-      if (d < 28) {
+      if (d < hitRadius) {
         hook.catchFish(this);
       }
     }
@@ -1407,11 +1588,9 @@ class RealisticFish {
     while (diff > Math.PI) diff -= Math.PI * 2;
     this.angle += diff * this.turnSpeed;
 
-    // Advance head position
     this.x += Math.cos(this.angle) * this.speed * dt;
     this.y += Math.sin(this.angle) * this.speed * dt;
 
-    // Head stays firm, wave propagates down spine to tail
     this.spine[0].x = this.x;
     this.spine[0].y = this.y;
 
@@ -1431,7 +1610,6 @@ class RealisticFish {
     }
   }
 
-  // Draw authentic fish with scales, fin rays, operculum, markings and countershading
   draw(ctx) {
     if (!this.alive && this.state !== 'hooked') return;
     ctx.save();
@@ -1440,7 +1618,6 @@ class RealisticFish {
     const puff = this.puff;
     const bodyW = sp.bodyW * (1 + puff * 1.6);
 
-    // Calculate left/right contour points from spine
     const leftSide = [];
     const rightSide = [];
 
@@ -1451,7 +1628,6 @@ class RealisticFish {
       const tangent = Math.atan2(nextPt.y - prevPt.y, nextPt.x - prevPt.x);
       const normal = tangent + Math.PI * 0.5;
 
-      // Realistic hydrodynamic profile (thickest at shoulders/belly, tapering to peduncle)
       const ratio = i / (this.numSegs - 1);
       const profile = Math.sin(ratio * Math.PI) * (1 - ratio * 0.35);
       const halfW = (bodyW * 0.5) * profile;
@@ -1460,22 +1636,24 @@ class RealisticFish {
       rightSide.push({ x: pt.x - Math.cos(normal) * halfW, y: pt.y - Math.sin(normal) * halfW });
     }
 
-    // 1. Pectoral Fins (Animated flapping along shoulder)
+    // 1. Pectoral Fins
     const finPt = this.spine[2];
     const flap = Math.sin(this.swimPhase * 1.5) * 0.5;
     ctx.fillStyle = sp.secondary || sp.primary;
-    ctx.globalAlpha = 0.75;
+    ctx.globalAlpha = 0.8;
+    const finW = (sp.role === 'boss') ? 22 : 13;
+    const finH = (sp.role === 'boss') ? 8 : 5;
     [1, -1].forEach(side => {
       ctx.save();
       ctx.translate(finPt.x, finPt.y);
       ctx.rotate(this.angle + side * (Math.PI * 0.45 + flap));
       ctx.beginPath();
-      ctx.ellipse(10, 0, 13, 5, 0, 0, Math.PI * 2);
+      ctx.ellipse(finW * 0.7, 0, finW, finH, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     });
 
-    // 2. Caudal Tail Fin (Flowing from last segment)
+    // 2. Caudal Tail Fin
     const tailBase = this.spine[this.numSegs - 1];
     const tailPrev = this.spine[this.numSegs - 2];
     const tailAngle = Math.atan2(tailBase.y - tailPrev.y, tailBase.x - tailPrev.x);
@@ -1484,33 +1662,33 @@ class RealisticFish {
     ctx.translate(tailBase.x, tailBase.y);
     ctx.rotate(tailAngle);
     ctx.fillStyle = sp.secondary || sp.primary;
-    ctx.globalAlpha = 0.88;
+    ctx.globalAlpha = 0.9;
 
     if (sp.id === 'tuna') {
-      // High aspect ratio lunate crescent tail
+      ctx.beginPath();
+      ctx.moveTo(0, 0); ctx.quadraticCurveTo(15, -28, 30, -32);
+      ctx.lineTo(24, 0); ctx.lineTo(30, 32);
+      ctx.quadraticCurveTo(15, 28, 0, 0);
+      ctx.closePath(); ctx.fill();
+    } else if (sp.role === 'boss' || sp.id === 'great_white' || sp.id === 'hammerhead') {
+      // Apex Heterocercal Shark Tail
       ctx.beginPath();
       ctx.moveTo(0, 0);
-      ctx.quadraticCurveTo(15, -28, 30, -32);
-      ctx.lineTo(24, 0);
-      ctx.lineTo(30, 32);
-      ctx.quadraticCurveTo(15, 28, 0, 0);
-      ctx.closePath();
-      ctx.fill();
+      ctx.quadraticCurveTo(24, -34, 46, -42);
+      ctx.lineTo(36, -14); ctx.lineTo(28, 0);
+      ctx.lineTo(35, 24); ctx.quadraticCurveTo(18, 16, 0, 0);
+      ctx.closePath(); ctx.fill();
     } else {
       ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(22, -15);
-      ctx.lineTo(15, 0);
-      ctx.lineTo(22, 15);
-      ctx.closePath();
-      ctx.fill();
+      ctx.moveTo(0, 0); ctx.lineTo(22, -15); ctx.lineTo(15, 0); ctx.lineTo(22, 15);
+      ctx.closePath(); ctx.fill();
     }
     ctx.restore();
 
-    // 3. Fleshy Streamlined Fish Body
+    // 3. Fleshy Fish/Shark Body
     ctx.globalAlpha = 1.0;
     ctx.beginPath();
-    ctx.moveTo(this.spine[0].x, this.spine[0].y); // Mouth tip
+    ctx.moveTo(this.spine[0].x, this.spine[0].y);
     for (let i = 0; i < leftSide.length - 1; i++) {
       const xc = (leftSide[i].x + leftSide[i + 1].x) * 0.5;
       const yc = (leftSide[i].y + leftSide[i + 1].y) * 0.5;
@@ -1524,7 +1702,6 @@ class RealisticFish {
     }
     ctx.closePath();
 
-    // Countershading Gradient (dark dorsal, bright belly)
     const grad = ctx.createLinearGradient(this.spine[0].x, this.spine[0].y, tailBase.x, tailBase.y);
     grad.addColorStop(0, sp.primary);
     grad.addColorStop(0.7, sp.primary);
@@ -1532,8 +1709,93 @@ class RealisticFish {
     ctx.fillStyle = grad;
     ctx.fill();
 
-    // 4. Species Markings & Custom Traits
-    if (sp.id === 'clown') {
+    // 4. Species Markings, Shark Dorsals, Teeth & Anatomical Profiles
+    if (sp.id === 'great_white') {
+      // Megalodon Great White: Tall Dorsal Fin
+      const dSeg = this.spine[3];
+      const dAngle = this.angle - Math.PI * 0.5;
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.moveTo(dSeg.x + Math.cos(this.angle) * 16, dSeg.y + Math.sin(this.angle) * 16);
+      ctx.lineTo(dSeg.x + Math.cos(dAngle) * 40 - Math.cos(this.angle) * 8, dSeg.y + Math.sin(dAngle) * 40 - Math.sin(this.angle) * 8);
+      ctx.lineTo(dSeg.x - Math.cos(this.angle) * 18, dSeg.y - Math.sin(this.angle) * 18);
+      ctx.closePath();
+      ctx.fill();
+
+      // Gill Slits
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.65)';
+      ctx.lineWidth = 2.0;
+      for (let g = 0; g < 5; g++) {
+        const gx = this.spine[2].x - Math.cos(this.angle) * (g * 4 - 8);
+        const gy = this.spine[2].y - Math.sin(this.angle) * (g * 4 - 8);
+        ctx.beginPath();
+        ctx.moveTo(gx - Math.sin(this.angle) * 12, gy + Math.cos(this.angle) * 12);
+        ctx.lineTo(gx + Math.sin(this.angle) * 12, gy - Math.cos(this.angle) * 12);
+        ctx.stroke();
+      }
+
+      // Serrated triangular shark teeth
+      ctx.fillStyle = '#ffffff';
+      for (let t = -4; t <= 4; t += 2) {
+        const tx = this.spine[0].x + Math.cos(this.angle + 1.57) * t * 3.8;
+        const ty = this.spine[0].y + Math.sin(this.angle + 1.57) * t * 3.8;
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(tx + Math.cos(this.angle) * 9, ty + Math.sin(this.angle) * 9);
+        ctx.lineTo(tx + Math.cos(this.angle - 0.7) * 5, ty + Math.sin(this.angle - 0.7) * 5);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // White belly countershading
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      ctx.moveTo(this.spine[0].x, this.spine[0].y + 4);
+      for (let i = 1; i < this.numSegs - 2; i++) {
+        ctx.lineTo(this.spine[i].x, this.spine[i].y + 3);
+      }
+      ctx.stroke();
+    } else if (sp.id === 'hammerhead') {
+      // Titan Hammerhead: Cephalofoil T-bar head
+      const hSeg = this.spine[0];
+      const hNormal = this.angle + Math.PI * 0.5;
+      const barLen = 30;
+
+      ctx.save();
+      ctx.fillStyle = '#334155';
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.ellipse(hSeg.x, hSeg.y, barLen, 8.5, this.angle + Math.PI * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Wide-set lateral eyes on the ends of the hammerhead
+      const eyeL_x = hSeg.x + Math.cos(hNormal) * (barLen - 4);
+      const eyeL_y = hSeg.y + Math.sin(hNormal) * (barLen - 4);
+      const eyeR_x = hSeg.x - Math.cos(hNormal) * (barLen - 4);
+      const eyeR_y = hSeg.y - Math.sin(hNormal) * (barLen - 4);
+
+      [{ x: eyeL_x, y: eyeL_y }, { x: eyeR_x, y: eyeR_y }].forEach(eye => {
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.arc(eye.x, eye.y, 3.4, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath(); ctx.arc(eye.x, eye.y, 2.0, 0, Math.PI * 2); ctx.fill();
+      });
+      ctx.restore();
+
+      // Tall curved hammerhead dorsal fin
+      const dSeg = this.spine[3];
+      const dAngle = this.angle - Math.PI * 0.5;
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.moveTo(dSeg.x + Math.cos(this.angle) * 14, dSeg.y + Math.sin(this.angle) * 14);
+      ctx.quadraticCurveTo(dSeg.x + Math.cos(dAngle) * 38, dSeg.y + Math.sin(dAngle) * 38, dSeg.x + Math.cos(dAngle) * 34 - Math.cos(this.angle) * 12, dSeg.y + Math.sin(dAngle) * 34 - Math.sin(this.angle) * 12);
+      ctx.lineTo(dSeg.x - Math.cos(this.angle) * 14, dSeg.y - Math.sin(this.angle) * 14);
+      ctx.closePath();
+      ctx.fill();
+    } else if (sp.id === 'clown') {
       ctx.fillStyle = '#ffffff';
       ctx.strokeStyle = '#111';
       ctx.lineWidth = 1.2;
@@ -1559,7 +1821,6 @@ class RealisticFish {
         ctx.stroke();
       }
     } else if (sp.id === 'tuna') {
-      // Golden finlet keels along peduncle
       ctx.fillStyle = sp.finlet || '#facc15';
       [6, 7, 8, 9].forEach(seg => {
         if (seg < leftSide.length && seg < rightSide.length) {
@@ -1577,7 +1838,6 @@ class RealisticFish {
         }
       });
     } else if (sp.id === 'gold_king') {
-      // Dragon chin whiskers & royal golden aura
       ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 2.2;
       ctx.beginPath();
       ctx.moveTo(this.spine[0].x, this.spine[0].y);
@@ -1588,7 +1848,6 @@ class RealisticFish {
       ctx.quadraticCurveTo(this.spine[0].x + Math.cos(this.angle - 0.6) * 18, this.spine[0].y + Math.sin(this.angle - 0.6) * 18, this.spine[0].x + Math.cos(this.angle - 0.9) * 28, this.spine[0].y + Math.sin(this.angle - 0.9) * 28);
       ctx.stroke();
     } else if (sp.id === 'angler') {
-      // Jagged needle teeth on lower jaw
       ctx.fillStyle = '#ffffff';
       for (let t = -3; t <= 3; t += 2) {
         const tx = this.spine[0].x + Math.cos(this.angle + 1.5) * t * 3.5;
@@ -1600,18 +1859,15 @@ class RealisticFish {
         ctx.fill();
       }
 
-      // Bioluminescent antenna & glowing esca lure
       const antBase = this.spine[1];
       const antTipX = antBase.x + Math.cos(this.angle - 0.85) * 32;
       const antTipY = antBase.y + Math.sin(this.angle - 0.85) * 32;
-
       ctx.strokeStyle = '#0f766e'; ctx.lineWidth = 2.2;
       ctx.beginPath();
       ctx.moveTo(antBase.x, antBase.y);
       ctx.quadraticCurveTo(antBase.x + Math.cos(this.angle - 1.4) * 24, antBase.y + Math.sin(this.angle - 1.4) * 24, antTipX, antTipY);
       ctx.stroke();
 
-      // Glowing cyan lure
       const lureGrad = ctx.createRadialGradient(antTipX, antTipY, 1, antTipX, antTipY, 15);
       lureGrad.addColorStop(0, '#ffffff');
       lureGrad.addColorStop(0.35, '#22d3ee');
@@ -1622,29 +1878,31 @@ class RealisticFish {
       ctx.fill();
     }
 
-    // 5. Realistic Eye with Catch-light
-    const eyeSeg = this.spine[1];
-    const eyeTangent = Math.atan2(this.spine[2].y - this.spine[0].y, this.spine[2].x - this.spine[0].x);
-    const eyeNormal = eyeTangent + Math.PI * 0.5;
-    const eyeDist = bodyW * 0.32;
+    // 5. Realistic Eye (except hammerhead which has lateral eyes)
+    if (sp.id !== 'hammerhead') {
+      const eyeSeg = this.spine[1];
+      const eyeTangent = Math.atan2(this.spine[2].y - this.spine[0].y, this.spine[2].x - this.spine[0].x);
+      const eyeNormal = eyeTangent + Math.PI * 0.5;
+      const eyeDist = bodyW * 0.32;
 
-    [1, -1].forEach(side => {
-      const ex = eyeSeg.x + Math.cos(eyeNormal) * eyeDist * side;
-      const ey = eyeSeg.y + Math.sin(eyeNormal) * eyeDist * side;
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath(); ctx.arc(ex, ey, 3.4, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#06131c';
-      ctx.beginPath(); ctx.arc(ex, ey, 2.0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath(); ctx.arc(ex - 0.7, ey - 0.7, 0.8, 0, Math.PI * 2); ctx.fill();
-    });
+      [1, -1].forEach(side => {
+        const ex = eyeSeg.x + Math.cos(eyeNormal) * eyeDist * side;
+        const ey = eyeSeg.y + Math.sin(eyeNormal) * eyeDist * side;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.arc(ex, ey, (sp.role === 'boss') ? 3.8 : 3.4, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#06131c';
+        ctx.beginPath(); ctx.arc(ex, ey, (sp.role === 'boss') ? 2.4 : 2.0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.arc(ex - 0.7, ey - 0.7, 0.8, 0, Math.PI * 2); ctx.fill();
+      });
+    }
 
     ctx.restore();
   }
 }
 
 /* --------------------------------------------------------------------------
-   VISCERAL FISHING HOOK & TACKLE SYSTEM
+   VISCERAL FISHING HOOK & SHARK BATTLE ENGINE
    -------------------------------------------------------------------------- */
 class FishingHook {
   constructor() {
@@ -1652,51 +1910,111 @@ class FishingHook {
     this.y = 120;
     this.targetX = this.x;
     this.targetY = this.y;
-    this.state = 'IDLE'; // 'IDLE' | 'REELING' | 'LAUNCHING'
+    this.startX = this.x;
+    this.startY = 120;
+    this.state = 'IDLE'; // 'IDLE' | 'REELING' | 'BATTLING'
     this.active = true;
     this.fish = null;
     this.reelTime = 0;
     this.reelDuration = 1.8;
-    this.startY = 120;
     this.lastRatchet = 0;
     this.struggleWiggle = 0;
+
+    // Advanced Shark Battle State
+    this.stamina = 1.0;
+    this.tension = 0.35;
+    this.battleTimer = 0;
+    this.isThrashing = false;
+    this.thrashTimer = 1.8;
+    this.overTensionTime = 0;
   }
 
   moveTo(x, y) {
-    if (this.state === 'REELING') return; // Locked into reeling battle
     this.targetX = x;
-    this.targetY = Math.max(70, Math.min(H - 40, y));
+    if (this.state === 'IDLE') {
+      this.targetY = Math.max(70, Math.min(H - 40, y));
+    }
   }
 
   catchFish(fish) {
     if (this.state !== 'IDLE' || !fish.alive) return;
-    this.state = 'REELING';
     this.fish = fish;
     fish.alive = false;
     fish.state = 'hooked';
+    this.startX = this.x;
     this.startY = this.y;
 
-    // Reel duration scales with fish weight & size:
-    // small fish = 1.4s, big tuna/angler/shark = 2.4 to 2.8s
-    const ratio = Math.min(1.0, Math.max(0, (fish.species.bodyL - 34) / 84));
-    this.reelDuration = 1.4 + ratio * 1.4;
-    this.reelTime = 0;
+    const isBoss = (fish.species.role === 'boss');
+    const isTrophy = (fish.species.role === 'trophy');
 
-    // Meaty hook piercing sound + blood burst
-    sfx.hookPierce();
-    if (fish.species.role === 'trophy' || fish.species.id === 'shark') {
+    if (isBoss || isTrophy) {
+      this.state = 'BATTLING';
+      this.stamina = 1.0;
+      this.tension = 0.35;
+      this.battleTimer = 0;
+      this.isThrashing = false;
+      this.thrashTimer = 1.6;
+      this.overTensionTime = 0;
+
+      sfx.sharkRoar();
+      sfx.hookPierce();
       sfx.bigFishTug();
+
+      battleHud.classList.add('active');
+      battleHud.classList.remove('critical');
+      battleTitle.textContent = `⚔️ ${fish.species.name.toUpperCase()} HOOKED!`;
+      battleHint.textContent = 'PULL UP / HOLD CLICK TO WINCH SHARK!';
+
+      for (let i = 0; i < 40; i++) {
+        bloodParticles.push(new BloodParticle(fish.x, fish.y));
+      }
+      floatingScores.push(new FloatingText(fish.x, fish.y - 20, `🔥 ${fish.species.name} HOOKED!`, '#ff4757'));
+    } else {
+      this.state = 'REELING';
+      const ratio = Math.min(1.0, Math.max(0, (fish.species.bodyL - 34) / 84));
+      this.reelDuration = 1.3 + ratio * 1.2;
+      this.reelTime = 0;
+
+      sfx.hookPierce();
+      for (let i = 0; i < 28; i++) {
+        bloodParticles.push(new BloodParticle(fish.x, fish.y));
+      }
+      floatingScores.push(new FloatingText(fish.x, fish.y - 18, 'HOOKED!', '#35f3df'));
+    }
+  }
+
+  deliverCatchToJellyDock() {
+    const f = this.fish;
+    if (!f) return;
+
+    sfx.surfaceBreach();
+
+    for (let i = 0; i < 28; i++) {
+      splashParticles.push(new SplashParticle(W * 0.5 + (Math.random() - 0.5) * 30, 72));
     }
 
-    // Spawn 28-35 Blood particles bursting out of the mouth
-    for (let i = 0; i < 30; i++) {
-      bloodParticles.push(new BloodParticle(fish.x, fish.y));
-    }
+    const len = f.species.len[0] + Math.random() * (f.species.len[1] - f.species.len[0]);
+    const weight = Math.round(Math.pow(len, 2.7) * 0.16);
+    const item = { species: f.species, len, weight, points: f.species.basePoints };
 
-    // Floating notification text
-    const label = (fish.species.role === 'trophy') ? '🔥 BIG TROPHY HOOKED!' : 'HOOKED!';
-    const col = (fish.species.role === 'trophy') ? '#ffd32a' : '#ff4757';
-    floatingScores.push(new FloatingText(fish.x, fish.y - 18, label, col));
+    catchBag.push(item);
+    score += item.points;
+    updateUI();
+
+    // DELIVER DIRECTLY INTO TOP ELASTIC JELLY TANK!
+    topJellyTank.gulpFish(item);
+
+    bagBtn.classList.remove('shake');
+    void bagBtn.offsetWidth;
+    bagBtn.classList.add('shake');
+
+    floatingScores.push(new FloatingText(W * 0.5 - 40, 95, `+${item.points} PTS!`, '#ffb732'));
+
+    battleHud.classList.remove('active', 'critical');
+    f.respawnTimer = 6.0;
+    this.fish = null;
+    this.state = 'IDLE';
+    this.targetY = 120;
   }
 
   update(dt, now) {
@@ -1706,77 +2024,158 @@ class FishingHook {
       return;
     }
 
-    if (this.state === 'REELING' && this.fish) {
-      this.reelTime += dt;
-      const progress = Math.min(1.0, this.reelTime / this.reelDuration);
+    // 1. ADVANCED SHARK TUG-OF-WAR BATTLE
+    if (this.state === 'BATTLING' && this.fish) {
+      this.battleTimer += dt;
+      this.thrashTimer -= dt;
 
-      // Smooth steady pull upwards
-      const ease = 1 - Math.pow(1 - progress, 2);
-      const targetSurfaceY = 66; // Surface level
-      this.y = this.startY + (targetSurfaceY - this.startY) * ease;
+      if (this.thrashTimer <= 0) {
+        this.isThrashing = !this.isThrashing;
+        this.thrashTimer = this.isThrashing ? (1.3 + Math.random() * 1.2) : (1.6 + Math.random() * 1.4);
+        if (this.isThrashing) {
+          sfx.dragScreech();
+        }
+      }
 
-      // Realistic struggle wiggling (fish pulling against the line)
-      this.struggleWiggle = Math.sin(now * 0.024) * (7 + (1 - progress) * 11);
-      this.x = this.targetX + this.struggleWiggle;
+      const isPlayerPulling = isPointerDown || (this.targetY < this.y - 4);
 
-      // Make reel ratchet sound every 100ms
-      if (now - this.lastRatchet > 100) {
-        sfx.reelRatchet();
-        this.lastRatchet = now;
+      if (this.isThrashing) {
+        // SHARK FRENZY SURGE
+        const diveSpeed = (this.fish.species.role === 'boss') ? 160 : 110;
+        this.y = Math.min(H - 60, this.y + diveSpeed * dt);
+        this.struggleWiggle = Math.sin(now * 0.035) * 16;
+        this.x = W * 0.5 + this.struggleWiggle;
+
+        if (isPlayerPulling) {
+          this.tension = Math.min(1.0, this.tension + 0.65 * dt);
+        } else {
+          this.tension = Math.max(0.3, this.tension - 0.28 * dt);
+        }
+
+        battleHint.textContent = '⚠️ SHARK THRASHING! EASE OFF TO PREVENT SNAP!';
+        battleHint.style.color = '#ff4757';
+      } else {
+        // EXHAUSTION / REEL WINDOW
+        this.struggleWiggle = Math.sin(now * 0.015) * 6;
+        this.x = W * 0.5 + this.struggleWiggle;
+
+        if (isPlayerPulling) {
+          const winchSpeed = 95;
+          this.y = Math.max(75, this.y - winchSpeed * dt);
+          this.stamina = Math.max(0, this.stamina - 0.38 * dt);
+          this.tension = Math.min(0.84, this.tension + 0.22 * dt);
+
+          if (now - this.lastRatchet > 110) {
+            sfx.reelRatchet();
+            this.lastRatchet = now;
+          }
+        } else {
+          this.tension = Math.max(0.2, this.tension - 0.35 * dt);
+        }
+
+        battleHint.textContent = '🎣 SHARK EXHAUSTED! DRAG UP / HOLD CLICK TO WINCH!';
+        battleHint.style.color = '#35f3df';
+      }
+
+      // Update battle HUD
+      staminaFill.style.width = `${Math.round(this.stamina * 100)}%`;
+      battleStaminaVal.textContent = `STAMINA: ${Math.round(this.stamina * 100)}%`;
+      tensionFill.style.width = `${Math.round(this.tension * 100)}%`;
+
+      if (this.tension > 0.88) {
+        battleHud.classList.add('critical');
+        tensionLabel.textContent = 'CRITICAL OVER-TENSION!';
+        tensionLabel.style.color = '#ff4757';
+        this.overTensionTime += dt;
+
+        if (this.overTensionTime > 1.35) {
+          sfx.snap();
+          floatingScores.push(new FloatingText(this.x, this.y, '💥 LINE SNAPPED! SHARK ESCAPED!', '#ff0033'));
+
+          const f = this.fish;
+          f.alive = true;
+          f.state = 'cruise';
+          f.speed = f.baseSpeed * 2.8;
+          f.angle = Math.PI * 0.5;
+
+          battleHud.classList.remove('active', 'critical');
+          this.state = 'IDLE';
+          this.fish = null;
+          return;
+        }
+      } else {
+        battleHud.classList.remove('critical');
+        tensionLabel.textContent = (this.tension > 0.6) ? 'HIGH' : 'NORMAL';
+        tensionLabel.style.color = (this.tension > 0.6) ? '#ffb732' : '#35f3df';
+        this.overTensionTime = Math.max(0, this.overTensionTime - dt * 2);
       }
 
       // Lock fish to hook
       const f = this.fish;
       f.x = this.x;
-      f.y = this.y + 6;
-      f.angle = -Math.PI * 0.5 + Math.sin(now * 0.02) * 0.35; // Head pointed straight up
+      f.y = this.y + 10;
+      f.angle = -Math.PI * 0.5 + Math.sin(now * 0.02) * 0.3;
       f.targetAngle = f.angle;
-      f.speed = 0;
-      f.swimPhase += 35 * dt; // Frantic tail thrashing!
+      f.swimPhase += 35 * dt;
 
-      // Align spine segments vertically hanging beneath hook
       f.spine[0].x = f.x;
       f.spine[0].y = f.y;
       for (let i = 1; i < f.numSegs; i++) {
         const prev = f.spine[i - 1];
         const cur = f.spine[i];
-        const tailWiggle = Math.sin(f.swimPhase - i * 0.65) * (5 + i * 2.2);
+        const tailWiggle = Math.sin(f.swimPhase - i * 0.6) * (6 + i * 2.5);
         cur.x = prev.x + tailWiggle;
         cur.y = prev.y + f.segDist;
       }
 
-      // Emit rising struggle bubbles
-      if (Math.random() < 0.5) {
-        bubbleParticles.push(new BubbleParticle(f.x, f.y + 8));
+      if (Math.random() < 0.6) bubbleParticles.push(new BubbleParticle(f.x, f.y + 10));
+      if (Math.random() < 0.2) bloodParticles.push(new BloodParticle(f.x, f.y));
+
+      if (this.y <= 85 || this.stamina <= 0.02) {
+        this.deliverCatchToJellyDock();
+      }
+      return;
+    }
+
+    // 2. STANDARD REELING DIRECTLY INTO TOP JELLY INTAKE PORT
+    if (this.state === 'REELING' && this.fish) {
+      this.reelTime += dt;
+      const progress = Math.min(1.0, this.reelTime / this.reelDuration);
+      const ease = 1 - Math.pow(1 - progress, 2);
+      const targetDockY = 78;
+
+      this.y = this.startY + (targetDockY - this.startY) * ease;
+      this.struggleWiggle = Math.sin(now * 0.025) * (7 + (1 - progress) * 10);
+      this.x = W * 0.5 + (this.startX - W * 0.5) * (1 - ease) + this.struggleWiggle;
+
+      if (now - this.lastRatchet > 105) {
+        sfx.reelRatchet();
+        this.lastRatchet = now;
       }
 
-      // Continual slight blood seepage while reeling big fish
-      if (Math.random() < 0.18) {
-        bloodParticles.push(new BloodParticle(f.x, f.y));
+      const f = this.fish;
+      f.x = this.x;
+      f.y = this.y + 6;
+      f.angle = -Math.PI * 0.5 + Math.sin(now * 0.02) * 0.35;
+      f.targetAngle = f.angle;
+      f.speed = 0;
+      f.swimPhase += 32 * dt;
+
+      f.spine[0].x = f.x;
+      f.spine[0].y = f.y;
+      for (let i = 1; i < f.numSegs; i++) {
+        const prev = f.spine[i - 1];
+        const cur = f.spine[i];
+        const tailWiggle = Math.sin(f.swimPhase - i * 0.65) * (4 + i * 2.0);
+        cur.x = prev.x + tailWiggle;
+        cur.y = prev.y + f.segDist;
       }
 
-      // Check if surface reached
-      if (progress >= 1.0) {
-        // Surface breach!
-        this.state = 'LAUNCHING';
-        sfx.surfaceBreach();
+      if (Math.random() < 0.45) bubbleParticles.push(new BubbleParticle(f.x, f.y + 8));
+      if (Math.random() < 0.16) bloodParticles.push(new BloodParticle(f.x, f.y));
 
-        // Spawn surface splash foam & droplets
-        for (let i = 0; i < 35; i++) {
-          splashParticles.push(new SplashParticle(this.x, 65));
-        }
-
-        // Launch acrobatic leaping fish targeting the Jelly Aquarium Box!
-        leapingFishes.push(new LeapingFish(this.fish, this.x, 65));
-
-        // Respawn original fish from horizon after delay
-        this.fish.respawnTimer = 5.0;
-
-        // Reset hook
-        setTimeout(() => {
-          this.state = 'IDLE';
-          this.fish = null;
-        }, 140);
+      if (progress >= 1.0 || this.y <= 80) {
+        this.deliverCatchToJellyDock();
       }
     }
   }
@@ -1784,17 +2183,26 @@ class FishingHook {
   draw(ctx, now) {
     const rodX = W * 0.5;
     const rodY = 0;
+    const isBattling = (this.state === 'BATTLING');
     const isReeling = (this.state === 'REELING');
 
-    // Flexible Fishing Line with tension vibration
     ctx.save();
-    ctx.strokeStyle = isReeling ? 'rgba(255, 183, 50, 0.95)' : 'rgba(235, 255, 250, 0.65)';
-    ctx.lineWidth = isReeling ? 2.5 : 1.3;
+    if (isBattling) {
+      ctx.strokeStyle = (this.tension > 0.85) ? '#ff4757' : (this.tension > 0.6 ? '#ffb732' : '#35f3df');
+      ctx.lineWidth = 3.0;
+    } else if (isReeling) {
+      ctx.strokeStyle = 'rgba(255, 183, 50, 0.95)';
+      ctx.lineWidth = 2.4;
+    } else {
+      ctx.strokeStyle = 'rgba(235, 255, 250, 0.65)';
+      ctx.lineWidth = 1.3;
+    }
+
     ctx.beginPath();
     ctx.moveTo(rodX, rodY);
 
-    if (isReeling) {
-      const hum = Math.sin(now * 0.08) * 1.8;
+    if (isBattling || isReeling) {
+      const hum = Math.sin(now * 0.08) * (isBattling ? 2.5 : 1.5);
       ctx.lineTo(this.x + hum, this.y);
     } else {
       const midX = (rodX + this.x) * 0.5;
@@ -1807,35 +2215,32 @@ class FishingHook {
     ctx.save();
     ctx.translate(this.x, this.y);
 
-    if (isReeling && this.fish) {
-      // The hook penetrates through the mouth and jaw!
+    if ((isBattling || isReeling) && this.fish) {
       ctx.strokeStyle = '#e2e8f0';
-      ctx.lineWidth = 3.0;
+      ctx.lineWidth = (isBattling ? 3.6 : 3.0);
       ctx.beginPath();
       ctx.moveTo(0, -14);
-      ctx.lineTo(0, 4); // enters upper lip
+      ctx.lineTo(0, 4);
       ctx.stroke();
 
-      // Hook bend looping through lower jaw
       ctx.strokeStyle = '#cbd5e1';
       ctx.beginPath();
       ctx.arc(-5, 4, 6, 0, Math.PI);
-      ctx.lineTo(-11, 0); // Barb punctures out of cheek!
+      ctx.lineTo(-11, 0);
       ctx.stroke();
 
-      // Sharp Barb tip with blood drop!
+      // Sharp Barb tip with blood
       ctx.fillStyle = '#dc2626';
       ctx.beginPath();
-      ctx.arc(-11, 0, 2.4, 0, Math.PI * 2);
+      ctx.arc(-11, 0, 2.6, 0, Math.PI * 2);
       ctx.fill();
 
-      // Red puncture wound dot where hook pierces mouth
+      // Puncture wound dot
       ctx.fillStyle = '#b91c1c';
       ctx.beginPath();
-      ctx.arc(0, 3, 2.8, 0, Math.PI * 2);
+      ctx.arc(0, 3, 3.0, 0, Math.PI * 2);
       ctx.fill();
     } else {
-      // Normal idle hook with bait
       ctx.strokeStyle = '#cbd5e1';
       ctx.lineWidth = 2.4;
       ctx.beginPath();
@@ -1845,7 +2250,7 @@ class FishingHook {
       ctx.lineTo(-8, 1);
       ctx.stroke();
 
-      // Wiggling red bait worm
+      // Red bait worm
       ctx.fillStyle = '#ff4757';
       ctx.beginPath();
       ctx.arc(-2, 4, 3.5, 0, Math.PI * 2);
@@ -1861,7 +2266,6 @@ class FishingHook {
    SIMULATION RUNTIME & ENTITY ARRAYS
    -------------------------------------------------------------------------- */
 let fishes = [];
-let leapingFishes = [];
 let floatingScores = [];
 let pellets = [];
 let bloodParticles = [];
@@ -1885,14 +2289,25 @@ function initWorld() {
 }
 window.addEventListener('resize', initWorld);
 
-// Pointer drag / cast hook
+// Pointer drag & casting listeners
 canvas.addEventListener('pointerdown', e => {
   initAudio();
+  isPointerDown = true;
+  lastPointerY = e.clientY;
   hook.moveTo(e.clientX, e.clientY);
 });
 canvas.addEventListener('pointermove', e => {
+  if (isPointerDown && e.clientY < lastPointerY) {
+    // Winch pull upward motion
+    if (hook.state === 'BATTLING') {
+      hook.y = Math.max(75, hook.y - (lastPointerY - e.clientY));
+    }
+  }
+  lastPointerY = e.clientY;
   hook.moveTo(e.clientX, e.clientY);
 });
+window.addEventListener('pointerup', () => { isPointerDown = false; });
+window.addEventListener('pointercancel', () => { isPointerDown = false; });
 
 feedBtn.addEventListener('click', () => {
   initAudio();
@@ -1935,7 +2350,7 @@ function animate(now) {
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
 
-  // 2. Subtle God Rays
+  // 2. God Rays
   ctx.save();
   ctx.globalCompositeOperation = 'screen';
   for (let i = 0; i < 4; i++) {
@@ -1958,13 +2373,13 @@ function animate(now) {
     if (!p.alive) pellets.splice(i, 1);
   }
 
-  // 4. Fishes
+  // 4. Fishes & Apex Sharks
   fishes.forEach(f => {
     f.update(dt, hook, fishes, pellets);
     f.draw(ctx);
   });
 
-  // 5. Blood Particles (Underwater Red Inks/Mists)
+  // 5. Blood Particles
   for (let i = bloodParticles.length - 1; i >= 0; i--) {
     const bp = bloodParticles[i];
     bp.update(dt);
@@ -1988,19 +2403,11 @@ function animate(now) {
     if (!sp.alive) splashParticles.splice(i, 1);
   }
 
-  // 8. Fishing Hook & Reeling Tackle
+  // 8. Fishing Hook, Reeling & Shark Battle
   hook.update(dt, now);
   hook.draw(ctx, now);
 
-  // 9. Leaping Fishes into Jelly Tank
-  for (let i = leapingFishes.length - 1; i >= 0; i--) {
-    const lf = leapingFishes[i];
-    lf.update(dt);
-    lf.draw();
-    if (!lf.alive) leapingFishes.splice(i, 1);
-  }
-
-  // 10. Floating Scores
+  // 9. Floating Scores
   for (let i = floatingScores.length - 1; i >= 0; i--) {
     const fs = floatingScores[i];
     fs.update(dt);
@@ -2008,8 +2415,8 @@ function animate(now) {
     if (fs.life <= 0) floatingScores.splice(i, 1);
   }
 
-  // 11. Jelly Livewell Aquarium Box Rendering
-  jellyTank.updateAndDraw(dt);
+  // 10. Top Elastic Jelly Live Dock Rendering
+  topJellyTank.updateAndDraw(dt);
 
   requestAnimationFrame(animate);
 }
@@ -2018,6 +2425,7 @@ function animate(now) {
 initWorld();
 updateUI();
 requestAnimationFrame(animate);
+
 </script>
 </body>
 </html>
