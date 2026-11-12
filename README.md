@@ -6,7 +6,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 
 ---
 
-## 🎮 The 8 Experiments
+## 🎮 The 9 Experiments
 
 | # | Experiment | Technology | Highlights |
 |---|---|---|---|
@@ -18,6 +18,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 | **06** | [**NeuroLife 3D: Neural Evolution Simulator**](neuro.html) | Three.js WebGL, Real Neural Networks | 3D artificial life ecosystem powered by genuine feedforward neural networks (8 inputs, 8 hidden, 3 motor outputs). Inspect live firing neurons and synapses in real-time, trigger cosmic mutations, inject apex predators, or possess ("Mind-Jack") any organism directly. |
 | **07** | [**Royal Carrom Club 3D: Master Board Lounge**](carrom.html) | Three.js WebGL, 2D Disk Physics | Luxury 3D Indian Rosewood Carrom Board with regulation snug pockets, 1P-4P local multiplayer, dynamic player-seat camera, real Carrom extra-shot rules, talcum powder glide, and acoustic wooden clacks. |
 | **08** | [**Slingshot Smash: Antique Tabletop Alley**](smash.html) | Canvas 2D, 120Hz Sub-step Physics | Ultra-smooth physical destruction toy sharing the beloved tactile slingshot feel of Slingshot Lamp. Shatter crystal bottles, trigger domino cascades, ring tuned pentatonic brass bells, and fire river pebbles, steel bearings, glowing orbs, or superballs. |
+| **09** | [**The Focus Candle: Atmospheric Melting Timer**](candle.html) | Canvas 2D, Dynamic Wax Physics, Web Audio | Realistic beeswax candle timer with smooth real-time melting, organic multi-harmonic flame flickering, interactive wind flutter, dripping wax tear rivulets, cotton wick crackle, wooden matchstick strike, and dual-tone digital beep alarm. |
 
 ---
 
@@ -41,7 +42,14 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 - Computes optimal game tree branches with depth-weighted heuristics.
 - Generates live advantage evaluation percentages mapped directly to an esports-style evaluation bar.
 
-### 4. Procedural Audio Synthesizer
+### 4. Organic Candle Melting & Thermal Physics (`candle.html`)
+- **Proportional Wax Melting Ratio**: Cylinder height shortens continuously in real time based on active countdown progress `(totalDuration - remainingSeconds) / totalDuration`.
+- **Procedural Multi-Layer Flame**: Outer orange heat halo, radiant amber body, white-hot core, and blue oxygenated root with multi-harmonic sinusoidal micro-flickers.
+- **Dynamic Wax Tear Droplets**: Wax drips travel down the cylinder sides at varying viscosity speeds and solidify organically upon cooling.
+- **Interactive Aerodynamics**: Cursor movement translates velocity vectors into flame tilt drag with spring-back harmonic restoration.
+- **Dual-Tone Finish Alarm**: Crystal-clear B5 (987.77 Hz) and E6 (1318.51 Hz) alternating chime paired with a Tibetan bell resonance (523.25 Hz C5), plus real-time browser document title countdown flashing so users never miss their timer even when working in other tabs.
+
+### 5. Procedural Audio Synthesizer
 - Built using the native browser **Web Audio API** (`AudioContext`).
 - Generates dynamic square, sawtooth, triangle, and sine waveforms with custom ADSR envelopes for key clicks, phenolic ball collisions, biological chirps, and laser strikes without loading external `.mp3` or `.wav` files.
 

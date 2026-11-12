@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>The Focus Candle — Atmospheric Melting Timer</title>
+<meta name="description" content="A beautiful, realistic melting candle timer with organic flame physics, dripping wax simulation, soothing ambient crackle, and an unmistakable finish alarm.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@700;800&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06070a;
+    --panel: rgba(14, 16, 26, 0.92);
+    --border: rgba(230, 184, 74, 0.32);
+    --gold: #ffbe3b;
+    --amber: #e69224;
+    --flame-core: #ffffff;
+    --flame-mid: #ffd700;
+    --flame-outer: #ea580c;
+    --text: #f0f4f8;
+    --muted: rgba(240, 244, 248, 0.6);
+    --mono: "Geist Mono", ui-monospace, monospace;
+    --display: "Funnel Display", sans-serif;
+    --body: "Bricolage Grotesque", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: var(--bg); color: var(--text);
+    font-family: var(--body); touch-action: none;
+  }
+
+  canvas {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    display: block; cursor: crosshair;
+  }
+
+  /* TOP HUD */
+  .hud-top {
+    position: fixed; top: 16px; left: 18px; right: 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 30; pointer-events: none; gap: 12px;
+  }
+  .hud-top > * { pointer-events: auto; }
+
+  .brand-group { display: flex; align-items: center; gap: 10px; }
+  .home-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 7px 15px; border-radius: 999px; color: var(--text);
+    text-decoration: none; font: 600 12px/1 var(--body);
+    backdrop-filter: blur(16px); transition: all 0.2s;
+  }
+  .home-btn:hover { border-color: var(--gold); color: #fff; transform: translateY(-1px); }
+  .home-btn span { color: var(--gold); font-weight: 700; }
+
+  .candle-tag {
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 6px 14px; border-radius: 999px; backdrop-filter: blur(16px);
+    display: flex; align-items: center; gap: 7px; font: 500 11px/1 var(--mono); color: var(--muted);
+  }
+  .candle-tag b { color: var(--gold); font-weight: 700; }
+
+  /* PRESET DURATION BUTTONS */
+  .preset-tabs {
+    display: flex; gap: 4px; background: var(--panel);
+    border: 1px solid var(--border); padding: 4px; border-radius: 999px;
+    backdrop-filter: blur(16px);
+  }
+  .preset-tab {
+    background: transparent; border: 0; color: var(--muted);
+    font: 600 11px/1 var(--mono); padding: 6px 11px; border-radius: 999px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .preset-tab:hover { color: #fff; }
+  .preset-tab.active {
+    background: linear-gradient(135deg, rgba(255, 190, 59, 0.35), rgba(230, 146, 36, 0.2));
+    border: 1px solid var(--gold); color: #fff; box-shadow: 0 0 12px rgba(255, 190, 59, 0.35);
+  }
+
+  /* TOP TOOLS */
+  .top-tools { display: flex; align-items: center; gap: 6px; }
+  .tool-btn {
+    background: var(--panel); border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 7px 13px; border-radius: 999px; color: var(--text);
+    font: 600 11px/1 var(--body); cursor: pointer; backdrop-filter: blur(16px);
+    transition: all 0.2s; display: flex; align-items: center; gap: 5px;
+  }
+  .tool-btn:hover { background: rgba(255, 255, 255, 0.16); border-color: var(--gold); color: #fff; }
+  .tool-btn.active { background: rgba(255, 190, 59, 0.25); border-color: var(--gold); color: #fff; }
+
+  /* CENTRAL TIME DISPLAY CARD */
+  .time-card {
+    position: fixed; top: 72px; left: 50%; transform: translateX(-50%);
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 8px 24px; border-radius: 999px; backdrop-filter: blur(18px);
+    display: flex; align-items: center; gap: 16px; z-index: 25;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.7);
+  }
+  .time-display {
+    font: 800 24px/1 var(--mono); color: var(--gold);
+    letter-spacing: 1px; min-width: 90px; text-align: center;
+  }
+  .progress-rail {
+    width: 120px; height: 6px; background: rgba(255, 255, 255, 0.12);
+    border-radius: 999px; overflow: hidden; position: relative;
+  }
+  .progress-bar {
+    height: 100%; width: 100%; background: linear-gradient(90deg, #ffbe3b, #ea580c);
+    border-radius: 999px; transform-origin: left; transition: width 0.3s;
+  }
+  .status-text { font: 600 11px/1 var(--mono); color: var(--muted); }
+
+  /* BOTTOM MASTER CONTROL CONSOLE */
+  .console-dock {
+    position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 9px 22px; border-radius: 999px; backdrop-filter: blur(20px);
+    display: flex; align-items: center; gap: 14px; z-index: 35;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.85);
+  }
+
+  .primary-btn {
+    background: linear-gradient(135deg, #ffbe3b 0%, #e68a00 100%);
+    color: #0b0d14; border: 0; padding: 10px 24px; border-radius: 999px;
+    font: 800 13px/1 var(--display); letter-spacing: 0.5px;
+    cursor: pointer; display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 0 24px rgba(255, 190, 59, 0.55), 0 4px 12px rgba(0,0,0,0.5);
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .primary-btn:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 0 32px rgba(255, 190, 59, 0.8), 0 6px 16px rgba(0,0,0,0.6);
+  }
+  .primary-btn:active { transform: translateY(1px) scale(0.98); }
+
+  .custom-time-group {
+    display: flex; align-items: center; gap: 6px; font: 600 11px/1 var(--mono);
+    color: var(--muted);
+  }
+  .custom-input {
+    width: 48px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff; padding: 5px 8px; border-radius: 6px; font: 700 12px/1 var(--mono);
+    text-align: center; outline: none;
+  }
+  .custom-input:focus { border-color: var(--gold); }
+
+  /* ONBOARDING INSTRUCTION HINT */
+  .candle-hint {
+    position: fixed; bottom: 82px; left: 50%; transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.78); border: 1px solid rgba(255, 190, 59, 0.35);
+    padding: 7px 22px; border-radius: 999px; pointer-events: none;
+    font: 600 11px/1.4 var(--mono); color: var(--muted); backdrop-filter: blur(10px);
+    z-index: 25; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  }
+  .candle-hint b { color: var(--gold); }
+
+  /* ALARM OVERLAY MODAL */
+  .alarm-modal {
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(12px); display: none; align-items: center; justify-content: center;
+    z-index: 100; animation: pulseGlow 1.8s infinite;
+  }
+  .alarm-modal.show { display: flex; }
+  .alarm-box {
+    background: var(--panel); border: 2px solid var(--gold);
+    border-radius: 28px; padding: 36px 44px; text-align: center;
+    max-width: 440px; width: 90%; box-shadow: 0 20px 60px rgba(255, 190, 59, 0.3);
+  }
+  .alarm-bell { font-size: 52px; margin-bottom: 12px; animation: ringBell 0.8s infinite ease-in-out; }
+  .alarm-box h2 { font: 800 32px/1.1 var(--display); color: var(--gold); margin-bottom: 8px; }
+  .alarm-box p { font: 500 13px/1.5 var(--mono); color: var(--muted); margin-bottom: 24px; }
+  .dismiss-btn {
+    background: linear-gradient(135deg, #ffbe3b, #e68a00); color: #0b0d14;
+    border: 0; padding: 12px 32px; border-radius: 999px;
+    font: 800 14px/1 var(--display); cursor: pointer; transition: transform 0.15s;
+    box-shadow: 0 0 24px rgba(255, 190, 59, 0.5);
+  }
+  .dismiss-btn:hover { transform: scale(1.06); }
+
+  @keyframes ringBell {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-15deg); }
+    75% { transform: rotate(15deg); }
+  }
+
+  /* TOAST NOTIFICATION */
+  .toast {
+    position: fixed; top: 124px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: rgba(12, 16, 26, 0.96); border: 1px solid var(--gold);
+    color: #fff; padding: 10px 24px; border-radius: 999px;
+    font: 700 13px/1 var(--mono); backdrop-filter: blur(16px);
+    opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 40; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  @media (max-width: 900px) {
+    .hud-top { flex-direction: column; gap: 8px; align-items: flex-start; }
+    .preset-tabs { align-self: center; }
+    .console-dock { width: calc(100% - 24px); padding: 8px 12px; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .time-card { top: 124px; padding: 6px 16px; font-size: 11px; }
+    .time-display { font-size: 18px; min-width: 70px; }
+    .progress-rail { width: 80px; }
+    .candle-hint { bottom: 120px; font-size: 10px; padding: 5px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stage"></canvas>
+
+<!-- TOP HUD -->
+<header class="hud-top">
+  <div class="brand-group">
+    <a href="index.html" class="home-btn">← <span>AI Smarts</span></a>
+    <div class="candle-tag">
+      <span>🕯️ <b>The Focus Candle</b> · Organic Melt Timer</span>
+    </div>
+  </div>
+
+  <!-- Quick Presets -->
+  <div class="preset-tabs">
+    <button class="preset-tab" data-min="1">1 min</button>
+    <button class="preset-tab" data-min="2">2 min</button>
+    <button class="preset-tab" data-min="5">5 min</button>
+    <button class="preset-tab active" data-min="10">10 min</button>
+    <button class="preset-tab" data-min="15">15 min</button>
+    <button class="preset-tab" data-min="25">25 min</button>
+  </div>
+
+  <!-- Ambience Tools -->
+  <div class="top-tools">
+    <button class="tool-btn active" id="alarm-toggle-btn">🔔 Alarm: ON</button>
+    <button class="tool-btn active" id="crackle-btn">🪵 Crackle: ON</button>
+  </div>
+</header>
+
+<!-- TIME REMAINING CARD -->
+<div class="time-card">
+  <div class="time-display" id="time-display">10:00</div>
+  <div class="progress-rail">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+  <div class="status-text" id="status-text">BURNING WAX</div>
+</div>
+
+<!-- INSTRUCTION HINT -->
+<div class="candle-hint" id="candle-hint">
+  🕯️ <b>Wax melts smoothly with real-time countdown</b> · Move cursor to flutter flame · Beep alarm alerts when time is up!
+</div>
+
+<!-- BOTTOM MASTER CONTROLS -->
+<nav class="console-dock">
+  <button class="primary-btn" id="start-btn">
+    <span id="start-btn-icon">⏸️</span>
+    <span id="start-btn-text">PAUSE TIMER</span>
+  </button>
+
+  <button class="tool-btn" id="extinguish-btn" title="Blow out flame">💨 Blow Flame</button>
+  <button class="tool-btn" id="relight-btn" title="Strike match to reset & relight">🔥 Strike Match</button>
+
+  <div class="custom-time-group">
+    <span>Custom:</span>
+    <input type="number" class="custom-input" id="custom-min" min="1" max="120" value="10">
+    <span>min</span>
+    <button class="tool-btn" id="set-custom-btn">Set</button>
+  </div>
+</nav>
+
+<!-- ALARM MODAL -->
+<div class="alarm-modal" id="alarm-modal">
+  <div class="alarm-box">
+    <div class="alarm-bell">🔔</div>
+    <h2>TIME'S UP!</h2>
+    <p id="alarm-summary">Focus session complete! The candle has melted down to the brass dish.</p>
+    <button class="dismiss-btn" id="dismiss-alarm-btn">✓ Stop Alarm & Relight</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">🔥 Match Struck! Candle Relit.</div>
+
+<script>
+/* ==========================================================================
+   AUTHENTIC PROCEDURAL WICK & ALARM ACOUSTICS (WEB AUDIO API)
+   ========================================================================== */
+class CandleAudio {
+  constructor() {
+    this.ctx = null;
+    this.noise = null;
+    this.crackleEnabled = true;
+    this.alarmEnabled = true;
+    this.crackleNode = null;
+    this.crackleGain = null;
+    this.alarmInterval = null;
+  }
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) {
+        this.ctx = new AudioCtx();
+        this.noise = this.ctx.createBuffer(1, this.ctx.sampleRate, this.ctx.sampleRate);
+        const d = this.noise.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+        this.startWickCrackle();
+      }
+    }
+    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+  }
+
+  // Wooden Matchstick Ignition Sound
+  matchStrike() {
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    // Friction scratch
+    const src = this.ctx.createBufferSource();
+    src.buffer = this.noise;
+    const f = this.ctx.createBiquadFilter();
+    f.type = 'bandpass'; f.frequency.value = 2400; f.Q.value = 3.0;
+    const g = this.ctx.createGain();
+    g.gain.setValueAtTime(0.18, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+    src.connect(f); f.connect(g); g.connect(this.ctx.destination);
+    src.start(now); src.stop(now + 0.14);
+
+    // Ignition puff
+    const osc = this.ctx.createOscillator();
+    const gOsc = this.ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(320, now + 0.08);
+    osc.frequency.exponentialRampToValueAtTime(70, now + 0.25);
+    gOsc.gain.setValueAtTime(0.12, now + 0.08);
+    gOsc.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+    osc.connect(gOsc); gOsc.connect(this.ctx.destination);
+    osc.start(now + 0.08); osc.stop(now + 0.3);
+  }
+
+  // Soft breath snuffing out
+  blowOut() {
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    const src = this.ctx.createBufferSource();
+    src.buffer = this.noise;
+    const f = this.ctx.createBiquadFilter();
+    f.type = 'lowpass'; f.frequency.setValueAtTime(900, now);
+    f.frequency.exponentialRampToValueAtTime(200, now + 0.35);
+    const g = this.ctx.createGain();
+    g.gain.setValueAtTime(0.22, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+    src.connect(f); f.connect(g); g.connect(this.ctx.destination);
+    src.start(now); src.stop(now + 0.42);
+  }
+
+  // Soothing Cotton/Wood Wick Crackling
+  startWickCrackle() {
+    if (!this.ctx) return;
+    setInterval(() => {
+      if (!this.crackleEnabled || !timerRunning || isExtinguished) return;
+      if (Math.random() < 0.45) {
+        const now = this.ctx.currentTime;
+        const src = this.ctx.createBufferSource();
+        src.buffer = this.noise;
+        const f = this.ctx.createBiquadFilter();
+        f.type = 'highpass'; f.frequency.value = 3200 + Math.random() * 1200;
+        const g = this.ctx.createGain();
+        const v = 0.012 + Math.random() * 0.025;
+        g.gain.setValueAtTime(v, now);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.02 + Math.random() * 0.03);
+        src.connect(f); f.connect(g); g.connect(this.ctx.destination);
+        src.start(now); src.stop(now + 0.06);
+      }
+    }, 120);
+  }
+
+  // Clear Digital Beep Alarm Pattern (Beep-Beep! Beep-Beep!)
+  startAlarm() {
+    if (!this.alarmEnabled || !this.ctx) return;
+    this.stopAlarm();
+
+    const playBeepPair = () => {
+      if (!this.alarmEnabled || !this.ctx) return;
+      const now = this.ctx.currentTime;
+
+      // Beep 1
+      const osc1 = this.ctx.createOscillator();
+      const g1 = this.ctx.createGain();
+      osc1.type = 'sine'; osc1.frequency.setValueAtTime(987.77, now); // B5
+      g1.gain.setValueAtTime(0.3, now);
+      g1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      osc1.connect(g1); g1.connect(this.ctx.destination);
+      osc1.start(now); osc1.stop(now + 0.13);
+
+      // Beep 2
+      const osc2 = this.ctx.createOscillator();
+      const g2 = this.ctx.createGain();
+      osc2.type = 'sine'; osc2.frequency.setValueAtTime(1318.51, now + 0.16); // E6
+      g2.gain.setValueAtTime(0.35, now + 0.16);
+      g2.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+      osc2.connect(g2); g2.connect(this.ctx.destination);
+      osc2.start(now + 0.16); osc2.stop(now + 0.33);
+
+      // Subtle Tibetan chime resonance
+      const osc3 = this.ctx.createOscillator();
+      const g3 = this.ctx.createGain();
+      osc3.type = 'triangle'; osc3.frequency.setValueAtTime(523.25, now);
+      g3.gain.setValueAtTime(0.18, now);
+      g3.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+      osc3.connect(g3); g3.connect(this.ctx.destination);
+      osc3.start(now); osc3.stop(now + 0.95);
+    };
+
+    playBeepPair();
+    this.alarmInterval = setInterval(playBeepPair, 1400);
+  }
+
+  stopAlarm() {
+    if (this.alarmInterval) {
+      clearInterval(this.alarmInterval);
+      this.alarmInterval = null;
+    }
+  }
+}
+const sfx = new CandleAudio();
+document.body.addEventListener('pointerdown', () => sfx.init(), { once: true });
+document.body.addEventListener('keydown', () => sfx.init(), { once: true });
+
+/* ==========================================================================
+   CANDLE STATE & MELTING TIMING ENGINE
+   ========================================================================== */
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+
+let W = window.innerWidth;
+let H = window.innerHeight;
+let DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+// Timer State
+let totalDurationSeconds = 600; // 10 minutes default
+let remainingSeconds = 600;
+let timerRunning = true;
+let isExtinguished = false;
+let isAlarming = false;
+
+// Wax & Flame Geometry
+const candleBase = {
+  w: 125, // Candle cylinder diameter
+  initialH: 310, // Full unburnt height
+  minH: 45 // Burnt-down stub height
+};
+
+let currentCandleH = candleBase.initialH;
+let waxPoolLevel = 0;
+let waxDrips = []; // Array of solidified / dripping wax tears
+let smokeParticles = [];
+let emberParticles = [];
+
+// Flame flutter & wind physics
+let flameTilt = 0;
+let flameTargetTilt = 0;
+let lastMousePos = null;
+let flameWindForce = 0;
+
+/* ==========================================================================
+   WAX DRIPS & ORGANIC MELTING RIVULETS
+   ========================================================================== */
+class WaxDrip {
+  constructor(side, startY, speed, maxLen, thickness, color) {
+    this.side = side; // -1 for left side, +1 for right side, 0 for front
+    this.xOffset = side * (candleBase.w * 0.48);
+    this.startY = startY;
+    this.currentY = startY;
+    this.speed = speed;
+    this.maxLen = maxLen;
+    this.thickness = thickness;
+    this.color = color;
+    this.solidified = false;
+  }
+  update(dt, candleTopY) {
+    if (!this.solidified) {
+      this.currentY += this.speed * dt;
+      if (this.currentY - this.startY >= this.maxLen) {
+        this.solidified = true;
+      }
+    }
+  }
+}
+
+function spawnWaxDrip() {
+  if (waxDrips.length > 28) return;
+  const candleY = getCandleY();
+  const side = Math.random() < 0.5 ? -1 : 1;
+  const speed = 12 + Math.random() * 26;
+  const maxLen = 35 + Math.random() * 95;
+  const thickness = 4 + Math.random() * 5.5;
+  const shades = ['#fffbeb', '#fef3c7', '#fde68a', '#fafaf9'];
+  const color = shades[Math.floor(Math.random() * shades.length)];
+
+  waxDrips.push(new WaxDrip(side, candleY, speed, maxLen, thickness, color));
+}
+
+function getCandleY() {
+  const tableY = H * 0.76;
+  return tableY - currentCandleH;
+}
+
+function getCandleX() {
+  return W * 0.5;
+}
+
+/* ==========================================================================
+   TIMER CONTROLS & LOGIC
+   ========================================================================== */
+function setTimer(minutes) {
+  totalDurationSeconds = minutes * 60;
+  remainingSeconds = totalDurationSeconds;
+  timerRunning = true;
+  isExtinguished = false;
+  isAlarming = false;
+  sfx.stopAlarm();
+  document.getElementById('alarm-modal').classList.remove('show');
+
+  // Clear excess drips and reset height
+  waxDrips = [];
+  smokeParticles = [];
+  currentCandleH = candleBase.initialH;
+
+  sfx.init();
+  sfx.matchStrike();
+  updateTimeDisplay();
+  updateButtonStates();
+  showToast(`🕯️ Timer set to ${minutes} min. Candle burning!`);
+}
+
+function updateTimeDisplay() {
+  const m = Math.floor(remainingSeconds / 60);
+  const s = Math.floor(remainingSeconds % 60);
+  const text = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  document.getElementById('time-display').textContent = text;
+
+  // Window title countdown so user sees remaining time while in other apps
+  document.title = isAlarming ? `⏰ [00:00] TIME'S UP!` : `🕯️ [${text}] The Focus Candle`;
+
+  // Progress Bar
+  const progressRatio = Math.max(0, remainingSeconds / totalDurationSeconds);
+  document.getElementById('progress-bar').style.width = `${progressRatio * 100}%`;
+
+  // Status text
+  if (isAlarming) {
+    document.getElementById('status-text').textContent = 'TIME IS UP!';
+  } else if (isExtinguished) {
+    document.getElementById('status-text').textContent = 'FLAME EXTINCTION';
+  } else if (!timerRunning) {
+    document.getElementById('status-text').textContent = 'TIMER PAUSED';
+  } else {
+    document.getElementById('status-text').textContent = 'MELTING BEESWAX';
+  }
+}
+
+function triggerAlarm() {
+  isAlarming = true;
+  timerRunning = false;
+  isExtinguished = true;
+  sfx.init();
+  sfx.startAlarm();
+
+  // Snuff flame with puff of smoke
+  for (let i = 0; i < 35; i++) {
+    const cx = getCandleX();
+    const cy = getCandleY() - 10;
+    smokeParticles.push({
+      x: cx + (Math.random() - 0.5) * 10,
+      y: cy,
+      vx: (Math.random() - 0.5) * 35,
+      vy: -30 - Math.random() * 60,
+      r: 6 + Math.random() * 8,
+      alpha: 0.8
+    });
+  }
+
+  document.getElementById('alarm-summary').textContent = `Your ${Math.round(totalDurationSeconds / 60)} minute focus session is complete!`;
+  document.getElementById('alarm-modal').classList.add('show');
+  updateTimeDisplay();
+}
+
+/* ==========================================================================
+   RENDER & VISUAL PROCEDURAL FLAME PIPELINE
+   ========================================================================== */
+function draw(now) {
+  ctx.save();
+  ctx.scale(DPR, DPR);
+  ctx.clearRect(0, 0, W, H);
+
+  const cx = getCandleX();
+  const tableY = H * 0.76;
+  const candleY = getCandleY();
+  const wickTipY = candleY - 14;
+
+  // 1. Atmosphere: Midnight Study Room with Warm Ambient Radial Light
+  const flameIntensity = isExtinguished ? 0.05 : (0.85 + Math.sin(now * 0.006) * 0.08);
+  const roomLight = ctx.createRadialGradient(cx, wickTipY - 20, 20, cx, wickTipY, W * 0.85);
+  roomLight.addColorStop(0, `rgba(45, 26, 12, ${0.45 * flameIntensity})`);
+  roomLight.addColorStop(0.4, `rgba(20, 14, 18, ${0.25 * flameIntensity})`);
+  roomLight.addColorStop(1, '#050608');
+  ctx.fillStyle = roomLight;
+  ctx.fillRect(0, 0, W, H);
+
+  // 2. Antique Dark Oak Desk Surface with Soft Shadow
+  const woodGrad = ctx.createLinearGradient(0, tableY, 0, H);
+  woodGrad.addColorStop(0, '#1c130b');
+  woodGrad.addColorStop(0.1, '#130d07');
+  woodGrad.addColorStop(1, '#080503');
+  ctx.fillStyle = woodGrad;
+  ctx.fillRect(0, tableY, W, H - tableY);
+
+  ctx.fillStyle = 'rgba(230, 146, 36, 0.12)';
+  ctx.fillRect(0, tableY, W, 2);
+
+  // 3. Antique Polished Brass Candleholder Stand & Saucer
+  drawBrassStand(cx, tableY);
+
+  // 4. Wax Column (Beeswax Ivory Cylinder with Subsurface Glow)
+  drawCandleWax(cx, candleY, tableY);
+
+  // 5. Solidified & Active Wax Drips
+  drawWaxDrips(cx, tableY);
+
+  // 6. Braided Wick & Glowing Red Ember
+  drawWick(cx, candleY, wickTipY);
+
+  // 7. Realistic Multi-Layered Flickering Flame
+  if (!isExtinguished) {
+    drawFlame(cx, wickTipY, now);
+  }
+
+  // 8. Smoke & Ash Particles
+  drawSmoke();
+
+  ctx.restore();
+}
+
+function drawBrassStand(cx, tableY) {
+  ctx.save();
+  // Drop Shadow on Desk
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+  ctx.beginPath();
+  ctx.ellipse(cx, tableY + 8, candleBase.w * 1.05, 22, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Brass Saucer Dish
+  const saucerGrad = ctx.createLinearGradient(cx - 100, 0, cx + 100, 0);
+  saucerGrad.addColorStop(0, '#92400e');
+  saucerGrad.addColorStop(0.3, '#fde047');
+  saucerGrad.addColorStop(0.5, '#d4af37');
+  saucerGrad.addColorStop(0.8, '#b45309');
+  saucerGrad.addColorStop(1, '#78350f');
+
+  ctx.fillStyle = saucerGrad;
+  ctx.beginPath();
+  ctx.ellipse(cx, tableY - 4, candleBase.w * 0.95, 14, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#fef08a'; ctx.lineWidth = 1.5; ctx.stroke();
+
+  // Saucer Pedestal Rim
+  ctx.fillStyle = '#b45309';
+  ctx.fillRect(cx - candleBase.w * 0.55, tableY - 6, candleBase.w * 1.1, 7);
+
+  // Finger Loop Handle (Left side)
+  ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.arc(cx - candleBase.w * 0.88, tableY - 14, 18, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawCandleWax(cx, candleY, tableY) {
+  const cw = candleBase.w;
+  const ch = tableY - candleY;
+
+  ctx.save();
+  // Translucent Beeswax Pillar Gradient
+  const waxGrad = ctx.createLinearGradient(cx - cw * 0.5, 0, cx + cw * 0.5, 0);
+  waxGrad.addColorStop(0, '#fef3c7');
+  waxGrad.addColorStop(0.18, '#ffffff');
+  waxGrad.addColorStop(0.5, '#fafaf9');
+  waxGrad.addColorStop(0.82, '#fde68a');
+  waxGrad.addColorStop(1, '#d97706');
+
+  ctx.fillStyle = waxGrad;
+  ctx.fillRect(cx - cw * 0.5, candleY, cw, ch);
+
+  // Subsurface light scattering near top rim
+  if (!isExtinguished) {
+    const sssGrad = ctx.createRadialGradient(cx, candleY, 5, cx, candleY + 25, cw * 0.55);
+    sssGrad.addColorStop(0, 'rgba(251, 146, 60, 0.45)');
+    sssGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = sssGrad;
+    ctx.fillRect(cx - cw * 0.5, candleY, cw, 40);
+  }
+
+  // Top Molten Wax Rim (Concave Melt Pool)
+  ctx.fillStyle = '#fffbeb';
+  ctx.beginPath();
+  ctx.ellipse(cx, candleY, cw * 0.5, 10, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 2; ctx.stroke();
+
+  // Molten Liquid Pool Reflection
+  if (!isExtinguished) {
+    ctx.fillStyle = 'rgba(251, 191, 36, 0.65)';
+    ctx.beginPath();
+    ctx.ellipse(cx, candleY + 1, cw * 0.35, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+function drawWaxDrips(cx, tableY) {
+  ctx.save();
+  waxDrips.forEach(d => {
+    const dx = cx + d.xOffset;
+    ctx.fillStyle = d.color;
+    ctx.strokeStyle = 'rgba(217, 119, 6, 0.2)';
+    ctx.lineWidth = 1;
+
+    ctx.beginPath();
+    ctx.roundRect(dx - d.thickness * 0.5, d.startY, d.thickness, d.currentY - d.startY, [d.thickness, d.thickness, d.thickness, d.thickness]);
+    ctx.fill();
+    ctx.stroke();
+
+    // Tear droplet at bottom of drip
+    ctx.beginPath();
+    ctx.arc(dx, d.currentY, d.thickness * 0.85, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.restore();
+}
+
+function drawWick(cx, candleY, wickTipY) {
+  ctx.save();
+  // Braided Cotton Wick
+  ctx.strokeStyle = '#18181b'; ctx.lineWidth = 3.5; ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(cx, candleY + 2);
+  // Slight natural organic curve
+  ctx.quadraticCurveTo(cx - 2, candleY - 8, cx - 1, wickTipY);
+  ctx.stroke();
+
+  // Glowing Cherry-Red Ember at Wick Tip
+  if (!isExtinguished) {
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath();
+    ctx.arc(cx - 1, wickTipY, 2.8, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#ffedd5';
+    ctx.beginPath();
+    ctx.arc(cx - 1, wickTipY, 1.2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawFlame(cx, wickTipY, now) {
+  ctx.save();
+  const t = now * 0.005;
+
+  // Multi-harmonic organic flicker offsets
+  const flickerX = Math.sin(t * 3.7) * 1.5 + Math.sin(t * 7.1) * 0.8 + flameTilt * 18;
+  const flickerY = Math.sin(t * 5.3) * 2.5 + Math.cos(t * 9.2) * 1.2;
+  const flameH = 58 + flickerY;
+  const flameW = 20;
+
+  const tipX = cx + flickerX;
+  const tipY = wickTipY - flameH;
+
+  // 1. Soft Radiant Outer Heat Glow (Large Ambient Bloom)
+  const halo = ctx.createRadialGradient(cx, wickTipY - 24, 6, cx, wickTipY - 24, 110);
+  halo.addColorStop(0, 'rgba(255, 140, 0, 0.45)');
+  halo.addColorStop(0.3, 'rgba(249, 115, 22, 0.2)');
+  halo.addColorStop(1, 'transparent');
+  ctx.fillStyle = halo;
+  ctx.beginPath();
+  ctx.arc(cx, wickTipY - 24, 110, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 2. Outer Vibrant Orange Teardrop
+  ctx.fillStyle = '#ea580c';
+  ctx.beginPath();
+  ctx.moveTo(cx - 7, wickTipY);
+  ctx.bezierCurveTo(cx - flameW, wickTipY - 14, tipX - flameW * 0.6, tipY + 16, tipX, tipY);
+  ctx.bezierCurveTo(tipX + flameW * 0.6, tipY + 16, cx + flameW, wickTipY - 14, cx + 7, wickTipY);
+  ctx.closePath();
+  ctx.fill();
+
+  // 3. Mid Radiant Golden Yellow Body
+  ctx.fillStyle = '#fde047';
+  ctx.beginPath();
+  ctx.moveTo(cx - 5, wickTipY);
+  ctx.bezierCurveTo(cx - flameW * 0.65, wickTipY - 12, tipX - flameW * 0.4, tipY + 22, tipX, tipY + 8);
+  ctx.bezierCurveTo(tipX + flameW * 0.4, tipY + 22, cx + flameW * 0.65, wickTipY - 12, cx + 5, wickTipY);
+  ctx.closePath();
+  ctx.fill();
+
+  // 4. Inner White-Hot Intense Core
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.moveTo(cx - 3, wickTipY);
+  ctx.bezierCurveTo(cx - flameW * 0.35, wickTipY - 10, tipX - 4, tipY + 34, tipX, tipY + 26);
+  ctx.bezierCurveTo(tipX + 4, tipY + 34, cx + flameW * 0.35, wickTipY - 10, cx + 3, wickTipY);
+  ctx.closePath();
+  ctx.fill();
+
+  // 5. Cyan/Blue Flame Base Root
+  const blueRoot = ctx.createRadialGradient(cx, wickTipY, 1, cx, wickTipY, 10);
+  blueRoot.addColorStop(0, 'rgba(0, 240, 255, 0.7)');
+  blueRoot.addColorStop(0.7, 'rgba(59, 130, 246, 0.4)');
+  blueRoot.addColorStop(1, 'transparent');
+  ctx.fillStyle = blueRoot;
+  ctx.beginPath();
+  ctx.ellipse(cx, wickTipY, 8, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawSmoke() {
+  ctx.save();
+  smokeParticles.forEach(p => {
+    ctx.fillStyle = `rgba(160, 165, 180, ${p.alpha})`;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.restore();
+}
+
+/* ==========================================================================
+   PHYSICS & TICK ENGINE (MELTING, SMOKE & WIND)
+   ========================================================================== */
+let lastDripCheck = 0;
+let lastSmokeSpawn = 0;
+
+function updatePhysics(dt) {
+  // 1. Timer Countdown
+  if (timerRunning && !isExtinguished && remainingSeconds > 0) {
+    remainingSeconds = Math.max(0, remainingSeconds - dt);
+    updateTimeDisplay();
+
+    // Wax melts down proportionally:
+    const elapsedRatio = (totalDurationSeconds - remainingSeconds) / totalDurationSeconds;
+    const targetH = candleBase.initialH - elapsedRatio * (candleBase.initialH - candleBase.minH);
+    currentCandleH = targetH;
+
+    // Periodically spawn wax drips as candle melts
+    if (Date.now() - lastDripCheck > 4000) {
+      if (Math.random() < 0.6) spawnWaxDrip();
+      lastDripCheck = Date.now();
+    }
+
+    if (remainingSeconds <= 0) {
+      triggerAlarm();
+    }
+  }
+
+  // 2. Update Wax Drips
+  const candleY = getCandleY();
+  waxDrips.forEach(d => d.update(dt, candleY));
+
+  // 3. Flame Wind Flutter Dynamics (Inertia & Drag)
+  flameTilt += (flameTargetTilt - flameTilt) * 0.12;
+  flameTargetTilt *= 0.94; // Spring back upright
+
+  // 4. Smoke Particles
+  smokeParticles.forEach(p => {
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.r += dt * 4;
+    p.alpha -= dt * 0.35;
+  });
+  smokeParticles = smokeParticles.filter(p => p.alpha > 0);
+
+  // Faint smoke wisp while burning
+  if (!isExtinguished && Date.now() - lastSmokeSpawn > 240) {
+    const cx = getCandleX();
+    const wickTipY = getCandleY() - 14;
+    smokeParticles.push({
+      x: cx + (Math.random() - 0.5) * 4,
+      y: wickTipY - 45,
+      vx: flameTilt * 15 + (Math.random() - 0.5) * 8,
+      vy: -25 - Math.random() * 20,
+      r: 2.5,
+      alpha: 0.25
+    });
+    lastSmokeSpawn = Date.now();
+  }
+}
+
+/* ==========================================================================
+   INTERACTIVITY & WIND BLOW
+   ========================================================================== */
+window.addEventListener('pointermove', e => {
+  if (!lastMousePos) {
+    lastMousePos = { x: e.clientX, y: e.clientY };
+    return;
+  }
+  const dx = e.clientX - lastMousePos.x;
+  lastMousePos = { x: e.clientX, y: e.clientY };
+
+  // Wind pushes flame
+  flameTargetTilt = Math.min(1.2, Math.max(-1.2, flameTargetTilt + dx * 0.04));
+});
+
+/* ==========================================================================
+   BUTTON LISTENERS & PRESETS
+   ========================================================================== */
+// Presets
+document.querySelectorAll('.preset-tab').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.preset-tab').forEach(t => t.classList.remove('active'));
+    b.classList.add('active');
+    const min = parseInt(b.dataset.min);
+    setTimer(min);
+  });
+});
+
+// Start / Pause
+const startBtn = document.getElementById('start-btn');
+startBtn.addEventListener('click', () => {
+  sfx.init();
+  if (remainingSeconds <= 0 || isAlarming) {
+    setTimer(Math.round(totalDurationSeconds / 60));
+    return;
+  }
+  timerRunning = !timerRunning;
+  updateButtonStates();
+  updateTimeDisplay();
+  showToast(timerRunning ? '▶ Timer Resumed' : '⏸️ Timer Paused');
+});
+
+function updateButtonStates() {
+  const icon = document.getElementById('start-btn-icon');
+  const text = document.getElementById('start-btn-text');
+  if (timerRunning) {
+    icon.textContent = '⏸️';
+    text.textContent = 'PAUSE TIMER';
+  } else {
+    icon.textContent = '▶';
+    text.textContent = 'RESUME TIMER';
+  }
+}
+
+// Blow Flame
+document.getElementById('extinguish-btn').addEventListener('click', () => {
+  sfx.init();
+  if (isExtinguished) return;
+  isExtinguished = true;
+  timerRunning = false;
+  sfx.blowOut();
+  updateButtonStates();
+  updateTimeDisplay();
+  showToast('💨 Flame Snuffed Out! Timer Paused.');
+
+  // Smoke burst
+  const cx = getCandleX();
+  const wickTipY = getCandleY() - 14;
+  for (let i = 0; i < 20; i++) {
+    smokeParticles.push({
+      x: cx, y: wickTipY,
+      vx: (Math.random() - 0.5) * 40,
+      vy: -25 - Math.random() * 45,
+      r: 4 + Math.random() * 6,
+      alpha: 0.7
+    });
+  }
+});
+
+// Strike Match & Relight
+document.getElementById('relight-btn').addEventListener('click', () => {
+  sfx.init();
+  isExtinguished = false;
+  timerRunning = true;
+  sfx.matchStrike();
+  updateButtonStates();
+  updateTimeDisplay();
+  showToast('🔥 Wooden Match Struck! Candle Relit.');
+});
+
+// Custom Timer Set
+document.getElementById('set-custom-btn').addEventListener('click', () => {
+  const val = parseInt(document.getElementById('custom-min').value) || 10;
+  document.querySelectorAll('.preset-tab').forEach(t => t.classList.remove('active'));
+  setTimer(val);
+});
+
+// Alarm Toggle
+const alarmToggleBtn = document.getElementById('alarm-toggle-btn');
+alarmToggleBtn.addEventListener('click', () => {
+  sfx.alarmEnabled = !sfx.alarmEnabled;
+  alarmToggleBtn.classList.toggle('active', sfx.alarmEnabled);
+  alarmToggleBtn.textContent = sfx.alarmEnabled ? '🔔 Alarm: ON' : '🔕 Alarm: OFF';
+  showToast(sfx.alarmEnabled ? '🔔 Alarm sound enabled' : '🔕 Alarm sound muted');
+});
+
+// Crackle Toggle
+const crackleBtn = document.getElementById('crackle-btn');
+crackleBtn.addEventListener('click', () => {
+  sfx.crackleEnabled = !sfx.crackleEnabled;
+  crackleBtn.classList.toggle('active', sfx.crackleEnabled);
+  crackleBtn.textContent = sfx.crackleEnabled ? '🪵 Crackle: ON' : '🪵 Crackle: OFF';
+  showToast(sfx.crackleEnabled ? '🪵 Wick crackle sound active' : '🪵 Wick crackle muted');
+});
+
+// Dismiss Alarm Modal
+document.getElementById('dismiss-alarm-btn').addEventListener('click', () => {
+  sfx.stopAlarm();
+  document.getElementById('alarm-modal').classList.remove('show');
+  setTimer(Math.round(totalDurationSeconds / 60));
+});
+
+// Keyboard Shortcuts (Space, P, R, M)
+window.addEventListener('keydown', e => {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (isAlarming) {
+      document.getElementById('dismiss-alarm-btn').click();
+    } else {
+      startBtn.click();
+    }
+  } else if (e.key === 'r' || e.key === 'R') {
+    setTimer(Math.round(totalDurationSeconds / 60));
+  }
+});
+
+// Toast Helper
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+}
+
+// Resize Handling
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = Math.round(W * DPR);
+  canvas.height = Math.round(H * DPR);
+}
+window.addEventListener('resize', resize);
+
+/* ==========================================================================
+   MAIN ANIMATION LOOP
+   ========================================================================== */
+let lastTime = performance.now();
+function loop(now) {
+  requestAnimationFrame(loop);
+  const dt = (now - lastTime) / 1000;
+  lastTime = now;
+
+  updatePhysics(dt);
+  draw(now);
+}
+
+resize();
+updateTimeDisplay();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
