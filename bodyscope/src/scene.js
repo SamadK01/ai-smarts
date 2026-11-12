@@ -191,3 +191,4 @@ export class SceneManager {
     this.controls.update();
   }
 }
+

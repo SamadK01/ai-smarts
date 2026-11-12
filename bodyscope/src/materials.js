@@ -270,3 +270,4 @@ export class MaterialManager {
     return this.bone;
   }
 }
+

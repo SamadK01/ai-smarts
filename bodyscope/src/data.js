@@ -487,3 +487,4 @@ export function getAnatomyDataForMesh(meshName) {
 
   return ANATOMY_DATA.skeleton_general || ANATOMY_DATA.cranium;
 }
+

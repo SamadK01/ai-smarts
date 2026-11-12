@@ -104,3 +104,4 @@ As outlined in our design specifications:
 
 ## ⚠️ Medical Disclaimer
 > **Educational Visualization Only:** BodyScope 3D is designed strictly for academic, educational, and medical-visualization research purposes. It does not provide clinical medical diagnosis, triage, or personalized therapeutic advice.
+

@@ -312,3 +312,4 @@ class BodyScopeApp {
 window.addEventListener('DOMContentLoaded', () => {
   window.app = new BodyScopeApp();
 });
+
