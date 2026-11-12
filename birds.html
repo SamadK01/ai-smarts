@@ -388,6 +388,23 @@
 </div>
 
 <script>
+const canvas = document.getElementById('game-canvas');
+const ctx = canvas.getContext('2d');
+let W = window.innerWidth;
+let H = window.innerHeight;
+let DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+function resizeCanvas() {
+  W = window.innerWidth;
+  H = window.innerHeight;
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(W * DPR);
+  canvas.height = Math.round(H * DPR);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
 /* ==========================================================================
    CONFIG
    ========================================================================== */
@@ -1489,22 +1506,8 @@ function drawCrosshair() {
 }
 
 /* ==========================================================================
-   WINDOW SIZING & MAIN ENGINE LOOP
+   INITIAL SETUP & MAIN ENGINE LOOP
    ========================================================================== */
-let W = window.innerWidth;
-let H = window.innerHeight;
-let DPR = Math.min(window.devicePixelRatio || 1, 2);
-
-function resizeCanvas() {
-  W = window.innerWidth;
-  H = window.innerHeight;
-  DPR = Math.min(window.devicePixelRatio || 1, 2);
-  canvas.width = Math.round(W * DPR);
-  canvas.height = Math.round(H * DPR);
-  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
 
 // Initial Setup
 updateAmmoUI();
