@@ -569,113 +569,144 @@ const SEATS = {
 };
 
 /* ==========================================================================
-   BOARD MARKINGS TEXTURE (CENTRAL ROSETTE, BASELINES & AUTHENTIC POCKET HOLES)
+   BOARD MARKINGS TEXTURE (ACCORDING TO REAL CARROM BOARD DARAZ SCREENSHOT)
    ========================================================================== */
 function makeCarromBoardTexture() {
   const c = document.createElement('canvas');
   c.width = 1024; c.height = 1024;
   const ctx = c.getContext('2d');
 
-  // 1. Natural Polished Birch / Mango Plywood Grain Background
-  ctx.fillStyle = '#f4e3c3';
+  // 1. Natural Polished Plywood Surface (Warm Tan Birch Ply)
+  ctx.fillStyle = '#f5e4c6';
   ctx.fillRect(0, 0, 1024, 1024);
 
-  // Subtle wood grain lines
-  ctx.fillStyle = 'rgba(210, 180, 140, 0.22)';
-  for (let i = 0; i < 1024; i += 6) {
-    ctx.fillRect(0, i, 1024, 2);
+  // Realistic wood grain striations
+  ctx.fillStyle = 'rgba(180, 140, 95, 0.12)';
+  for (let i = 0; i < 1024; i += 4) {
+    const h = (i % 8 === 0) ? 2 : 1;
+    ctx.fillRect(0, i, 1024, h);
   }
+  // Soft radial vignette towards wood frame
+  const bgVignette = ctx.createRadialGradient(512, 512, 200, 512, 512, 700);
+  bgVignette.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
+  bgVignette.addColorStop(0.7, 'transparent');
+  bgVignette.addColorStop(1, 'rgba(120, 75, 30, 0.18)');
+  ctx.fillStyle = bgVignette;
+  ctx.fillRect(0, 0, 1024, 1024);
 
   ctx.save();
   ctx.translate(512, 512);
 
-  // 2. Central Concentric Rings & Rosette
-  ctx.strokeStyle = '#222222'; ctx.lineWidth = 4;
-  ctx.beginPath(); ctx.arc(0, 0, 160, 0, Math.PI * 2); ctx.stroke();
-  ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.arc(0, 0, 175, 0, Math.PI * 2); ctx.stroke();
+  // 2. Central Concentric Rings & 3-Dot Center (Exactly matching screenshot)
+  // Outer Large Ring
+  ctx.strokeStyle = '#1e1c18'; ctx.lineWidth = 3.5;
+  ctx.beginPath(); ctx.arc(0, 0, 155, 0, Math.PI * 2); ctx.stroke();
 
-  // Center Queen Red Rosette Circle
-  ctx.fillStyle = '#dc2626';
-  ctx.beginPath(); ctx.arc(0, 0, 34, 0, Math.PI * 2); ctx.fill();
-  ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 3; ctx.stroke();
+  // Middle Concentric Ring
+  ctx.strokeStyle = '#1e1c18'; ctx.lineWidth = 2.0;
+  ctx.beginPath(); ctx.arc(0, 0, 140, 0, Math.PI * 2); ctx.stroke();
 
-  // Decorative Petals around Center
-  for (let i = 0; i < 8; i++) {
-    const ang = (i * Math.PI) / 4;
-    ctx.fillStyle = i % 2 === 0 ? '#1f2937' : '#ea580c';
-    ctx.beginPath();
-    ctx.arc(Math.cos(ang) * 95, Math.sin(ang) * 95, 24, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#f4e3c3'; ctx.lineWidth = 2; ctx.stroke();
-  }
+  // Inner Queen Circle
+  ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.arc(0, 0, 48, 0, Math.PI * 2); ctx.stroke();
 
-  // 3. 4 Baselines with Red End Circles
-  const baselineDist = 360;
-  const baselineLen = 290;
+  // The 3 iconic colored center circles from Daraz photo (Yellow, Red, Green)
+  const dotR = 14;
+  // Left: Yellow
+  ctx.fillStyle = '#facc15'; ctx.strokeStyle = '#713f12'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.arc(-26, 10, dotR, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  // Center: Red (Queen spot)
+  ctx.fillStyle = '#dc2626'; ctx.strokeStyle = '#450a0a'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.arc(0, 0, dotR + 1, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  // Right/Top: Green
+  ctx.fillStyle = '#16a34a'; ctx.strokeStyle = '#052e16'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.arc(26, -10, dotR, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+  // 3. Baselines & Red End Circles on All 4 Sides
+  const baselineDist = 345;
+  const baselineLen = 275;
+  const redSpotR = 17;
+
   for (let side = 0; side < 4; side++) {
     ctx.save();
     ctx.rotate((side * Math.PI) / 2);
 
-    // Double Baseline
-    ctx.strokeStyle = '#111827'; ctx.lineWidth = 3;
+    // Double Baseline (Two parallel black lines)
+    ctx.strokeStyle = '#1a1917'; ctx.lineWidth = 2.8;
     ctx.beginPath();
-    ctx.moveTo(-baselineLen, baselineDist - 18);
-    ctx.lineTo( baselineLen, baselineDist - 18);
+    ctx.moveTo(-baselineLen, baselineDist - 16);
+    ctx.lineTo( baselineLen, baselineDist - 16);
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.moveTo(-baselineLen, baselineDist + 18);
-    ctx.lineTo( baselineLen, baselineDist + 18);
+    ctx.moveTo(-baselineLen, baselineDist + 16);
+    ctx.lineTo( baselineLen, baselineDist + 16);
     ctx.stroke();
 
-    // Red End Spot Circles
-    [-baselineLen, baselineLen].forEach(x => {
+    // Red End Circles with black outlines on each end of the baseline
+    [-baselineLen, baselineLen].forEach(bx => {
       ctx.fillStyle = '#dc2626';
-      ctx.beginPath(); ctx.arc(x, baselineDist, 18, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#111827'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.beginPath(); ctx.arc(bx, baselineDist, redSpotR, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#1a1917'; ctx.lineWidth = 2.2; ctx.stroke();
     });
 
-    // 45-Degree Foul / Arrow Lines pointing to pockets
-    ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2;
+    // 4. Diagonal Foul Lines with Pocket Direction Arrows (Screenshot Style)
+    // Line starting from center outer ring and extending to pocket corner
+    ctx.strokeStyle = '#1e1c18'; ctx.lineWidth = 2.0;
+    ctx.beginPath();
+    ctx.moveTo(110, 110);
+    ctx.lineTo(baselineLen, baselineDist);
+    ctx.stroke();
+
+    // Extension past the red circle with arrow towards the pocket
     ctx.beginPath();
     ctx.moveTo(baselineLen, baselineDist);
-    ctx.lineTo(440, 440);
+    ctx.lineTo(430, 430);
     ctx.stroke();
+
+    // Pocket Arrowhead
+    ctx.fillStyle = '#dc2626';
+    ctx.beginPath();
+    ctx.moveTo(438, 438);
+    ctx.lineTo(422, 435);
+    ctx.lineTo(435, 422);
+    ctx.closePath();
+    ctx.fill();
 
     ctx.restore();
   }
 
-  // 4. REGULATION-SIZED CORNER POCKET HOLES (456px from center, ~50px radius)
-  const pocketCenterDist = 456;
+  // 5. Four Regulation Corner Pockets with Warm Amber Net Catchers (Screenshot Style)
+  const pocketDist = 452;
+  const pocketR = 48;
   [
-    [-pocketCenterDist, -pocketCenterDist],
-    [ pocketCenterDist, -pocketCenterDist],
-    [-pocketCenterDist,  pocketCenterDist],
-    [ pocketCenterDist,  pocketCenterDist]
+    [-pocketDist, -pocketDist],
+    [ pocketDist, -pocketDist],
+    [-pocketDist,  pocketDist],
+    [ pocketDist,  pocketDist]
   ].forEach(([px, py]) => {
-    // Outer dark wood chamfer
-    ctx.fillStyle = '#1c0e07';
-    ctx.beginPath(); ctx.arc(px, py, 56, 0, Math.PI * 2); ctx.fill();
+    // Warm orange-amber mesh pocket hole (Daraz screenshot style)
+    ctx.fillStyle = '#c2410c';
+    ctx.beginPath(); ctx.arc(px, py, pocketR + 4, 0, Math.PI * 2); ctx.fill();
 
-    // Polished Brass Rim
-    ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.arc(px, py, 52, 0, Math.PI * 2); ctx.stroke();
+    // Inner deep hole
+    ctx.fillStyle = '#090a0f';
+    ctx.beginPath(); ctx.arc(px, py, pocketR - 2, 0, Math.PI * 2); ctx.fill();
 
-    // Deep Pitch-Black Pocket Hole
-    ctx.fillStyle = '#06070a';
-    ctx.beginPath(); ctx.arc(px, py, 48, 0, Math.PI * 2); ctx.fill();
-
-    // Woven crochet string netting
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)'; ctx.lineWidth = 1.5;
-    for (let k = -30; k <= 30; k += 12) {
+    // Woven Net Lines
+    ctx.strokeStyle = '#ea580c'; ctx.lineWidth = 1.4;
+    for (let k = -28; k <= 28; k += 10) {
       ctx.beginPath();
-      ctx.moveTo(px + k, py - 30); ctx.lineTo(px + k, py + 30);
+      ctx.moveTo(px + k, py - 26); ctx.lineTo(px + k, py + 26);
       ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo(px - 30, py + k); ctx.lineTo(px + 30, py + k);
+      ctx.moveTo(px - 26, py + k); ctx.lineTo(px + 26, py + k);
       ctx.stroke();
     }
+
+    // Outer subtle wood contour ring
+    ctx.strokeStyle = 'rgba(40, 20, 10, 0.4)'; ctx.lineWidth = 2.0;
+    ctx.beginPath(); ctx.arc(px, py, pocketR + 4, 0, Math.PI * 2); ctx.stroke();
   });
 
   ctx.restore();
@@ -712,24 +743,38 @@ class CarromPiece {
       roughness = 0.25;
       metalness = 0.2;
     } else if (type === 'striker') {
-      color = 0xffffff;
-      roughness = 0.15;
-      metalness = 0.15;
+      color = 0x2dd4bf; // Daraz screenshot turquoise sea-green acrylic striker
+      roughness = 0.18;
+      metalness = 0.25;
     }
 
-    const mat = new THREE.MeshStandardMaterial({ color, roughness, metalness });
+    const mat = new THREE.MeshStandardMaterial({
+      color,
+      roughness,
+      metalness,
+      transparent: type === 'striker',
+      opacity: type === 'striker' ? 0.92 : 1.0
+    });
     this.mesh = new THREE.Mesh(geo, mat);
     this.mesh.castShadow = true;
     this.mesh.receiveShadow = true;
     this.mesh.position.set(x, h * 0.5, y);
 
-    // Decorative Center Ring / Jade Gem
+    // Decorative Center Ring / Acrylic Details (Screenshot Style)
     if (type === 'striker') {
-      const gem = new THREE.Mesh(
-        new THREE.CylinderGeometry(this.r * 0.42, this.r * 0.42, h + 0.02, 16),
-        new THREE.MeshStandardMaterial({ color: 0x059669, roughness: 0.2, metalness: 0.6 })
+      const innerRidge = new THREE.Mesh(
+        new THREE.TorusGeometry(this.r * 0.62, 0.045, 12, 32),
+        new THREE.MeshStandardMaterial({ color: 0x0d9488, roughness: 0.12, metalness: 0.35 })
       );
-      this.mesh.add(gem);
+      innerRidge.rotation.x = Math.PI / 2;
+      innerRidge.position.y = h * 0.5 + 0.003;
+      this.mesh.add(innerRidge);
+
+      const centerPip = new THREE.Mesh(
+        new THREE.CylinderGeometry(this.r * 0.22, this.r * 0.22, h + 0.012, 20),
+        new THREE.MeshStandardMaterial({ color: 0x14b8a6, roughness: 0.12, metalness: 0.4 })
+      );
+      this.mesh.add(centerPip);
     } else {
       const ring = new THREE.Mesh(
         new THREE.TorusGeometry(this.r * 0.5, 0.04, 8, 20),
