@@ -52,14 +52,29 @@ export class MaterialManager {
       side: THREE.FrontSide
     });
 
-    // 2b. SKIN SHELL: Realistic Human Flesh/Skin (Solid PBR Epidermis)
-    this.skinRealistic = new THREE.MeshStandardMaterial({
+    // 2b. SKIN SHELL: Realistic Human Flesh/Skin (Physical Subsurface Scattering & Epidermal Sheen)
+    this.skinRealistic = new THREE.MeshPhysicalMaterial({
       color: 0xefb8a5,
       roughness: 0.44,
-      metalness: 0.02,
+      metalness: 0.0,
+      clearcoat: 0.12,
+      clearcoatRoughness: 0.35,
+      sheen: 0.45,
+      sheenColor: new THREE.Color(0xffdcd2),
+      transmission: 0.05,
+      thickness: 0.45,
+      attenuationColor: new THREE.Color(0xd93829),
+      attenuationDistance: 0.8,
       transparent: false,
       opacity: 1.0,
-      side: THREE.FrontSide
+      side: THREE.DoubleSide
+    });
+
+    this.lips = new THREE.MeshStandardMaterial({
+      color: 0xba5d67,
+      roughness: 0.35,
+      metalness: 0.02,
+      clippingPlanes: [clippingPlane]
     });
 
     // Active skin material pointer
@@ -292,10 +307,12 @@ export class MaterialManager {
     this.skinPeach.opacity = val;
     this.skinXRay.opacity = val;
     this.skinRealistic.opacity = val;
-    if (val >= 0.8) {
+    if (val >= 0.85) {
       this.skinRealistic.transparent = false;
+      this.skinRealistic.depthWrite = true;
     } else {
       this.skinRealistic.transparent = true;
+      this.skinRealistic.depthWrite = false;
     }
   }
 
