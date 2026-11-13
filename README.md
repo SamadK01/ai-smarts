@@ -6,7 +6,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 
 ---
 
-## 🎮 The 13 Experiments
+## 🎮 The 15 Experiments
 
 | # | Experiment | Technology | Highlights |
 |---|---|---|---|
@@ -23,6 +23,8 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 | **11** | [**Fruit Slash**](fruit.html) | Canvas 2D, Web Audio API, Segment Slicing | Fast-paced neon blade arcade featuring unlimited recursive slicing, parabolic fruit trajectories, glowing cyan blade trails with velocity swish, explosive bombs, golden slow-mo mangoes, combo multipliers, and live speed switching. |
 | **12** | [**Foosball Pro**](foosball.html) | Canvas 2D, 240Hz Sub-step CCD, Web Audio | Tournament table soccer simulation with continuous collision detection, 8 regulation interleaved rods (GK, DEF, MID, ATT), realistic figure trapping and bank shots, 3-tier bot AI, instant slow-motion goal replay, and local 2P multiplayer. |
 | **13** | [**BodyScope 3D: Medical Anatomy Atlas**](bodyscope/index.html) | Three.js v0.160.0, BodyParts3D & Z-Anatomy 3D Models, Web Audio | Production-grade 3D medical anatomy explorer built with authentic open-licensed 3D models (all 206+ bones with individual names, skull, mandible, full hands and feet), translucent peach/pink PBR physical skin (`MeshPhysicalMaterial`), soft studio lighting, cardiovascular tree with instanced glowing blood particles and "Blood Path" circulation tour, real-time beating heart with dual-tone lub-dub valve acoustics, live scrolling ECG (Lead II), biophysical glycemic/insulin simulation, cross-section slicing, bilingual English/Urdu details, and anatomy quiz. |
+| **14** | [**Royal Ludo Master 3D**](ludo.html) | Standard 15x15 Grid, Heuristic AI Bots, Web Audio | Authentic regulation Ludo board with 4 colored bases (Red, Green, Yellow, Blue), 52-step outer circuit, 8 star safe spots, 3D rolling dice, step-by-step token hops, cutting bonus turns, pass & play local multiplayer, and smart AI bots. |
+| **15** | [**Cyber Drift 3D: Tokyo Midnight**](drift.html) | Three.js WebGL, 60 FPS Vehicle Physics, Procedural Audio | Adrenaline-fueled 3D cyberpunk highway racer with authentic drift slip physics, counter-steering, dynamic tire smoke, asphalt skidmarks, dual-exhaust NOS boost with tunnel-warp FOV, traffic weave near-misses, police pursuit sirens, and procedural engine acoustics. |
 
 ---
 
@@ -56,6 +58,16 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 ### 5. Procedural Audio Synthesizer
 - Built using the native browser **Web Audio API** (`AudioContext`).
 - Generates dynamic square, sawtooth, triangle, and sine waveforms with custom ADSR envelopes for key clicks, phenolic ball collisions, biological chirps, and laser strikes without loading external `.mp3` or `.wav` files.
+
+### 6. Authentic Ludo Logic & Heuristic Engine (`ludo.html`)
+- **Regulation 15x15 Grid**: Exact geometry with 4 colored bases (Red, Green, Yellow, Blue), 52 outer track steps, 8 Star safe zones where tokens cannot be captured, and 4 colored home columns leading to the center finish triangle.
+- **Official Tournament Rules**: Need a 6 to deploy tokens from base; consecutive 6 penalties; bonus rolls awarded on rolling a 6, capturing an opponent, or entering a token into the home triangle.
+- **Smart AI Bot Engine**: 4-tier decision priority (1. Capture opponent, 2. Enter home, 3. Deploy from base on a 6, 4. Advance safest token).
+
+### 7. 3D Vehicle Dynamics & Drift Slip Mechanics (`drift.html`)
+- **Physics-Driven Drift Model**: Real-time tire slip angles, lateral momentum, body roll suspension lean, and dynamic counter-steering feedback.
+- **Nitro Boost & Warp Effect**: Dual-exhaust flaming thrust, dynamic camera field-of-view expansion (warp vision), and screen vibration at 300+ km/h.
+- **Procedural Engine & Screech Acoustics**: Multi-oscillator harmonic engine growl that scales dynamically with RPM and gear shifts (1st through 5th), bandpass-filtered tire screeching on drifts, and turbo blow-off valve *pssshhht* on throttle release.
 
 ---
 
