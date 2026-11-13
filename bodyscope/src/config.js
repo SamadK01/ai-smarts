@@ -78,6 +78,14 @@ export const CONFIG = {
 
   // Skin appearance modes
   skinModes: {
+    realistic: {
+      name: "Realistic Human Body (حقیقی جسم)",
+      roughness: 0.44,
+      transmission: 0.0,
+      thickness: 0.0,
+      color: 0xefb8a5,
+      opacity: 1.0
+    },
     peach: {
       name: "Translucent Peach (PBR)",
       roughness: 0.14,

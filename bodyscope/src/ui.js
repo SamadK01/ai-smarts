@@ -40,6 +40,9 @@ export class UIManager {
       infoFunction: document.getElementById('info-function'),
       infoFacts: document.getElementById('info-facts'),
       infoConditions: document.getElementById('info-conditions'),
+      infoActionBox: document.getElementById('info-action-box'),
+      infoActionText: document.getElementById('info-action-text'),
+      demonstrateActionBtn: document.getElementById('demonstrate-action-btn'),
 
       // Search & Autocomplete
       searchInput: document.getElementById('search-input'),
@@ -59,9 +62,11 @@ export class UIManager {
       // Sliders & Toggles
       skinOpacitySlider: document.getElementById('skin-opacity-slider'),
       skinOpacityVal: document.getElementById('skin-opacity-val'),
-      skinClearBtn: document.getElementById('skin-clear-btn'),
-      skinGhostBtn: document.getElementById('skin-ghost-btn'),
-      skinTransBtn: document.getElementById('skin-trans-btn'),
+      bodyRealBtn: document.getElementById('body-real-btn'),
+      bodyFleshBtn: document.getElementById('body-flesh-btn'),
+      bodyGhostBtn: document.getElementById('body-ghost-btn'),
+      bodyXrayBtn: document.getElementById('body-xray-btn'),
+      bodyBareBtn: document.getElementById('body-bare-btn'),
       sliceSlider: document.getElementById('slice-slider'),
       sliceToggle: document.getElementById('slice-toggle'),
       sliceAxisSelect: document.getElementById('slice-axis-select'),
@@ -139,37 +144,83 @@ export class UIManager {
       });
     }
 
-    // Quick Skin Presets
-    if (this.dom.skinClearBtn) {
-      this.dom.skinClearBtn.addEventListener('click', () => {
-        this.app.materials.setSkinOpacity(0.0);
-        this.app.models.setLayerVisibility('skin', false);
-        this.dom.skinOpacitySlider.value = 0.0;
-        if (this.dom.skinOpacityVal) this.dom.skinOpacityVal.textContent = '0%';
+    // Body Appearance & Flesh (Maas) Controls
+    if (this.dom.bodyRealBtn) {
+      this.dom.bodyRealBtn.addEventListener('click', () => {
+        const mat = this.app.materials.setSkinMode('realistic');
+        this.app.models.updateSkinMaterial(mat);
+        this.app.materials.setSkinOpacity(1.0);
+        this.app.models.setLayerVisibility('skin', true);
+        if (this.dom.skinOpacitySlider) this.dom.skinOpacitySlider.value = 1.0;
+        if (this.dom.skinOpacityVal) this.dom.skinOpacityVal.textContent = '100%';
         const skinCb = document.querySelector('input[data-system="skin"]');
-        if (skinCb) skinCb.checked = false;
+        if (skinCb) skinCb.checked = true;
       });
     }
 
-    if (this.dom.skinGhostBtn) {
-      this.dom.skinGhostBtn.addEventListener('click', () => {
+    if (this.dom.bodyFleshBtn) {
+      this.dom.bodyFleshBtn.addEventListener('click', () => {
+        // Show full muscular system (Maas) + transparent ghost skin
+        this.app.models.setLayerVisibility('muscles', true);
+        const muscCb = document.querySelector('input[data-system="muscles"]');
+        if (muscCb) muscCb.checked = true;
+        this.app.materials.setSkinOpacity(0.12);
+        if (this.dom.skinOpacitySlider) this.dom.skinOpacitySlider.value = 0.12;
+        if (this.dom.skinOpacityVal) this.dom.skinOpacityVal.textContent = '12%';
+      });
+    }
+
+    if (this.dom.bodyGhostBtn) {
+      this.dom.bodyGhostBtn.addEventListener('click', () => {
+        const mat = this.app.materials.setSkinMode('peach');
+        this.app.models.updateSkinMaterial(mat);
         this.app.materials.setSkinOpacity(0.18);
         this.app.models.setLayerVisibility('skin', true);
-        this.dom.skinOpacitySlider.value = 0.18;
+        if (this.dom.skinOpacitySlider) this.dom.skinOpacitySlider.value = 0.18;
         if (this.dom.skinOpacityVal) this.dom.skinOpacityVal.textContent = '18%';
         const skinCb = document.querySelector('input[data-system="skin"]');
         if (skinCb) skinCb.checked = true;
       });
     }
 
-    if (this.dom.skinTransBtn) {
-      this.dom.skinTransBtn.addEventListener('click', () => {
-        this.app.materials.setSkinOpacity(0.40);
+    if (this.dom.bodyXrayBtn) {
+      this.dom.bodyXrayBtn.addEventListener('click', () => {
+        const mat = this.app.materials.setSkinMode('xray');
+        this.app.models.updateSkinMaterial(mat);
+        this.app.materials.setSkinOpacity(0.22);
         this.app.models.setLayerVisibility('skin', true);
-        this.dom.skinOpacitySlider.value = 0.40;
-        if (this.dom.skinOpacityVal) this.dom.skinOpacityVal.textContent = '40%';
+        if (this.dom.skinOpacitySlider) this.dom.skinOpacitySlider.value = 0.22;
+        if (this.dom.skinOpacityVal) this.dom.skinOpacityVal.textContent = '22%';
         const skinCb = document.querySelector('input[data-system="skin"]');
         if (skinCb) skinCb.checked = true;
+      });
+    }
+
+    if (this.dom.bodyBareBtn) {
+      this.dom.bodyBareBtn.addEventListener('click', () => {
+        this.app.materials.setSkinOpacity(0.0);
+        this.app.models.setLayerVisibility('skin', false);
+        if (this.dom.skinOpacitySlider) this.dom.skinOpacitySlider.value = 0.0;
+        if (this.dom.skinOpacityVal) this.dom.skinOpacityVal.textContent = '0%';
+        const skinCb = document.querySelector('input[data-system="skin"]');
+        if (skinCb) skinCb.checked = false;
+      });
+    }
+
+    // Interactive Organ Action Buttons
+    document.querySelectorAll('.organ-action-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const organId = btn.getAttribute('data-organ');
+        this.selectById(organId, true);
+        this.app.physiology.triggerOrganAction(organId);
+      });
+    });
+
+    // Demonstrate Biological Action in Info Card
+    if (this.dom.demonstrateActionBtn) {
+      this.dom.demonstrateActionBtn.addEventListener('click', () => {
+        const id = this.selectedMesh ? this.selectedMesh.userData.id : 'heart';
+        this.app.physiology.triggerOrganAction(id);
       });
     }
 
@@ -313,6 +364,10 @@ export class UIManager {
     this.dom.infoFunction.textContent = data.function;
     this.dom.infoFacts.textContent = data.facts;
     this.dom.infoConditions.innerHTML = `<b>Clinical Conditions:</b> ${data.conditions}`;
+
+    if (this.dom.infoActionText) {
+      this.dom.infoActionText.textContent = data.action || data.function || "Active physiological metabolism and perfusion.";
+    }
 
     this.dom.infoCard.classList.add('visible');
   }

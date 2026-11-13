@@ -67,19 +67,36 @@ All 3D models integrated into BodyScope are authentic, open-licensed biomedical 
 | **Female Reference Data** | [NIH Visible Human Project (NLM)](https://www.nlm.nih.gov/research/visible/visible_human.html) | Public Domain / CC BY 4.0 | Female reference pelvic inlet and thoracic dimensions. |
 | **Terminology** | *Terminologia Anatomica (TA2)* | FIPAT | Official international Latin anatomical nomenclature. |
 
-### ⚧ Honest Disclosure on Sexual Dimorphism Morphing
-As outlined in our design specifications:
-- The base high-resolution skeletal framework is derived from the validated adult reference dataset.
-- The **Female Model** is created via a biologically faithful anatomical morph: interpolating the pelvic girdle (widening the subpubic angle from ~70° to >90°, expanding the pelvic inlet for obstetric compatibility), narrowing the shoulder biacromial breadth, and tapering the thoracic rib cage.
+### ⚧ Sex-Specific Reproductive & Mammary Anatomy
+- **Male Anatomy**: Anatomically complete male reproductive system including bilateral testes, epididymis, ductus deferens, prostate, seminal glands, and penile erectile structures (corpus cavernosum, corpus spongiosum, glans penis).
+- **Female Anatomy**:
+  - **Pelvic Reproductive Organs**: Anteverted muscular uterus (fundus, body, cervix), bilateral ovaries in ovarian fossae, arched fallopian tubes with fimbriae, and vaginal canal. All male structures are strictly hidden in female mode.
+  - **Mammary Glands & Breasts (پستان / دودھ کے غدود)**: Situated over anterior ribs 2–6, featuring natural feminine breast contours, areola, nipple, 14–16 internal glandular lobules, and lactiferous ducts with active lactation milk particle flow.
+  - **Skeletal Dimorphism**: Expanded pelvic inlet and wider subpubic angle (>90°).
 
 ---
 
 ## ✨ Core Technological Innovations
 
-1. **Photorealistic PBR Translucent Peach Skin**:
-   - Rendered using Three.js `MeshPhysicalMaterial` with true optical transmission (`transmission: 0.88`), subsurface-like warm attenuation (`attenuationColor: #ffa490`), and subtle roughness to reveal the internal skeleton, moist organs, and pulsing red arteries in soft studio lighting.
-   - Optional one-click **Cyan X-Ray Hologram Mode**.
-2. **Cardiovascular Blood Flow & "Blood Path" Tour**:
+1. **Multiple Body Appearance & Flesh (Maas) Modes**:
+   - **Realistic Human Body (👤 حقیقی جسم)**: Solid, photorealistic human skin with warm epidermis, natural specular reflections, and realistic feminine breast contours or male torso.
+   - **Flesh & Muscles (🥩 گوشت / عضلات)**: Activates 440+ striated skeletal muscles from Z-Anatomy in rich anatomical detail.
+   - **Translucent Peach (🍑 نیم شفاف شیشہ)**: 18% ghost physical transmission revealing internal skeleton and organs.
+   - **Cyan X-Ray Hologram (💎 ایکس رے ہولوگرام)**: Sci-fi medical hologram with edge rim fresnel.
+   - **Bare Organs (🫀 خالص اعضاء)**: 100% skin transparency for direct organ visibility.
+
+2. **Organs in Action ⚡ (اعضاء کی فعال کارکردگی)**:
+   - Live, animated physiological demonstrations for each vital organ:
+     - 🫀 **Heart**: Vigorous chamber pumping, lub-dub audio, and live ECG synchrony.
+     - 🫁 **Lungs**: Rhythmic respiratory inhalation/exhalation expansion and recoil.
+     - 🧠 **Brain**: Neural electrical synaptic impulse flashing across the cerebral cortex.
+     - 🥩 **Stomach**: Peristaltic gastric churning contractions for food digestion.
+     - 🫘 **Kidneys**: Filtration flow through ureters to the urinary bladder.
+     - 🤱 **Mammary Glands / Breasts (Female)**: Lactation milk droplet transit through lactiferous ducts toward the nipple.
+     - 🤰 **Uterus & Ovaries (Female)**: Cyclic follicular maturation and uterine gestational support.
+     - ♂️ **Male Reproductive (Male)**: Active spermatogenesis and androgen perfusion.
+
+3. **Cardiovascular Blood Flow & "Blood Path" Tour**:
    - Over 1,400 instanced glowing blood particles travelling along arterial (crimson) and venous (royal blue) centerline trajectories down to the hands and feet.
    - "Blood Path" closed-loop tour smoothly guides the camera through the full cycle: *Right Ventricle ➔ Pulmonary Arteries ➔ Lungs (Oxygenation) ➔ Left Heart ➔ Aorta ➔ Systemic Organs & Limbs ➔ Vena Cava ➔ Right Atrium*.
 3. **Synchronized Cardiac Lub-Dub & Synthesized Acoustics**:

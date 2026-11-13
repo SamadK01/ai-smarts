@@ -95,6 +95,17 @@ class BodyScopeApp {
         this.state.morphTarget = isMale ? 1.0 : 0.0;
         genderToggle.textContent = isMale ? '♀ Female' : '♂ Male';
         genderToggle.classList.toggle('active', isMale);
+
+        // Dynamically toggle sex-specific organs and skin morphology
+        if (this.models) {
+          this.models.setGender(this.state.gender);
+        }
+
+        // Toggle visibility of sex-specific action buttons
+        const femaleBtns = document.querySelectorAll('.female-only-btn');
+        const maleBtns = document.querySelectorAll('.male-only-btn');
+        femaleBtns.forEach(b => b.style.display = isMale ? 'flex' : 'none');
+        maleBtns.forEach(b => b.style.display = isMale ? 'none' : 'flex');
       });
     }
 
@@ -106,14 +117,28 @@ class BodyScopeApp {
       });
     });
 
-    // Skin Appearance Modes (Peach vs X-Ray)
+    // Skin Appearance Modes (Peach -> Realistic -> X-Ray)
     const skinModeBtn = document.getElementById('skin-mode-btn');
     if (skinModeBtn) {
       skinModeBtn.addEventListener('click', () => {
-        const isPeach = this.state.skinMode === 'peach';
-        this.state.skinMode = isPeach ? 'xray' : 'peach';
-        skinModeBtn.textContent = isPeach ? '💎 X-Ray Mode' : '🍑 Translucent Peach';
-        const newMat = this.materials.setSkinMode(this.state.skinMode);
+        let nextMode = 'peach';
+        if (this.state.skinMode === 'peach') nextMode = 'realistic';
+        else if (this.state.skinMode === 'realistic') nextMode = 'xray';
+        else nextMode = 'peach';
+
+        this.state.skinMode = nextMode;
+        if (nextMode === 'realistic') {
+          skinModeBtn.textContent = '👤 Real Human Body';
+          this.materials.setSkinOpacity(1.0);
+        } else if (nextMode === 'xray') {
+          skinModeBtn.textContent = '💎 X-Ray Hologram';
+          this.materials.setSkinOpacity(0.22);
+        } else {
+          skinModeBtn.textContent = '🍑 Translucent Peach';
+          this.materials.setSkinOpacity(0.18);
+        }
+
+        const newMat = this.materials.setSkinMode(nextMode);
         if (this.models) {
           this.models.updateSkinMaterial(newMat);
         }

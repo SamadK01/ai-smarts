@@ -231,6 +231,47 @@
       cursor: pointer;
     }
 
+    /* Organ Actions & Body Appearance Grid */
+    .organs-action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .organ-action-btn {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(45, 226, 230, 0.22);
+      color: var(--text-main);
+      padding: 6px 8px;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      cursor: pointer;
+      transition: all 0.18s;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .organ-action-btn:hover {
+      background: rgba(45, 226, 230, 0.22);
+      border-color: var(--accent-cyan);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    .pulse-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      animation: pulseLive 1.4s infinite;
+    }
+    @keyframes pulseLive {
+      0% { transform: scale(0.9); opacity: 0.6; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.6; }
+    }
+
     /* Camera Presets Grid */
     .presets-grid {
       display: grid;
@@ -603,27 +644,52 @@
 
   <!-- Left Drawer: Layer Toggles, Slicing & Views -->
   <aside class="left-drawer">
+    <!-- Real Human Body & Flesh Appearance Mode -->
+    <div class="drawer-section">
+      <div class="section-title">Body Appearance & Flesh (جسم کی ہیئت)</div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:8px;">
+        <button id="body-real-btn" class="preset-pill" style="padding:6px 8px; text-align:center; font-weight:600; color:var(--accent-gold); border-color:var(--accent-gold);">👤 Real Human (حقیقی جسم)</button>
+        <button id="body-flesh-btn" class="preset-pill" style="padding:6px 8px; text-align:center; font-weight:600; color:#f87171; border-color:#f87171;">🥩 Flesh & Muscles (گوشت)</button>
+      </div>
+      <div style="display:flex; gap:5px;">
+        <button id="body-ghost-btn" class="preset-pill" style="flex:1; text-align:center; padding:5px 4px;">Ghost (18%)</button>
+        <button id="body-xray-btn" class="preset-pill" style="flex:1; text-align:center; padding:5px 4px;">X-Ray Mode</button>
+        <button id="body-bare-btn" class="preset-pill" style="flex:1; text-align:center; padding:5px 4px;">Bare (0%)</button>
+      </div>
+      <div class="slider-row" style="margin-top:10px;">
+        <span>Skin Opacity: <b id="skin-opacity-val" style="color:var(--accent-cyan);">18%</b></span>
+        <input type="range" id="skin-opacity-slider" min="0" max="1" step="0.02" value="0.18">
+      </div>
+    </div>
+
+    <!-- Active Organs in Action (Clickable Interactive Demonstration) -->
+    <div class="drawer-section">
+      <div class="section-title">Organs in Action ⚡ (اعضاء کی کارکردگی)</div>
+      <div class="organs-action-grid">
+        <button class="organ-action-btn" data-organ="heart">🫀 Heart (دل)</button>
+        <button class="organ-action-btn" data-organ="lungs">🫁 Lungs (پھیپھڑے)</button>
+        <button class="organ-action-btn" data-organ="brain">🧠 Brain (دماغ)</button>
+        <button class="organ-action-btn" data-organ="stomach">🥩 Stomach (معدہ)</button>
+        <button class="organ-action-btn" data-organ="kidneys">🫘 Kidneys (گردے)</button>
+        <!-- Female-Specific Active Organs -->
+        <button class="organ-action-btn female-only-btn" data-organ="mammary_glands" style="display:none; border-color:#f472b6; color:#fbcfe8;">🤱 Breasts (دودھ کے غدود)</button>
+        <button class="organ-action-btn female-only-btn" data-organ="uterus" style="display:none; border-color:#f472b6; color:#fbcfe8;">🤰 Uterus (بچہ دانی)</button>
+        <!-- Male-Specific Active Organs -->
+        <button class="organ-action-btn male-only-btn" data-organ="male_reproductive" style="border-color:#38bdf8; color:#bae6fd;">♂️ Male Repro (مردانہ اعضاء)</button>
+      </div>
+    </div>
+
     <div class="drawer-section">
       <div class="section-title">Anatomical Layers</div>
       <div class="layers-grid">
         <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="skin" checked> Skin Shell</label>
         <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="skeleton" checked> Skeleton</label>
-        <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="muscles"> Muscles</label>
+        <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="muscles"> Muscles (Maas)</label>
         <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="cardiovascular" checked> Cardiovascular</label>
         <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="respiratory" checked> Respiratory</label>
         <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="digestive" checked> Digestive</label>
         <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="renal" checked> Renal</label>
         <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="nervous" checked> Nervous</label>
-      </div>
-
-      <div class="slider-row">
-        <span>Skin Opacity: <b id="skin-opacity-val" style="color:var(--accent-cyan);">18%</b></span>
-        <input type="range" id="skin-opacity-slider" min="0" max="1" step="0.02" value="0.18">
-      </div>
-      <div style="display:flex; gap:6px; margin-top:8px;">
-        <button id="skin-clear-btn" class="preset-pill" style="flex:1; text-align:center; padding:4px 6px;">Bare Organs (0%)</button>
-        <button id="skin-ghost-btn" class="preset-pill" style="flex:1; text-align:center; padding:4px 6px;">Ghost (18%)</button>
-        <button id="skin-trans-btn" class="preset-pill" style="flex:1; text-align:center; padding:4px 6px;">Glass (40%)</button>
       </div>
     </div>
 
@@ -698,9 +764,14 @@
     </div>
 
     <div class="info-body">
+      <div id="info-action-box" style="background:rgba(45,226,230,0.12); border:1px solid rgba(45,226,230,0.3); border-radius:8px; padding:8px 10px; margin-bottom:12px; font-size:0.8rem; color:#a5f3fc; line-height:1.4;">
+        <span class="pulse-dot" style="margin-right:6px;"></span>
+        <b style="color:#10b981;">LIVE ACTION:</b> <span id="info-action-text">Pumping arterial blood and maintaining systemic blood pressure.</span>
+      </div>
       <p id="info-function">Central muscular pump that drives systemic and pulmonary circulatory circuits.</p>
       <p id="info-facts">Beats approximately 100,000 times daily, ejecting roughly 7,500 liters of blood.</p>
       <div id="info-conditions" class="conditions-box">Clinical Conditions</div>
+      <button id="demonstrate-action-btn" class="btn" style="width:100%; justify-content:center; margin-top:14px; background:rgba(45,226,230,0.22); border-color:var(--accent-cyan); color:#fff; font-weight:600;">⚡ Demonstrate Biological Action (کام دکھائیں)</button>
     </div>
   </aside>
 

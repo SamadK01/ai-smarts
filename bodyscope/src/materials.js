@@ -52,6 +52,16 @@ export class MaterialManager {
       side: THREE.FrontSide
     });
 
+    // 2b. SKIN SHELL: Realistic Human Flesh/Skin (Solid PBR Epidermis)
+    this.skinRealistic = new THREE.MeshStandardMaterial({
+      color: 0xefb8a5,
+      roughness: 0.44,
+      metalness: 0.02,
+      transparent: false,
+      opacity: 1.0,
+      side: THREE.FrontSide
+    });
+
     // Active skin material pointer
     this.skinActive = this.skinPeach;
 
@@ -193,19 +203,84 @@ export class MaterialManager {
       clippingPlanes: [clippingPlane]
     });
 
-    // 10. MUSCLES
+    // 10. MUSCLES (Maas / Striated Muscle)
     this.muscle = new THREE.MeshStandardMaterial({
-      color: 0xa8423f,
-      roughness: 0.65,
+      color: 0xaa3838,
+      roughness: 0.52,
       metalness: 0.05,
+      clippingPlanes: [clippingPlane]
+    });
+
+    // 11. FEMALE REPRODUCTIVE & MAMMARY MATERIALS
+    this.uterus = new THREE.MeshStandardMaterial({
+      color: 0xc84c68,
+      roughness: 0.35,
+      metalness: 0.05,
+      clippingPlanes: [clippingPlane]
+    });
+
+    this.ovary = new THREE.MeshStandardMaterial({
+      color: 0xf2a7b8,
+      roughness: 0.30,
+      metalness: 0.08,
+      clippingPlanes: [clippingPlane]
+    });
+
+    this.fallopian = new THREE.MeshStandardMaterial({
+      color: 0xd9687e,
+      roughness: 0.38,
+      clippingPlanes: [clippingPlane]
+    });
+
+    this.mammary = new THREE.MeshStandardMaterial({
+      color: 0xf5989d,
+      roughness: 0.32,
+      metalness: 0.02,
       transparent: true,
-      opacity: 0.62,
+      opacity: 0.88,
+      clippingPlanes: [clippingPlane]
+    });
+
+    this.areola = new THREE.MeshStandardMaterial({
+      color: 0xb55a68,
+      roughness: 0.40,
+      metalness: 0.02,
+      clippingPlanes: [clippingPlane]
+    });
+
+    this.milk = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      emissive: 0xfffae0,
+      emissiveIntensity: 0.85,
+      roughness: 0.15,
+      metalness: 0.05
+    });
+
+    // 12. MALE REPRODUCTIVE MATERIALS
+    this.testis = new THREE.MeshStandardMaterial({
+      color: 0xc76a75,
+      roughness: 0.35,
+      clippingPlanes: [clippingPlane]
+    });
+
+    this.prostate = new THREE.MeshStandardMaterial({
+      color: 0xa87050,
+      roughness: 0.45,
+      clippingPlanes: [clippingPlane]
+    });
+
+    this.penis = new THREE.MeshStandardMaterial({
+      color: 0xb04558,
+      roughness: 0.36,
+      metalness: 0.04,
       clippingPlanes: [clippingPlane]
     });
   }
 
   setSkinMode(mode) {
-    if (mode === "xray") {
+    if (mode === "realistic") {
+      this.skinActive = this.skinRealistic;
+    } else if (mode === "xray") {
       this.skinActive = this.skinXRay;
     } else {
       this.skinActive = this.skinPeach;
@@ -216,6 +291,12 @@ export class MaterialManager {
   setSkinOpacity(val) {
     this.skinPeach.opacity = val;
     this.skinXRay.opacity = val;
+    this.skinRealistic.opacity = val;
+    if (val >= 0.8) {
+      this.skinRealistic.transparent = false;
+    } else {
+      this.skinRealistic.transparent = true;
+    }
   }
 
   setClipping(enabled, axis = "y", offset = 1.25) {
@@ -244,6 +325,18 @@ export class MaterialManager {
   getMaterialForNode(nodeName, system = "") {
     const n = (nodeName || "").toLowerCase();
     const s = (system || "").toLowerCase();
+
+    // Female Reproductive & Breasts
+    if (n.includes("mammary") || n.includes("breast") || n.includes("lactiferous")) return this.mammary;
+    if (n.includes("areola") || n.includes("nipple")) return this.areola;
+    if (n.includes("uterus") || n.includes("cervix") || n.includes("womb") || n.includes("vagina")) return this.uterus;
+    if (n.includes("ovary") || n.includes("ovarium")) return this.ovary;
+    if (n.includes("fallopian") || n.includes("tuba")) return this.fallopian;
+
+    // Male Reproductive
+    if (n.includes("testis") || n.includes("testicle") || n.includes("epididym")) return this.testis;
+    if (n.includes("prostate") || n.includes("seminal")) return this.prostate;
+    if (n.includes("penis") || n.includes("cavernosum") || n.includes("spongiosum") || n.includes("glans")) return this.penis;
 
     // Cardiovascular
     if (n.includes("artery") || n.includes("arteria") || n.includes("aorta")) return this.artery;

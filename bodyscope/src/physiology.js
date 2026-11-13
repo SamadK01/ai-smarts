@@ -23,8 +23,13 @@ export class PhysiologyEngine {
     // Cycle Timers
     this.cardiacPhase = 0.0;    // 0.0 to 1.0 per heartbeat
     this.breathingPhase = 0.0;  // 0.0 to 1.0 per respiratory cycle
+    this.simulationTime = 0.0;
     this.s1Fired = false;
     this.s2Fired = false;
+
+    // Organ Action Spotlight State
+    this.activeActionOrgan = null;
+    this.actionTimer = 0.0;
 
     // Glycemic Simulation State
     this.glucoseHistory = new Array(80).fill(90);
@@ -124,6 +129,60 @@ export class PhysiologyEngine {
 
     if (this.models.lungsGroup) {
       this.models.lungsGroup.scale.set(lungExpansion, lungExpansion * 1.02, lungExpansion * 1.04);
+    }
+
+    this.simulationTime += delta;
+    if (this.actionTimer > 0) {
+      this.actionTimer -= delta;
+      if (this.actionTimer <= 0) this.activeActionOrgan = null;
+    }
+
+    // 2b. ACTIVE DIGESTIVE STOMACH PERISTALSIS
+    if (this.models.stomachMesh) {
+      const isSpotlight = this.activeActionOrgan === 'stomach';
+      const amp = isSpotlight ? 0.08 : 0.03;
+      const speed = isSpotlight ? 4.5 : 2.0;
+      const peristalsis = 1.0 + Math.sin(this.simulationTime * speed) * amp;
+      this.models.stomachMesh.scale.set(peristalsis, 1.0 + Math.cos(this.simulationTime * speed) * (amp * 0.7), peristalsis);
+    }
+
+    // 2c. ACTIVE NEURAL SYNAPSE FIRING (Brain & Peripheral Nerves)
+    if (this.models.materials && this.models.materials.brain) {
+      const isBrainSpotlight = this.activeActionOrgan === 'brain';
+      const baseEmissive = isBrainSpotlight ? 0.45 : 0.18;
+      const pulseSpeed = isBrainSpotlight ? 10.0 : 4.5;
+      const brainGlow = baseEmissive + Math.sin(this.simulationTime * pulseSpeed) * 0.18 + (Math.random() > 0.93 ? 0.22 : 0.0);
+      this.models.materials.brain.emissiveIntensity = brainGlow;
+
+      if (this.models.materials.nerve) {
+        const nerveGlow = 0.65 + Math.sin(this.simulationTime * pulseSpeed * 1.2) * 0.30;
+        this.models.materials.nerve.emissiveIntensity = nerveGlow;
+      }
+    }
+
+    // 2d. ACTIVE FEMALE LACTATION MILK FLOW (Mammary Glands)
+    if (this.models.milkParticles && this.models.systems.femaleMammary.visible) {
+      const isLactating = this.activeActionOrgan === 'mammary_glands';
+      const flowRate = isLactating ? 0.025 : 0.008;
+      const posAttr = this.models.milkParticles.geometry.attributes.position;
+      const initPositions = this.models.milkParticles.userData.initialPositions;
+      if (posAttr && initPositions) {
+        const arr = posAttr.array;
+        for (let i = 0; i < initPositions.length; i++) {
+          const idx = i * 3;
+          // Progress milk droplets along the lactiferous duct path towards the nipple
+          const wave = Math.sin(this.simulationTime * (isLactating ? 8.0 : 3.0) + i * 0.4) * flowRate;
+          arr[idx + 2] = initPositions[i].z + wave;
+        }
+        posAttr.needsUpdate = true;
+      }
+    }
+
+    // 2e. ACTIVE UTERINE / OVARIAN CYCLE
+    if (this.models.uterusMesh && this.models.systems.femaleReproductive.visible) {
+      const isRepro = this.activeActionOrgan === 'uterus' || this.activeActionOrgan === 'ovaries';
+      const uterPulse = 1.0 + Math.sin(this.simulationTime * (isRepro ? 3.5 : 1.2)) * (isRepro ? 0.06 : 0.02);
+      this.models.uterusMesh.scale.set(uterPulse, uterPulse, 1.0);
     }
 
     // 3. GLYCEMIC METABOLIC FEEDBACK SIMULATION
@@ -294,6 +353,20 @@ export class PhysiologyEngine {
       } else {
         this.models.materials.skinPeach.color.setHex(0xffd9ce);
       }
+    }
+  }
+
+  triggerOrganAction(organId) {
+    this.activeActionOrgan = organId;
+    this.actionTimer = 6.0;
+
+    if (organId === 'heart') {
+      this.setBPM(95); // Aerobic functional pulse
+      if (this.audio) this.audio.playS1();
+    } else if (organId === 'lungs') {
+      this.breathingPhase = 0.0;
+    } else if (organId === 'stomach') {
+      this.eatSugar();
     }
   }
 

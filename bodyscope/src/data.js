@@ -418,6 +418,66 @@ export const ANATOMY_DATA = {
     function: "Shields internal viscera from mechanical trauma, ultraviolet radiation, and microbial pathogens; regulates core body temperature.",
     facts: "The human body's largest organ by surface area (~1.8 m² in adults) and weight (~16% of total body weight).",
     conditions: "Atopic dermatitis, Burns, Melanoma, Psoriasis, Cutaneous infections."
+  },
+
+  // ==========================================
+  // 9. FEMALE REPRODUCTIVE & LACTATION SYSTEM
+  // ==========================================
+  mammary_glands: {
+    id: "mammary_glands",
+    name: "Mammary Glands & Breasts",
+    latin: "Glandula mammaria",
+    urdu: "پستان اور دودھ کے غدود (چھاتی)",
+    system: "Female Reproductive & Endocrine",
+    region: "Anterior Thoracic Wall (Ribs 2-6)",
+    type: "Apocrine Tubuloalveolar Glands",
+    action: "Active Lactogenesis & Neuroendocrine Milk Ejection Reflex (Oxytocin & Prolactin)",
+    function: "Specialized glandular structures that synthesize, store, and eject nutrient-rich breast milk (lactation) under prolactin and oxytocin hormonal stimulation to nourish and immunize infants.",
+    facts: "Each breast contains 15 to 20 glandular lobes draining through lactiferous ducts into the nipple. Colostrum delivers vital secretory IgA antibodies immediately after birth.",
+    conditions: "Lactational mastitis, Fibroadenoma, Breast carcinoma, Duct ectasia, Galactocele."
+  },
+  uterus: {
+    id: "uterus",
+    name: "Uterus (Womb) & Cervix",
+    latin: "Uterus et cervix uteri",
+    urdu: "رحم (بچہ دانی) اور سروکس",
+    system: "Female Reproductive",
+    region: "Lesser Pelvis (Between Bladder and Rectum)",
+    type: "Hollow Muscular Organ",
+    action: "Gestational Fetal Support, Endometrial Decidualization & Labor Myometrial Contractions",
+    function: "Thick-walled muscular pelvic organ that accepts fertilized blastocysts, maintains fetal gestation, and generates powerful rhythmic myometrial contractions during childbirth.",
+    facts: "The myometrium can expand more than 500 times its pre-pregnancy volume, with uterine blood flow increasing from 50 mL/min to over 600 mL/min at full term.",
+    conditions: "Uterine leiomyomas (fibroids), Endometriosis, Cervical dysplasia, Adenomyosis, Uterine prolapse."
+  },
+  ovaries: {
+    id: "ovaries",
+    name: "Ovaries & Fallopian (Uterine) Tubes",
+    latin: "Ovaria et tubae uterinae",
+    urdu: "بیضہ دانیاں اور رحمی نالیاں",
+    system: "Female Reproductive",
+    region: "Lateral Pelvic Wall (Ovarian Fossa)",
+    type: "Primary Female Gonads & Conduit",
+    action: "Cyclic Follicular Oogenesis, Ovulation, and Estrogen/Progesterone Secretion",
+    function: "Bilateral gonads producing mature oocytes (eggs) and essential reproductive steroids (estrogen, progesterone, inhibin). Fallopian tubes capture ovulated ova via fimbriae and serve as the site of fertilization.",
+    facts: "A female is born with approximately 1-2 million primary oocytes arrested in prophase I. Only about 400 will fully mature and ovulate during reproductive lifespan.",
+    conditions: "Polycystic Ovary Syndrome (PCOS), Ovarian follicular cyst, Ectopic tubal pregnancy, Ovarian torsion."
+  },
+
+  // ==========================================
+  // 10. MALE REPRODUCTIVE SYSTEM
+  // ==========================================
+  male_reproductive: {
+    id: "male_reproductive",
+    name: "Male Reproductive System (Testes, Ductus Deferens, Prostate & Penis)",
+    latin: "Systema genitale masculinum",
+    urdu: "مردانہ اعضاءِ تناسل (خصیے، غدۂ مثانہ، عضوِ تناسل)",
+    system: "Male Reproductive",
+    region: "Perineum & Lesser Pelvis",
+    type: "Primary Male Gonads & External Genitalia",
+    action: "Continuous Spermatogenesis (~1,000 sperm/second) & Endocrine Testosterone Secretion",
+    function: "Synthesizes spermatozoa in seminiferous tubules, secretes testosterone, produces alkaline seminal plasma via the prostate and seminal vesicles, and facilitates gamete delivery.",
+    facts: "Testes require a temperature 2-3°C lower than core body temperature for viable spermatogenesis, precisely maintained by scrotal cremasteric and dartos reflexes.",
+    conditions: "Benign Prostatic Hyperplasia (BPH), Testicular torsion, Varicocele, Prostatitis, Erectile dysfunction."
   }
 };
 
@@ -475,12 +535,28 @@ export function getAnatomyDataForMesh(meshName) {
   if (name.includes("femur") || name.includes("patella") || name.includes("tibia") || name.includes("fibula")) return ANATOMY_DATA.leg_bones;
   if (name.includes("tarsal") || name.includes("metatarsal") || name.includes("calcaneus") || name.includes("talus") || name.includes("toe") || name.includes("foot")) return ANATOMY_DATA.foot_bones;
 
-  // 7. Muscular checks
+  // 7. Female Reproductive & Lactation checks
+  if (name.includes("mammary") || name.includes("breast") || name.includes("nipple") || name.includes("areola") || name.includes("lactiferous") || name.includes("doodh")) {
+    return ANATOMY_DATA.mammary_glands;
+  }
+  if (name.includes("uterus") || name.includes("cervix") || name.includes("womb") || name.includes("endometri") || name.includes("myometri") || name.includes("vagina")) {
+    return ANATOMY_DATA.uterus;
+  }
+  if (name.includes("ovary") || name.includes("ovaria") || name.includes("fallopian") || name.includes("tuba") || name.includes("fimbria")) {
+    return ANATOMY_DATA.ovaries;
+  }
+
+  // 8. Male Reproductive checks
+  if (name.includes("penis") || name.includes("testis") || name.includes("testicle") || name.includes("prostate") || name.includes("epididym") || name.includes("scrotum") || name.includes("cavernosum") || name.includes("spongiosum") || name.includes("deferens") || name.includes("seminal")) {
+    return ANATOMY_DATA.male_reproductive;
+  }
+
+  // 9. Muscular checks
   if (name.includes("muscle") || name.includes("pectoral") || name.includes("biceps") || name.includes("deltoid") || name.includes("gluteus") || name.includes("rectus")) {
     return ANATOMY_DATA.muscles_major;
   }
 
-  // 8. Skin
+  // 10. Skin
   if (name.includes("skin") || name.includes("body") || name.includes("integument")) {
     return ANATOMY_DATA.skin;
   }
