@@ -4,28 +4,31 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Royal Ludo Master 3D — Classic Board Championship</title>
-<meta name="description" content="An authentic, beautifully crafted classic Ludo game with standard 52-step board, 8 safe star zones, 4-player pass & play, smart bots AI, 3D rolling dice, step-by-step token hops, and procedural sound.">
+<meta name="description" content="An authentic, beautifully crafted classic Ludo game with 15x15 standard regulation board, 52-step track, 8 safe star zones, 1v1 / 3P / 4P role assignment, smart AI bots, 3D rolling dice, step-by-step token hops, and procedural Web Audio.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@700;800&family=Bricolage+Grotesque:opsz,wght@12..96,500;700;800&family=Geist+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-deep: #0b0d13;
+    --bg-deep: #090b10;
     --gold: #f59e0b;
     --gold-bright: #fbbf24;
-    --red: #ef4444;
-    --green: #10b981;
-    --yellow: #facc15;
-    --blue: #3b82f6;
-    --red-bg: #fee2e2;
+    --red: #e11d48;
+    --red-dark: #9f1239;
+    --green: #059669;
+    --green-dark: #064e3b;
+    --yellow: #eab308;
+    --yellow-dark: #854d0e;
+    --blue: #2563eb;
+    --blue-dark: #1e3a8a;
+    --red-bg: #ffe4e6;
     --green-bg: #d1fae5;
     --yellow-bg: #fef9c3;
     --blue-bg: #dbeafe;
-    --board-border: #311b0b;
-    --wood-1: #2a1508;
-    --wood-2: #190c04;
-    --panel-bg: rgba(18, 22, 34, 0.88);
-    --panel-border: rgba(245, 158, 11, 0.25);
+    --board-wood: #2c1808;
+    --board-border: #4a2810;
+    --panel-bg: rgba(15, 20, 32, 0.92);
+    --panel-border: rgba(245, 158, 11, 0.28);
     --font-display: 'Funnel Display', sans-serif;
     --font-body: 'Bricolage Grotesque', sans-serif;
     --font-mono: 'Geist Mono', monospace;
@@ -35,129 +38,198 @@
   
   html, body {
     width: 100%; height: 100%; overflow: hidden;
-    background: radial-gradient(circle at 50% 40%, #151a28 0%, #080a0f 100%);
+    background: radial-gradient(circle at 50% 35%, #182033 0%, #080a0f 100%);
     color: #f1f5f9; font-family: var(--font-body);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
   }
 
-  /* Top App Bar */
+  /* Top Navigation Bar */
   header.top-bar {
-    position: fixed; top: 0; left: 0; right: 0;
-    height: 52px; padding: 0 20px;
+    width: 100%; height: 54px; padding: 0 16px;
     display: flex; align-items: center; justify-content: space-between;
-    background: rgba(11, 13, 19, 0.85); backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    z-index: 100;
+    background: rgba(11, 14, 23, 0.88); backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 100; flex-shrink: 0;
   }
   .brand {
-    display: flex; align-items: center; gap: 10px;
+    display: flex; align-items: center; gap: 8px;
     font-family: var(--font-display); font-size: 1.15rem; font-weight: 800;
     color: #fff; letter-spacing: -0.5px;
   }
   .brand span { color: var(--gold); }
   .nav-actions { display: flex; align-items: center; gap: 8px; }
   .btn {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
     color: #f1f5f9; padding: 6px 12px; border-radius: 8px;
-    font-size: 0.8rem; font-weight: 600; cursor: pointer;
-    transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.78rem; font-weight: 700; cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--font-body); text-decoration: none;
   }
-  .btn:hover { background: rgba(245, 158, 11, 0.18); border-color: var(--gold); color: #fff; }
-  .btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
+  .btn:hover { background: rgba(245, 158, 11, 0.2); border-color: var(--gold); color: #fff; transform: translateY(-1px); }
+  .btn:active { transform: translateY(1px); }
+  .btn.active { background: var(--gold); color: #000; border-color: var(--gold); font-weight: 800; }
+  .btn.btn-primary {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #000; border: none; font-weight: 800;
+    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.35);
+  }
+  .btn.btn-primary:hover {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.5);
+  }
 
   /* Main Container */
   main.game-container {
     display: flex; align-items: center; justify-content: center;
-    gap: 28px; width: 100%; max-width: 1100px;
-    padding: 60px 16px 16px; height: 100%;
+    gap: 24px; width: 100%; max-width: 1200px;
+    padding: 12px 16px; height: calc(100% - 54px);
+    overflow-y: auto; overflow-x: hidden;
   }
 
-  /* Left/Right Player Cards */
+  /* Player Slots Grid around Board */
+  .players-sidebar {
+    display: flex; flex-direction: column; gap: 14px;
+    min-width: 160px;
+  }
+
   .player-slot {
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
-    padding: 12px 16px; border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 12px 14px; border-radius: 14px;
     background: var(--panel-bg); border: 2px solid transparent;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    min-width: 130px; text-align: center;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative; box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    min-width: 140px;
   }
   .player-slot.active {
-    border-color: var(--gold);
-    box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
-    transform: scale(1.04);
+    border-color: var(--gold-bright);
+    box-shadow: 0 0 22px rgba(245, 158, 11, 0.45);
+    transform: scale(1.03);
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(15, 20, 32, 0.95));
+  }
+  .player-slot.inactive {
+    opacity: 0.32; filter: grayscale(0.85);
   }
   .player-avatar {
-    width: 44px; height: 44px; border-radius: 50%;
+    width: 42px; height: 42px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.4rem; position: relative;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    font-size: 1.3rem; position: relative;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+    border: 2px solid #fff;
   }
-  .player-name { font-size: 0.85rem; font-weight: 700; color: #fff; }
-  .player-status { font-size: 0.72rem; color: #94a3b8; font-family: var(--font-mono); }
+  .player-name {
+    font-size: 0.82rem; font-weight: 800; color: #fff;
+    white-space: nowrap; max-width: 130px; overflow: hidden; text-overflow: ellipsis;
+  }
+  .player-status {
+    font-size: 0.7rem; color: #94a3b8; font-family: var(--font-mono);
+  }
+
+  /* Role Toggle Badge on Player Card */
+  .role-toggle-badge {
+    font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 10px;
+    cursor: pointer; transition: all 0.2s;
+    background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #e2e8f0; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .role-toggle-badge:hover {
+    background: var(--gold); color: #000; border-color: var(--gold);
+    transform: scale(1.05);
+  }
+  .role-toggle-badge.human { border-color: #38bdf8; color: #7dd3fc; }
+  .role-toggle-badge.bot { border-color: #a78bfa; color: #c4b5fd; }
+  .role-toggle-badge.off { border-color: #ef4444; color: #fca5a5; }
+
   .rank-badge {
     position: absolute; top: -6px; right: -6px;
     background: var(--gold); color: #000;
-    font-size: 0.65rem; font-weight: 800;
-    width: 18px; height: 18px; border-radius: 50%;
+    font-size: 0.7rem; font-weight: 900;
+    width: 22px; height: 22px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
   }
 
-  /* Board Wrapper & Board Frame */
+  /* Board Wrapper & 15x15 Board */
   .board-wrapper {
     position: relative;
     display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
   }
   .board-frame {
-    background: linear-gradient(145deg, #381f0d, #1f0f05);
-    padding: 14px; border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 2px 4px rgba(255, 255, 255, 0.2);
-    border: 3px solid #5a3317;
+    background: linear-gradient(145deg, #381f0d, #1b0c03);
+    padding: 12px; border-radius: 18px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), inset 0 2px 4px rgba(255, 255, 255, 0.25);
+    border: 3px solid #5a3215;
   }
   #ludo-board {
     display: grid;
     grid-template-columns: repeat(15, 1fr);
     grid-template-rows: repeat(15, 1fr);
-    width: min(80vw, 80vh, 560px);
-    height: min(80vw, 80vh, 560px);
+    width: min(78vw, 78vh, 540px);
+    height: min(78vw, 78vh, 540px);
     background: #ffffff;
-    border-radius: 8px;
-    overflow: hidden;
+    border-radius: 6px;
     position: relative;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+    box-shadow: inset 0 0 12px rgba(0,0,0,0.35);
   }
 
   /* Board Cells */
   .cell {
-    border: 1px solid rgba(0, 0, 0, 0.14);
+    border: 0.5px solid rgba(0, 0, 0, 0.15);
     display: flex; align-items: center; justify-content: center;
-    position: relative; font-size: 0.75rem; font-weight: 800;
+    position: relative; font-size: 0.65rem; font-weight: 800;
+    user-select: none;
   }
   .cell.star {
-    background-image: radial-gradient(circle, rgba(0,0,0,0.12) 20%, transparent 20%);
+    background-image: radial-gradient(circle, rgba(245, 158, 11, 0.22) 30%, transparent 70%);
   }
   .cell.star::after {
     content: "⭐";
-    font-size: 0.95rem; opacity: 0.75;
+    font-size: 0.82rem;
     position: absolute; pointer-events: none;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
   }
+  .cell.arrow::before {
+    font-size: 0.82rem; font-weight: 900;
+    position: absolute; pointer-events: none;
+    color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  }
+  .cell.arrow-up::before { content: "▲"; }
+  .cell.arrow-right::before { content: "►"; }
+  .cell.arrow-down::before { content: "▼"; }
+  .cell.arrow-left::before { content: "◄"; }
 
-  /* Home Base Quadrants (6x6 each) */
+  /* 4 Corner Base Quadrants (6x6 cells each) */
   .base-quadrant {
     grid-column: span 6; grid-row: span 6;
-    padding: 14px; display: flex; align-items: center; justify-content: center;
+    padding: 10px; display: flex; align-items: center; justify-content: center;
+    position: relative; transition: opacity 0.3s;
   }
   .base-inner {
     width: 100%; height: 100%; background: #ffffff;
     border-radius: 12px; display: grid;
     grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
-    gap: 12px; padding: 12px;
-    box-shadow: inset 0 2px 8px rgba(0,0,0,0.25);
+    gap: 8px; padding: 10px;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.25);
   }
   .base-slot {
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.35);
+    border: 2px dashed rgba(0, 0, 0, 0.2);
     position: relative;
+  }
+  .base-quadrant.inactive {
+    opacity: 0.25; filter: grayscale(0.9);
+  }
+  .base-inactive-overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 900; color: #64748b;
+    background: rgba(0, 0, 0, 0.4); border-radius: 10px;
+    text-transform: uppercase; letter-spacing: 1px;
+    pointer-events: none;
   }
 
   /* Color Schemes */
@@ -167,145 +239,193 @@
   .c-blue { background: var(--blue); color: #fff; }
 
   .bg-red-light { background: #ffe4e6; }
-  .bg-green-light { background: #dcfce7; }
+  .bg-green-light { background: #d1fae5; }
   .bg-yellow-light { background: #fef9c3; }
-  .bg-blue-light { background: #e0f2fe; }
+  .bg-blue-light { background: #dbeafe; }
 
-  /* Center Home Triangle (3x3) */
+  /* Center Home Triangle (3x3 at row 7-9, col 7-9) */
   .center-home {
     grid-column: 7 / span 3; grid-row: 7 / span 3;
     position: relative; background: #ffffff;
     overflow: hidden;
   }
-  .triangle {
-    position: absolute; width: 100%; height: 100%;
-  }
-  .tri-red {
-    clip-path: polygon(0% 0%, 50% 50%, 0% 100%);
-    background: var(--red);
-  }
-  .tri-green {
-    clip-path: polygon(0% 0%, 100% 0%, 50% 50%);
-    background: var(--green);
-  }
-  .tri-yellow {
-    clip-path: polygon(100% 0%, 100% 100%, 50% 50%);
-    background: var(--yellow);
-  }
-  .tri-blue {
-    clip-path: polygon(0% 100%, 100% 100%, 50% 50%);
-    background: var(--blue);
-  }
-  .center-podium {
-    position: absolute; top: 25%; left: 25%; width: 50%; height: 50%;
-    background: radial-gradient(circle, #fff, #fef08a);
-    border-radius: 50%; z-index: 5;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  .center-svg {
+    width: 100%; height: 100%; display: block;
   }
 
-  /* Tokens (Gotis) */
+  /* Dedicated Tokens Layer */
+  #tokens-layer {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  /* Tokens (Gotis) - Scaled exactly to cell */
   .token {
-    width: 72%; height: 72%; border-radius: 50%;
-    position: absolute; cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.6);
-    border: 2px solid #ffffff; z-index: 20;
-    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    width: 5.2%; height: 5.2%; border-radius: 50%;
+    position: absolute; cursor: pointer; pointer-events: auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.55), inset 0 2px 4px rgba(255,255,255,0.85);
+    border: 2.2px solid #ffffff; z-index: 50;
+    transform: translate(-50%, -50%);
+    transition: left 0.16s cubic-bezier(0.25, 1, 0.5, 1),
+                top 0.16s cubic-bezier(0.25, 1, 0.5, 1),
+                transform 0.16s ease,
+                box-shadow 0.16s ease;
     display: flex; align-items: center; justify-content: center;
   }
   .token::after {
     content: ""; width: 44%; height: 44%; border-radius: 50%;
-    background: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.7);
     box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   }
+  .token.c-red { background: radial-gradient(circle at 35% 35%, #fb7185, #e11d48 60%, #9f1239 100%); }
+  .token.c-green { background: radial-gradient(circle at 35% 35%, #34d399, #059669 60%, #064e3b 100%); }
+  .token.c-yellow { background: radial-gradient(circle at 35% 35%, #fef08a, #eab308 60%, #854d0e 100%); }
+  .token.c-blue { background: radial-gradient(circle at 35% 35%, #60a5fa, #2563eb 60%, #1e3a8a 100%); }
+
   .token.selectable {
     animation: pulseToken 0.7s infinite alternate ease-in-out;
-    cursor: pointer; z-index: 30;
+    cursor: pointer; z-index: 70;
   }
   @keyframes pulseToken {
-    0% { transform: scale(1.0); box-shadow: 0 0 6px #fff, 0 4px 8px rgba(0,0,0,0.4); }
-    100% { transform: scale(1.28); box-shadow: 0 0 16px var(--gold-bright), 0 6px 12px rgba(0,0,0,0.5); }
+    0% { transform: translate(-50%, -50%) scale(1.0); box-shadow: 0 0 8px #fff, 0 4px 8px rgba(0,0,0,0.4); }
+    100% { transform: translate(-50%, -50%) scale(1.32); box-shadow: 0 0 20px var(--gold-bright), 0 8px 16px rgba(0,0,0,0.6); }
   }
   .token.hopping {
-    z-index: 40;
-    transition: left 0.18s ease-in-out, top 0.18s ease-in-out, transform 0.18s ease;
+    z-index: 80;
+    transform: translate(-50%, -50%) scale(1.22);
   }
 
   /* Right Control Panel (Dice & Actions) */
   .control-panel {
-    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
     background: var(--panel-bg); backdrop-filter: blur(14px);
     border: 1px solid var(--panel-border); border-radius: 18px;
-    padding: 20px 24px; min-width: 220px;
+    padding: 18px 20px; min-width: 210px;
     box-shadow: 0 16px 36px rgba(0,0,0,0.5);
   }
   .turn-announcer {
-    font-size: 0.95rem; font-weight: 700; text-align: center;
-    color: #e2e8f0;
+    font-size: 0.9rem; font-weight: 700; text-align: center;
+    color: #e2e8f0; width: 100%;
   }
   .turn-player-pill {
-    padding: 3px 12px; border-radius: 20px; font-weight: 800;
-    display: inline-block; margin-top: 4px;
+    padding: 4px 14px; border-radius: 20px; font-weight: 800;
+    display: inline-block; margin-top: 4px; font-size: 0.85rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
 
   /* 3D Dice Cup & Roller */
   .dice-area {
-    position: relative; width: 90px; height: 90px;
+    position: relative; width: 84px; height: 84px;
     perspective: 600px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
   }
+  .dice-area.disabled {
+    pointer-events: none; opacity: 0.7;
+  }
   .dice-cube {
-    width: 68px; height: 68px; position: relative;
+    width: 64px; height: 64px; position: relative;
     transform-style: preserve-3d;
     transform: rotateX(-20deg) rotateY(25deg);
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
   .dice-cube.rolling {
-    animation: rollDiceAnim 0.65s linear infinite;
+    animation: rollDiceAnim 0.6s linear infinite;
   }
   @keyframes rollDiceAnim {
     0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
     100% { transform: rotateX(720deg) rotateY(1080deg) rotateZ(360deg); }
   }
   .dice-face {
-    position: absolute; width: 68px; height: 68px;
+    position: absolute; width: 64px; height: 64px;
     background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
-    border: 1px solid #cbd5e1; border-radius: 14px;
-    box-shadow: inset 0 0 8px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.3);
-    display: grid; padding: 10px;
+    border: 1px solid #cbd5e1; border-radius: 12px;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.1), 0 3px 8px rgba(0,0,0,0.3);
+    display: grid; padding: 8px;
   }
-  .dice-face.front  { transform: translateZ(34px); }
-  .dice-face.back   { transform: rotateY(180deg) translateZ(34px); }
-  .dice-face.right  { transform: rotateY(90deg) translateZ(34px); }
-  .dice-face.left   { transform: rotateY(-90deg) translateZ(34px); }
-  .dice-face.top    { transform: rotateX(90deg) translateZ(34px); }
-  .dice-face.bottom { transform: rotateX(-90deg) translateZ(34px); }
+  .dice-face.front  { transform: translateZ(32px); }
+  .dice-face.back   { transform: rotateY(180deg) translateZ(32px); }
+  .dice-face.right  { transform: rotateY(90deg) translateZ(32px); }
+  .dice-face.left   { transform: rotateY(-90deg) translateZ(32px); }
+  .dice-face.top    { transform: rotateX(90deg) translateZ(32px); }
+  .dice-face.bottom { transform: rotateX(-90deg) translateZ(32px); }
 
   .dot {
-    width: 12px; height: 12px; border-radius: 50%;
+    width: 11px; height: 11px; border-radius: 50%;
     background: #0f172a; margin: auto;
     box-shadow: inset 0 2px 3px rgba(0,0,0,0.5);
   }
   .dot.center-red { background: #dc2626; } /* Single red dot for face 1 */
 
   .roll-prompt {
-    font-size: 0.78rem; font-family: var(--font-mono); color: var(--gold);
-    letter-spacing: 0.5px; text-transform: uppercase;
+    font-size: 0.76rem; font-family: var(--font-mono); color: var(--gold);
+    letter-spacing: 0.5px; text-transform: uppercase; text-align: center;
+    min-height: 20px;
   }
 
   /* Modals & Overlays */
   .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.78);
-    backdrop-filter: blur(8px); z-index: 200;
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(8px); z-index: 250;
     display: none; align-items: center; justify-content: center;
+    padding: 16px;
   }
   .modal-box {
     background: #0f172a; border: 1px solid var(--panel-border);
-    border-radius: 20px; padding: 28px; width: 90%; max-width: 440px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.8); text-align: center;
+    border-radius: 20px; padding: 24px; width: 100%; max-width: 500px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.85); text-align: center;
+    max-height: 90vh; overflow-y: auto;
   }
-  .modal-title { font-size: 1.5rem; font-family: var(--font-display); font-weight: 800; color: var(--gold); margin-bottom: 12px; }
-  .modal-desc { font-size: 0.88rem; color: #94a3b8; line-height: 1.5; margin-bottom: 20px; }
+  .modal-title { font-size: 1.4rem; font-family: var(--font-display); font-weight: 800; color: var(--gold); margin-bottom: 8px; }
+  .modal-desc { font-size: 0.84rem; color: #94a3b8; line-height: 1.4; margin-bottom: 16px; }
+
+  /* Presets Bar inside Modal */
+  .preset-buttons {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 18px;
+  }
+  .preset-btn {
+    background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 8px; border-radius: 8px; font-size: 0.76rem; font-weight: 700;
+    color: #f1f5f9; cursor: pointer; transition: all 0.2s;
+  }
+  .preset-btn:hover { background: rgba(245, 158, 11, 0.2); border-color: var(--gold); }
+  .preset-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
+
+  /* Player Config Cards inside Modal */
+  .player-config-cards {
+    display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;
+    text-align: left;
+  }
+  .p-config-card {
+    background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px; padding: 10px 14px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .p-config-left {
+    display: flex; align-items: center; gap: 10px; flex: 1;
+  }
+  .p-color-dot {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; flex-shrink: 0;
+  }
+  .p-name-input {
+    background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff; font-size: 0.8rem; font-weight: 600; padding: 4px 8px;
+    border-radius: 6px; width: 110px; font-family: var(--font-body);
+  }
+  .p-role-options {
+    display: flex; gap: 4px;
+  }
+  .p-role-btn {
+    background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #cbd5e1; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem;
+    font-weight: 700; cursor: pointer; transition: all 0.15s;
+  }
+  .p-role-btn:hover { background: rgba(255, 255, 255, 0.18); }
+  .p-role-btn.active {
+    background: var(--gold); color: #000; border-color: var(--gold); font-weight: 800;
+  }
 
   /* Confetti Celebration */
   #confetti-canvas {
@@ -314,33 +434,38 @@
   }
 
   /* Responsive Design for Mobile */
-  @media (max-width: 840px) {
+  @media (max-width: 900px) {
     main.game-container {
-      flex-direction: column; gap: 12px; padding: 56px 8px 8px;
+      flex-direction: column; gap: 12px; padding: 8px;
     }
+    .players-sidebar {
+      flex-direction: row; width: 100%; justify-content: space-around;
+      min-width: auto;
+    }
+    .player-slot { min-width: 72px; padding: 6px 8px; }
+    .player-avatar { width: 32px; height: 32px; font-size: 1rem; }
+    .player-name { font-size: 0.72rem; max-width: 80px; }
+    .role-toggle-badge { font-size: 0.6rem; padding: 1px 6px; }
     .control-panel {
       flex-direction: row; justify-content: space-between;
-      width: 100%; max-width: min(92vw, 480px); padding: 10px 16px;
+      width: 100%; max-width: min(92vw, 480px); padding: 8px 14px;
     }
-    .players-list { display: flex; width: 100%; justify-content: space-around; }
-    .player-slot { min-width: 75px; padding: 6px 8px; }
-    .player-avatar { width: 34px; height: 34px; font-size: 1.1rem; }
     #ludo-board {
-      width: min(92vw, 76vh, 440px);
-      height: min(92vw, 76vh, 440px);
+      width: min(90vw, 70vh, 420px);
+      height: min(90vw, 70vh, 420px);
     }
   }
 </style>
 </head>
 <body>
 
-  <!-- Top Navigation Header -->
+  <!-- Top App Navigation -->
   <header class="top-bar">
     <div class="brand">
       <span>🎲</span> ROYAL LUDO <span>MASTER</span>
     </div>
     <div class="nav-actions">
-      <button id="btn-mode" class="btn" title="Toggle 1 vs 3 Bots or 4-Player Pass & Play">👥 Mode: Pass & Play</button>
+      <button id="btn-setup" class="btn btn-primary">⚙️ Assign Roles & Players</button>
       <button id="btn-sound" class="btn">🔊 Sound: ON</button>
       <button id="btn-rules" class="btn">📜 Rules</button>
       <a href="index.html" class="btn">🏠 Home</a>
@@ -353,15 +478,16 @@
   <!-- Main Game Field -->
   <main class="game-container">
 
-    <!-- Players Info Slots (Green & Yellow on Top/Sides) -->
-    <div class="players-list" id="players-bar">
+    <!-- Left Players: Red & Green -->
+    <div class="players-sidebar" id="players-left">
       <!-- Player Red -->
       <div class="player-slot active" id="slot-red">
         <div class="player-avatar c-red">
           🔴
           <span class="rank-badge" style="display:none;">1</span>
         </div>
-        <div class="player-name">Player 1 (Red)</div>
+        <div class="player-name" id="name-red">Player 1 (Red)</div>
+        <button class="role-toggle-badge human" id="badge-red" title="Click to toggle Human / Bot / Off">👤 Human</button>
         <div class="player-status" id="status-red">Active Turn</div>
       </div>
 
@@ -371,17 +497,34 @@
           🟢
           <span class="rank-badge" style="display:none;">2</span>
         </div>
-        <div class="player-name">Player 2 (Green)</div>
+        <div class="player-name" id="name-green">Bot Green</div>
+        <button class="role-toggle-badge bot" id="badge-green" title="Click to toggle Human / Bot / Off">🤖 Bot</button>
         <div class="player-status" id="status-green">Waiting</div>
       </div>
+    </div>
 
+    <!-- 15x15 Regulation Ludo Board -->
+    <div class="board-wrapper">
+      <div class="board-frame">
+        <div id="ludo-board">
+          <!-- Populated procedurally: 4 Base Quadrants, 4 Arms Track Cells, Center SVG -->
+          <div id="tokens-layer">
+            <!-- 16 Tokens (4 per color) placed here with absolute coordinates -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Players: Yellow & Blue -->
+    <div class="players-sidebar" id="players-right">
       <!-- Player Yellow -->
       <div class="player-slot" id="slot-yellow">
         <div class="player-avatar c-yellow">
           🟡
           <span class="rank-badge" style="display:none;">3</span>
         </div>
-        <div class="player-name">Player 3 (Yellow)</div>
+        <div class="player-name" id="name-yellow">Bot Yellow</div>
+        <button class="role-toggle-badge bot" id="badge-yellow" title="Click to toggle Human / Bot / Off">🤖 Bot</button>
         <div class="player-status" id="status-yellow">Waiting</div>
       </div>
 
@@ -391,21 +534,13 @@
           🔵
           <span class="rank-badge" style="display:none;">4</span>
         </div>
-        <div class="player-name">Player 4 (Blue)</div>
+        <div class="player-name" id="name-blue">Bot Blue</div>
+        <button class="role-toggle-badge bot" id="badge-blue" title="Click to toggle Human / Bot / Off">🤖 Bot</button>
         <div class="player-status" id="status-blue">Waiting</div>
       </div>
     </div>
 
-    <!-- 15x15 Ludo Board Frame -->
-    <div class="board-wrapper">
-      <div class="board-frame">
-        <div id="ludo-board">
-          <!-- Procedurally populated by initializeLudoBoard() -->
-        </div>
-      </div>
-    </div>
-
-    <!-- Interactive Dice & Control Console -->
+    <!-- Dice Control Console -->
     <div class="control-panel">
       <div class="turn-announcer">
         Current Turn:
@@ -413,7 +548,7 @@
       </div>
 
       <!-- 3D Rolling Dice -->
-      <div class="dice-area" id="dice-trigger">
+      <div class="dice-area" id="dice-trigger" title="Tap to Roll (or Spacebar)">
         <div class="dice-cube" id="dice-cube">
           <!-- Face 1 -->
           <div class="dice-face front" style="grid-template: 1fr / 1fr;">
@@ -454,24 +589,114 @@
         </div>
       </div>
 
-      <div class="roll-prompt" id="roll-prompt">Tap to Roll 🎲</div>
-      <button id="btn-restart" class="btn" style="width:100%; justify-content:center;">🔄 New Match</button>
+      <div class="roll-prompt" id="roll-prompt">Tap Dice to Roll 🎲</div>
+      <button id="btn-roll-direct" class="btn btn-primary" style="width:100%; justify-content:center;">🎲 Roll Dice</button>
+      <button id="btn-new-match" class="btn" style="width:100%; justify-content:center;">🔄 Reset Game</button>
     </div>
 
   </main>
 
-  <!-- Rules / Victory Modal -->
+  <!-- Match Setup & Role Assignment Modal -->
+  <div class="modal-overlay" id="setup-modal">
+    <div class="modal-box">
+      <div class="modal-title">👑 Match Setup & Roles</div>
+      <div class="modal-desc">Assign Human, AI Bot, or Inactive roles for each player, or pick a quick preset:</div>
+
+      <!-- Quick Preset Selectors -->
+      <div class="preset-buttons">
+        <button class="preset-btn active" data-preset="1v3">🎯 1 Human vs 3 Bots</button>
+        <button class="preset-btn" data-preset="1v1">⚔️ 2 Players (1v1)</button>
+        <button class="preset-btn" data-preset="3p">👥 3 Players</button>
+        <button class="preset-btn" data-preset="4p">🏆 4P Pass & Play</button>
+        <button class="preset-btn" data-preset="spectate" style="grid-column: span 2;">🍿 4 Bots Spectate (AI Match)</button>
+      </div>
+
+      <!-- 4 Custom Player Configuration Cards -->
+      <div class="player-config-cards">
+        <!-- Red Player -->
+        <div class="p-config-card" id="cfg-card-red">
+          <div class="p-config-left">
+            <div class="p-color-dot c-red">🔴</div>
+            <input type="text" class="p-name-input" id="cfg-name-red" value="You (Red)" maxlength="14">
+          </div>
+          <div class="p-role-options" data-player="red">
+            <button class="p-role-btn active" data-role="human">👤 Human</button>
+            <button class="p-role-btn" data-role="bot">🤖 Bot</button>
+            <button class="p-role-btn" data-role="off">🚫 Off</button>
+          </div>
+        </div>
+
+        <!-- Green Player -->
+        <div class="p-config-card" id="cfg-card-green">
+          <div class="p-config-left">
+            <div class="p-color-dot c-green">🟢</div>
+            <input type="text" class="p-name-input" id="cfg-name-green" value="Bot Green" maxlength="14">
+          </div>
+          <div class="p-role-options" data-player="green">
+            <button class="p-role-btn" data-role="human">👤 Human</button>
+            <button class="p-role-btn active" data-role="bot">🤖 Bot</button>
+            <button class="p-role-btn" data-role="off">🚫 Off</button>
+          </div>
+        </div>
+
+        <!-- Yellow Player -->
+        <div class="p-config-card" id="cfg-card-yellow">
+          <div class="p-config-left">
+            <div class="p-color-dot c-yellow">🟡</div>
+            <input type="text" class="p-name-input" id="cfg-name-yellow" value="Bot Yellow" maxlength="14">
+          </div>
+          <div class="p-role-options" data-player="yellow">
+            <button class="p-role-btn" data-role="human">👤 Human</button>
+            <button class="p-role-btn active" data-role="bot">🤖 Bot</button>
+            <button class="p-role-btn" data-role="off">🚫 Off</button>
+          </div>
+        </div>
+
+        <!-- Blue Player -->
+        <div class="p-config-card" id="cfg-card-blue">
+          <div class="p-config-left">
+            <div class="p-color-dot c-blue">🔵</div>
+            <input type="text" class="p-name-input" id="cfg-name-blue" value="Bot Blue" maxlength="14">
+          </div>
+          <div class="p-role-options" data-player="blue">
+            <button class="p-role-btn" data-role="human">👤 Human</button>
+            <button class="p-role-btn active" data-role="bot">🤖 Bot</button>
+            <button class="p-role-btn" data-role="off">🚫 Off</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="btn-apply-setup" style="width:100%; justify-content:center; padding:12px; font-size:0.95rem;">
+        ▶️ Start Match with these Roles
+      </button>
+    </div>
+  </div>
+
+  <!-- Rules Modal -->
   <div class="modal-overlay" id="rules-modal">
     <div class="modal-box">
       <div class="modal-title">Official Ludo Rules 📜</div>
       <div class="modal-desc" style="text-align:left;">
-        • <b>Need a 6 to Release:</b> Roll a 6 to move a token from your base to the starting track.<br><br>
+        • <b>Need a 6 to Release:</b> Roll a 6 to move a token from base to the starting track.<br><br>
         • <b>Bonus Extra Roll:</b> Rolling a <b>6</b>, capturing an opponent's token, or entering a token into Home grants an extra roll!<br><br>
-        • <b>Capture / Cut:</b> Land on an opponent's token on any regular step to send them back to base!<br><br>
-        • <b>Safe Spots (⭐):</b> The 4 starting arrow cells and 4 midway star cells are safe — tokens cannot be cut there.<br><br>
-        • <b>Home Victory:</b> First player to guide all 4 tokens into the central Home Triangle wins the Championship! 👑
+        • <b>Safe Star Spots (⭐):</b> The 4 starting arrow cells and 4 midway star cells are safe — tokens cannot be cut there.<br><br>
+        • <b>Capture / Cut:</b> Land on an opponent on an unstarred cell to send their token back to base!<br><br>
+        • <b>Three 6s Rule:</b> Rolling three 6s consecutively forfeits the turn.<br><br>
+        • <b>Championship Victory:</b> First player to guide all 4 tokens into the central Home Triangle wins the Championship! 👑
       </div>
       <button class="btn active" id="close-rules-btn" style="width:100%; justify-content:center; padding:10px;">Got it! Let's Play</button>
+    </div>
+  </div>
+
+  <!-- Victory Podium Modal -->
+  <div class="modal-overlay" id="victory-modal">
+    <div class="modal-box">
+      <div class="modal-title" id="victory-title">🏆 Championship Victory!</div>
+      <div class="modal-desc" id="victory-desc">Congratulations! Here are the match standings:</div>
+      <div id="podium-list" style="margin-bottom:20px; font-weight:700;"></div>
+      <button class="btn btn-primary" id="btn-play-again" style="width:100%; justify-content:center; padding:12px;">
+        🔄 Play Another Match
+      </button>
     </div>
   </div>
 
@@ -479,10 +704,10 @@
 /**
  * Royal Ludo Master 3D - High Precision Web Game
  * 15x15 Standard Regulation Board, 52-step Track, 8 Star Safe Spots
- * Smart AI Bots, 3D Rolling Dice, and Web Audio API Synthesis
+ * Interactive Role Assignment (Human / Bot / Off), 3D Rolling Dice, Web Audio API
  */
 
-// 1. Audio Synthesizer via Native Web Audio API
+// 1. Procedural Audio Synthesizer via Native Web Audio API
 class LudoAudio {
   constructor() {
     this.ctx = null;
@@ -507,13 +732,13 @@ class LudoAudio {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(140 + Math.random() * 120, t + i * 0.07);
-      gain.gain.setValueAtTime(0.18, t + i * 0.07);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.07 + 0.05);
+      osc.frequency.setValueAtTime(160 + Math.random() * 140, t + i * 0.06);
+      gain.gain.setValueAtTime(0.18, t + i * 0.06);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.06 + 0.05);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
-      osc.start(t + i * 0.07);
-      osc.stop(t + i * 0.07 + 0.06);
+      osc.start(t + i * 0.06);
+      osc.stop(t + i * 0.06 + 0.06);
     }
   }
 
@@ -524,27 +749,26 @@ class LudoAudio {
     const gain = this.ctx.createGain();
     const t = this.ctx.currentTime;
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(420, t);
-    osc.frequency.exponentialRampToValueAtTime(260, t + 0.08);
+    osc.frequency.setValueAtTime(440, t);
+    osc.frequency.exponentialRampToValueAtTime(280, t + 0.07);
     gain.gain.setValueAtTime(0.2, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
     osc.connect(gain);
     gain.connect(this.ctx.destination);
     osc.start(t);
-    osc.stop(t + 0.09);
+    osc.stop(t + 0.08);
   }
 
   playCut() {
     if (!this.enabled) return;
     this.init();
     const t = this.ctx.currentTime;
-    // Dramatic descending frequency sweep
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(600, t);
-    osc.frequency.exponentialRampToValueAtTime(80, t + 0.35);
-    gain.gain.setValueAtTime(0.3, t);
+    osc.frequency.setValueAtTime(650, t);
+    osc.frequency.exponentialRampToValueAtTime(90, t + 0.35);
+    gain.gain.setValueAtTime(0.28, t);
     gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
     osc.connect(gain);
     gain.connect(this.ctx.destination);
@@ -561,13 +785,13 @@ class LudoAudio {
       const gain = this.ctx.createGain();
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, t + idx * 0.06);
-      gain.gain.setValueAtTime(0.18, t + idx * 0.06);
+      gain.gain.setValueAtTime(0.2, t + idx * 0.06);
       gain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.06 + 0.25);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start(t + idx * 0.06);
       osc.stop(t + idx * 0.06 + 0.26);
-    } );
+    });
   }
 
   playHome() {
@@ -578,122 +802,133 @@ class LudoAudio {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(freq, t + idx * 0.09);
-      gain.gain.setValueAtTime(0.25, t + idx * 0.09);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.09 + 0.4);
+      osc.frequency.setValueAtTime(freq, t + idx * 0.08);
+      gain.gain.setValueAtTime(0.25, t + idx * 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.08 + 0.4);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
-      osc.start(t + idx * 0.09);
-      osc.stop(t + idx * 0.09 + 0.42);
+      osc.start(t + idx * 0.08);
+      osc.stop(t + idx * 0.08 + 0.42);
+    });
+  }
+
+  playFanfare() {
+    if (!this.enabled) return;
+    this.init();
+    const t = this.ctx.currentTime;
+    [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((freq, idx) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t + idx * 0.12);
+      gain.gain.setValueAtTime(0.28, t + idx * 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.12 + 0.5);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t + idx * 0.12);
+      osc.stop(t + idx * 0.12 + 0.52);
     });
   }
 }
 
 const audio = new LudoAudio();
 
-// 2. Standard 15x15 Ludo Board Coordinate Map
-// 52 main outer track steps (0 to 51)
+// 2. Standard 15x15 Regulation Ludo Coordinate Map
+// 52 outer track steps (clockwise)
 const TRACK_COORDS = [
-  // Red Wing (Bottom arm) -> Left side ascending
-  { r: 8, c: 1 },  // 0: Red Start (Star)
-  { r: 8, c: 2 },  // 1
-  { r: 8, c: 3 },  // 2
-  { r: 8, c: 4 },  // 3
-  { r: 8, c: 5 },  // 4
-  { r: 9, c: 6 },  // 5
-  { r: 10, c: 6 }, // 6
-  { r: 11, c: 6 }, // 7
-  { r: 12, c: 6 }, // 8: Star
-  { r: 13, c: 6 }, // 9
-  { r: 14, c: 6 }, // 10
-  { r: 14, c: 7 }, // 11
-  { r: 14, c: 8 }, // 12
+  // Red Wing (ascending towards Left arm)
+  { r: 13, c: 6 }, // 0: Red Start (Star ⭐)
+  { r: 12, c: 6 }, // 1
+  { r: 11, c: 6 }, // 2
+  { r: 10, c: 6 }, // 3
+  { r: 9, c: 6 },  // 4
+  { r: 8, c: 5 },  // 5
+  { r: 8, c: 4 },  // 6
+  { r: 8, c: 3 },  // 7
+  { r: 8, c: 2 },  // 8: Star ⭐ (Red Midway)
+  { r: 8, c: 1 },  // 9
+  { r: 8, c: 0 },  // 10
+  { r: 7, c: 0 },  // 11
+  { r: 6, c: 0 },  // 12
 
-  // Green Wing (Left arm) -> Rightward across top
-  { r: 13, c: 8 }, // 13: Green Start (Star)
-  { r: 12, c: 8 }, // 14
-  { r: 11, c: 8 }, // 15
-  { r: 10, c: 8 }, // 16
-  { r: 9, c: 8 },  // 17
-  { r: 8, c: 9 },  // 18
-  { r: 8, c: 10 }, // 19
-  { r: 8, c: 11 }, // 20
-  { r: 8, c: 12 }, // 21: Star
-  { r: 8, c: 13 }, // 22
-  { r: 8, c: 14 }, // 23
-  { r: 7, c: 14 }, // 24
-  { r: 6, c: 14 }, // 25
+  // Green Wing (ascending towards Top arm)
+  { r: 6, c: 1 },  // 13: Green Start (Star ⭐)
+  { r: 6, c: 2 },  // 14
+  { r: 6, c: 3 },  // 15
+  { r: 6, c: 4 },  // 16
+  { r: 6, c: 5 },  // 17
+  { r: 5, c: 6 },  // 18
+  { r: 4, c: 6 },  // 19
+  { r: 3, c: 6 },  // 20
+  { r: 2, c: 6 },  // 21: Star ⭐ (Green Midway)
+  { r: 1, c: 6 },  // 22
+  { r: 0, c: 6 },  // 23
+  { r: 0, c: 7 },  // 24
+  { r: 0, c: 8 },  // 25
 
-  // Yellow Wing (Top arm) -> Descending right side
-  { r: 6, c: 13 }, // 26: Yellow Start (Star)
-  { r: 6, c: 12 }, // 27
-  { r: 6, c: 11 }, // 28
-  { r: 6, c: 10 }, // 29
-  { r: 6, c: 9 },  // 30
-  { r: 5, c: 8 },  // 31
-  { r: 4, c: 8 },  // 32
-  { r: 3, c: 8 },  // 33
-  { r: 2, c: 8 },  // 34: Star
-  { r: 1, c: 8 },  // 35
-  { r: 0, c: 8 },  // 36
-  { r: 0, c: 7 },  // 37
-  { r: 0, c: 6 },  // 38
+  // Yellow Wing (descending towards Right arm)
+  { r: 1, c: 8 },  // 26: Yellow Start (Star ⭐)
+  { r: 2, c: 8 },  // 27
+  { r: 3, c: 8 },  // 28
+  { r: 4, c: 8 },  // 29
+  { r: 5, c: 8 },  // 30
+  { r: 6, c: 9 },  // 31
+  { r: 6, c: 10 }, // 32
+  { r: 6, c: 11 }, // 33
+  { r: 6, c: 12 }, // 34: Star ⭐ (Yellow Midway)
+  { r: 6, c: 13 }, // 35
+  { r: 6, c: 14 }, // 36
+  { r: 7, c: 14 }, // 37
+  { r: 8, c: 14 }, // 38
 
-  // Blue Wing (Right arm) -> Leftward bottom
-  { r: 1, c: 6 },  // 39: Blue Start (Star)
-  { r: 2, c: 6 },  // 40
-  { r: 3, c: 6 },  // 41
-  { r: 4, c: 6 },  // 42
-  { r: 5, c: 6 },  // 43
-  { r: 6, c: 5 },  // 44
-  { r: 6, c: 4 },  // 45
-  { r: 6, c: 3 },  // 46
-  { r: 6, c: 2 },  // 47: Star
-  { r: 6, c: 1 },  // 48
-  { r: 6, c: 0 },  // 49
-  { r: 7, c: 0 },  // 50
-  { r: 8, c: 0 }   // 51
+  // Blue Wing (descending towards Bottom arm)
+  { r: 8, c: 13 }, // 39: Blue Start (Star ⭐)
+  { r: 8, c: 12 }, // 40
+  { r: 8, c: 11 }, // 41
+  { r: 8, c: 10 }, // 42
+  { r: 8, c: 9 },  // 43
+  { r: 9, c: 8 },  // 44
+  { r: 10, c: 8 }, // 45
+  { r: 11, c: 8 }, // 46
+  { r: 12, c: 8 }, // 47: Star ⭐ (Blue Midway)
+  { r: 13, c: 8 }, // 48
+  { r: 14, c: 8 }, // 49
+  { r: 14, c: 7 }, // 50
+  { r: 14, c: 6 }  // 51 (immediately precedes Red Home entry at col 7)
 ];
 
-// Standard Star Safe Positions (indices in TRACK_COORDS)
+// Star Safe indices on outer track
 const STAR_INDICES = [0, 8, 13, 21, 26, 34, 39, 47];
 
-// Home Paths (5 steps leading from loop into center triangle)
+// 5 Home Column Steps for each player leading towards center
 const HOME_PATHS = {
-  red: [
-    { r: 7, c: 1 }, { r: 7, c: 2 }, { r: 7, c: 3 }, { r: 7, c: 4 }, { r: 7, c: 5 }
-  ],
-  green: [
-    { r: 13, c: 7 }, { r: 12, c: 7 }, { r: 11, c: 7 }, { r: 10, c: 7 }, { r: 9, c: 7 }
-  ],
-  yellow: [
-    { r: 7, c: 13 }, { r: 7, c: 12 }, { r: 7, c: 11 }, { r: 7, c: 10 }, { r: 7, c: 9 }
-  ],
-  blue: [
-    { r: 1, c: 7 }, { r: 2, c: 7 }, { r: 3, c: 7 }, { r: 4, c: 7 }, { r: 5, c: 7 }
-  ]
+  red:    [ { r: 13, c: 7 }, { r: 12, c: 7 }, { r: 11, c: 7 }, { r: 10, c: 7 }, { r: 9, c: 7 } ],
+  green:  [ { r: 7, c: 1 },  { r: 7, c: 2 },  { r: 7, c: 3 },  { r: 7, c: 4 },  { r: 7, c: 5 } ],
+  yellow: [ { r: 1, c: 7 },  { r: 2, c: 7 },  { r: 3, c: 7 },  { r: 4, c: 7 },  { r: 5, c: 7 } ],
+  blue:   [ { r: 7, c: 13 }, { r: 7, c: 12 }, { r: 7, c: 11 }, { r: 7, c: 10 }, { r: 7, c: 9 } ]
 };
 
-// Base slots coordinates inside the 6x6 corner bases
+// Base slots for resting tokens inside the 6x6 corner bases
 const BASE_SLOTS = {
   red:    [ { r: 10.5, c: 1.5 }, { r: 10.5, c: 3.5 }, { r: 12.5, c: 1.5 }, { r: 12.5, c: 3.5 } ],
-  green:  [ { r: 1.5, c: 1.5 }, { r: 1.5, c: 3.5 }, { r: 3.5, c: 1.5 }, { r: 3.5, c: 3.5 } ],
+  green:  [ { r: 1.5, c: 1.5 },  { r: 1.5, c: 3.5 },  { r: 3.5, c: 1.5 },  { r: 3.5, c: 3.5 } ],
   yellow: [ { r: 1.5, c: 10.5 }, { r: 1.5, c: 12.5 }, { r: 3.5, c: 10.5 }, { r: 3.5, c: 12.5 } ],
   blue:   [ { r: 10.5, c: 10.5 }, { r: 10.5, c: 12.5 }, { r: 12.5, c: 10.5 }, { r: 12.5, c: 12.5 } ]
 };
 
-// Start offsets on the outer 52-step track for each player
-const PLAYER_CONFIGS = [
-  { id: 'red', name: 'Red', color: '#ef4444', startIdx: 0, endIdx: 51, homePos: { r: 7, c: 6 }, isBot: false },
-  { id: 'green', name: 'Green', color: '#10b981', startIdx: 13, endIdx: 12, homePos: { r: 8, c: 7 }, isBot: true },
-  { id: 'yellow', name: 'Yellow', color: '#facc15', startIdx: 26, endIdx: 25, homePos: { r: 7, c: 8 }, isBot: true },
-  { id: 'blue', name: 'Blue', color: '#3b82f6', startIdx: 39, endIdx: 38, homePos: { r: 6, c: 7 }, isBot: true }
+// Player initial configuration
+const DEFAULT_PLAYERS = [
+  { id: 'red', name: 'You (Red)', color: '#e11d48', startIdx: 0, role: 'human', homePos: { r: 7.7, c: 7.0 } },
+  { id: 'green', name: 'Bot Green', color: '#059669', startIdx: 13, role: 'bot', homePos: { r: 7.0, c: 6.3 } },
+  { id: 'yellow', name: 'Bot Yellow', color: '#eab308', startIdx: 26, role: 'bot', homePos: { r: 6.3, c: 7.0 } },
+  { id: 'blue', name: 'Bot Blue', color: '#2563eb', startIdx: 39, role: 'bot', homePos: { r: 7.0, c: 7.7 } }
 ];
 
-// Game State
+// Game Controller
 class LudoGame {
-  constructor() {
-    this.players = PLAYER_CONFIGS.map(cfg => ({
+  constructor(playerSettings = null) {
+    const settings = playerSettings || DEFAULT_PLAYERS;
+    this.players = settings.map(cfg => ({
       ...cfg,
       tokens: [
         { id: 0, state: 'base', step: -1 },
@@ -710,51 +945,70 @@ class LudoGame {
     this.isRolling = false;
     this.hasRolled = false;
     this.consecutiveSixes = 0;
-    this.isVsBotMode = true;
     this.rankCounter = 1;
     this.isGameOver = false;
+    this.botSpeed = 650;
+
+    // Advance to first active player
+    while (this.players[this.currentTurnIdx].role === 'off') {
+      this.currentTurnIdx = (this.currentTurnIdx + 1) % 4;
+    }
 
     this.initBoardDOM();
     this.initTokensDOM();
     this.updateUI();
+
+    // If first player is Bot, trigger turn
+    if (this.players[this.currentTurnIdx].role === 'bot') {
+      setTimeout(() => this.rollDice(), 800);
+    }
   }
 
   initBoardDOM() {
     const board = document.getElementById('ludo-board');
-    board.innerHTML = '';
+    // Keep tokens layer
+    board.innerHTML = '<div id="tokens-layer"></div>';
 
     // 1. Four Corner Bases (6x6 each)
-    // Red Base (Bottom-Left: row 9-14, col 0-5)
-    this.createBaseElement(board, 'red', 10, 1, 'c-red bg-red-light');
-    // Green Base (Top-Left: row 0-5, col 0-5)
-    this.createBaseElement(board, 'green', 1, 1, 'c-green bg-green-light');
-    // Yellow Base (Top-Right: row 0-5, col 9-14)
-    this.createBaseElement(board, 'yellow', 1, 10, 'c-yellow bg-yellow-light');
-    // Blue Base (Bottom-Right: row 9-14, col 9-14)
-    this.createBaseElement(board, 'blue', 10, 10, 'c-blue bg-blue-light');
+    this.createBaseQuadrant(board, 'green', 1, 1, 'c-green bg-green-light');
+    this.createBaseQuadrant(board, 'yellow', 1, 10, 'c-yellow bg-yellow-light');
+    this.createBaseQuadrant(board, 'red', 10, 1, 'c-red bg-red-light');
+    this.createBaseQuadrant(board, 'blue', 10, 10, 'c-blue bg-blue-light');
 
-    // 2. Center Home Triangle (3x3 at row 6-8, col 6-8)
+    // 2. Central Home 3x3 SVG with 4 colored triangles & golden crown
     const center = document.createElement('div');
     center.className = 'center-home';
     center.innerHTML = `
-      <div class="triangle tri-red"></div>
-      <div class="triangle tri-green"></div>
-      <div class="triangle tri-yellow"></div>
-      <div class="triangle tri-blue"></div>
-      <div class="center-podium">👑</div>
+      <svg class="center-svg" viewBox="0 0 100 100">
+        <defs>
+          <radialGradient id="goldPodium" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#fffbeb"/>
+            <stop offset="70%" stop-color="#fef08a"/>
+            <stop offset="100%" stop-color="#f59e0b"/>
+          </radialGradient>
+        </defs>
+        <!-- 4 Central Triangles meeting at (50, 50) -->
+        <polygon points="0,0 100,0 50,50" fill="#eab308" />
+        <polygon points="100,0 100,100 50,50" fill="#2563eb" />
+        <polygon points="0,100 100,100 50,50" fill="#e11d48" />
+        <polygon points="0,0 0,100 50,50" fill="#059669" />
+        <!-- Golden Center Trophy Ring -->
+        <circle cx="50" cy="50" r="16" fill="url(#goldPodium)" stroke="#b45309" stroke-width="2.5" />
+        <text x="50" y="55" font-size="13" text-anchor="middle" dominant-baseline="middle">👑</text>
+      </svg>
     `;
     board.appendChild(center);
 
-    // 3. Main Track Cells & Home Columns
+    // 3. Track Cells & Home Columns
     for (let r = 0; r < 15; r++) {
       for (let c = 0; c < 15; c++) {
         // Skip corner bases and center
         if (
-          (r < 6 && c < 6) || // Green base
-          (r < 6 && c > 8) || // Yellow base
-          (r > 8 && c < 6) || // Red base
-          (r > 8 && c > 8) || // Blue base
-          (r >= 6 && r <= 8 && c >= 6 && c <= 8) // Center
+          (r < 6 && c < 6) ||
+          (r < 6 && c > 8) ||
+          (r > 8 && c < 6) ||
+          (r > 8 && c > 8) ||
+          (r >= 6 && r <= 8 && c >= 6 && c <= 8)
         ) {
           continue;
         }
@@ -773,27 +1027,50 @@ class LudoGame {
           if (STAR_INDICES.includes(trackIdx)) {
             cell.classList.add('star');
           }
-          // Highlight player start arrows
-          if (trackIdx === 0) cell.style.background = 'var(--red-bg)';
-          if (trackIdx === 13) cell.style.background = 'var(--green-bg)';
-          if (trackIdx === 26) cell.style.background = 'var(--yellow-bg)';
-          if (trackIdx === 39) cell.style.background = 'var(--blue-bg)';
+
+          // Starting cells with directional arrows
+          if (trackIdx === 0) { // Red start
+            cell.style.background = 'var(--red)';
+            cell.classList.add('arrow', 'arrow-up');
+          } else if (trackIdx === 13) { // Green start
+            cell.style.background = 'var(--green)';
+            cell.classList.add('arrow', 'arrow-right');
+          } else if (trackIdx === 26) { // Yellow start
+            cell.style.background = 'var(--yellow)';
+            cell.classList.add('arrow', 'arrow-down');
+          } else if (trackIdx === 39) { // Blue start
+            cell.style.background = 'var(--blue)';
+            cell.classList.add('arrow', 'arrow-left');
+          }
         }
 
-        // Check Home Columns
-        if (r === 7 && c >= 1 && c <= 5) cell.style.background = 'var(--red)';
-        if (c === 7 && r >= 9 && r <= 13) cell.style.background = 'var(--green)';
-        if (r === 7 && c >= 9 && c <= 13) cell.style.background = 'var(--yellow)';
-        if (c === 7 && r >= 1 && r <= 5) cell.style.background = 'var(--blue)';
+        // Colored Home Columns (5 cells each) with inward arrows
+        if (c === 7 && r >= 9 && r <= 13) {
+          cell.style.background = 'var(--red)';
+          cell.classList.add('arrow', 'arrow-up');
+        } else if (r === 7 && c >= 1 && c <= 5) {
+          cell.style.background = 'var(--green)';
+          cell.classList.add('arrow', 'arrow-right');
+        } else if (c === 7 && r >= 1 && r <= 5) {
+          cell.style.background = 'var(--yellow)';
+          cell.classList.add('arrow', 'arrow-down');
+        } else if (r === 7 && c >= 9 && c <= 13) {
+          cell.style.background = 'var(--blue)';
+          cell.classList.add('arrow', 'arrow-left');
+        }
 
         board.appendChild(cell);
       }
     }
   }
 
-  createBaseElement(board, color, row, col, styleClasses) {
+  createBaseQuadrant(board, color, row, col, styleClasses) {
+    const player = this.players.find(p => p.id === color);
+    const isInactive = player && player.role === 'off';
+
     const base = document.createElement('div');
-    base.className = `base-quadrant ${styleClasses.split(' ')[0]}`;
+    base.className = `base-quadrant ${styleClasses.split(' ')[0]} ${isInactive ? 'inactive' : ''}`;
+    base.id = `base-${color}`;
     base.style.gridRow = `${row} / span 6`;
     base.style.gridColumn = `${col} / span 6`;
     base.innerHTML = `
@@ -803,12 +1080,14 @@ class LudoGame {
         <div class="base-slot ${styleClasses.split(' ')[1]}"></div>
         <div class="base-slot ${styleClasses.split(' ')[1]}"></div>
       </div>
+      ${isInactive ? '<div class="base-inactive-overlay">OFF</div>' : ''}
     `;
     board.appendChild(base);
   }
 
   initTokensDOM() {
-    const board = document.getElementById('ludo-board');
+    const layer = document.getElementById('tokens-layer');
+    layer.innerHTML = '';
     this.tokenElements = [];
 
     this.players.forEach(p => {
@@ -818,11 +1097,16 @@ class LudoGame {
         el.dataset.player = p.id;
         el.dataset.token = t.id;
 
-        el.addEventListener('click', () => {
+        if (p.role === 'off') {
+          el.style.display = 'none';
+        }
+
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
           this.handleTokenClick(p.id, t.id);
         });
 
-        board.appendChild(el);
+        layer.appendChild(el);
         this.tokenElements.push({ player: p.id, id: t.id, el });
       });
     });
@@ -837,38 +1121,75 @@ class LudoGame {
     return { x, y };
   }
 
+  // Renders all tokens with smart offset stacking for shared cells
   renderTokenPositions() {
-    this.players.forEach(p => {
-      p.tokens.forEach(t => {
-        const item = this.tokenElements.find(i => i.player === p.id && i.id === t.id);
-        if (!item) return;
+    // Group active tokens by cell position
+    const cellGroups = {};
 
-        let coords;
+    this.players.forEach(p => {
+      if (p.role === 'off') return;
+
+      p.tokens.forEach(t => {
+        let key, coords;
+
         if (t.state === 'base') {
           const slot = BASE_SLOTS[p.id][t.id];
           coords = this.getCellCoords(slot.r, slot.c);
+          key = `base_${p.id}_${t.id}`;
         } else if (t.state === 'home') {
           coords = this.getCellCoords(p.homePos.r, p.homePos.c);
+          key = `home_${p.id}`;
         } else {
-          // Track / Home Path
+          // On outer track or home path
           if (t.step < 51) {
             const trackIdx = (p.startIdx + t.step) % 52;
             const pt = TRACK_COORDS[trackIdx];
             coords = this.getCellCoords(pt.r, pt.c);
-          } else {
-            const homeStep = t.step - 51;
-            const pt = HOME_PATHS[p.id][homeStep];
+            key = `track_${pt.r}_${pt.c}`;
+          } else if (t.step <= 56) {
+            const pt = HOME_PATHS[p.id][t.step - 51];
             coords = this.getCellCoords(pt.r, pt.c);
+            key = `hpath_${p.id}_${pt.r}_${pt.c}`;
+          } else {
+            coords = this.getCellCoords(p.homePos.r, p.homePos.c);
+            key = `home_${p.id}`;
           }
         }
 
-        item.el.style.left = `calc(${coords.x}% - 3.5%)`;
-        item.el.style.top = `calc(${coords.y}% - 3.5%)`;
+        if (!cellGroups[key]) cellGroups[key] = [];
+        cellGroups[key].push({ player: p.id, id: t.id, coords });
+      });
+    });
+
+    // Apply positions with smart offset for shared cells
+    Object.keys(cellGroups).forEach(key => {
+      const group = cellGroups[key];
+      const count = group.length;
+
+      group.forEach((item, idx) => {
+        const domItem = this.tokenElements.find(i => i.player === item.player && i.id === item.id);
+        if (!domItem) return;
+
+        let offsetX = 0;
+        let offsetY = 0;
+
+        // Offset when multiple tokens share a cell
+        if (count === 2) {
+          offsetX = idx === 0 ? -1.1 : 1.1;
+          offsetY = idx === 0 ? -1.1 : 1.1;
+        } else if (count >= 3) {
+          const angles = [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2];
+          offsetX = Math.cos(angles[idx % 4]) * 1.3;
+          offsetY = Math.sin(angles[idx % 4]) * 1.3;
+        }
+
+        domItem.el.style.left = `${item.coords.x + offsetX}%`;
+        domItem.el.style.top = `${item.coords.y + offsetY}%`;
       });
     });
   }
 
-  // Dice Roll Trigger
+  // Dice Roll Execution
   rollDice() {
     if (this.isRolling || this.hasRolled || this.isGameOver) return;
 
@@ -877,9 +1198,12 @@ class LudoGame {
 
     const cube = document.getElementById('dice-cube');
     cube.classList.add('rolling');
+    document.getElementById('dice-trigger').classList.add('disabled');
 
     setTimeout(() => {
       cube.classList.remove('rolling');
+      document.getElementById('dice-trigger').classList.remove('disabled');
+
       this.diceValue = Math.floor(Math.random() * 6) + 1;
       this.setDiceFace(this.diceValue);
 
@@ -897,17 +1221,16 @@ class LudoGame {
       if (this.consecutiveSixes >= 3) {
         this.consecutiveSixes = 0;
         this.showTurnMessage("Three 6s in a row! Turn forfeited.");
-        setTimeout(() => this.passTurn(), 1000);
+        setTimeout(() => this.passTurn(), 1100);
         return;
       }
 
       this.evaluateTurnMoves();
-    }, 550);
+    }, 520);
   }
 
   setDiceFace(val) {
     const cube = document.getElementById('dice-cube');
-    // Rotate cube to show corresponding face
     const rotations = [
       { x: 0, y: 0 },       // 1 (Front)
       { x: 0, y: 180 },     // 2 (Back)
@@ -931,31 +1254,31 @@ class LudoGame {
     });
 
     if (validTokens.length === 0) {
-      document.getElementById('roll-prompt').textContent = `Rolled ${this.diceValue} — No moves!`;
+      this.showTurnMessage(`Rolled ${this.diceValue} — No moves!`);
       setTimeout(() => this.passTurn(), 900);
       return;
     }
 
-    if (curPlayer.isBot) {
-      // Intelligent AI Bot move selection
-      document.getElementById('roll-prompt').textContent = `Bot rolling & choosing move...`;
+    if (curPlayer.role === 'bot') {
+      this.showTurnMessage(`🤖 ${curPlayer.name} rolling & thinking...`);
       setTimeout(() => {
         const bestToken = this.chooseBestBotMove(curPlayer, validTokens, this.diceValue);
         this.moveToken(curPlayer, bestToken, this.diceValue);
-      }, 700);
+      }, this.botSpeed);
     } else {
-      // Human turn: highlight valid tokens
-      document.getElementById('roll-prompt').textContent = `Select token to move +${this.diceValue}`;
+      this.showTurnMessage(`Select token to move +${this.diceValue}`);
       validTokens.forEach(t => {
         const item = this.tokenElements.find(i => i.player === curPlayer.id && i.id === t.id);
         if (item) item.el.classList.add('selectable');
       });
 
-      // Auto-move if only 1 option available
+      // Auto-move convenience if only 1 option available
       if (validTokens.length === 1) {
         setTimeout(() => {
-          this.handleTokenClick(curPlayer.id, validTokens[0].id);
-        }, 350);
+          if (this.hasRolled && this.players[this.currentTurnIdx].id === curPlayer.id) {
+            this.handleTokenClick(curPlayer.id, validTokens[0].id);
+          }
+        }, 500);
       }
     }
   }
@@ -963,18 +1286,18 @@ class LudoGame {
   isValidMove(player, token, roll) {
     if (token.state === 'home') return false;
     if (token.state === 'base') return roll === 6;
-    // Cannot overshoot Home Triangle (exact roll required)
+    // Step 56 enters Home Triangle. Exactly 57 is required to finish.
     return (token.step + roll) <= 56;
   }
 
   handleTokenClick(playerId, tokenId) {
     const curPlayer = this.players[this.currentTurnIdx];
-    if (curPlayer.id !== playerId || !this.hasRolled || curPlayer.isBot) return;
+    if (curPlayer.id !== playerId || !this.hasRolled || curPlayer.role === 'bot' || curPlayer.role === 'off') return;
 
     const token = curPlayer.tokens.find(t => t.id === tokenId);
     if (!token || !this.isValidMove(curPlayer, token, this.diceValue)) return;
 
-    // Clear selectable pulses
+    // Clear pulsing highlights
     this.tokenElements.forEach(i => i.el.classList.remove('selectable'));
     this.moveToken(curPlayer, token, this.diceValue);
   }
@@ -983,7 +1306,7 @@ class LudoGame {
     const item = this.tokenElements.find(i => i.player === player.id && i.id === token.id);
     if (!item) return;
 
-    // If in base, step out onto starting track cell on a 6
+    // Releasing from base on a 6
     if (token.state === 'base') {
       token.state = 'track';
       token.step = 0;
@@ -994,7 +1317,7 @@ class LudoGame {
       return;
     }
 
-    // Step-by-step hopping animation
+    // Step-by-step hopping along track
     let remainingSteps = steps;
     item.el.classList.add('hopping');
 
@@ -1014,7 +1337,6 @@ class LudoGame {
           player.finishedCount++;
           audio.playHome();
 
-          // Check if player completed all 4 tokens
           if (player.finishedCount === 4 && player.rank === 0) {
             player.rank = this.rankCounter++;
             this.showRankBadge(player);
@@ -1024,29 +1346,27 @@ class LudoGame {
           // Bonus roll for entering home
           this.checkCellInteractions(player, token, true);
         } else {
-          // Check collision / capture on the board
           this.checkCellInteractions(player, token, false);
         }
       }
-    }, 180);
+    }, 170);
   }
 
   checkCellInteractions(player, token, bonusEarned) {
     let captured = false;
 
-    // Check if token landed on an opponent (only applicable on outer 52-step track)
+    // Check collision / capture on outer 52-step track
     if (token.state === 'track' && token.step < 51) {
       const myTrackIdx = (player.startIdx + token.step) % 52;
       const isSafeCell = STAR_INDICES.includes(myTrackIdx);
 
       if (!isSafeCell) {
         this.players.forEach(otherP => {
-          if (otherP.id !== player.id) {
+          if (otherP.id !== player.id && otherP.role !== 'off') {
             otherP.tokens.forEach(otherT => {
               if (otherT.state === 'track' && otherT.step < 51) {
                 const otherTrackIdx = (otherP.startIdx + otherT.step) % 52;
                 if (myTrackIdx === otherTrackIdx) {
-                  // Capture opponent's token!
                   otherT.state = 'base';
                   otherT.step = -1;
                   captured = true;
@@ -1062,15 +1382,15 @@ class LudoGame {
 
     this.renderTokenPositions();
 
-    // Extra roll granted if rolled a 6, captured opponent, or reached home!
+    // Bonus roll granted for rolling 6, capturing opponent, or entering home!
     if (this.diceValue === 6 || captured || bonusEarned) {
       this.hasRolled = false;
-      document.getElementById('roll-prompt').textContent = `Bonus Roll Earned! 🎲`;
-      if (player.isBot) {
-        setTimeout(() => this.rollDice(), 700);
+      this.showTurnMessage(`Bonus Roll Earned! 🎲`);
+      if (player.role === 'bot' && !this.isGameOver) {
+        setTimeout(() => this.rollDice(), this.botSpeed);
       }
     } else {
-      setTimeout(() => this.passTurn(), 500);
+      setTimeout(() => this.passTurn(), 450);
     }
   }
 
@@ -1079,19 +1399,24 @@ class LudoGame {
     this.hasRolled = false;
     this.consecutiveSixes = 0;
 
-    // Advance to next active player who hasn't finished
+    if (this.isGameOver) return;
+
+    // Advance to next active, unfinished player
     let loops = 0;
     do {
       this.currentTurnIdx = (this.currentTurnIdx + 1) % 4;
       loops++;
-    } while (this.players[this.currentTurnIdx].finishedCount === 4 && loops < 5);
+    } while (
+      (this.players[this.currentTurnIdx].role === 'off' ||
+       this.players[this.currentTurnIdx].finishedCount === 4) &&
+      loops < 8
+    );
 
     this.updateUI();
 
-    // Trigger Bot turn if current player is Bot
     const nextPlayer = this.players[this.currentTurnIdx];
-    if (nextPlayer.isBot && !this.isGameOver) {
-      setTimeout(() => this.rollDice(), 650);
+    if (nextPlayer.role === 'bot' && !this.isGameOver) {
+      setTimeout(() => this.rollDice(), this.botSpeed);
     }
   }
 
@@ -1102,7 +1427,7 @@ class LudoGame {
         const nextTrackIdx = (bot.startIdx + t.step + roll) % 52;
         if (!STAR_INDICES.includes(nextTrackIdx)) {
           for (let p of this.players) {
-            if (p.id !== bot.id) {
+            if (p.id !== bot.id && p.role !== 'off') {
               for (let ot of p.tokens) {
                 if (ot.state === 'track' && ot.step < 51) {
                   if ((p.startIdx + ot.step) % 52 === nextTrackIdx) {
@@ -1141,61 +1466,142 @@ class LudoGame {
       }
     }
     if (player.rank === 1) {
+      audio.playFanfare();
       this.triggerConfetti();
     }
   }
 
   checkGameOver() {
-    const finishedPlayers = this.players.filter(p => p.finishedCount === 4);
-    if (finishedPlayers.length >= 3) {
+    const activePlayers = this.players.filter(p => p.role !== 'off');
+    const finishedPlayers = activePlayers.filter(p => p.finishedCount === 4);
+
+    // End match when all but 1 active player have finished
+    if (finishedPlayers.length >= Math.max(1, activePlayers.length - 1)) {
       this.isGameOver = true;
       document.getElementById('turn-banner').textContent = 'Tournament Finished!';
       this.triggerConfetti();
+      setTimeout(() => this.showVictoryModal(), 900);
     }
+  }
+
+  showVictoryModal() {
+    const modal = document.getElementById('victory-modal');
+    const list = document.getElementById('podium-list');
+    list.innerHTML = '';
+
+    const sorted = [...this.players]
+      .filter(p => p.role !== 'off')
+      .sort((a, b) => {
+        if (a.rank > 0 && b.rank > 0) return a.rank - b.rank;
+        if (a.rank > 0) return -1;
+        if (b.rank > 0) return 1;
+        return b.finishedCount - a.finishedCount;
+      });
+
+    sorted.forEach((p, idx) => {
+      const medals = ['🥇 1st Place', '🥈 2nd Place', '🥉 3rd Place', '4th Place'];
+      const row = document.createElement('div');
+      row.style.padding = '8px 12px';
+      row.style.margin = '4px 0';
+      row.style.borderRadius = '8px';
+      row.style.background = 'rgba(255,255,255,0.06)';
+      row.style.display = 'flex';
+      row.style.justifyContent = 'space-between';
+      row.innerHTML = `
+        <span>${medals[idx] || (idx + 1)}: <b>${p.name}</b></span>
+        <span>${p.finishedCount}/4 In Home</span>
+      `;
+      list.appendChild(row);
+    });
+
+    modal.style.display = 'flex';
   }
 
   updateUI() {
     const curPlayer = this.players[this.currentTurnIdx];
 
-    // Update active slot highlighting
+    // Update active slot highlighting & roles
     this.players.forEach(p => {
       const slot = document.getElementById(`slot-${p.id}`);
       const status = document.getElementById(`status-${p.id}`);
+      const badge = document.getElementById(`badge-${p.id}`);
+      const nameEl = document.getElementById(`name-${p.id}`);
+
+      if (nameEl) nameEl.textContent = p.name;
+
       if (slot) {
-        if (p.id === curPlayer.id) {
-          slot.classList.add('active');
-          if (status) status.textContent = p.isBot ? 'Bot Playing...' : 'Active Turn';
-        } else {
+        if (p.role === 'off') {
+          slot.classList.add('inactive');
           slot.classList.remove('active');
+          if (status) status.textContent = 'Inactive';
+        } else if (p.id === curPlayer.id) {
+          slot.classList.add('active');
+          slot.classList.remove('inactive');
+          if (status) status.textContent = p.role === 'bot' ? 'Bot Playing...' : 'Active Turn 🎲';
+        } else {
+          slot.classList.remove('active', 'inactive');
           if (status) status.textContent = p.finishedCount === 4 ? `Finished #${p.rank}` : 'Waiting';
         }
       }
+
+      if (badge) {
+        badge.className = `role-toggle-badge ${p.role}`;
+        badge.textContent = p.role === 'human' ? '👤 Human' : (p.role === 'bot' ? '🤖 Bot' : '🚫 Off');
+      }
     });
 
+    // Update turn banner
     const banner = document.getElementById('turn-banner');
     banner.textContent = `${curPlayer.name}'s Turn`;
     banner.className = `turn-player-pill c-${curPlayer.id}`;
 
-    document.getElementById('roll-prompt').textContent = curPlayer.isBot ? 'Bot Rolling...' : 'Tap to Roll 🎲';
+    // Prompt message
+    if (curPlayer.role === 'bot') {
+      this.showTurnMessage(`🤖 ${curPlayer.name} rolling...`);
+    } else {
+      this.showTurnMessage(`Tap Dice to Roll 🎲`);
+    }
   }
 
   showTurnMessage(msg) {
     document.getElementById('roll-prompt').textContent = msg;
   }
 
-  toggleMode() {
-    this.isVsBotMode = !this.isVsBotMode;
-    const btn = document.getElementById('btn-mode');
+  // Live fast-cycle player role (Human -> Bot -> Off -> Human)
+  cyclePlayerRole(playerId) {
+    const player = this.players.find(p => p.id === playerId);
+    if (!player) return;
 
-    if (this.isVsBotMode) {
-      btn.textContent = '🤖 Mode: 1 vs 3 Bots';
-      this.players[0].isBot = false;
-      this.players[1].isBot = true;
-      this.players[2].isBot = true;
-      this.players[3].isBot = true;
+    const cycle = { 'human': 'bot', 'bot': 'off', 'off': 'human' };
+    player.role = cycle[player.role];
+
+    // Hide or show tokens
+    this.tokenElements.forEach(i => {
+      if (i.player === player.id) {
+        i.el.style.display = player.role === 'off' ? 'none' : 'flex';
+      }
+    });
+
+    // Toggle base quadrant overlay
+    const base = document.getElementById(`base-${player.id}`);
+    if (base) {
+      base.classList.toggle('inactive', player.role === 'off');
+      let overlay = base.querySelector('.base-inactive-overlay');
+      if (player.role === 'off' && !overlay) {
+        const div = document.createElement('div');
+        div.className = 'base-inactive-overlay';
+        div.textContent = 'OFF';
+        base.appendChild(div);
+      } else if (player.role !== 'off' && overlay) {
+        overlay.remove();
+      }
+    }
+
+    // Check if current turn player became inactive
+    if (this.players[this.currentTurnIdx].role === 'off') {
+      this.passTurn();
     } else {
-      btn.textContent = '👥 Mode: Pass & Play';
-      this.players.forEach(p => p.isBot = false);
+      this.updateUI();
     }
   }
 
@@ -1206,18 +1612,18 @@ class LudoGame {
     canvas.height = window.innerHeight;
 
     const particles = [];
-    const colors = ['#ef4444', '#10b981', '#facc15', '#3b82f6', '#fbbf24', '#ffffff'];
+    const colors = ['#e11d48', '#059669', '#eab308', '#2563eb', '#fbbf24', '#ffffff'];
 
-    for (let i = 0; i < 140; i++) {
+    for (let i = 0; i < 150; i++) {
       particles.push({
         x: canvas.width / 2,
         y: canvas.height / 2,
-        vx: (Math.random() - 0.5) * 16,
-        vy: (Math.random() - 0.8) * 18,
+        vx: (Math.random() - 0.5) * 18,
+        vy: (Math.random() - 0.8) * 20,
         size: 6 + Math.random() * 8,
         color: colors[Math.floor(Math.random() * colors.length)],
         rotation: Math.random() * 360,
-        vr: (Math.random() - 0.5) * 12,
+        vr: (Math.random() - 0.5) * 14,
         alpha: 1.0
       });
     }
@@ -1229,9 +1635,9 @@ class LudoGame {
       particles.forEach(p => {
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.38; // gravity
+        p.vy += 0.38;
         p.rotation += p.vr;
-        p.alpha -= 0.008;
+        p.alpha -= 0.009;
 
         if (p.alpha > 0) {
           alive = true;
@@ -1256,23 +1662,117 @@ class LudoGame {
   }
 }
 
-// Instantiate Game
+// Global Game Instance & Event Bindings
 let game;
 
+// Setup Modal Helper Functions
+function getModalPlayerConfigs() {
+  const configs = [
+    {
+      id: 'red',
+      color: '#e11d48',
+      startIdx: 0,
+      homePos: { r: 7.7, c: 7.0 },
+      name: document.getElementById('cfg-name-red').value.trim() || 'Red',
+      role: document.querySelector('#cfg-card-red .p-role-btn.active').dataset.role
+    },
+    {
+      id: 'green',
+      color: '#059669',
+      startIdx: 13,
+      homePos: { r: 7.0, c: 6.3 },
+      name: document.getElementById('cfg-name-green').value.trim() || 'Green',
+      role: document.querySelector('#cfg-card-green .p-role-btn.active').dataset.role
+    },
+    {
+      id: 'yellow',
+      color: '#eab308',
+      startIdx: 26,
+      homePos: { r: 6.3, c: 7.0 },
+      name: document.getElementById('cfg-name-yellow').value.trim() || 'Yellow',
+      role: document.querySelector('#cfg-card-yellow .p-role-btn.active').dataset.role
+    },
+    {
+      id: 'blue',
+      color: '#2563eb',
+      startIdx: 39,
+      homePos: { r: 7.0, c: 7.7 },
+      name: document.getElementById('cfg-name-blue').value.trim() || 'Blue',
+      role: document.querySelector('#cfg-card-blue .p-role-btn.active').dataset.role
+    }
+  ];
+
+  // Guarantee at least two players are active
+  const activeCount = configs.filter(c => c.role !== 'off').length;
+  if (activeCount < 2) {
+    configs[0].role = 'human';
+    configs[1].role = 'bot';
+  }
+
+  return configs;
+}
+
+function applyPreset(presetType) {
+  const setRole = (color, role) => {
+    const card = document.getElementById(`cfg-card-${color}`);
+    if (!card) return;
+    card.querySelectorAll('.p-role-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.role === role);
+    });
+  };
+
+  if (presetType === '1v3') {
+    setRole('red', 'human');
+    setRole('green', 'bot');
+    setRole('yellow', 'bot');
+    setRole('blue', 'bot');
+  } else if (presetType === '1v1') {
+    setRole('red', 'human');
+    setRole('yellow', 'bot');
+    setRole('green', 'off');
+    setRole('blue', 'off');
+  } else if (presetType === '3p') {
+    setRole('red', 'human');
+    setRole('green', 'human');
+    setRole('yellow', 'human');
+    setRole('blue', 'off');
+  } else if (presetType === '4p') {
+    setRole('red', 'human');
+    setRole('green', 'human');
+    setRole('yellow', 'human');
+    setRole('blue', 'human');
+  } else if (presetType === 'spectate') {
+    setRole('red', 'bot');
+    setRole('green', 'bot');
+    setRole('yellow', 'bot');
+    setRole('blue', 'bot');
+  }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
+  // Start default game
   game = new LudoGame();
 
-  // Dice roll click
-  document.getElementById('dice-trigger').addEventListener('click', () => {
-    game.rollDice();
+  // Dice roll actions
+  const triggerDice = () => {
+    const curPlayer = game.players[game.currentTurnIdx];
+    if (curPlayer.role === 'human' && !game.hasRolled && !game.isRolling) {
+      game.rollDice();
+    }
+  };
+
+  document.getElementById('dice-trigger').addEventListener('click', triggerDice);
+  document.getElementById('btn-roll-direct').addEventListener('click', triggerDice);
+
+  // Keyboard shortcut: Spacebar to roll
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && !e.target.matches('input')) {
+      e.preventDefault();
+      triggerDice();
+    }
   });
 
-  // Toggle Mode button
-  document.getElementById('btn-mode').addEventListener('click', () => {
-    game.toggleMode();
-  });
-
-  // Audio mute button
+  // Sound toggle button
   const soundBtn = document.getElementById('btn-sound');
   soundBtn.addEventListener('click', () => {
     audio.enabled = !audio.enabled;
@@ -1280,18 +1780,75 @@ window.addEventListener('DOMContentLoaded', () => {
     soundBtn.classList.toggle('active', !audio.enabled);
   });
 
-  // Restart match
-  document.getElementById('btn-restart').addEventListener('click', () => {
-    game = new LudoGame();
+  // Reset / New Match
+  document.getElementById('btn-new-match').addEventListener('click', () => {
+    const configs = getModalPlayerConfigs();
+    game = new LudoGame(configs);
   });
 
-  // Rules modal
+  // Play Again from Victory Modal
+  document.getElementById('btn-play-again').addEventListener('click', () => {
+    document.getElementById('victory-modal').style.display = 'none';
+    const configs = getModalPlayerConfigs();
+    game = new LudoGame(configs);
+  });
+
+  // Setup / Roles Modal
+  const setupModal = document.getElementById('setup-modal');
+  document.getElementById('btn-setup').addEventListener('click', () => {
+    setupModal.style.display = 'flex';
+  });
+
+  // Role button selections in setup modal
+  document.querySelectorAll('.p-role-options').forEach(group => {
+    group.addEventListener('click', (e) => {
+      const btn = e.target.closest('.p-role-btn');
+      if (!btn) return;
+      group.querySelectorAll('.p-role-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Preset button clicks in setup modal
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyPreset(btn.dataset.preset);
+    });
+  });
+
+  // Apply Setup & Start Match
+  document.getElementById('btn-apply-setup').addEventListener('click', () => {
+    setupModal.style.display = 'none';
+    const configs = getModalPlayerConfigs();
+    game = new LudoGame(configs);
+  });
+
+  // Direct In-Game Role Toggle Pills
+  ['red', 'green', 'yellow', 'blue'].forEach(pid => {
+    const badge = document.getElementById(`badge-${pid}`);
+    if (badge) {
+      badge.addEventListener('click', (e) => {
+        e.stopPropagation();
+        game.cyclePlayerRole(pid);
+      });
+    }
+  });
+
+  // Rules Modal
   const rulesModal = document.getElementById('rules-modal');
   document.getElementById('btn-rules').addEventListener('click', () => {
     rulesModal.style.display = 'flex';
   });
   document.getElementById('close-rules-btn').addEventListener('click', () => {
     rulesModal.style.display = 'none';
+  });
+
+  // Close modals on background click
+  window.addEventListener('click', (e) => {
+    if (e.target === setupModal) setupModal.style.display = 'none';
+    if (e.target === rulesModal) rulesModal.style.display = 'none';
   });
 });
 </script>
