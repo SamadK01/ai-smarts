@@ -117,21 +117,25 @@ class BodyScopeApp {
       });
     });
 
-    // Skin Appearance Modes (Peach -> Realistic -> X-Ray)
+    // Skin Appearance Modes (Crystal -> Realistic -> Peach -> X-Ray)
     const skinModeBtn = document.getElementById('skin-mode-btn');
     if (skinModeBtn) {
       skinModeBtn.addEventListener('click', () => {
-        let nextMode = 'peach';
-        if (this.state.skinMode === 'peach') nextMode = 'realistic';
-        else if (this.state.skinMode === 'realistic') nextMode = 'xray';
-        else nextMode = 'peach';
+        let nextMode = 'crystal';
+        if (this.state.skinMode === 'crystal') nextMode = 'realistic';
+        else if (this.state.skinMode === 'realistic') nextMode = 'peach';
+        else if (this.state.skinMode === 'peach') nextMode = 'xray';
+        else nextMode = 'crystal';
 
         this.state.skinMode = nextMode;
-        if (nextMode === 'realistic') {
-          skinModeBtn.textContent = '👤 Real Human Body';
+        if (nextMode === 'crystal') {
+          skinModeBtn.textContent = '💎 Crystal Clear (کرسٹل)';
+          this.materials.setSkinOpacity(0.22);
+        } else if (nextMode === 'realistic') {
+          skinModeBtn.textContent = '👤 Real Human (حقیقی جسم)';
           this.materials.setSkinOpacity(1.0);
         } else if (nextMode === 'xray') {
-          skinModeBtn.textContent = '💎 X-Ray Hologram';
+          skinModeBtn.textContent = '⚡ Cyan X-Ray';
           this.materials.setSkinOpacity(0.22);
         } else {
           skinModeBtn.textContent = '🍑 Translucent Peach';

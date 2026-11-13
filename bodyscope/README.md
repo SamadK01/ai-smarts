@@ -79,10 +79,11 @@ All 3D models integrated into BodyScope are authentic, open-licensed biomedical 
 ## ✨ Core Technological Innovations
 
 1. **Multiple Body Appearance & Flesh (Maas) Modes**:
+   - **Ultra-Clear Crystal (💎 کرسٹل شیشہ)**: Optical crystal glass with 98% transmission, IOR 1.52, mirror specular highlights and pristine clarity, displaying the complete inner anatomy with maximum transparency.
    - **Realistic Human Body (👤 حقیقی جسم)**: Solid, photorealistic human skin with warm epidermis, natural specular reflections, and realistic feminine breast contours or male torso.
    - **Flesh & Muscles (🥩 گوشت / عضلات)**: Activates 440+ striated skeletal muscles from Z-Anatomy in rich anatomical detail.
    - **Translucent Peach (🍑 نیم شفاف شیشہ)**: 18% ghost physical transmission revealing internal skeleton and organs.
-   - **Cyan X-Ray Hologram (💎 ایکس رے ہولوگرام)**: Sci-fi medical hologram with edge rim fresnel.
+   - **Cyan X-Ray Hologram (⚡ ایکس رے ہولوگرام)**: Sci-fi medical hologram with edge rim fresnel.
    - **Bare Organs (🫀 خالص اعضاء)**: 100% skin transparency for direct organ visibility.
 
 2. **Organs in Action ⚡ (اعضاء کی فعال کارکردگی)**:

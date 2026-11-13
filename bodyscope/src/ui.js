@@ -63,6 +63,7 @@ export class UIManager {
       skinOpacitySlider: document.getElementById('skin-opacity-slider'),
       skinOpacityVal: document.getElementById('skin-opacity-val'),
       bodyRealBtn: document.getElementById('body-real-btn'),
+      bodyCrystalBtn: document.getElementById('body-crystal-btn'),
       bodyFleshBtn: document.getElementById('body-flesh-btn'),
       bodyGhostBtn: document.getElementById('body-ghost-btn'),
       bodyXrayBtn: document.getElementById('body-xray-btn'),
@@ -153,6 +154,19 @@ export class UIManager {
         this.app.models.setLayerVisibility('skin', true);
         if (this.dom.skinOpacitySlider) this.dom.skinOpacitySlider.value = 1.0;
         if (this.dom.skinOpacityVal) this.dom.skinOpacityVal.textContent = '100%';
+        const skinCb = document.querySelector('input[data-system="skin"]');
+        if (skinCb) skinCb.checked = true;
+      });
+    }
+
+    if (this.dom.bodyCrystalBtn) {
+      this.dom.bodyCrystalBtn.addEventListener('click', () => {
+        const mat = this.app.materials.setSkinMode('crystal');
+        this.app.models.updateSkinMaterial(mat);
+        this.app.materials.setSkinOpacity(0.22);
+        this.app.models.setLayerVisibility('skin', true);
+        if (this.dom.skinOpacitySlider) this.dom.skinOpacitySlider.value = 0.22;
+        if (this.dom.skinOpacityVal) this.dom.skinOpacityVal.textContent = '22%';
         const skinCb = document.querySelector('input[data-system="skin"]');
         if (skinCb) skinCb.checked = true;
       });

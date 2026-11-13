@@ -78,6 +78,19 @@ export const CONFIG = {
 
   // Skin appearance modes
   skinModes: {
+    crystal: {
+      name: "Ultra-Clear Crystal (💎 کرسٹل شیشہ)",
+      roughness: 0.03,
+      transmission: 0.98,
+      thickness: 0.22,
+      ior: 1.52,
+      reflectivity: 0.95,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.02,
+      color: 0xffffff,
+      attenuationColor: 0xdff6f8,
+      opacity: 0.22
+    },
     realistic: {
       name: "Realistic Human Body (حقیقی جسم)",
       roughness: 0.44,
@@ -124,8 +137,8 @@ export const INITIAL_STATE = {
   breathingPhase: 0.0,
 
   // Visual Controls
-  skinMode: "peach",         // "peach" | "xray"
-  skinOpacity: 0.18,
+  skinMode: "crystal",       // "crystal" | "realistic" | "peach" | "xray"
+  skinOpacity: 0.22,
   backgroundTheme: "dark",   // "dark" | "white" | "gradient"
   postProcessing: true,
   bloomStrength: 0.45,

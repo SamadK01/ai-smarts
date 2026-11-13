@@ -619,8 +619,8 @@
       <!-- Gender Morph Toggle -->
       <button id="gender-toggle" class="btn" title="Morph between male and female pelvic/shoulder anatomical proportions">♂ Male</button>
       
-      <!-- Translucent Peach vs X-Ray Mode -->
-      <button id="skin-mode-btn" class="btn" title="Toggle PBR Translucent Peach vs Cyan X-Ray Mode">🍑 Translucent Peach</button>
+      <!-- Skin Appearance Mode Toggle -->
+      <button id="skin-mode-btn" class="btn" title="Toggle Crystal Glass / Real Human / Peach / X-Ray Mode">💎 Crystal Clear (کرسٹل)</button>
 
       <!-- Blood Path Circuit Tour -->
       <button id="blood-path-btn" class="btn" title="Follow complete cardiovascular circulation loop">🩸 Tour Blood Circuit</button>
@@ -648,17 +648,18 @@
     <div class="drawer-section">
       <div class="section-title">Body Appearance & Flesh (جسم کی ہیئت)</div>
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:8px;">
+        <button id="body-crystal-btn" class="preset-pill active" style="padding:6px 8px; text-align:center; font-weight:600; color:#38bdf8; border-color:#38bdf8; box-shadow:0 0 10px rgba(56,189,248,0.25);">💎 Crystal (کرسٹل شیشہ)</button>
         <button id="body-real-btn" class="preset-pill" style="padding:6px 8px; text-align:center; font-weight:600; color:var(--accent-gold); border-color:var(--accent-gold);">👤 Real Human (حقیقی جسم)</button>
-        <button id="body-flesh-btn" class="preset-pill" style="padding:6px 8px; text-align:center; font-weight:600; color:#f87171; border-color:#f87171;">🥩 Flesh & Muscles (گوشت)</button>
       </div>
-      <div style="display:flex; gap:5px;">
-        <button id="body-ghost-btn" class="preset-pill" style="flex:1; text-align:center; padding:5px 4px;">Ghost (18%)</button>
-        <button id="body-xray-btn" class="preset-pill" style="flex:1; text-align:center; padding:5px 4px;">X-Ray Mode</button>
-        <button id="body-bare-btn" class="preset-pill" style="flex:1; text-align:center; padding:5px 4px;">Bare (0%)</button>
+      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:5px;">
+        <button id="body-flesh-btn" class="preset-pill" style="text-align:center; padding:5px 2px; font-size:0.75rem;">🥩 Flesh</button>
+        <button id="body-ghost-btn" class="preset-pill" style="text-align:center; padding:5px 2px; font-size:0.75rem;">Peach</button>
+        <button id="body-xray-btn" class="preset-pill" style="text-align:center; padding:5px 2px; font-size:0.75rem;">X-Ray</button>
+        <button id="body-bare-btn" class="preset-pill" style="text-align:center; padding:5px 2px; font-size:0.75rem;">Bare 0%</button>
       </div>
       <div class="slider-row" style="margin-top:10px;">
-        <span>Skin Opacity: <b id="skin-opacity-val" style="color:var(--accent-cyan);">18%</b></span>
-        <input type="range" id="skin-opacity-slider" min="0" max="1" step="0.02" value="0.18">
+        <span>Skin Opacity: <b id="skin-opacity-val" style="color:var(--accent-cyan);">22%</b></span>
+        <input type="range" id="skin-opacity-slider" min="0" max="1" step="0.02" value="0.22">
       </div>
     </div>
 

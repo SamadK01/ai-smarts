@@ -70,6 +70,30 @@ export class MaterialManager {
       side: THREE.DoubleSide
     });
 
+    // 2c. SKIN SHELL: Ultra-Clear Pristine Diamond Crystal Glass
+    this.skinCrystal = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(0xffffff),
+      emissive: new THREE.Color(0x0a1e2e),
+      emissiveIntensity: 0.15,
+      roughness: 0.03,
+      metalness: 0.02,
+      transmission: 0.98,
+      thickness: 0.22,
+      ior: 1.52,
+      reflectivity: 0.95,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.02,
+      specularIntensity: 1.0,
+      specularColor: new THREE.Color(0xffffff),
+      attenuationColor: new THREE.Color(0xdff6f8),
+      attenuationDistance: 4.5,
+      transparent: true,
+      opacity: 0.22,
+      depthWrite: false,
+      depthTest: true,
+      side: THREE.FrontSide
+    });
+
     this.lips = new THREE.MeshStandardMaterial({
       color: 0xba5d67,
       roughness: 0.35,
@@ -77,8 +101,8 @@ export class MaterialManager {
       clippingPlanes: [clippingPlane]
     });
 
-    // Active skin material pointer
-    this.skinActive = this.skinPeach;
+    // Active skin material pointer (Defaults to ultra-clear Crystal Glass for maximum interior organ clarity)
+    this.skinActive = this.skinCrystal;
 
     // 3. SKELETON: Polished Ivory Bone with subtle specular highlights
     this.bone = new THREE.MeshStandardMaterial({
@@ -293,7 +317,9 @@ export class MaterialManager {
   }
 
   setSkinMode(mode) {
-    if (mode === "realistic") {
+    if (mode === "crystal") {
+      this.skinActive = this.skinCrystal;
+    } else if (mode === "realistic") {
       this.skinActive = this.skinRealistic;
     } else if (mode === "xray") {
       this.skinActive = this.skinXRay;
@@ -307,6 +333,7 @@ export class MaterialManager {
     this.skinPeach.opacity = val;
     this.skinXRay.opacity = val;
     this.skinRealistic.opacity = val;
+    this.skinCrystal.opacity = val;
     if (val >= 0.85) {
       this.skinRealistic.transparent = false;
       this.skinRealistic.depthWrite = true;
