@@ -113,7 +113,10 @@ class BodyScopeApp {
         const isPeach = this.state.skinMode === 'peach';
         this.state.skinMode = isPeach ? 'xray' : 'peach';
         skinModeBtn.textContent = isPeach ? '💎 X-Ray Mode' : '🍑 Translucent Peach';
-        this.materials.setSkinMode(this.state.skinMode);
+        const newMat = this.materials.setSkinMode(this.state.skinMode);
+        if (this.models) {
+          this.models.updateSkinMaterial(newMat);
+        }
       });
     }
 

@@ -58,6 +58,10 @@ export class UIManager {
 
       // Sliders & Toggles
       skinOpacitySlider: document.getElementById('skin-opacity-slider'),
+      skinOpacityVal: document.getElementById('skin-opacity-val'),
+      skinClearBtn: document.getElementById('skin-clear-btn'),
+      skinGhostBtn: document.getElementById('skin-ghost-btn'),
+      skinTransBtn: document.getElementById('skin-trans-btn'),
       sliceSlider: document.getElementById('slice-slider'),
       sliceToggle: document.getElementById('slice-toggle'),
       sliceAxisSelect: document.getElementById('slice-axis-select'),
@@ -120,10 +124,54 @@ export class UIManager {
     });
 
     // Skin Opacity
-    this.dom.skinOpacitySlider.addEventListener('input', (e) => {
-      const val = parseFloat(e.target.value);
-      this.app.materials.setSkinOpacity(val);
-    });
+    if (this.dom.skinOpacitySlider) {
+      this.dom.skinOpacitySlider.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        this.app.materials.setSkinOpacity(val);
+        if (this.dom.skinOpacityVal) {
+          this.dom.skinOpacityVal.textContent = `${Math.round(val * 100)}%`;
+        }
+        if (val <= 0.01) {
+          this.app.models.setLayerVisibility('skin', false);
+        } else {
+          this.app.models.setLayerVisibility('skin', true);
+        }
+      });
+    }
+
+    // Quick Skin Presets
+    if (this.dom.skinClearBtn) {
+      this.dom.skinClearBtn.addEventListener('click', () => {
+        this.app.materials.setSkinOpacity(0.0);
+        this.app.models.setLayerVisibility('skin', false);
+        this.dom.skinOpacitySlider.value = 0.0;
+        if (this.dom.skinOpacityVal) this.dom.skinOpacityVal.textContent = '0%';
+        const skinCb = document.querySelector('input[data-system="skin"]');
+        if (skinCb) skinCb.checked = false;
+      });
+    }
+
+    if (this.dom.skinGhostBtn) {
+      this.dom.skinGhostBtn.addEventListener('click', () => {
+        this.app.materials.setSkinOpacity(0.18);
+        this.app.models.setLayerVisibility('skin', true);
+        this.dom.skinOpacitySlider.value = 0.18;
+        if (this.dom.skinOpacityVal) this.dom.skinOpacityVal.textContent = '18%';
+        const skinCb = document.querySelector('input[data-system="skin"]');
+        if (skinCb) skinCb.checked = true;
+      });
+    }
+
+    if (this.dom.skinTransBtn) {
+      this.dom.skinTransBtn.addEventListener('click', () => {
+        this.app.materials.setSkinOpacity(0.40);
+        this.app.models.setLayerVisibility('skin', true);
+        this.dom.skinOpacitySlider.value = 0.40;
+        if (this.dom.skinOpacityVal) this.dom.skinOpacityVal.textContent = '40%';
+        const skinCb = document.querySelector('input[data-system="skin"]');
+        if (skinCb) skinCb.checked = true;
+      });
+    }
 
     // Slicing Tool
     this.dom.sliceToggle.addEventListener('change', (e) => {
@@ -150,13 +198,22 @@ export class UIManager {
     });
   }
 
+  isMeshVisible(mesh) {
+    let curr = mesh;
+    while (curr) {
+      if (curr.visible === false) return false;
+      curr = curr.parent;
+    }
+    return true;
+  }
+
   handlePointerMove(e) {
     const rect = this.dom.canvas.getBoundingClientRect();
     this.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     this.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
     this.raycaster.setFromCamera(this.mouse, this.app.scene.camera);
-    const visibleMeshes = this.app.models.clickableMeshes.filter(m => m.parent && m.parent.visible);
+    const visibleMeshes = this.app.models.clickableMeshes.filter(m => this.isMeshVisible(m));
     const hits = this.raycaster.intersectObjects(visibleMeshes, false);
 
     if (hits.length > 0) {
@@ -184,7 +241,7 @@ export class UIManager {
     this.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
     this.raycaster.setFromCamera(this.mouse, this.app.scene.camera);
-    const visibleMeshes = this.app.models.clickableMeshes.filter(m => m.parent && m.parent.visible);
+    const visibleMeshes = this.app.models.clickableMeshes.filter(m => this.isMeshVisible(m));
     const hits = this.raycaster.intersectObjects(visibleMeshes, false);
 
     if (hits.length > 0) {

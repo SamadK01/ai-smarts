@@ -10,10 +10,10 @@ export const CONFIG = {
 
   // Camera defaults
   camera: {
-    fov: 42,
+    fov: 40,
     near: 0.1,
     far: 200,
-    initialPos: [0, 1.15, 3.2],
+    initialPos: [0, 1.15, 2.9],
     initialTarget: [0, 0.95, 0],
     minDistance: 0.25,
     maxDistance: 6.5
@@ -80,19 +80,21 @@ export const CONFIG = {
   skinModes: {
     peach: {
       name: "Translucent Peach (PBR)",
-      roughness: 0.22,
-      transmission: 0.88,
-      thickness: 1.8,
-      color: 0xffd9ce,
-      attenuationColor: 0xffa490
+      roughness: 0.14,
+      transmission: 0.95,
+      thickness: 0.6,
+      color: 0xffe4db,
+      attenuationColor: 0xff9985,
+      opacity: 0.18
     },
     xray: {
       name: "Cyan X-Ray Hologram",
-      roughness: 0.15,
-      transmission: 0.82,
-      thickness: 2.2,
+      roughness: 0.12,
+      transmission: 0.93,
+      thickness: 0.8,
       color: 0x2de2e6,
-      attenuationColor: 0x0284c7
+      attenuationColor: 0x0284c7,
+      opacity: 0.22
     }
   }
 };
@@ -115,7 +117,7 @@ export const INITIAL_STATE = {
 
   // Visual Controls
   skinMode: "peach",         // "peach" | "xray"
-  skinOpacity: 0.55,
+  skinOpacity: 0.18,
   backgroundTheme: "dark",   // "dark" | "white" | "gradient"
   postProcessing: true,
   bloomStrength: 0.45,

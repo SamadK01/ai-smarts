@@ -23,31 +23,33 @@ export class MaterialManager {
       metalness: 0.02,
       transmission: CONFIG.skinModes.peach.transmission,
       thickness: CONFIG.skinModes.peach.thickness,
-      ior: 1.45,
+      ior: 1.35,
       attenuationColor: new THREE.Color(CONFIG.skinModes.peach.attenuationColor),
-      attenuationDistance: 2.2,
+      attenuationDistance: 1.5,
       transparent: true,
-      opacity: 0.55,
+      opacity: CONFIG.skinModes.peach.opacity || 0.18,
       depthWrite: false,
-      side: THREE.DoubleSide
+      depthTest: true,
+      side: THREE.FrontSide
     });
 
     // 2. SKIN SHELL: Cyan Blue X-Ray Hologram Mode
     this.skinXRay = new THREE.MeshPhysicalMaterial({
       color: new THREE.Color(CONFIG.skinModes.xray.color),
       emissive: new THREE.Color(0x0a2540),
-      emissiveIntensity: 0.45,
+      emissiveIntensity: 0.35,
       roughness: CONFIG.skinModes.xray.roughness,
       metalness: 0.05,
       transmission: CONFIG.skinModes.xray.transmission,
       thickness: CONFIG.skinModes.xray.thickness,
-      ior: 1.45,
+      ior: 1.35,
       attenuationColor: new THREE.Color(CONFIG.skinModes.xray.attenuationColor),
-      attenuationDistance: 2.0,
+      attenuationDistance: 1.8,
       transparent: true,
-      opacity: 0.48,
+      opacity: CONFIG.skinModes.xray.opacity || 0.22,
       depthWrite: false,
-      side: THREE.DoubleSide
+      depthTest: true,
+      side: THREE.FrontSide
     });
 
     // Active skin material pointer
@@ -55,9 +57,9 @@ export class MaterialManager {
 
     // 3. SKELETON: Polished Ivory Bone with subtle specular highlights
     this.bone = new THREE.MeshStandardMaterial({
-      color: 0xf3eedf,
-      roughness: 0.38,
-      metalness: 0.06,
+      color: 0xf6f1e5,
+      roughness: 0.35,
+      metalness: 0.05,
       clippingPlanes: [clippingPlane],
       clipShadows: true
     });
@@ -74,103 +76,111 @@ export class MaterialManager {
 
     // 5. CARDIOVASCULAR MATERIALS
     this.artery = new THREE.MeshStandardMaterial({
-      color: 0xe52538,
-      emissive: 0x800816,
-      emissiveIntensity: 0.40,
-      roughness: 0.25,
-      metalness: 0.12,
+      color: 0xef233c,
+      emissive: 0x900c1e,
+      emissiveIntensity: 0.45,
+      roughness: 0.22,
+      metalness: 0.15,
       clippingPlanes: [clippingPlane]
     });
 
     this.vein = new THREE.MeshStandardMaterial({
-      color: 0x1e50bb,
-      emissive: 0x0c2560,
-      emissiveIntensity: 0.35,
-      roughness: 0.25,
-      metalness: 0.12,
+      color: 0x1d64e8,
+      emissive: 0x09307d,
+      emissiveIntensity: 0.40,
+      roughness: 0.22,
+      metalness: 0.15,
       clippingPlanes: [clippingPlane]
     });
 
     this.heart = new THREE.MeshStandardMaterial({
-      color: 0xa81c2d,
-      roughness: 0.32,
-      metalness: 0.08,
+      color: 0xba1a2b,
+      emissive: 0x550a14,
+      emissiveIntensity: 0.25,
+      roughness: 0.28,
+      metalness: 0.10,
       clippingPlanes: [clippingPlane]
     });
 
     // 6. RESPIRATORY MATERIALS
     this.lung = new THREE.MeshStandardMaterial({
-      color: 0xd47b85,
-      roughness: 0.45,
+      color: 0xe07a8b,
+      emissive: 0x4a1820,
+      emissiveIntensity: 0.15,
+      roughness: 0.38,
       metalness: 0.04,
       transparent: true,
-      opacity: 0.88,
+      opacity: 0.92,
       clippingPlanes: [clippingPlane]
     });
 
     this.trachea = new THREE.MeshStandardMaterial({
-      color: 0xe2d6c9,
-      roughness: 0.5,
+      color: 0xe8ddd0,
+      roughness: 0.45,
       clippingPlanes: [clippingPlane]
     });
 
     // 7. DIGESTIVE ORGANS
     this.liver = new THREE.MeshStandardMaterial({
-      color: 0x6e2727,
-      roughness: 0.35,
-      metalness: 0.05,
+      color: 0x7c2424,
+      emissive: 0x2d0808,
+      emissiveIntensity: 0.15,
+      roughness: 0.28,
+      metalness: 0.08,
       clippingPlanes: [clippingPlane]
     });
 
     this.stomach = new THREE.MeshStandardMaterial({
-      color: 0xcf7a65,
-      roughness: 0.40,
+      color: 0xdb826e,
+      roughness: 0.38,
       clippingPlanes: [clippingPlane]
     });
 
     this.pancreas = new THREE.MeshStandardMaterial({
-      color: 0xd9a84e,
-      roughness: 0.52,
+      color: 0xdfaa4d,
+      roughness: 0.45,
       clippingPlanes: [clippingPlane]
     });
 
     this.spleen = new THREE.MeshStandardMaterial({
-      color: 0x581e2e,
-      roughness: 0.36,
-      clippingPlanes: [clippingPlane]
-    });
-
-    this.gallbladder = new THREE.MeshStandardMaterial({
-      color: 0x3d6e35,
+      color: 0x5a1928,
       roughness: 0.30,
       clippingPlanes: [clippingPlane]
     });
 
+    this.gallbladder = new THREE.MeshStandardMaterial({
+      color: 0x2e6e32,
+      roughness: 0.25,
+      clippingPlanes: [clippingPlane]
+    });
+
     this.intestines = new THREE.MeshStandardMaterial({
-      color: 0xc98063,
-      roughness: 0.50,
+      color: 0xcf7e68,
+      roughness: 0.45,
       clippingPlanes: [clippingPlane]
     });
 
     // 8. RENAL MATERIALS
     this.kidney = new THREE.MeshStandardMaterial({
-      color: 0x7b2828,
-      roughness: 0.32,
+      color: 0x8b2222,
+      roughness: 0.28,
       clippingPlanes: [clippingPlane]
     });
 
     this.bladder = new THREE.MeshStandardMaterial({
-      color: 0xd4a373,
-      roughness: 0.38,
+      color: 0xdfb47e,
+      roughness: 0.35,
       transparent: true,
-      opacity: 0.85,
+      opacity: 0.90,
       clippingPlanes: [clippingPlane]
     });
 
     // 9. NERVOUS MATERIALS
     this.brain = new THREE.MeshStandardMaterial({
-      color: 0xdfa5a5,
-      roughness: 0.55,
+      color: 0xe8a6a6,
+      emissive: 0x3d1b1b,
+      emissiveIntensity: 0.18,
+      roughness: 0.45,
       metalness: 0.04,
       clippingPlanes: [clippingPlane]
     });
@@ -178,8 +188,8 @@ export class MaterialManager {
     this.nerve = new THREE.MeshStandardMaterial({
       color: 0xfacc15,
       emissive: 0xeab308,
-      emissiveIntensity: 0.70,
-      roughness: 0.22,
+      emissiveIntensity: 0.85,
+      roughness: 0.20,
       clippingPlanes: [clippingPlane]
     });
 

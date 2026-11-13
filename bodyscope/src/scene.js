@@ -51,7 +51,7 @@ export class SceneManager {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, CONFIG.maxPixelRatio));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.18;
+    this.renderer.toneMappingExposure = 1.25;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.localClippingEnabled = true;
 
@@ -67,13 +67,13 @@ export class SceneManager {
   }
 
   initLighting() {
-    // 1. Soft Ambient Light
-    this.ambientLight = new THREE.AmbientLight(0x283040, 1.2);
+    // 1. Soft Ambient Light for overall internal cavity visibility
+    this.ambientLight = new THREE.AmbientLight(0x38455a, 1.8);
     this.scene.add(this.ambientLight);
 
-    // 2. Studio Key Light (Warm front-right light)
-    this.keyLight = new THREE.DirectionalLight(0xfff5ea, 1.8);
-    this.keyLight.position.set(2.5, 3.2, 3.0);
+    // 2. Studio Key Light (Warm front-right high-angle light)
+    this.keyLight = new THREE.DirectionalLight(0xfff8ee, 2.4);
+    this.keyLight.position.set(2.5, 3.5, 3.2);
     this.keyLight.castShadow = true;
     this.keyLight.shadow.mapSize.width = 1024;
     this.keyLight.shadow.mapSize.height = 1024;
@@ -81,17 +81,22 @@ export class SceneManager {
     this.scene.add(this.keyLight);
 
     // 3. Studio Fill Light (Cool front-left soft fill)
-    this.fillLight = new THREE.DirectionalLight(0xbfe0ff, 1.0);
-    this.fillLight.position.set(-2.8, 2.0, 2.2);
+    this.fillLight = new THREE.DirectionalLight(0xbce2ff, 1.4);
+    this.fillLight.position.set(-2.8, 2.2, 2.5);
     this.scene.add(this.fillLight);
 
-    // 4. Studio Rim / Backlight (Crisp cyan/white silhouette rim)
-    this.rimLight = new THREE.DirectionalLight(0xa5f3fc, 2.4);
+    // 4. Direct Front Cavity Light (Directly illuminates chest and visceral organs)
+    this.frontLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    this.frontLight.position.set(0.0, 1.2, 3.0);
+    this.scene.add(this.frontLight);
+
+    // 5. Studio Rim / Backlight (Crisp cyan/white silhouette rim)
+    this.rimLight = new THREE.DirectionalLight(0xa5f3fc, 3.2);
     this.rimLight.position.set(0.0, 3.5, -3.2);
     this.scene.add(this.rimLight);
 
-    // 5. Subtle Under-light (Floor bounce)
-    this.bounceLight = new THREE.DirectionalLight(0x1a2638, 0.6);
+    // 6. Subtle Floor Bounce Light
+    this.bounceLight = new THREE.DirectionalLight(0x1f2e42, 0.8);
     this.bounceLight.position.set(0, -2.5, 1.0);
     this.scene.add(this.bounceLight);
   }

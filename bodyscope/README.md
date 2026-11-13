@@ -34,10 +34,9 @@ bodyscope/
 │   ├── skeleton.glb         # 242 named individual bones with hands & feet (BodyParts3D)
 │   ├── cardiovascular.glb   # Heart, aorta, pulmonary and systemic arterial/venous trees
 │   ├── respiratory.glb      # Lungs with lobes, trachea, and bronchial subdivisions
-│   ├── digestive.glb        # Stomach, liver, pancreas, spleen, intestines
+│   ├── visceral_male.glb    # Complete 120 visceral digestive organs: liver segments, stomach, intestines, pancreas, spleen
 │   ├── renal.glb            # Kidneys, ureters, urinary bladder
 │   ├── nervous.glb          # Brain, brainstem, spinal cord, peripheral nerves
-│   ├── skin_male.glb        # Human skin body shell
 │   ├── manifest.json        # 3,478 Terminologia Anatomica entries & hierarchy
 │   ├── LICENSE              # CC BY-SA 4.0 License text
 │   └── NOTICE               # Comprehensive attribution records
@@ -45,9 +44,9 @@ bodyscope/
     ├── config.js            # Global configuration, presets, and initial application state
     ├── data.js              # Standardized anatomical dictionary (English, Latin, Urdu, function, facts)
     ├── materials.js         # PBR MeshPhysicalMaterial translucent peach skin, ivory bones, organs
-    ├── scene.js             # PerspectiveCamera, studio three-point lighting, RoomEnvironment, controls
+    ├── scene.js             # PerspectiveCamera, studio multi-point lighting + front cavity light, controls
     ├── postprocessing.js    # EffectComposer, RenderPass, UnrealBloomPass, OutputPass
-    ├── modelLoader.js       # GLTFLoader, DRACOLoader, system group assembly, raycast registration
+    ├── modelLoader.js       # 1:1 True metric alignment, procedural glass silhouette shell, raycast registration
     ├── bloodFlow.js         # Centerline curves, instanced arterial/venous flow, "Blood Path" tour
     ├── physiology.js        # Cardiac lub-dub mechanics, lung respiration, live ECG, glucose simulation
     ├── audio.js             # Web Audio API synthesized S1/S2 heart valve closure acoustics

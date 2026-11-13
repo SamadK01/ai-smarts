@@ -617,8 +617,13 @@
       </div>
 
       <div class="slider-row">
-        <span>Skin Opacity</span>
-        <input type="range" id="skin-opacity-slider" min="0" max="1" step="0.05" value="0.55">
+        <span>Skin Opacity: <b id="skin-opacity-val" style="color:var(--accent-cyan);">18%</b></span>
+        <input type="range" id="skin-opacity-slider" min="0" max="1" step="0.02" value="0.18">
+      </div>
+      <div style="display:flex; gap:6px; margin-top:8px;">
+        <button id="skin-clear-btn" class="preset-pill" style="flex:1; text-align:center; padding:4px 6px;">Bare Organs (0%)</button>
+        <button id="skin-ghost-btn" class="preset-pill" style="flex:1; text-align:center; padding:4px 6px;">Ghost (18%)</button>
+        <button id="skin-trans-btn" class="preset-pill" style="flex:1; text-align:center; padding:4px 6px;">Glass (40%)</button>
       </div>
     </div>
 
