@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Neon Snake Pulse — Hunter & Titan Beasts</title>
-<meta name="description" content="An arcade snake game with live animated prey animals (frogs, mice, bunnies, chicks), mega titan growth feasts (+10 length), strict laser wall vs free wrap-around mode, sub-tick 60fps interpolation, and procedural audio.">
+<title>Neon Snake Pulse — Titan Hunter</title>
+<meta name="description" content="A professional arcade serpent game. Features seamless portal wrap, sinusoidal slithering spine physics, live animated prey, titan mega feasts, strict vs free warp modes, and Web Audio.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@700;800;900&family=Geist+Mono:wght@500;700;900&family=Bricolage+Grotesque:opsz,wght@12..96,600;700;800&display=swap" rel="stylesheet">
@@ -17,8 +17,8 @@
     --gold: #f59e0b;
     --pink: #ff007f;
     --red: #ef4444;
-    --panel-bg: rgba(10, 15, 26, 0.88);
-    --panel-border: rgba(255, 255, 255, 0.14);
+    --panel-bg: rgba(11, 17, 30, 0.92);
+    --panel-border: rgba(255, 255, 255, 0.12);
     --font-display: 'Funnel Display', sans-serif;
     --font-mono: 'Geist Mono', monospace;
     --font-ui: 'Bricolage Grotesque', sans-serif;
@@ -28,11 +28,12 @@
 
   html, body {
     width: 100%; height: 100%; overflow: hidden;
-    background: #060911; color: #f1f5f9;
+    background: #050811; color: #f1f5f9;
     font-family: var(--font-ui); touch-action: none;
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* Fullscreen Canvas */
   #game-canvas {
     position: fixed; inset: 0; width: 100%; height: 100%;
     display: block; z-index: 1;
@@ -43,38 +44,38 @@
     position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
   }
   .bg-orb {
-    position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.18;
+    position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.16;
     transition: background 0.8s ease;
   }
   .bg-orb-1 {
-    width: 500px; height: 500px; top: -100px; left: -100px;
+    width: 520px; height: 520px; top: -120px; left: -100px;
     background: var(--theme-accent);
   }
   .bg-orb-2 {
-    width: 600px; height: 600px; bottom: -150px; right: -150px;
+    width: 620px; height: 620px; bottom: -150px; right: -120px;
     background: var(--theme-secondary);
   }
 
-  /* HUD Overlay */
+  /* Professional Fixed HUD */
   #hud {
     position: fixed; inset: 0; pointer-events: none;
-    z-index: 10; display: flex; flex-direction: column;
+    z-index: 20; display: flex; flex-direction: column;
     justify-content: space-between;
-    padding: max(16px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+    padding: max(14px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
   }
 
-  /* Top HUD Bar */
+  /* Top Control Bar */
   .hud-top {
-    display: flex; justify-content: space-between; align-items: flex-start;
-    gap: 12px; pointer-events: auto;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 12px; pointer-events: auto; flex-wrap: wrap;
   }
 
   .brand-block {
-    display: flex; flex-direction: column; gap: 4px;
+    display: flex; align-items: center; gap: 12px;
   }
   .brand-title {
     font-family: var(--font-display); font-size: 1.55rem; font-weight: 900;
-    color: #fff; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px;
+    color: #fff; letter-spacing: -0.5px; display: flex; align-items: center; gap: 6px;
     text-shadow: 0 2px 14px rgba(0,0,0,0.8);
   }
   .brand-title span {
@@ -83,52 +84,52 @@
     transition: color 0.4s ease;
   }
 
-  /* Rank & Mode Badges */
-  .badge-row {
+  /* Status Badges */
+  .badge-cluster {
     display: flex; gap: 6px; align-items: center;
   }
-  .mode-badge {
+  .status-badge {
     background: var(--panel-bg); backdrop-filter: blur(12px);
     border: 1.5px solid var(--panel-border);
     font-family: var(--font-mono); font-size: 0.68rem; font-weight: 800;
-    color: #fff; padding: 3px 10px; border-radius: 20px;
-    letter-spacing: 0.5px; width: fit-content; text-transform: uppercase;
+    color: #fff; padding: 4px 10px; border-radius: 20px;
+    letter-spacing: 0.5px; text-transform: uppercase;
     box-shadow: 0 4px 14px rgba(0,0,0,0.4);
     display: flex; align-items: center; gap: 5px;
   }
-  .mode-badge.strict-on {
+  .status-badge.strict-on {
     border-color: var(--red); color: #fca5a5;
-    box-shadow: 0 0 14px rgba(239, 68, 68, 0.4);
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.45);
   }
-  .mode-badge.strict-off {
+  .status-badge.strict-off {
     border-color: var(--theme-secondary); color: var(--theme-secondary);
-    box-shadow: 0 0 14px rgba(0, 240, 255, 0.3);
+    box-shadow: 0 0 14px rgba(0, 240, 255, 0.35);
   }
   .rank-badge {
     background: rgba(245, 158, 11, 0.15); border: 1.5px solid var(--gold);
     color: var(--gold); font-family: var(--font-mono); font-size: 0.68rem; font-weight: 800;
-    padding: 3px 10px; border-radius: 20px;
+    padding: 4px 10px; border-radius: 20px;
   }
 
-  /* Stats Cluster */
+  /* Stat Gauges */
   .stats-cluster {
     display: flex; gap: 8px; align-items: center;
   }
   .stat-card {
     background: var(--panel-bg); backdrop-filter: blur(14px);
     border: 1.5px solid var(--panel-border);
-    border-radius: 14px; padding: 8px 14px; min-width: 86px;
+    border-radius: 12px; padding: 6px 14px; min-width: 82px;
     text-align: right; box-shadow: 0 6px 20px rgba(0,0,0,0.5);
   }
   .stat-card.combo-card {
     border-color: var(--gold); display: none;
   }
   .stat-lbl {
-    font-family: var(--font-mono); font-size: 0.62rem;
+    font-family: var(--font-mono); font-size: 0.6rem;
     color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
   }
   .stat-val {
-    font-family: var(--font-display); font-size: 1.5rem; font-weight: 900;
+    font-family: var(--font-display); font-size: 1.45rem; font-weight: 900;
     line-height: 1; color: #fff; margin-top: 2px;
   }
   .stat-val.accent {
@@ -140,15 +141,15 @@
     text-shadow: 0 0 14px rgba(245, 158, 11, 0.6);
   }
 
-  /* Top Right Action Pills */
+  /* Action Buttons */
   .hud-actions {
-    display: flex; gap: 8px; align-items: center; pointer-events: auto; flex-wrap: wrap; justify-content: flex-end;
+    display: flex; gap: 6px; align-items: center; pointer-events: auto;
   }
   .pill-btn {
     background: var(--panel-bg); backdrop-filter: blur(12px);
     border: 1.5px solid var(--panel-border); color: #e2e8f0;
-    padding: 8px 13px; border-radius: 12px;
-    font-family: var(--font-ui); font-size: 0.78rem; font-weight: 800;
+    padding: 8px 12px; border-radius: 10px;
+    font-family: var(--font-ui); font-size: 0.76rem; font-weight: 800;
     cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
     text-decoration: none; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: 0 4px 14px rgba(0,0,0,0.3);
@@ -158,17 +159,17 @@
     border-color: var(--theme-accent);
     color: #fff; transform: translateY(-2px);
   }
-  .pill-strict-toggle {
+  .pill-strict-btn {
     font-weight: 900;
   }
-  .pill-strict-toggle.active {
+  .pill-strict-btn.strict-active {
     border-color: var(--red); color: #fca5a5;
     box-shadow: 0 0 14px rgba(239, 68, 68, 0.4);
   }
 
   /* Center Titan Banner */
   #titan-banner {
-    position: fixed; top: 16%; left: 50%; transform: translateX(-50%);
+    position: fixed; top: 14%; left: 50%; transform: translateX(-50%);
     display: none; flex-direction: column; align-items: center; text-align: center;
     pointer-events: none; z-index: 80;
     animation: titanPulse 0.4s infinite alternate;
@@ -178,12 +179,12 @@
     100% { transform: translateX(-50%) scale(1.05); }
   }
   #titan-text {
-    font-family: var(--font-display); font-size: 3rem; font-weight: 900;
+    font-family: var(--font-display); font-size: 2.8rem; font-weight: 900;
     color: var(--gold); text-shadow: 0 0 25px rgba(245, 158, 11, 0.9), 0 4px 12px #000;
     letter-spacing: 1px;
   }
   #titan-sub {
-    font-family: var(--font-mono); font-size: 1.1rem; font-weight: 800;
+    font-family: var(--font-mono); font-size: 1rem; font-weight: 800;
     color: #fff; text-shadow: 0 2px 8px #000; text-transform: uppercase;
   }
 
@@ -193,10 +194,10 @@
     gap: 16px; pointer-events: auto;
   }
 
-  /* Prey Alert Legend */
+  /* Prey Legend */
   .prey-legend {
     background: var(--panel-bg); backdrop-filter: blur(12px);
-    border: 1px solid var(--panel-border); border-radius: 14px;
+    border: 1px solid var(--panel-border); border-radius: 12px;
     padding: 6px 14px; display: flex; align-items: center; gap: 12px;
     font-family: var(--font-mono); font-size: 0.72rem; color: #94a3b8; font-weight: 800;
   }
@@ -208,17 +209,17 @@
     display: none; align-items: center; gap: 10px;
     background: var(--panel-bg); backdrop-filter: blur(12px);
     border: 1.5px solid var(--gold);
-    padding: 8px 16px; border-radius: 14px;
+    padding: 6px 14px; border-radius: 12px;
     box-shadow: 0 6px 24px rgba(245, 158, 11, 0.4);
   }
-  .pw-icon { font-size: 1.4rem; }
+  .pw-icon { font-size: 1.3rem; }
   .pw-details { display: flex; flex-direction: column; gap: 2px; }
   .pw-name {
-    font-family: var(--font-mono); font-size: 0.74rem; font-weight: 900;
+    font-family: var(--font-mono); font-size: 0.7rem; font-weight: 900;
     color: var(--gold); text-transform: uppercase; letter-spacing: 0.5px;
   }
   .pw-meter-wrap {
-    width: 110px; height: 5px; background: rgba(255, 255, 255, 0.15);
+    width: 100px; height: 5px; background: rgba(255, 255, 255, 0.15);
     border-radius: 3px; overflow: hidden;
   }
   #pw-meter-bar {
@@ -228,8 +229,8 @@
 
   /* Mobile Touch Controls */
   #mobile-dpad {
-    position: fixed; bottom: 24px; right: 24px;
-    width: 154px; height: 154px; z-index: 40;
+    position: fixed; bottom: 20px; right: 20px;
+    width: 148px; height: 148px; z-index: 40;
     display: none; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
     pointer-events: auto;
   }
@@ -256,8 +257,8 @@
   .dpad-down { grid-column: 2; grid-row: 3; }
 
   #btn-turbo-mobile {
-    position: fixed; bottom: 36px; left: 24px;
-    width: 72px; height: 72px; border-radius: 50%;
+    position: fixed; bottom: 28px; left: 20px;
+    width: 68px; height: 68px; border-radius: 50%;
     background: var(--panel-bg); backdrop-filter: blur(12px);
     border: 2px solid var(--theme-accent); color: var(--theme-accent);
     font-family: var(--font-mono); font-size: 0.85rem; font-weight: 900;
@@ -273,18 +274,19 @@
     #mobile-dpad { display: grid; }
     #btn-turbo-mobile { display: flex; }
     .prey-legend { display: none; }
+    .badge-cluster { display: none; }
   }
 
-  /* Modals (Start Screen & Game Over) */
+  /* Modals */
   .modal-overlay {
-    position: fixed; inset: 0; background: rgba(4, 7, 15, 0.85);
+    position: fixed; inset: 0; background: rgba(4, 7, 15, 0.88);
     backdrop-filter: blur(16px); z-index: 100;
     display: flex; align-items: center; justify-content: center;
     padding: 18px;
   }
   .modal-card {
     background: #0b1120; border: 2px solid var(--theme-accent);
-    border-radius: 24px; padding: 32px 28px; width: 100%; max-width: 500px;
+    border-radius: 22px; padding: 30px 26px; width: 100%; max-width: 490px;
     text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.9), 0 0 40px var(--theme-accent-glow);
     position: relative; overflow: hidden; animation: modalPop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -301,17 +303,17 @@
     border-radius: 20px; margin-bottom: 12px; letter-spacing: 0.5px;
   }
   .modal-title {
-    font-family: var(--font-display); font-size: 2.3rem; font-weight: 900;
+    font-family: var(--font-display); font-size: 2.2rem; font-weight: 900;
     color: #fff; line-height: 1.05; letter-spacing: -0.5px; margin-bottom: 8px;
   }
   .modal-title span { color: var(--theme-accent); }
   .modal-desc {
-    font-size: 0.92rem; color: #94a3b8; line-height: 1.5; margin-bottom: 20px;
+    font-size: 0.9rem; color: #94a3b8; line-height: 1.5; margin-bottom: 20px;
   }
 
   /* Mode Selection Tabs */
   .section-label {
-    font-family: var(--font-mono); font-size: 0.7rem; font-weight: 800;
+    font-family: var(--font-mono); font-size: 0.68rem; font-weight: 800;
     color: #cbd5e1; text-transform: uppercase; letter-spacing: 1px;
     text-align: left; margin: 12px 0 8px; display: flex; justify-content: space-between;
   }
@@ -320,7 +322,7 @@
   }
   .tab-btn {
     background: rgba(255, 255, 255, 0.05); border: 1.5px solid rgba(255, 255, 255, 0.12);
-    border-radius: 14px; padding: 12px 10px; color: #cbd5e1;
+    border-radius: 12px; padding: 12px 10px; color: #cbd5e1;
     font-family: var(--font-ui); font-size: 0.85rem; font-weight: 800;
     cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column;
     align-items: center; gap: 4px;
@@ -335,7 +337,7 @@
     border-color: var(--red);
     box-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
   }
-  .tab-icon { font-size: 1.4rem; }
+  .tab-icon { font-size: 1.35rem; }
   .tab-sub { font-size: 0.65rem; font-family: var(--font-mono); color: #94a3b8; font-weight: 600; }
 
   /* Theme Row */
@@ -397,7 +399,7 @@
   <!-- Center Titan Growth Alert -->
   <div id="titan-banner">
     <div id="titan-text">🔥 TITAN MEGA BEAST!</div>
-    <div id="titan-sub">+12 INSTANT LENGTH & DOUBLE BODY WIDTH</div>
+    <div id="titan-sub">+12 INSTANT LENGTH & TITAN WIDTH</div>
   </div>
 
   <!-- HUD Interface -->
@@ -406,10 +408,10 @@
     <div class="hud-top">
       <div class="brand-block">
         <div class="brand-title">
-          NEON<span>SNAKE</span>
+          NEON<span>SERPENT</span>
         </div>
-        <div class="badge-row">
-          <div class="mode-badge strict-off" id="hud-mode-pill">🌀 FREE WARP MODE</div>
+        <div class="badge-cluster">
+          <div class="status-badge strict-off" id="hud-mode-pill">🌀 FREE WARP</div>
           <div class="rank-badge" id="hud-rank-pill">🐍 BABY PYTHON</div>
         </div>
       </div>
@@ -437,8 +439,8 @@
       </div>
 
       <div class="hud-actions">
-        <!-- Strict Mode Live Toggle Pill -->
-        <button id="btn-strict-toggle" class="pill-btn pill-strict-toggle">🌀 Strict: OFF</button>
+        <!-- Live Mode Toggle Pill -->
+        <button id="btn-strict-toggle" class="pill-btn pill-strict-btn">🌀 Strict: OFF</button>
         <button id="btn-theme-cycle" class="pill-btn">🎨 Theme</button>
         <button id="btn-sound" class="pill-btn">🔊 Audio: ON</button>
         <button id="btn-pause" class="pill-btn">⏸️ Pause</button>
@@ -449,11 +451,11 @@
     <!-- Bottom HUD -->
     <div class="hud-bottom">
       <div class="prey-legend">
-        <span>HUNT PREY:</span>
+        <span>HUNT:</span>
         <div class="prey-tag">🐸 Frog <span>+3</span></div>
         <div class="prey-tag">🐭 Mouse <span>+4</span></div>
         <div class="prey-tag">🐰 Bunny <span>+5</span></div>
-        <div class="prey-tag">🥩 Mega Feast <span>+10 🔥</span></div>
+        <div class="prey-tag">🥩 Mega Feast <span>+12 🔥</span></div>
       </div>
 
       <div id="active-powerup">
@@ -468,7 +470,7 @@
     </div>
   </div>
 
-  <!-- Mobile Touch Controls -->
+  <!-- Mobile Touch Virtual Controls -->
   <div id="mobile-dpad">
     <button class="dpad-btn dpad-up" id="dpad-up">▲</button>
     <button class="dpad-btn dpad-left" id="dpad-left">◀</button>
@@ -481,8 +483,8 @@
   <!-- Start Game Modal -->
   <div class="modal-overlay" id="start-modal">
     <div class="modal-card">
-      <div class="modal-badge">✨ TITAN PREY HUNTER</div>
-      <h1 class="modal-title">NEON <span>SNAKE</span> PULSE</h1>
+      <div class="modal-badge">✨ TITAN SERPENT ARCADE</div>
+      <h1 class="modal-title">NEON <span>SERPENT</span> PRO</h1>
       <p class="modal-desc">
         Hunt animated live frogs, mice, and bunnies to grow rapidly! Devour the glowing Mega Beast Feast to become a giant Titan Behemoth!
       </p>
@@ -540,7 +542,7 @@
         </div>
         <div class="go-stat-box">
           <div class="go-lbl">Evolution Rank</div>
-          <div class="go-val" id="go-rank" style="font-size:1.1rem; color:var(--theme-secondary);">Cobra</div>
+          <div class="go-val" id="go-rank" style="font-size:1.05rem; color:var(--theme-secondary);">Cobra</div>
         </div>
       </div>
 
@@ -552,11 +554,11 @@
 
 <script>
 /**
- * Neon Snake Pulse — Animated Prey Animals, Mega Growth Feasts (+10 Length),
- * Strict Laser Walls vs Free Warp Mode, Sub-Tick 60fps Interpolation, Web Audio SFX
+ * Neon Serpent Pro — Organic Slithering Spine Waves, Flawless Wrap Portal Rendering,
+ * Live Animated Prey, Mega Beast Growth, Strict Laser Walls vs Free Warp, Web Audio
  */
 
-// 1. Procedural Audio Synthesizer (Zero External Dependencies)
+// 1. Procedural Audio Synthesizer
 class SynthAudio {
   constructor() {
     this.ctx = null;
@@ -631,7 +633,6 @@ class SynthAudio {
     if (!this.enabled || !this.ctx) return;
     const t = this.ctx.currentTime;
 
-    // Sub-bass boom
     const sub = this.ctx.createOscillator();
     const sGain = this.ctx.createGain();
     sub.type = 'sine';
@@ -644,7 +645,6 @@ class SynthAudio {
     sub.start(t);
     sub.stop(t + 0.61);
 
-    // Fanfare chord
     [523.25, 659.25, 783.99, 1046.5].forEach(freq => {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
@@ -727,22 +727,20 @@ const PREY_SPECIES = [
   { id: 'chick', emoji: '🐥', name: 'Chick', grow: 2, pts: 100, color: '#facc15', sound: 'squeak' }
 ];
 
-// 4. Main Game Controller
+// 4. Main Game Engine
 class NeonSnakeGame {
   constructor() {
     this.canvas = document.getElementById('game-canvas');
     this.ctx = this.canvas.getContext('2d');
 
-    // Confetti
     this.confettiCanvas = document.getElementById('confetti-canvas');
     this.confettiCtx = this.confettiCanvas.getContext('2d');
     this.confettiParticles = [];
 
-    // Configuration
     this.themeKey = 'emerald';
     this.theme = THEMES[this.themeKey];
 
-    // Strict Mode (Wall Death) vs Free Warp (Wrap-around, only body collision kills)
+    // Strict Mode: Wall Collision Kills vs Free Warp: Wrap around edges
     this.strictMode = false;
 
     // Grid Dimensions
@@ -754,38 +752,38 @@ class NeonSnakeGame {
     this.arenaW = 0;
     this.arenaH = 0;
 
-    // Game State
+    // State
     this.state = 'menu';
     this.score = 0;
     this.highScore = parseInt(localStorage.getItem('neon_snake_highscore') || '0', 10);
     document.getElementById('high-display').textContent = this.highScore;
 
-    // Growth Queue & Titan Mode
+    // Growth & Titan Mode
     this.pendingGrowth = 0;
     this.isTitan = false;
     this.titanEndsAt = 0;
 
-    // Combo System
+    // Combo
     this.combo = 1;
     this.lastEatTime = 0;
     this.comboTimeout = 3200;
 
-    // Snake Body & Direction
+    // Snake Body
     this.snake = [];
     this.prevSnake = [];
     this.dir = { x: 1, y: 0 };
     this.nextDir = { x: 1, y: 0 };
     this.inputQueue = [];
 
-    // Timing & Tick Loop
+    // Ticks & Speed
     this.tickInterval = 110;
     this.lastTickTime = performance.now();
     this.isTurbo = false;
 
-    // Animals & Mega Feasts
-    this.animals = []; // Multiple roaming live animals
-    this.megaFeast = null; // { x, y, expireAt }
-    this.nextMegaSpawn = performance.now() + 18000;
+    // Prey & Mega Feast
+    this.animals = [];
+    this.megaFeast = null;
+    this.nextMegaSpawn = performance.now() + 16000;
 
     // Visual FX
     this.particles = [];
@@ -813,18 +811,21 @@ class NeonSnakeGame {
     this.confettiCanvas.height = h * dpr;
     this.confettiCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const marginY = w < 860 ? 140 : 115;
-    const marginX = 28;
-    const availW = w - marginX * 2;
-    const availH = h - marginY * 2;
+    // Reserved vertical padding so arena NEVER overlaps top HUD or bottom controls
+    const topMargin = w < 860 ? 110 : 88;
+    const bottomMargin = w < 860 ? 120 : 64;
+    const horizMargin = 24;
+
+    const availW = w - horizMargin * 2;
+    const availH = h - topMargin - bottomMargin;
 
     this.cellSize = Math.floor(Math.min(availW / this.cols, availH / this.rows));
-    this.cellSize = Math.max(16, Math.min(32, this.cellSize));
+    this.cellSize = Math.max(16, Math.min(34, this.cellSize));
 
     this.arenaW = this.cols * this.cellSize;
     this.arenaH = this.rows * this.cellSize;
     this.arenaX = Math.floor((w - this.arenaW) / 2);
-    this.arenaY = Math.floor((h - this.arenaH) / 2);
+    this.arenaY = Math.floor(topMargin + (availH - this.arenaH) / 2);
   }
 
   applyTheme(themeKey) {
@@ -849,15 +850,15 @@ class NeonSnakeGame {
     const toggleBtn = document.getElementById('btn-strict-toggle');
 
     if (this.strictMode) {
-      pill.textContent = '⚡ STRICT LASER WALLS';
-      pill.className = 'mode-badge strict-on';
-      toggleBtn.textContent = '⚡ Strict: ON (Wall Dies)';
-      toggleBtn.classList.add('active');
+      pill.textContent = '⚡ STRICT LASER';
+      pill.className = 'status-badge strict-on';
+      toggleBtn.textContent = '⚡ Strict: ON';
+      toggleBtn.classList.add('strict-active');
     } else {
-      pill.textContent = '🌀 FREE WARP MODE';
-      pill.className = 'mode-badge strict-off';
-      toggleBtn.textContent = '🌀 Strict: OFF (Pass Wall)';
-      toggleBtn.classList.remove('active');
+      pill.textContent = '🌀 FREE WARP';
+      pill.className = 'status-badge strict-off';
+      toggleBtn.textContent = '🌀 Strict: OFF';
+      toggleBtn.classList.remove('strict-active');
     }
   }
 
@@ -908,7 +909,6 @@ class NeonSnakeGame {
 
   spawnAnimalsInitial() {
     this.animals = [];
-    // Spawn 2 live animated prey creatures on the board
     this.spawnAnimal();
     this.spawnAnimal();
   }
@@ -946,14 +946,13 @@ class NeonSnakeGame {
     this.megaFeast = {
       x,
       y,
-      expireAt: performance.now() + 14000 // 14 seconds to claim
+      expireAt: performance.now() + 14000
     };
   }
 
   bindEvents() {
     window.addEventListener('resize', () => this.resize());
 
-    // Keyboard Controls
     window.addEventListener('keydown', (e) => {
       audio.init();
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
@@ -979,7 +978,6 @@ class NeonSnakeGame {
       }
     });
 
-    // Touch D-Pad
     const bindBtn = (id, dx, dy) => {
       const el = document.getElementById(id);
       if (!el) return;
@@ -1002,7 +1000,6 @@ class NeonSnakeGame {
     turboBtn.addEventListener('pointerup', () => this.isTurbo = false);
     turboBtn.addEventListener('pointercancel', () => this.isTurbo = false);
 
-    // Fullscreen Swipe
     let touchStartX = 0;
     let touchStartY = 0;
     this.canvas.addEventListener('touchstart', (e) => {
@@ -1024,19 +1021,17 @@ class NeonSnakeGame {
       }
     }, { passive: true });
 
-    // Strict Mode Live Toggle Button in HUD
     document.getElementById('btn-strict-toggle').addEventListener('click', () => {
       this.strictMode = !this.strictMode;
       this.updateStrictModeUI();
       this.triggerFloatText(
         this.arenaX + this.arenaW / 2,
         this.arenaY + 40,
-        this.strictMode ? '⚡ STRICT MODE: WALL CRASH ON' : '🌀 FREE WARP: WALL PASS ON',
+        this.strictMode ? '⚡ STRICT: WALL CRASH ON' : '🌀 FREE WARP: PASS WALL ON',
         this.strictMode ? '#ef4444' : '#00f0ff'
       );
     });
 
-    // Header Action Buttons
     document.getElementById('btn-theme-cycle').addEventListener('click', () => {
       const keys = Object.keys(THEMES);
       const nextIdx = (keys.indexOf(this.themeKey) + 1) % keys.length;
@@ -1050,7 +1045,6 @@ class NeonSnakeGame {
 
     document.getElementById('btn-pause').addEventListener('click', () => this.togglePause());
 
-    // Modal Mode Selector Tabs
     document.querySelectorAll('#mode-tabs .tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('#mode-tabs .tab-btn').forEach(b => b.classList.remove('active'));
@@ -1089,7 +1083,7 @@ class NeonSnakeGame {
     }
   }
 
-  // Core Grid Logic
+  // Core Simulation Tick
   tick() {
     if (this.state !== 'playing') return;
 
@@ -1101,29 +1095,27 @@ class NeonSnakeGame {
     const head = this.snake[0];
     let newHead = { x: head.x + this.dir.x, y: head.y + this.dir.y };
 
-    // STRICT MODE vs FREE WARP MODE
+    // STRICT WALLS VS FREE WARP
     if (this.strictMode) {
-      // Hitting the arena boundary wall = DEAD!
       if (newHead.x < 0 || newHead.x >= this.cols || newHead.y < 0 || newHead.y >= this.rows) {
         this.gameOver('⚡ Crashed into Deadly Laser Wall! (Strict Mode)');
         return;
       }
     } else {
-      // Free Warp: Pass-through walls to opposite side!
+      // Warp safely to the opposite side
       newHead.x = (newHead.x + this.cols) % this.cols;
       newHead.y = (newHead.y + this.rows) % this.rows;
     }
 
-    // Self Collision (Touching own body kills in BOTH modes!)
+    // Body Collision: Only touching own body kills in Free Warp!
     const hitSelf = this.snake.slice(0, -1).some(seg => seg.x === newHead.x && seg.y === newHead.y);
     if (hitSelf) {
-      this.gameOver('💀 Collided with your own tail!');
+      this.gameOver('💀 Collided with your own body!');
       return;
     }
 
     this.snake.unshift(newHead);
 
-    // Check Animal Prey Collision
     let eatenAnimalIdx = -1;
     for (let i = 0; i < this.animals.length; i++) {
       if (newHead.x === this.animals[i].x && newHead.y === this.animals[i].y) {
@@ -1132,7 +1124,6 @@ class NeonSnakeGame {
       }
     }
 
-    // Check Mega Beast Feast Collision
     let ateMega = false;
     if (this.megaFeast && newHead.x === this.megaFeast.x && newHead.y === this.megaFeast.y) {
       this.onEatMegaFeast();
@@ -1143,26 +1134,21 @@ class NeonSnakeGame {
       const animal = this.animals[eatenAnimalIdx];
       this.onEatAnimal(animal);
       this.animals.splice(eatenAnimalIdx, 1);
-      // Respawn a new animal immediately so prey is always active
       this.spawnAnimal();
     }
 
-    // Check if snake should grow or pop tail
     if (this.pendingGrowth > 0) {
       this.pendingGrowth--;
-      // Retain tail -> Snake grows longer!
     } else if (!ateMega && eatenAnimalIdx === -1) {
       this.snake.pop();
     }
 
-    // Periodically spawn Mega Feast
     const now = performance.now();
     if (!this.megaFeast && now >= this.nextMegaSpawn) {
       this.spawnMegaFeast();
       this.nextMegaSpawn = now + 24000;
     }
 
-    // Update Frightened State of Nearby Animals
     this.animals.forEach(a => {
       const dist = Math.hypot(a.x - newHead.x, a.y - newHead.y);
       a.frightened = dist <= 3.2;
@@ -1183,11 +1169,10 @@ class NeonSnakeGame {
     }
     this.lastEatTime = now;
 
-    // Fast Growth Boost!
     const growAmount = sp.grow * (this.isTitan ? 2 : 1);
     this.pendingGrowth += growAmount;
 
-    // Immediately push 1 extra segment for instantaneous visual snap
+    // Immediate tail elongation for responsive game feel
     const lastSeg = this.snake[this.snake.length - 1];
     this.snake.push({ x: lastSeg.x, y: lastSeg.y });
 
@@ -1210,28 +1195,24 @@ class NeonSnakeGame {
   }
 
   onEatMegaFeast() {
-    // HUGE GIANT GROWTH (+10 to +12 Length Instantly!)
     const megaGrow = 12;
     this.pendingGrowth += megaGrow;
 
-    // Instantly append 3 segments for dramatic immediate elongation
     const lastSeg = this.snake[this.snake.length - 1];
     for (let k = 0; k < 3; k++) this.snake.push({ x: lastSeg.x, y: lastSeg.y });
 
     this.score += 800 * this.combo;
     this.isTitan = true;
-    this.titanEndsAt = performance.now() + 10000; // 10s Titan Mode
+    this.titanEndsAt = performance.now() + 10000;
 
     audio.playMegaFeast();
     this.triggerScreenShake(12);
     this.triggerEatFX(this.megaFeast.x, this.megaFeast.y, '🔥 TITAN FEAST! +12 LENGTH!', '#f59e0b', 45);
 
-    // Display Titan Banner
     const banner = document.getElementById('titan-banner');
     banner.style.display = 'flex';
     setTimeout(() => { banner.style.display = 'none'; }, 2400);
 
-    // Show Active Powerup Bar
     const pwContainer = document.getElementById('active-powerup');
     document.getElementById('pw-name').textContent = '🔥 TITAN BEHEMOTH ACTIVE';
     pwContainer.style.display = 'flex';
@@ -1370,7 +1351,6 @@ class NeonSnakeGame {
       }
     }
 
-    // Titan Duration
     if (this.isTitan) {
       const rem = this.titanEndsAt - currentTime;
       if (rem <= 0) {
@@ -1382,7 +1362,6 @@ class NeonSnakeGame {
       }
     }
 
-    // Mega Feast Expiry
     if (this.megaFeast && currentTime >= this.megaFeast.expireAt) {
       this.megaFeast = null;
     }
@@ -1441,6 +1420,7 @@ class NeonSnakeGame {
     }
   }
 
+  // Draw Scene
   draw(alpha, time) {
     const ctx = this.ctx;
     const w = window.innerWidth;
@@ -1453,25 +1433,32 @@ class NeonSnakeGame {
       ctx.translate((Math.random() - 0.5) * this.screenShake, (Math.random() - 0.5) * this.screenShake);
     }
 
-    // 1. Arena Border with Dynamic Strict vs Free Warp styling
-    this.drawArena(ctx, time);
+    // 1. Draw Arena Background & Perimeter Frame
+    this.drawArenaFrame(ctx, time);
 
-    // 2. Animated Live Prey Animals
+    // 2. CRITICAL FIX: Clip all gameplay entities within the arena bounds!
+    // This guarantees NOTHING can EVER overflow or cover the UI!
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(this.arenaX, this.arenaY, this.arenaW, this.arenaH, 16);
+    ctx.clip();
+
+    // 3. Draw Prey Animals & Mega Feast
     this.drawAnimals(ctx, time);
-
-    // 3. Mega Beast Feast (+10 Growth)
     this.drawMegaFeast(ctx, time);
 
-    // 4. Snake Body & Expressive Face
+    // 4. Draw Snake with Slithering Spine & Seamless Wrap
     this.drawSnake(ctx, alpha, time);
 
-    // 5. Particles & Text Popups
+    // 5. Draw In-Arena Particle Bursts
     this.drawParticles(ctx);
 
-    ctx.restore();
+    ctx.restore(); // Restore from arena clip
+
+    ctx.restore(); // Restore from shake
   }
 
-  drawArena(ctx, time) {
+  drawArenaFrame(ctx, time) {
     const x = this.arenaX;
     const y = this.arenaY;
     const w = this.arenaW;
@@ -1479,7 +1466,8 @@ class NeonSnakeGame {
     const r = 16;
 
     ctx.save();
-    ctx.fillStyle = 'rgba(11, 16, 28, 0.78)';
+    // Arena Floor Glass
+    ctx.fillStyle = 'rgba(11, 17, 30, 0.88)';
     ctx.beginPath();
     ctx.roundRect(x, y, w, h, r);
     ctx.fill();
@@ -1500,10 +1488,10 @@ class NeonSnakeGame {
       ctx.stroke();
     }
 
-    // Border Styling based on Strict vs Free Warp Mode
+    // Border Frame
     if (this.strictMode) {
-      // ⚡ Deadly Laser Walls (Red electric pulse & hazard stripes)
-      const pulse = (Math.sin(time * 0.006) + 1) * 0.5;
+      // ⚡ Deadly Laser Walls
+      const pulse = (Math.sin(time * 0.007) + 1) * 0.5;
       ctx.strokeStyle = '#ef4444';
       ctx.lineWidth = 3.5;
       ctx.shadowColor = '#ef4444';
@@ -1512,12 +1500,11 @@ class NeonSnakeGame {
       ctx.roundRect(x, y, w, h, r);
       ctx.stroke();
 
-      // Corner Electric Warning Sparks
       ctx.fillStyle = '#fca5a5';
       ctx.font = 'bold 11px sans-serif';
       ctx.fillText('⚡ LASER HAZARD', x + 16, y - 6);
     } else {
-      // 🌀 Free Warp Walls (Soft Cyan/Emerald portal gates with pass-through indicator)
+      // 🌀 Free Warp Walls (Soft Cyan Portal Rings)
       const pulse = (Math.sin(time * 0.003) + 1) * 0.5;
       ctx.strokeStyle = this.theme.secondary;
       ctx.lineWidth = 2.5;
@@ -1527,16 +1514,14 @@ class NeonSnakeGame {
       ctx.roundRect(x, y, w, h, r);
       ctx.stroke();
 
-      // Soft Portal Arrows on edges
-      ctx.fillStyle = 'rgba(0, 240, 255, 0.35)';
+      ctx.fillStyle = 'rgba(0, 240, 255, 0.4)';
       ctx.font = '9px monospace';
-      ctx.fillText('◀ PASS WARP ▶', x + w / 2 - 38, y - 5);
-      ctx.fillText('◀ PASS WARP ▶', x + w / 2 - 38, y + h + 12);
+      ctx.fillText('◀ PORTAL PASS ▶', x + w / 2 - 44, y - 5);
+      ctx.fillText('◀ PORTAL PASS ▶', x + w / 2 - 44, y + h + 12);
     }
     ctx.restore();
   }
 
-  // Draw Cute Animated Prey Animals (Frogs, Mice, Bunnies, Chicks)
   drawAnimals(ctx, time) {
     const cs = this.cellSize;
 
@@ -1547,7 +1532,6 @@ class NeonSnakeGame {
       const py = this.arenaY + a.y * cs + cs / 2 + hop;
 
       ctx.save();
-      // Glowing aura circle under animal
       ctx.shadowColor = sp.color;
       ctx.shadowBlur = 12;
 
@@ -1556,13 +1540,11 @@ class NeonSnakeGame {
       ctx.arc(px, py + 2, cs * 0.42, 0, Math.PI * 2);
       ctx.fill();
 
-      // Crisp Cartoon Animal Emoji
       ctx.font = `${Math.round(cs * 0.95)}px sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(sp.emoji, px, py);
 
-      // Frightened Emotion Emote when Snake is close!
       if (a.frightened) {
         ctx.font = 'bold 11px sans-serif';
         ctx.fillStyle = '#ef4444';
@@ -1572,7 +1554,6 @@ class NeonSnakeGame {
     });
   }
 
-  // Draw Mega Beast Feast (+10 Length Golden Meat)
   drawMegaFeast(ctx, time) {
     if (!this.megaFeast) return;
     const cs = this.cellSize;
@@ -1584,90 +1565,184 @@ class NeonSnakeGame {
     ctx.shadowColor = '#f59e0b';
     ctx.shadowBlur = 22 + pulse * 14;
 
-    // Golden Sunburst Ring
     ctx.strokeStyle = '#f59e0b';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.arc(px, py, cs * 0.65 + pulse * 2, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Radiant Meat Graphic
     ctx.font = `${Math.round(cs * 1.15)}px sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('🥩', px, py);
 
-    // Floating Tag
     ctx.font = 'bold 10px sans-serif';
     ctx.fillStyle = '#fef08a';
-    ctx.fillText('+10', px, py - cs * 0.6);
+    ctx.fillText('+12', px, py - cs * 0.6);
     ctx.restore();
   }
 
+  // 100% Seamless Warp & Organic Serpentine Movement
   drawSnake(ctx, alpha, time) {
     const cs = this.cellSize;
     const len = this.snake.length;
     if (len === 0) return;
 
+    // 1. Calculate continuous wrap-aware interpolated segment points
     const points = [];
     for (let i = 0; i < len; i++) {
       const curr = this.snake[i];
       const prev = this.prevSnake[i] || curr;
 
-      let ix = prev.x + (curr.x - prev.x) * alpha;
-      let iy = prev.y + (curr.y - prev.y) * alpha;
+      let dx = curr.x - prev.x;
+      let dy = curr.y - prev.y;
+
+      // Handle wrap delta correctly so segments never fly backwards across the screen!
+      if (!this.strictMode) {
+        if (dx < -this.cols / 2) dx += this.cols;
+        else if (dx > this.cols / 2) dx -= this.cols;
+
+        if (dy < -this.rows / 2) dy += this.rows;
+        else if (dy > this.rows / 2) dy -= this.rows;
+      }
+
+      let ix = prev.x + dx * alpha;
+      let iy = prev.y + dy * alpha;
 
       if (!this.strictMode) {
-        if (Math.abs(curr.x - prev.x) > 1) ix = curr.x;
-        if (Math.abs(curr.y - prev.y) > 1) iy = curr.y;
+        ix = (ix + this.cols) % this.cols;
+        iy = (iy + this.rows) % this.rows;
+      }
+
+      // 2. Organic Serpentine Spine Undulation (Natural S-curve slithering wave)
+      let waveX = 0;
+      let waveY = 0;
+      if (i > 0 && i < len - 1) {
+        const nextSeg = this.snake[i + 1] || curr;
+        const segDx = curr.x - nextSeg.x;
+        const segDy = curr.y - nextSeg.y;
+        const headingLen = Math.hypot(segDx, segDy) || 1;
+        // Normal vector perpendicular to forward direction
+        const normX = -segDy / headingLen;
+        const normY = segDx / headingLen;
+        const wave = Math.sin(time * 0.012 + i * 0.5) * (cs * 0.14) * (1 - (i / len) * 0.35);
+        waveX = normX * wave;
+        waveY = normY * wave;
       }
 
       points.push({
-        x: this.arenaX + ix * cs + cs / 2,
-        y: this.arenaY + iy * cs + cs / 2
+        gridX: ix,
+        gridY: iy,
+        x: this.arenaX + ix * cs + cs / 2 + waveX,
+        y: this.arenaY + iy * cs + cs / 2 + waveY
       });
     }
 
-    // 1. Body Segments (Width swells dynamically during Titan Mode!)
-    ctx.save();
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.shadowColor = this.isTitan ? '#f59e0b' : this.theme.glow;
-    ctx.shadowBlur = this.isTitan ? 22 : 12;
-
     const titanMultiplier = this.isTitan ? 1.5 : 1.0;
+
+    // 3. Draw Body Connectors & Discs (Never draw connecting lines across wrap boundaries!)
+    ctx.save();
+    ctx.shadowColor = this.isTitan ? '#f59e0b' : this.theme.glow;
+    ctx.shadowBlur = this.isTitan ? 20 : 12;
 
     for (let i = len - 1; i > 0; i--) {
       const p1 = points[i];
       const p2 = points[i - 1];
       const prog = i / len;
-      const segWidth = cs * (0.78 - prog * 0.3) * titanMultiplier;
+      const segRadius = (cs * (0.42 - prog * 0.18)) * titanMultiplier;
 
-      ctx.beginPath();
-      ctx.moveTo(p1.x, p1.y);
-      ctx.lineTo(p2.x, p2.y);
-      ctx.lineWidth = segWidth;
+      // Check if p1 and p2 wrapped across the boundary
+      const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+      const isWrapped = dist > cs * 1.8;
 
-      if (this.isTitan) {
-        ctx.strokeStyle = i % 2 === 0 ? '#f59e0b' : '#ef4444';
+      if (!isWrapped) {
+        // Normal connecting capsule
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.lineWidth = segRadius * 2;
+        ctx.lineCap = 'round';
+        if (this.isTitan) {
+          ctx.strokeStyle = i % 2 === 0 ? '#f59e0b' : '#ef4444';
+        } else {
+          ctx.strokeStyle = i === 1 ? this.theme.headGrad[1] : (prog > 0.6 ? this.theme.tailColor : this.theme.accent);
+        }
+        ctx.stroke();
       } else {
-        ctx.strokeStyle = i === 1 ? this.theme.headGrad[1] : (prog > 0.6 ? this.theme.tailColor : this.theme.accent);
+        // Seamless portal wrap: Draw phantom stubs into the walls, NEVER across the screen!
+        let phantomP2X = p2.x;
+        let phantomP2Y = p2.y;
+        if (p2.x - p1.x > cs * 2) phantomP2X -= this.cols * cs;
+        else if (p1.x - p2.x > cs * 2) phantomP2X += this.cols * cs;
+        if (p2.y - p1.y > cs * 2) phantomP2Y -= this.rows * cs;
+        else if (p1.y - p2.y > cs * 2) phantomP2Y += this.rows * cs;
+
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(phantomP2X, phantomP2Y);
+        ctx.lineWidth = segRadius * 2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = this.theme.accent;
+        ctx.stroke();
+
+        let phantomP1X = p1.x;
+        let phantomP1Y = p1.y;
+        if (p1.x - p2.x > cs * 2) phantomP1X -= this.cols * cs;
+        else if (p2.x - p1.x > cs * 2) phantomP1X += this.cols * cs;
+        if (p1.y - p2.y > cs * 2) phantomP1Y -= this.rows * cs;
+        else if (p2.y - p1.y > cs * 2) phantomP1Y += this.rows * cs;
+
+        ctx.beginPath();
+        ctx.moveTo(p2.x, p2.y);
+        ctx.lineTo(phantomP1X, phantomP1Y);
+        ctx.lineWidth = segRadius * 2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = this.theme.accent;
+        ctx.stroke();
       }
-      ctx.stroke();
+
+      // Draw Individual Scales / Discs
+      ctx.beginPath();
+      ctx.arc(p1.x, p1.y, segRadius, 0, Math.PI * 2);
+      ctx.fillStyle = this.isTitan ? (i % 2 === 0 ? '#fbbf24' : '#ef4444') : (prog > 0.5 ? this.theme.tailColor : this.theme.accent);
+      ctx.fill();
+
+      // Shiny Inner Scale Core Highlight
+      ctx.beginPath();
+      ctx.arc(p1.x - segRadius * 0.25, p1.y - segRadius * 0.25, segRadius * 0.38, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.fill();
     }
     ctx.restore();
 
-    // 2. Snake Head with Expressive Eyes
+    // 4. Snake Head (Cobra Hood & Expressive Eyes)
     const head = points[0];
     const neck = points[1] || { x: head.x - this.dir.x * cs, y: head.y - this.dir.y * cs };
-    const headRadius = cs * 0.5 * titanMultiplier;
+    const headRadius = cs * 0.52 * titanMultiplier;
+
+    // Movement angle
+    let moveAngle = Math.atan2(head.y - neck.y, head.x - neck.x);
+    if (Math.hypot(head.x - neck.x, head.y - neck.y) > cs * 1.8) {
+      moveAngle = Math.atan2(this.dir.y, this.dir.x);
+    }
 
     ctx.save();
     ctx.shadowColor = this.isTitan ? '#f59e0b' : this.theme.glow;
     ctx.shadowBlur = this.isTitan ? 25 : 18;
 
-    // Glowing Head Capsule
-    const headGrad = ctx.createRadialGradient(head.x, head.y, 2, head.x, head.y, headRadius);
+    // Cobra Hood Shape
+    ctx.save();
+    ctx.translate(head.x, head.y);
+    ctx.rotate(moveAngle);
+
+    // Lateral Flared Hood
+    ctx.fillStyle = this.isTitan ? '#b91c1c' : this.theme.headGrad[1];
+    ctx.beginPath();
+    ctx.ellipse(-headRadius * 0.3, 0, headRadius * 0.65, headRadius * 1.15, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Main Crown Capsule
+    const headGrad = ctx.createRadialGradient(headRadius * 0.2, 0, 2, 0, 0, headRadius);
     if (this.isTitan) {
       headGrad.addColorStop(0, '#ffffff');
       headGrad.addColorStop(0.35, '#f59e0b');
@@ -1679,15 +1754,44 @@ class NeonSnakeGame {
     }
     ctx.fillStyle = headGrad;
     ctx.beginPath();
-    ctx.arc(head.x, head.y, headRadius, 0, Math.PI * 2);
+    ctx.arc(0, 0, headRadius, 0, Math.PI * 2);
     ctx.fill();
+
+    // Nostrils
+    ctx.fillStyle = '#0f172a';
+    ctx.beginPath();
+    ctx.arc(headRadius * 0.65, -headRadius * 0.22, headRadius * 0.1, 0, Math.PI * 2);
+    ctx.arc(headRadius * 0.65, headRadius * 0.22, headRadius * 0.1, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Animated Forked Tongue
+    if (this.state === 'playing' && Math.sin(time * 0.015) > 0.45) {
+      const tongueLen = headRadius * 1.0;
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 2.0;
+      ctx.beginPath();
+      ctx.moveTo(headRadius * 0.8, 0);
+      ctx.lineTo(headRadius * 0.8 + tongueLen, 0);
+      ctx.lineTo(headRadius * 0.8 + tongueLen + 5, -4);
+      ctx.moveTo(headRadius * 0.8 + tongueLen, 0);
+      ctx.lineTo(headRadius * 0.8 + tongueLen + 5, 4);
+      ctx.stroke();
+    }
     ctx.restore();
 
-    // Dynamic Eyes Looking At Closest Prey
-    const moveAngle = Math.atan2(head.y - neck.y, head.x - neck.x);
-    const eyeOffsetAngle = 0.55;
-    const eyeDist = headRadius * 0.65;
-    const eyeRadius = headRadius * 0.36;
+    // 5. Dynamic Eyes (Looking towards nearest prey)
+    let target = this.megaFeast;
+    if (!target && this.animals.length > 0) target = this.animals[0];
+    let angleToPrey = moveAngle;
+    if (target) {
+      const tpx = this.arenaX + target.x * cs + cs / 2;
+      const tpy = this.arenaY + target.y * cs + cs / 2;
+      angleToPrey = Math.atan2(tpy - head.y, tpx - head.x);
+    }
+
+    const eyeOffsetAngle = 0.58;
+    const eyeDist = headRadius * 0.68;
+    const eyeRadius = headRadius * 0.35;
 
     const eye1 = {
       x: head.x + Math.cos(moveAngle - eyeOffsetAngle) * eyeDist,
@@ -1697,16 +1801,6 @@ class NeonSnakeGame {
       x: head.x + Math.cos(moveAngle + eyeOffsetAngle) * eyeDist,
       y: head.y + Math.sin(moveAngle + eyeOffsetAngle) * eyeDist
     };
-
-    // Find closest animal or mega feast
-    let target = this.megaFeast;
-    if (!target && this.animals.length > 0) target = this.animals[0];
-    let angleToPrey = moveAngle;
-    if (target) {
-      const tpx = this.arenaX + target.x * cs + cs / 2;
-      const tpy = this.arenaY + target.y * cs + cs / 2;
-      angleToPrey = Math.atan2(tpy - head.y, tpx - head.x);
-    }
 
     [eye1, eye2].forEach(eye => {
       ctx.fillStyle = '#ffffff';
@@ -1724,13 +1818,13 @@ class NeonSnakeGame {
         ctx.lineTo(eye.x - 3, eye.y + 3);
         ctx.stroke();
       } else {
-        const pupilShift = eyeRadius * 0.45;
+        const pupilShift = eyeRadius * 0.44;
         const pupilX = eye.x + Math.cos(angleToPrey) * pupilShift;
         const pupilY = eye.y + Math.sin(angleToPrey) * pupilShift;
 
         ctx.fillStyle = '#0f172a';
         ctx.beginPath();
-        ctx.arc(pupilX, pupilY, eyeRadius * 0.56, 0, Math.PI * 2);
+        ctx.arc(pupilX, pupilY, eyeRadius * 0.58, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.fillStyle = '#ffffff';
@@ -1740,24 +1834,7 @@ class NeonSnakeGame {
       }
     });
 
-    // Flickering Forked Tongue
-    if (this.state === 'playing' && Math.sin(time * 0.015) > 0.55) {
-      const tongueLen = cs * 0.45;
-      const tx = head.x + Math.cos(moveAngle) * (headRadius + tongueLen);
-      const ty = head.y + Math.sin(moveAngle) * (headRadius + tongueLen);
-
-      ctx.save();
-      ctx.strokeStyle = '#ef4444';
-      ctx.lineWidth = 2.0;
-      ctx.beginPath();
-      ctx.moveTo(head.x + Math.cos(moveAngle) * headRadius, head.y + Math.sin(moveAngle) * headRadius);
-      ctx.lineTo(tx, ty);
-      ctx.lineTo(tx + Math.cos(moveAngle - 0.5) * 4.5, ty + Math.sin(moveAngle - 0.5) * 4.5);
-      ctx.moveTo(tx, ty);
-      ctx.lineTo(tx + Math.cos(moveAngle + 0.5) * 4.5, ty + Math.sin(moveAngle + 0.5) * 4.5);
-      ctx.stroke();
-      ctx.restore();
-    }
+    ctx.restore();
   }
 
   drawParticles(ctx) {
