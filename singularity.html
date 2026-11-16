@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>PROJECT SINGULARITY — Kerr Black Hole & Gravitational Lensing Simulator</title>
+<meta name="description" content="A real-time 3D General Relativity Kerr Black Hole simulator. Features gravitational lensing, relativistic Doppler beaming, accretion disk physics, matter spaghettification, time dilation engine, and LIGO gravitational wave sound synthesizer.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;600;700;800;900&family=Funnel+Display:wght@700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,600;700;800&display=swap" rel="stylesheet">
+<!-- Three.js for 3D WebGL Rendering -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  :root {
+    --gold: #f59e0b;
+    --gold-glow: rgba(245, 158, 11, 0.45);
+    --cyan: #00f0ff;
+    --cyan-glow: rgba(0, 240, 255, 0.45);
+    --violet: #a855f7;
+    --red-alert: #ef4444;
+    --bg-dark: #020206;
+    --panel-bg: rgba(6, 8, 18, 0.85);
+    --border-color: rgba(245, 158, 11, 0.28);
+    --font-mono: 'Geist Mono', monospace;
+    --font-display: 'Funnel Display', sans-serif;
+    --font-ui: 'Bricolage Grotesque', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: var(--bg-dark); color: #f1f5f9;
+    font-family: var(--font-mono); touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #webgl-canvas {
+    position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1;
+    display: block; outline: none;
+  }
+
+  /* Vignette & Relativistic Chromatic Aberration Overlay */
+  .vignette-overlay {
+    position: fixed; inset: 0; pointer-events: none; z-index: 5;
+    background: radial-gradient(circle at 50% 50%, transparent 45%, rgba(2, 2, 6, 0.85) 100%);
+  }
+
+  /* HUD UI Layer */
+  .hud-wrap {
+    position: fixed; inset: 0; pointer-events: none; z-index: 10;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 16px 20px;
+  }
+
+  .hud-interactive { pointer-events: auto; }
+
+  /* Top Navigation Bar */
+  .top-bar {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 12px; flex-wrap: wrap;
+  }
+
+  .title-card {
+    background: var(--panel-bg); backdrop-filter: blur(14px);
+    border: 1.5px solid var(--border-color); border-radius: 12px;
+    padding: 10px 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+  }
+  .tag-label {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.65rem; font-weight: 900; letter-spacing: 1.5px;
+    color: var(--gold); text-transform: uppercase; margin-bottom: 4px;
+  }
+  .tag-label .pulsing-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--gold);
+    box-shadow: 0 0 10px var(--gold); animation: pulseDot 1.4s infinite;
+  }
+  @keyframes pulseDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
+
+  .main-title {
+    font-family: var(--font-display); font-size: 1.4rem; font-weight: 900;
+    letter-spacing: 0.5px; color: #fff;
+  }
+  .main-title span { color: var(--gold); text-shadow: 0 0 16px var(--gold-glow); }
+  .subtitle { font-size: 0.68rem; color: #94a3b8; font-weight: 600; margin-top: 2px; }
+
+  /* Quick Actions Bar */
+  .header-actions {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  }
+  .btn-hud {
+    background: rgba(15, 23, 42, 0.75); border: 1.5px solid var(--border-color);
+    color: #e2e8f0; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 800;
+    padding: 8px 14px; border-radius: 8px; cursor: pointer;
+    backdrop-filter: blur(12px); transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+  }
+  .btn-hud:hover {
+    background: rgba(245, 158, 11, 0.18); border-color: var(--gold);
+    color: #fff; transform: translateY(-1px); box-shadow: 0 0 16px var(--gold-glow);
+  }
+  .btn-hud.active {
+    background: var(--gold); color: #000; font-weight: 900;
+    box-shadow: 0 0 20px var(--gold-glow);
+  }
+  .btn-hud.btn-chirp {
+    border-color: var(--cyan); color: var(--cyan);
+    background: rgba(0, 240, 255, 0.12);
+  }
+  .btn-hud.btn-chirp:hover {
+    background: var(--cyan); color: #000; box-shadow: 0 0 20px var(--cyan-glow);
+  }
+
+  /* Center Ingestion Flash */
+  #matter-flash {
+    position: fixed; inset: 0; pointer-events: none; z-index: 8;
+    background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.5), transparent 70%);
+    opacity: 0; transition: opacity 0.5s ease-out;
+  }
+
+  /* Mid Sidebar: Relativistic Time Dilation & Metric Engine */
+  .center-row {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 16px; margin: auto 0;
+  }
+
+  .telemetry-card {
+    background: var(--panel-bg); backdrop-filter: blur(14px);
+    border: 1.5px solid var(--border-color); border-radius: 12px;
+    padding: 12px 16px; width: 290px; box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+    display: flex; flex-direction: column; gap: 10px; font-size: 0.72rem;
+  }
+  .card-header {
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.2); padding-bottom: 6px;
+    font-weight: 800; color: var(--gold); letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  .stat-row { display: flex; justify-content: space-between; align-items: center; }
+  .stat-label { color: #94a3b8; }
+  .stat-value { font-weight: 800; color: #fff; }
+  .stat-value.gold { color: var(--gold); text-shadow: 0 0 10px var(--gold-glow); }
+  .stat-value.cyan { color: var(--cyan); text-shadow: 0 0 10px var(--cyan-glow); }
+
+  /* Time Dilation Clocks */
+  .clock-box {
+    background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px;
+  }
+  .clock-title { font-size: 0.62rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; }
+  .clock-digits { font-family: var(--font-display); font-size: 1.15rem; font-weight: 900; letter-spacing: 0.5px; }
+
+  /* Sliders & Controls */
+  .slider-control { display: flex; flex-direction: column; gap: 4px; }
+  .slider-header { display: flex; justify-content: space-between; font-size: 0.65rem; font-weight: 700; color: #cbd5e1; }
+  .slider-header span { color: var(--gold); }
+  input[type=range] {
+    -webkit-appearance: none; width: 100%; height: 5px; border-radius: 3px;
+    background: rgba(255, 255, 255, 0.15); outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 15px; height: 15px; border-radius: 50%;
+    background: var(--gold); box-shadow: 0 0 10px var(--gold-glow); cursor: pointer;
+  }
+
+  /* Matter Injector Bar (Bottom) */
+  .bottom-dock {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: 16px; flex-wrap: wrap;
+  }
+
+  .matter-injector-panel {
+    background: var(--panel-bg); backdrop-filter: blur(14px);
+    border: 1.5px solid var(--border-color); border-radius: 12px;
+    padding: 10px 14px; display: flex; gap: 10px; align-items: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.7); flex-wrap: wrap;
+  }
+  .injector-title {
+    font-size: 0.68rem; font-weight: 900; color: var(--gold);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .btn-matter {
+    background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-color);
+    color: #fff; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 800;
+    padding: 6px 12px; border-radius: 8px; cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .btn-matter:hover {
+    background: var(--gold); color: #000; transform: scale(1.04);
+    box-shadow: 0 0 16px var(--gold-glow);
+  }
+
+  .camera-modes-bar {
+    display: flex; gap: 6px; background: var(--panel-bg); backdrop-filter: blur(14px);
+    border: 1.5px solid var(--border-color); border-radius: 12px; padding: 6px;
+  }
+  .btn-cam {
+    background: transparent; border: none; color: #94a3b8;
+    font-family: var(--font-mono); font-size: 0.68rem; font-weight: 800;
+    padding: 6px 10px; border-radius: 6px; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-cam:hover { color: #fff; }
+  .btn-cam.active { background: var(--border-color); color: #fff; font-weight: 900; }
+
+  /* Drag Orbit Instruction Hint */
+  .orbit-hint {
+    font-size: 0.65rem; color: #64748b; font-style: italic;
+    background: rgba(0,0,0,0.5); padding: 4px 10px; border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  @media (max-width: 900px) {
+    .center-row { flex-direction: column; }
+    .telemetry-card { width: 100%; max-width: 340px; }
+    .bottom-dock { flex-direction: column; align-items: stretch; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- 3D WebGL Canvas -->
+  <canvas id="webgl-canvas"></canvas>
+
+  <!-- Vignette Filter -->
+  <div class="vignette-overlay"></div>
+
+  <!-- Gravitational Shockwave / Ingestion Burst Flash -->
+  <div id="matter-flash"></div>
+
+  <!-- HUD Interface Layer -->
+  <div class="hud-wrap">
+    <!-- Top Command Header -->
+    <header class="top-bar hud-interactive">
+      <div class="title-card">
+        <div class="tag-label">
+          <span class="pulsing-dot"></span>
+          GENERAL RELATIVITY // ASTROPHYSICS ENGINE
+        </div>
+        <div class="main-title">PROJECT <span>SINGULARITY</span></div>
+        <div class="subtitle">Kerr Metric Black Hole & Einstein Gravitational Lensing (3D)</div>
+      </div>
+
+      <div class="header-actions">
+        <button id="btn-ligo-chirp" class="btn-hud btn-chirp">🔊 TRIGGER LIGO CHIRP</button>
+        <button id="btn-theme-color" class="btn-hud">🎨 SPECTRUM</button>
+        <button id="btn-audio-toggle" class="btn-hud">🔊 AUDIO: ON</button>
+        <button id="btn-fullscreen" class="btn-hud">⛶ FULLSCREEN</button>
+        <a href="index.html" class="btn-hud">🏠 EXIT</a>
+      </div>
+    </header>
+
+    <!-- Center Telemetry & Relativistic Clocks -->
+    <div class="center-row">
+      <!-- Left Card: Einstein Metric & Geometry -->
+      <section class="telemetry-card hud-interactive">
+        <div class="card-header">
+          <span>SPACETIME METRIC</span>
+          <span>KERR GEOMETRY</span>
+        </div>
+
+        <div class="slider-control">
+          <div class="slider-header">
+            <span>BLACK HOLE MASS</span>
+            <span id="val-mass">4.10M M☉</span>
+          </div>
+          <input type="range" id="slider-mass" min="10" max="1000" value="410">
+        </div>
+
+        <div class="slider-control">
+          <div class="slider-header">
+            <span>SPIN PARAMETER (a*)</span>
+            <span id="val-spin">0.94 c</span>
+          </div>
+          <input type="range" id="slider-spin" min="0" max="99" value="94">
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-label">Event Horizon (Rs):</span>
+          <span class="stat-value gold" id="val-rs">12.11 × 10⁶ km</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Photon Sphere (Rph):</span>
+          <span class="stat-value cyan" id="val-rph">18.16 × 10⁶ km</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">ISCO Orbital Limit:</span>
+          <span class="stat-value" id="val-isco">2.04 Rs</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Doppler Beaming Shift:</span>
+          <span class="stat-value gold">z = -0.42 / +1.18</span>
+        </div>
+      </section>
+
+      <!-- Right Card: Relativistic Time Dilation Engine -->
+      <section class="telemetry-card hud-interactive">
+        <div class="card-header">
+          <span>TIME DILATION ENGINE</span>
+          <span>Δt = Δt₀ / √(1 - Rs/r)</span>
+        </div>
+
+        <div class="slider-control">
+          <div class="slider-header">
+            <span>ORBIT DISTANCE (r)</span>
+            <span id="val-dist">1.65 Rs (Miller Orbit)</span>
+          </div>
+          <input type="range" id="slider-dist" min="105" max="1000" value="165">
+        </div>
+
+        <div class="clock-box">
+          <div class="clock-title">🚀 Local Ship Clock (Observer):</div>
+          <div class="clock-digits" style="color: var(--cyan);" id="ship-clock">00:00:00.000</div>
+        </div>
+
+        <div class="clock-box">
+          <div class="clock-title">🌍 Earth Station Coordinate Clock:</div>
+          <div class="clock-digits" style="color: var(--gold);" id="earth-clock">+000 YRS : 000 D</div>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-label">Dilation Factor (Lorentz):</span>
+          <span class="stat-value gold" id="val-dilation">1 sec = 61.4 hours</span>
+        </div>
+      </section>
+    </div>
+
+    <!-- Bottom Dock: Matter Injector & Camera Angles -->
+    <footer class="bottom-dock hud-interactive">
+      <!-- Matter Injector Controls -->
+      <div class="matter-injector-panel">
+        <div class="injector-title">⚡ INJECT CELESTIAL MATTER (SPAGHETTIFY):</div>
+        <button class="btn-matter" id="btn-inject-star">🌟 MAIN SEQUENCE STAR</button>
+        <button class="btn-matter" id="btn-inject-neutron">⚡ NEUTRON MAGNETAR</button>
+        <button class="btn-matter" id="btn-inject-asteroid">🪨 IRON ASTEROID</button>
+      </div>
+
+      <!-- Camera Preset Angles -->
+      <div class="camera-modes-bar">
+        <button class="btn-cam active" data-cam="orbit">ORBIT</button>
+        <button class="btn-cam" data-cam="polar">POLAR JET</button>
+        <button class="btn-cam" data-cam="equator">EQUATOR</button>
+        <button class="btn-cam" data-cam="zoom">EVENT HORIZON</button>
+      </div>
+
+      <div class="orbit-hint">🖱️ DRAG TO ROTATE ACCRETION DISK // SCROLL TO ZOOM</div>
+    </footer>
+  </div>
+
+<script>
+/**
+ * PROJECT SINGULARITY — 3D General Relativity Kerr Black Hole
+ * Gravitational Lensing, Doppler Beaming, Spaghettification, Time Dilation & LIGO Audio
+ */
+
+// 1. Procedural Gravitational Audio Synthesizer (Infrasound, Accretion Roar, LIGO Chirp)
+class SingularityAudioEngine {
+  constructor() {
+    this.ctx = null;
+    this.masterGain = null;
+    this.limiter = null;
+    this.infrasoundGain = null;
+    this.accretionGain = null;
+    this.enabled = true;
+  }
+
+  init() {
+    if (this.ctx) {
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      return;
+    }
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    this.ctx = new AudioCtx();
+
+    // Limiter to prevent clipping
+    this.limiter = this.ctx.createDynamicsCompressor();
+    this.limiter.threshold.setValueAtTime(-3, this.ctx.currentTime);
+    this.limiter.knee.setValueAtTime(6, this.ctx.currentTime);
+    this.limiter.ratio.setValueAtTime(12, this.ctx.currentTime);
+    this.limiter.connect(this.ctx.destination);
+
+    this.masterGain = this.ctx.createGain();
+    this.masterGain.gain.setValueAtTime(0.8, this.ctx.currentTime);
+    this.masterGain.connect(this.limiter);
+
+    this.startSpacetimeDrone();
+    this.startAccretionTurbulence();
+  }
+
+  // Deep Sub-Audible Spacetime Fabric Hum (32Hz Sine)
+  startSpacetimeDrone() {
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(32.7, this.ctx.currentTime); // C1 sub-bass
+
+    this.infrasoundGain = gain;
+    gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+
+    osc.connect(gain);
+    gain.connect(this.masterGain);
+    osc.start();
+  }
+
+  // Plasma Accretion Wind Noise
+  startAccretionTurbulence() {
+    const bufferSize = this.ctx.sampleRate * 2;
+    const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+
+    const whiteNoise = this.ctx.createBufferSource();
+    whiteNoise.buffer = noiseBuffer;
+    whiteNoise.loop = true;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(180, this.ctx.currentTime);
+
+    this.accretionGain = this.ctx.createGain();
+    this.accretionGain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+
+    whiteNoise.connect(filter);
+    filter.connect(this.accretionGain);
+    this.accretionGain.connect(this.masterGain);
+    whiteNoise.start();
+  }
+
+  // LIGO Gravitational Wave Chirp: f(t) = f0 * (1 - t/tc)^(-3/8)
+  playLigoChirp() {
+    if (!this.enabled || !this.ctx) return;
+    const t = this.ctx.currentTime;
+    const duration = 1.35;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    // Frequency ramps up exponentially from 38 Hz to 240 Hz (Iconic LIGO signal)
+    osc.frequency.setValueAtTime(38, t);
+    osc.frequency.exponentialRampToValueAtTime(245, t + duration * 0.88);
+    osc.frequency.linearRampToValueAtTime(180, t + duration); // Ringdown drop
+
+    // Amplitude grows and peaks before ringdown
+    gain.gain.setValueAtTime(0.01, t);
+    gain.gain.linearRampToValueAtTime(0.65, t + duration * 0.88);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+    osc.connect(gain);
+    gain.connect(this.masterGain);
+
+    osc.start(t);
+    osc.stop(t + duration + 0.05);
+
+    // Deep Sub-Impact Rumble on Merger Ringdown
+    const subOsc = this.ctx.createOscillator();
+    const subGain = this.ctx.createGain();
+    subOsc.type = 'triangle';
+    subOsc.frequency.setValueAtTime(60, t + duration * 0.88);
+    subOsc.frequency.exponentialRampToValueAtTime(28, t + duration + 0.6);
+    subGain.gain.setValueAtTime(0.7, t + duration * 0.88);
+    subGain.gain.exponentialRampToValueAtTime(0.001, t + duration + 0.65);
+    subOsc.connect(subGain);
+    subGain.connect(this.masterGain);
+    subOsc.start(t + duration * 0.88);
+    subOsc.stop(t + duration + 0.7);
+  }
+
+  // Tidal Disruption & Matter Ingestion Explosion
+  playSpaghettifyBurst() {
+    if (!this.enabled || !this.ctx) return;
+    const t = this.ctx.currentTime;
+
+    // High energy Synchrotron flare
+    const synOsc = this.ctx.createOscillator();
+    const synGain = this.ctx.createGain();
+    synOsc.type = 'sawtooth';
+    synOsc.frequency.setValueAtTime(800, t);
+    synOsc.frequency.exponentialRampToValueAtTime(80, t + 0.45);
+    synGain.gain.setValueAtTime(0.4, t);
+    synGain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+    synOsc.connect(synGain);
+    synGain.connect(this.masterGain);
+    synOsc.start(t);
+    synOsc.stop(t + 0.52);
+
+    // Sub-Bass Horizon Swallowing Thud
+    const bassOsc = this.ctx.createOscillator();
+    const bassGain = this.ctx.createGain();
+    bassOsc.type = 'sine';
+    bassOsc.frequency.setValueAtTime(140, t);
+    bassOsc.frequency.exponentialRampToValueAtTime(34, t + 0.8);
+    bassGain.gain.setValueAtTime(0.85, t);
+    bassGain.gain.exponentialRampToValueAtTime(0.001, t + 0.85);
+    bassOsc.connect(bassGain);
+    bassGain.connect(this.masterGain);
+    bassOsc.start(t);
+    bassOsc.stop(t + 0.9);
+  }
+
+  toggle() {
+    this.enabled = !this.enabled;
+    if (this.masterGain && this.ctx) {
+      this.masterGain.gain.setValueAtTime(this.enabled ? 0.8 : 0.0, this.ctx.currentTime);
+    }
+    return this.enabled;
+  }
+}
+
+const audio = new SingularityAudioEngine();
+
+// 2. Color Spectrums
+const COLOR_SPECTRUMS = [
+  { name: 'Gargantua Gold', inner: 0xffffff, mid: 0xf59e0b, outer: 0x92400e, jet: 0x00f0ff },
+  { name: 'Cherenkov Blue', inner: 0xffffff, mid: 0x00f0ff, outer: 0x1e3a8a, jet: 0xa855f7 },
+  { name: 'Quantum Violet', inner: 0xffffff, mid: 0xd946ef, outer: 0x4c1d95, jet: 0x38bdf8 },
+  { name: 'Blood Singularity', inner: 0xffffff, mid: 0xef4444, outer: 0x450a0a, jet: 0xf59e0b }
+];
+
+// 3. Main 3D Black Hole Simulator Engine
+class BlackHoleSimulator {
+  constructor() {
+    this.canvas = document.getElementById('webgl-canvas');
+    this.spectrumIdx = 0;
+    this.cameraMode = 'orbit';
+
+    // Physics parameters
+    this.massFactor = 4.10; // Millions of solar masses
+    this.spinA = 0.94; // Kerr spin parameter a*
+    this.orbitRadiusRatio = 1.65; // in units of Rs
+
+    // Active falling debris ribbons
+    this.spaghettifiedRibbons = [];
+
+    // Clocks
+    this.shipElapsedMs = 0;
+    this.earthYears = 0;
+    this.lastTime = performance.now();
+
+    this.initThree();
+    this.initSpacetimeObjects();
+    this.bindEvents();
+    this.animate();
+  }
+
+  initThree() {
+    this.renderer = new THREE.WebGLRenderer({
+      canvas: this.canvas,
+      antialias: true,
+      powerPreference: 'high-performance'
+    });
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+    this.scene = new THREE.Scene();
+
+    this.camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.1, 2000);
+    this.camera.position.set(0, 18, 56);
+    this.camera.lookAt(0, 0, 0);
+
+    // Mouse Drag Orbit
+    this.isDragging = false;
+    this.prevMouseX = 0;
+    this.prevMouseY = 0;
+    this.sphericalAngles = { theta: 0.35, phi: 1.25, radius: 58 };
+  }
+
+  initSpacetimeObjects() {
+    // 1. Event Horizon Black Sphere (Absolute Dark Core)
+    const rs = 6.0;
+    this.rs = rs;
+    const horizonGeo = new THREE.SphereGeometry(rs, 64, 64);
+    const horizonMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    this.horizonMesh = new THREE.Mesh(horizonGeo, horizonMat);
+    this.scene.add(this.horizonMesh);
+
+    // 2. Gravitational Photon Ring & Einstein Lensing Halo (Secondary Image of Accretion Disk)
+    // Custom Shader simulating light rays bending around the photon sphere (1.5 Rs)
+    const haloGeo = new THREE.RingGeometry(rs * 1.02, rs * 2.2, 128);
+    this.haloMat = new THREE.ShaderMaterial({
+      uniforms: {
+        time: { value: 0 },
+        innerRadius: { value: rs * 1.02 },
+        outerRadius: { value: rs * 2.2 },
+        colorMid: { value: new THREE.Color(COLOR_SPECTRUMS[0].mid) },
+        colorOuter: { value: new THREE.Color(COLOR_SPECTRUMS[0].outer) }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        varying vec3 vPos;
+        void main() {
+          vUv = uv;
+          vPos = position;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float time;
+        uniform float innerRadius;
+        uniform float outerRadius;
+        uniform vec3 colorMid;
+        uniform vec3 colorOuter;
+        varying vec2 vUv;
+        varying vec3 vPos;
+
+        void main() {
+          float dist = length(vPos.xy);
+          float norm = (dist - innerRadius) / (outerRadius - innerRadius);
+          if (norm < 0.0 || norm > 1.0) discard;
+
+          // Einstein ring intensity peaks sharply near photon sphere
+          float ringIntensity = pow(1.0 - norm, 2.5) * 1.8;
+          // Relativistic Doppler beaming across horizontal axis
+          float doppler = 1.0 + 0.65 * (-vPos.x / outerRadius);
+
+          vec3 col = mix(colorMid * 1.4, colorOuter, norm) * ringIntensity * doppler;
+          gl_FragColor = vec4(col, clamp(ringIntensity * doppler, 0.0, 1.0));
+        }
+      `,
+      side: THREE.DoubleSide,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    this.lensedHalo = new THREE.Mesh(haloGeo, this.haloMat);
+    this.scene.add(this.lensedHalo);
+
+    // 3. Primary Equatorial Accretion Disk (Rotates with Relativistic Beaming)
+    const diskInner = rs * 1.8;
+    const diskOuter = rs * 5.4;
+    const diskGeo = new THREE.RingGeometry(diskInner, diskOuter, 128);
+    this.diskMat = new THREE.ShaderMaterial({
+      uniforms: {
+        time: { value: 0 },
+        innerR: { value: diskInner },
+        outerR: { value: diskOuter },
+        colorInner: { value: new THREE.Color(COLOR_SPECTRUMS[0].inner) },
+        colorMid: { value: new THREE.Color(COLOR_SPECTRUMS[0].mid) },
+        colorOuter: { value: new THREE.Color(COLOR_SPECTRUMS[0].outer) }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        varying vec3 vWorldPos;
+        void main() {
+          vUv = uv;
+          vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
+          gl_Position = projectionMatrix * viewMatrix * vec4(vWorldPos, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float time;
+        uniform float innerR;
+        uniform float outerR;
+        uniform vec3 colorInner;
+        uniform vec3 colorMid;
+        uniform vec3 colorOuter;
+        varying vec2 vUv;
+        varying vec3 vWorldPos;
+
+        // Procedural noise for plasma swirling arms
+        float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+
+        void main() {
+          float r = length(vWorldPos.xz);
+          float norm = (r - innerR) / (outerR - innerR);
+          if (norm < 0.0 || norm > 1.0) discard;
+
+          // Keplerian velocity profile: v ~ 1 / sqrt(r)
+          float angle = atan(vWorldPos.z, vWorldPos.x);
+          float speed = 1.6 / sqrt(max(norm, 0.05));
+          float spiral = angle * 4.0 - time * speed;
+
+          float turbulence = sin(spiral) * 0.25 + sin(angle * 12.0 + time * speed * 2.0) * 0.15;
+          float density = smoothstep(0.0, 0.2, norm) * smoothstep(1.0, 0.75, norm) * (0.8 + turbulence);
+
+          // Relativistic Doppler Beaming: Left side moves toward observer, highly amplified & blueshifted
+          // (1 + beta * cos(theta))^4
+          float beta = 0.55 * (1.0 - norm * 0.5); // Near light-speed at inner edge
+          float beaming = pow(1.0 + beta * (-vWorldPos.x / outerR), 3.5);
+
+          vec3 color = mix(colorInner, colorMid, norm * 0.6);
+          color = mix(color, colorOuter, smoothstep(0.4, 1.0, norm)) * beaming * density * 1.5;
+
+          gl_FragColor = vec4(color, clamp(density * beaming, 0.0, 1.0));
+        }
+      `,
+      side: THREE.DoubleSide,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    this.accretionDisk = new THREE.Mesh(diskGeo, this.diskMat);
+    this.accretionDisk.rotation.x = Math.PI / 2;
+    this.scene.add(this.accretionDisk);
+
+    // 4. Relativistic Polar Magnetic Plasma Jets
+    this.initPolarJets();
+
+    // 5. Background Deep Celestial Starfield with Gravitational Bending
+    this.initStarfield();
+  }
+
+  initPolarJets() {
+    this.jetGroup = new THREE.Group();
+    const particleCount = 1800;
+    const geo = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const velocities = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+
+    const jetColor = new THREE.Color(COLOR_SPECTRUMS[0].jet);
+
+    for (let i = 0; i < particleCount; i++) {
+      const isNorth = Math.random() > 0.5;
+      const y = (isNorth ? 1 : -1) * (this.rs + Math.random() * 45);
+      const spread = (Math.abs(y) / 45) * 4.5;
+      const angle = Math.random() * Math.PI * 2;
+      const r = Math.random() * spread;
+
+      positions[i * 3] = Math.cos(angle) * r;
+      positions[i * 3 + 1] = y;
+      positions[i * 3 + 2] = Math.sin(angle) * r;
+
+      velocities[i * 3] = (Math.random() - 0.5) * 0.2;
+      velocities[i * 3 + 1] = (isNorth ? 1 : -1) * (0.8 + Math.random() * 1.2);
+      velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.2;
+
+      const alpha = 1.0 - (Math.abs(y) / 50);
+      colors[i * 3] = jetColor.r * alpha;
+      colors[i * 3 + 1] = jetColor.g * alpha;
+      colors[i * 3 + 2] = jetColor.b * alpha;
+    }
+
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const mat = new THREE.PointsMaterial({
+      size: 1.2,
+      vertexColors: true,
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      depthWrite: false
+    });
+
+    this.jetParticles = new THREE.Points(geo, mat);
+    this.jetVelocities = velocities;
+    this.jetGroup.add(this.jetParticles);
+    this.scene.add(this.jetGroup);
+  }
+
+  initStarfield() {
+    const starCount = 3500;
+    const geo = new THREE.BufferGeometry();
+    const pos = new Float32Array(starCount * 3);
+    const cols = new Float32Array(starCount * 3);
+
+    for (let i = 0; i < starCount; i++) {
+      const u = Math.random();
+      const v = Math.random();
+      const theta = u * 2.0 * Math.PI;
+      const phi = Math.acos(2.0 * v - 1.0);
+      const r = 400 + Math.random() * 400;
+
+      pos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      pos[i * 3 + 2] = r * Math.cos(phi);
+
+      const colorVariance = Math.random();
+      if (colorVariance > 0.8) {
+        cols[i * 3] = 0.7; cols[i * 3 + 1] = 0.85; cols[i * 3 + 2] = 1.0; // Blue star
+      } else if (colorVariance > 0.6) {
+        cols[i * 3] = 1.0; cols[i * 3 + 1] = 0.8; cols[i * 3 + 2] = 0.4; // Amber star
+      } else {
+        cols[i * 3] = 0.9; cols[i * 3 + 1] = 0.9; cols[i * 3 + 2] = 0.95; // White
+      }
+    }
+
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+
+    const mat = new THREE.PointsMaterial({
+      size: 1.8,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.85
+    });
+
+    this.starfield = new THREE.Points(geo, mat);
+    this.scene.add(this.starfield);
+  }
+
+  // Interactive Celestial Matter Ingestion (Spaghettification)
+  injectMatter(type) {
+    audio.init();
+    audio.playSpaghettifyBurst();
+
+    const flash = document.getElementById('matter-flash');
+    flash.style.opacity = '0.65';
+    setTimeout(() => { flash.style.opacity = '0'; }, 350);
+
+    let colorHex = 0xf59e0b;
+    let particleCount = 260;
+    if (type === 'neutron') colorHex = 0x00f0ff;
+    if (type === 'asteroid') colorHex = 0xe2e8f0;
+
+    const geo = new THREE.BufferGeometry();
+    const pos = new Float32Array(particleCount * 3);
+    const cols = new Float32Array(particleCount * 3);
+    const threeCol = new THREE.Color(colorHex);
+
+    const angle = Math.random() * Math.PI * 2;
+    const startR = this.rs * (3.8 + Math.random() * 1.5);
+    const particles = [];
+
+    for (let i = 0; i < particleCount; i++) {
+      const spread = (i / particleCount) * 5.0;
+      const r = startR + spread;
+      const th = angle + (i * 0.025);
+      const y = (Math.random() - 0.5) * 1.2;
+
+      pos[i * 3] = Math.cos(th) * r;
+      pos[i * 3 + 1] = y;
+      pos[i * 3 + 2] = Math.sin(th) * r;
+
+      cols[i * 3] = threeCol.r;
+      cols[i * 3 + 1] = threeCol.g;
+      cols[i * 3 + 2] = threeCol.b;
+
+      particles.push({
+        r: r,
+        th: th,
+        y: y,
+        speed: 0.04 + (i * 0.0003),
+        alive: true
+      });
+    }
+
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+
+    const mat = new THREE.PointsMaterial({
+      size: 2.2,
+      vertexColors: true,
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      depthWrite: false
+    });
+
+    const mesh = new THREE.Points(geo, mat);
+    this.scene.add(mesh);
+
+    this.spaghettifiedRibbons.push({
+      mesh: mesh,
+      particles: particles
+    });
+  }
+
+  cycleSpectrum() {
+    this.spectrumIdx = (this.spectrumIdx + 1) % COLOR_SPECTRUMS.length;
+    const spec = COLOR_SPECTRUMS[this.spectrumIdx];
+
+    this.haloMat.uniforms.colorMid.value.setHex(spec.mid);
+    this.haloMat.uniforms.colorOuter.value.setHex(spec.outer);
+
+    this.diskMat.uniforms.colorInner.value.setHex(spec.inner);
+    this.diskMat.uniforms.colorMid.value.setHex(spec.mid);
+    this.diskMat.uniforms.colorOuter.value.setHex(spec.outer);
+
+    document.documentElement.style.setProperty('--gold', '#' + spec.mid.toString(16).padStart(6, '0'));
+  }
+
+  setCameraMode(mode) {
+    this.cameraMode = mode;
+    document.querySelectorAll('.btn-cam').forEach(b => b.classList.toggle('active', b.dataset.cam === mode));
+
+    if (mode === 'orbit') {
+      this.sphericalAngles = { theta: 0.35, phi: 1.25, radius: 58 };
+    } else if (mode === 'polar') {
+      this.sphericalAngles = { theta: 0.05, phi: 0.1, radius: 62 };
+    } else if (mode === 'equator') {
+      this.sphericalAngles = { theta: 0.0, phi: Math.PI / 2, radius: 46 };
+    } else if (mode === 'zoom') {
+      this.sphericalAngles = { theta: 0.25, phi: 1.2, radius: this.rs * 2.8 };
+    }
+  }
+
+  bindEvents() {
+    window.addEventListener('resize', () => {
+      this.camera.aspect = window.innerWidth / window.innerHeight;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Mouse / Touch Drag Orbit
+    window.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('.hud-interactive')) return;
+      this.isDragging = true;
+      this.prevMouseX = e.clientX;
+      this.prevMouseY = e.clientY;
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!this.isDragging) return;
+      const dx = e.clientX - this.prevMouseX;
+      const dy = e.clientY - this.prevMouseY;
+      this.prevMouseX = e.clientX;
+      this.prevMouseY = e.clientY;
+
+      this.sphericalAngles.theta -= dx * 0.006;
+      this.sphericalAngles.phi = Math.max(0.05, Math.min(Math.PI - 0.05, this.sphericalAngles.phi - dy * 0.006));
+    });
+
+    window.addEventListener('pointerup', () => { this.isDragging = false; });
+    window.addEventListener('pointercancel', () => { this.isDragging = false; });
+
+    // Wheel Zoom
+    window.addEventListener('wheel', (e) => {
+      this.sphericalAngles.radius = Math.max(this.rs * 1.5, Math.min(180, this.sphericalAngles.radius + e.deltaY * 0.05));
+    }, { passive: true });
+
+    // HUD Sliders
+    const sliderMass = document.getElementById('slider-mass');
+    sliderMass.addEventListener('input', (e) => {
+      this.massFactor = parseFloat(e.target.value) / 100;
+      document.getElementById('val-mass').textContent = `${this.massFactor.toFixed(2)}M M☉`;
+      this.updateMetrics();
+    });
+
+    const sliderSpin = document.getElementById('slider-spin');
+    sliderSpin.addEventListener('input', (e) => {
+      this.spinA = parseFloat(e.target.value) / 100;
+      document.getElementById('val-spin').textContent = `${this.spinA.toFixed(2)} c`;
+      this.updateMetrics();
+    });
+
+    const sliderDist = document.getElementById('slider-dist');
+    sliderDist.addEventListener('input', (e) => {
+      this.orbitRadiusRatio = parseFloat(e.target.value) / 100;
+      document.getElementById('val-dist').textContent = `${this.orbitRadiusRatio.toFixed(2)} Rs`;
+      this.updateMetrics();
+    });
+
+    // Action Buttons
+    document.getElementById('btn-ligo-chirp').addEventListener('click', () => {
+      audio.init();
+      audio.playLigoChirp();
+    });
+
+    document.getElementById('btn-theme-color').addEventListener('click', () => {
+      this.cycleSpectrum();
+    });
+
+    document.getElementById('btn-audio-toggle').addEventListener('click', () => {
+      audio.init();
+      const on = audio.toggle();
+      document.getElementById('btn-audio-toggle').textContent = on ? '🔊 AUDIO: ON' : '🔇 AUDIO: OFF';
+    });
+
+    document.getElementById('btn-fullscreen').addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    // Matter Ingestion Buttons
+    document.getElementById('btn-inject-star').addEventListener('click', () => this.injectMatter('star'));
+    document.getElementById('btn-inject-neutron').addEventListener('click', () => this.injectMatter('neutron'));
+    document.getElementById('btn-inject-asteroid').addEventListener('click', () => this.injectMatter('asteroid'));
+
+    // Camera Mode Buttons
+    document.querySelectorAll('.btn-cam').forEach(btn => {
+      btn.addEventListener('click', () => this.setCameraMode(btn.dataset.cam));
+    });
+  }
+
+  updateMetrics() {
+    // Rs = 2GM / c^2 = 2.95 km per solar mass
+    const rsKm = this.massFactor * 2.953;
+    document.getElementById('val-rs').textContent = `${rsKm.toFixed(2)} × 10⁶ km`;
+
+    // Photon sphere radius for Kerr: depends on spin
+    const rphKm = rsKm * (1.5 - this.spinA * 0.25);
+    document.getElementById('val-rph').textContent = `${rphKm.toFixed(2)} × 10⁶ km`;
+
+    // ISCO calculation
+    const isco = (3.0 - this.spinA * 1.8).toFixed(2);
+    document.getElementById('val-isco').textContent = `${isco} Rs`;
+
+    // Time dilation factor: 1 / sqrt(1 - Rs/r)
+    const factor = 1.0 / Math.sqrt(Math.max(0.001, 1.0 - 1.0 / this.orbitRadiusRatio));
+    if (factor > 2000) {
+      document.getElementById('val-dilation').textContent = `1 sec = ∞ (FROZEN AT HORIZON)`;
+    } else if (factor > 100) {
+      document.getElementById('val-dilation').textContent = `1 sec = ${(factor / 60).toFixed(1)} days`;
+    } else {
+      document.getElementById('val-dilation').textContent = `1 sec = ${(factor * 2.4).toFixed(1)} hours`;
+    }
+  }
+
+  animate() {
+    requestAnimationFrame(() => this.animate());
+
+    const now = performance.now();
+    const dt = (now - this.lastTime) * 0.001;
+    this.lastTime = now;
+
+    // 1. Relativistic Clocks
+    this.shipElapsedMs += dt * 1000;
+    const sDate = new Date(this.shipElapsedMs);
+    document.getElementById('ship-clock').textContent =
+      `${String(sDate.getUTCMinutes()).padStart(2,'0')}:${String(sDate.getUTCSeconds()).padStart(2,'0')}.${String(Math.floor(sDate.getUTCMilliseconds() / 10)).padStart(2,'0')}`;
+
+    // Earth time runs ahead proportionally to gravitational dilation factor
+    const dilationRatio = 1.0 / Math.sqrt(Math.max(0.001, 1.0 - 1.0 / this.orbitRadiusRatio));
+    this.earthYears += dt * (dilationRatio * 0.85);
+    const yrs = Math.floor(this.earthYears);
+    const days = Math.floor((this.earthYears - yrs) * 365.25);
+    document.getElementById('earth-clock').textContent = `+${String(yrs).padStart(3,'0')} YRS : ${String(days).padStart(3,'0')} D`;
+
+    // 2. Camera Spherical Orbit
+    if (this.cameraMode === 'orbit' && !this.isDragging) {
+      this.sphericalAngles.theta += 0.0015; // Gentle majestic orbit
+    }
+
+    const sa = this.sphericalAngles;
+    this.camera.position.x = sa.radius * Math.sin(sa.phi) * Math.sin(sa.theta);
+    this.camera.position.y = sa.radius * Math.cos(sa.phi);
+    this.camera.position.z = sa.radius * Math.sin(sa.phi) * Math.cos(sa.theta);
+    this.camera.lookAt(0, 0, 0);
+
+    // 3. Accretion Disk & Einstein Lensing Shader Time Updates
+    const timeSec = now * 0.001;
+    this.haloMat.uniforms.time.value = timeSec;
+    this.diskMat.uniforms.time.value = timeSec;
+
+    // Lensed halo tracks camera so it always wraps behind event horizon
+    this.lensedHalo.lookAt(this.camera.position);
+
+    // 4. Update Polar Jets
+    const pos = this.jetParticles.geometry.attributes.position.array;
+    const count = pos.length / 3;
+    for (let i = 0; i < count; i++) {
+      pos[i * 3 + 1] += this.jetVelocities[i * 3 + 1];
+      // Reset if particle moves too far
+      if (Math.abs(pos[i * 3 + 1]) > 52) {
+        const isNorth = pos[i * 3 + 1] > 0;
+        pos[i * 3 + 1] = (isNorth ? 1 : -1) * (this.rs + Math.random() * 2);
+      }
+    }
+    this.jetParticles.geometry.attributes.position.needsUpdate = true;
+
+    // 5. Update and render Spaghettified Matter Ribbons
+    for (let rIdx = this.spaghettifiedRibbons.length - 1; rIdx >= 0; rIdx--) {
+      const ribbon = this.spaghettifiedRibbons[rIdx];
+      const pos = ribbon.mesh.geometry.attributes.position.array;
+      let aliveCount = 0;
+
+      for (let i = 0; i < ribbon.particles.length; i++) {
+        const p = ribbon.particles[i];
+        if (p.r > this.rs * 1.05) {
+          aliveCount++;
+          // Faster spiral as it nears event horizon (Keplerian tidal acceleration)
+          const accel = Math.pow(this.rs / p.r, 1.8);
+          p.th += p.speed * accel * 1.2;
+          p.r -= dt * (12.0 * accel);
+
+          pos[i * 3] = Math.cos(p.th) * p.r;
+          pos[i * 3 + 1] = p.y * (p.r / this.rs); // Tidal vertical flattening
+          pos[i * 3 + 2] = Math.sin(p.th) * p.r;
+        } else {
+          // Swallowed by event horizon: hide point inside center
+          pos[i * 3] = 0;
+          pos[i * 3 + 1] = 0;
+          pos[i * 3 + 2] = 0;
+        }
+      }
+
+      ribbon.mesh.geometry.attributes.position.needsUpdate = true;
+
+      if (aliveCount === 0) {
+        this.scene.remove(ribbon.mesh);
+        ribbon.mesh.geometry.dispose();
+        ribbon.mesh.material.dispose();
+        this.spaghettifiedRibbons.splice(rIdx, 1);
+      }
+    }
+
+    // 6. Slow cosmic starfield rotation
+    if (this.starfield) {
+      this.starfield.rotation.y += 0.0002;
+    }
+
+    this.renderer.render(this.scene, this.camera);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  new BlackHoleSimulator();
+});
+</script>
+</body>
+</html>

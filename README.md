@@ -6,7 +6,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 
 ---
 
-## 🎮 The 17 Experiments
+## 🎮 The 18 Experiments
 
 | # | Experiment | Technology | Highlights |
 |---|---|---|---|
@@ -27,6 +27,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 | **15** | [**Cyber Drift 3D: Tokyo Midnight**](drift.html) | Three.js WebGL, 60 FPS Vehicle Physics, Procedural Audio | Professional 3D Grand Prix racer with Armco steel guardrails, real rubber tire skidmarks, independent suspension body roll & dive, modified Super Booster hypercar (380+ km/h), radial speed streaks, circuit radar, and competitive AI rivals. |
 | **16** | [**Neon Snake Pulse**](snake.html) | Canvas 2D, 60fps Sub-tick Interpolation, Web Audio | Ultra-smooth cyber arcade snake game featuring live animated prey animals (frogs, mice, bunnies, chicks) for rapid growth, mega titan beast feasts (+12 length & swollen body width), strict laser walls vs free warp-around mode, sub-tick 60fps interpolation, dynamic tracking eyes, and procedural Web Audio synthesizers. |
 | **17** | [**Project A.E.T.H.E.R. (Alien Signal Deck)**](alien.html) | Three.js WebGL, Canvas FFT Spectrogram, Web Audio Synthesizer | Deep-space alien radio interceptor & elite cyber hacking command deck. Features 1.420 GHz Hydrogen line waterfall spectrogram, 3D celestial triangulation radar, interactive Any-Key hacker terminal, and 7-tone harmonic extraterrestrial synthesizer (Jadoo / Koi Mil Gaya style). |
+| **18** | [**Project Singularity (3D Black Hole)**](singularity.html) | Three.js WebGL, Custom GLSL Shaders, Procedural Web Audio | General Relativity Kerr Black Hole & Gravitational Lensing simulator. Features real-time Einstein photon ring bending, relativistic Doppler beaming, accretion disk plasma physics, celestial matter spaghettification, gravitational time dilation clocks (Ship vs Earth), and LIGO gravitational wave chirp synthesizer. |
 
 ---
 
@@ -120,11 +121,31 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
   - Pressing keyboard keys `1-7` or clicking on-screen nodes plays pure resonant sine waveforms with glowing radial acoustic ripple animations.
   - **"TRANSMIT JADOO SEQUENCE" Button**: Plays the authentic multi-octave harmonic sequence (*Sa Re Ga Ma Pa Dha Ni Sa* alien contact motif) accompanied by a screen-wide hyper-flash warp wave.
   - **Alien Glyph De-Obfuscator**: Cycles random encrypted alien symbols through continuous UTF-8 matrix decoding to decipher incoming extraterrestrial transmissions into plain English.
-- **Procedural Cosmic Audio Engine**:
-  - Real-time synthesized cosmic microwave background radiation hiss, dual-tone radar telemetry pings, alien harmonic resonance, and mechanical keystroke clacks using pure browser Web Audio API (zero external sound files).
+- **High-Gain Procedural Cosmic Audio & Defense Overdrive Engine**:
+  - Studio dynamics limiter compressor preventing clipping while pushing volume to maximum headroom.
+  - **Bass 300% Overdrive**: Low-shelf equalizer injecting +16dB at 80Hz, turning physical keystrokes into armor-piercing mechanical impacts with heavy 40Hz sub-bass thuds.
+  - **Continuous Ominous Sub-Bass Drone**: Detuned 39.5Hz and 40.2Hz oscillators producing a menacing deep-space starship engine rumble.
+  - **DEFCON 1 Red Alert Mode**: Dual-sawtooth alternating nuclear klaxon siren ($540\text{ Hz} \leftrightarrow 960\text{ Hz}$), screen earthquake tremors, full-screen emergency flash strobe banner, and robotic voice broadcasts via Web Speech API.
+  - **Geiger Ionization Sensor**: Stochastic radiation tick bursts that accelerate under high threat levels.
 - **Hacker Command Center UX**:
   - 4 switchable HUD themes: **Cyan Matrix**, **Jadoo Emerald**, **Solar Amber**, and **Red Alert**.
   - CRT scanlines, phosphor glow bloom, dynamic HUD clock, and 1-click full-screen immersion.
+
+### 10. General Relativity & Kerr Gravitational Singularity (`singularity.html`)
+- **Einstein Gravitational Lensing & Photon Ring (Custom GLSL)**:
+  - Custom vertex and fragment shaders calculating curved light paths around the photon sphere ($r = 1.5 R_s$).
+  - Produces the signature double Einstein ring halo that wraps over and under the black hole shadow, accurately mimicking Kip Thorne's astrophysical calculations for *Interstellar*.
+- **Relativistic Doppler Beaming**:
+  - The approaching side of the rotating plasma accretion disk is boosted and blueshifted by relativistic factor $(1 + \beta \cos\theta)^4$, creating an authentic asymmetric brightness profile.
+- **Interactive Matter Spaghettification**:
+  - Inject celestial objects (Main Sequence Stars, Neutron Magnetars, Iron Asteroids) into eccentric orbits.
+  - Tidal forces ($F_{\text{tidal}} \propto \frac{2GM \Delta r}{r^3}$) violently pull the mass into an elongated luminous ribbon before it crosses the event horizon with an explosive X-ray burst.
+- **Relativistic Time Dilation Engine**:
+  - Dual synchronized clocks calculate the exact General Relativity time discrepancy:
+    $$\Delta t_{\text{observer}} = \frac{\Delta t_{\text{local}}}{\sqrt{1 - \frac{2GM}{rc^2}}}$$
+  - Dynamic readout comparing Local Ship Time vs Earth Station Coordinate Time based on the ship's orbital radius.
+- **Procedural LIGO Gravitational Wave Synthesizer**:
+  - Generates the authentic Nobel Prize-winning gravitational chirp waveform ($f(t) \propto (t_c - t)^{-3/8}$) rising from 38 Hz to 240 Hz with ringdown dampening, paired with 32 Hz spacetime fabric infrasound and plasma wind turbulence.
 
 ---
 
