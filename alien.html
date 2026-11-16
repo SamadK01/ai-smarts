@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>PROJECT A.E.T.H.E.R. — Deep Space Alien Signal Interceptor & Cyber Command</title>
+<meta name="description" content="A military-grade deep space radio signal interceptor, alien frequency synthesizer, and live cyber hacking terminal. Features real-time FFT spectrograms, 3D celestial radar, binary matrix de-obfuscator, and procedural Web Audio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;600;700;800;900&family=Funnel+Display:wght@700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,600;700;800&display=swap" rel="stylesheet">
+<!-- Three.js for 3D Celestial Hologram -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  :root {
+    --theme-color: #00f0ff;
+    --theme-glow: rgba(0, 240, 255, 0.45);
+    --theme-dim: rgba(0, 240, 255, 0.12);
+    --theme-border: rgba(0, 240, 255, 0.35);
+    --bg-dark: #040810;
+    --panel-bg: rgba(6, 12, 24, 0.88);
+    --red-alert: #ef4444;
+    --gold: #f59e0b;
+    --font-mono: 'Geist Mono', monospace;
+    --font-display: 'Funnel Display', sans-serif;
+    --font-ui: 'Bricolage Grotesque', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: var(--bg-dark); color: #e2e8f0;
+    font-family: var(--font-mono); touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* CRT Scanline & Phosphor Overlay */
+  .crt-overlay {
+    position: fixed; inset: 0; pointer-events: none; z-index: 999;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%),
+                radial-gradient(circle at 50% 50%, transparent 65%, rgba(0, 0, 0, 0.75) 100%);
+    background-size: 100% 3px, 100% 100%;
+    opacity: 0.65;
+  }
+
+  /* Full App Container */
+  .deck-wrap {
+    display: flex; flex-direction: column; width: 100vw; height: 100vh;
+    padding: 10px 14px 12px; gap: 10px; position: relative; z-index: 10;
+  }
+
+  /* Top Command Header */
+  .deck-header {
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--panel-bg); backdrop-filter: blur(14px);
+    border: 1.5px solid var(--theme-border); border-radius: 12px;
+    padding: 8px 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    flex-wrap: wrap; gap: 8px;
+  }
+
+  .title-group {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .classification-tag {
+    background: rgba(239, 68, 68, 0.18); border: 1.5px solid var(--red-alert);
+    color: var(--red-alert); font-size: 0.68rem; font-weight: 900;
+    padding: 3px 10px; border-radius: 6px; letter-spacing: 1px;
+    animation: flashAlert 2.5s infinite;
+  }
+  @keyframes flashAlert {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+
+  .deck-title {
+    font-family: var(--font-display); font-size: 1.35rem; font-weight: 900;
+    color: #fff; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px;
+  }
+  .deck-title span {
+    color: var(--theme-color); text-shadow: 0 0 14px var(--theme-glow);
+  }
+
+  /* Live Telemetry Pills */
+  .telemetry-row {
+    display: flex; gap: 14px; align-items: center; font-size: 0.74rem; font-weight: 700;
+  }
+  .tel-item { display: flex; align-items: center; gap: 5px; color: #94a3b8; }
+  .tel-item span { color: #fff; }
+  .tel-item.active span { color: var(--theme-color); text-shadow: 0 0 8px var(--theme-glow); }
+
+  /* Header Actions */
+  .header-actions {
+    display: flex; gap: 6px; align-items: center;
+  }
+  .btn-cmd {
+    background: rgba(255, 255, 255, 0.05); border: 1.5px solid var(--theme-border);
+    color: #fff; padding: 6px 12px; border-radius: 8px;
+    font-family: var(--font-mono); font-size: 0.74rem; font-weight: 800;
+    cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex; align-items: center; gap: 5px; text-decoration: none;
+  }
+  .btn-cmd:hover {
+    background: var(--theme-dim); border-color: var(--theme-color);
+    color: var(--theme-color); transform: translateY(-1px);
+    box-shadow: 0 0 14px var(--theme-glow);
+  }
+  .btn-cmd.btn-transmit {
+    border-color: var(--red-alert); color: #fff;
+    background: rgba(239, 68, 68, 0.18);
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.35);
+  }
+  .btn-cmd.btn-transmit:hover {
+    background: var(--red-alert); color: #000;
+  }
+
+  /* 4-Quadrant Main Grid */
+  .deck-grid {
+    flex: 1; display: grid; grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr; gap: 10px; min-height: 0;
+  }
+
+  /* Panel Base Style */
+  .deck-panel {
+    background: var(--panel-bg); backdrop-filter: blur(14px);
+    border: 1.5px solid var(--theme-border); border-radius: 12px;
+    display: flex; flex-direction: column; overflow: hidden;
+    position: relative; box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  }
+  .panel-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 14px; background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--theme-border); font-size: 0.72rem; font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+  .panel-title {
+    display: flex; align-items: center; gap: 8px; color: var(--theme-color);
+    text-shadow: 0 0 10px var(--theme-glow); text-transform: uppercase;
+  }
+  .panel-status {
+    color: #64748b; font-size: 0.65rem; display: flex; align-items: center; gap: 5px;
+  }
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--theme-color);
+    box-shadow: 0 0 8px var(--theme-color); animation: dotPulse 1.2s infinite;
+  }
+  @keyframes dotPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .panel-body {
+    flex: 1; position: relative; overflow: hidden; display: flex; flex-direction: column;
+  }
+
+  /* QUADRANT 1: Radio Frequency Spectrogram & Oscilloscope */
+  #spectrogram-canvas {
+    width: 100%; height: 100%; display: block;
+  }
+  .spectro-hud {
+    position: absolute; bottom: 8px; left: 12px; right: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(4, 8, 16, 0.75); padding: 5px 12px; border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.68rem;
+  }
+  .carrier-tag { color: #f59e0b; font-weight: 900; }
+
+  /* QUADRANT 2: 3D Celestial Hologram & Radar Triangulation */
+  #celestial-container {
+    width: 100%; height: 100%; position: relative;
+  }
+  .radar-sweep-ring {
+    position: absolute; inset: 0; pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .target-select-bar {
+    position: absolute; top: 10px; left: 12px; right: 12px;
+    display: flex; gap: 6px; z-index: 5; flex-wrap: wrap;
+  }
+  .btn-target {
+    background: rgba(4, 8, 16, 0.75); border: 1px solid var(--theme-border);
+    color: #94a3b8; font-size: 0.65rem; font-weight: 800; padding: 4px 8px;
+    border-radius: 6px; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-target:hover { color: #fff; border-color: var(--theme-color); }
+  .btn-target.active {
+    background: var(--theme-dim); border-color: var(--theme-color);
+    color: var(--theme-color); box-shadow: 0 0 10px var(--theme-glow);
+  }
+
+  .target-info-card {
+    position: absolute; bottom: 10px; left: 12px;
+    background: rgba(4, 8, 16, 0.85); border: 1px solid var(--theme-border);
+    border-radius: 8px; padding: 8px 12px; font-size: 0.68rem;
+    pointer-events: none; z-index: 5; display: flex; flex-direction: column; gap: 2px;
+  }
+  .target-name { color: var(--theme-color); font-weight: 900; font-size: 0.76rem; }
+
+  /* QUADRANT 3: Live Hacker Shell & Memory Injector */
+  #terminal-log {
+    flex: 1; padding: 10px 14px; font-size: 0.74rem; line-height: 1.45;
+    overflow-y: auto; color: #cbd5e1; user-select: text; -webkit-user-select: text;
+    background: rgba(2, 5, 12, 0.65);
+  }
+  #terminal-log::-webkit-scrollbar { width: 5px; }
+  #terminal-log::-webkit-scrollbar-thumb { background: var(--theme-border); border-radius: 3px; }
+
+  .term-line { margin-bottom: 2px; word-break: break-all; }
+  .term-line.cyan { color: var(--theme-color); }
+  .term-line.gold { color: #f59e0b; }
+  .term-line.green { color: #10b981; }
+  .term-line.red { color: #ef4444; font-weight: 800; }
+  .term-line.glow { text-shadow: 0 0 8px currentColor; }
+
+  .terminal-input-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 12px; background: rgba(0, 0, 0, 0.45);
+    border-top: 1px solid var(--theme-border); font-size: 0.74rem;
+  }
+  .input-prompt { color: var(--theme-color); font-weight: 900; }
+  #term-input {
+    flex: 1; background: transparent; border: none; outline: none;
+    color: #fff; font-family: var(--font-mono); font-size: 0.74rem; font-weight: 700;
+  }
+  .type-hint {
+    font-size: 0.65rem; color: #64748b; font-style: italic;
+  }
+
+  /* QUADRANT 4: Extraterrestrial Message Decryptor & 7-Tone Synthesizer */
+  .alien-decrypt-wrap {
+    flex: 1; display: flex; flex-direction: column; padding: 10px 14px; gap: 10px;
+    background: rgba(2, 5, 12, 0.65);
+  }
+
+  .decoded-message-box {
+    background: rgba(0, 240, 255, 0.05); border: 1.5px solid var(--theme-border);
+    border-radius: 8px; padding: 10px 14px; min-height: 70px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .dec-header {
+    display: flex; justify-content: space-between; font-size: 0.65rem; font-weight: 800;
+    color: #94a3b8; text-transform: uppercase;
+  }
+  #decoded-text {
+    font-family: var(--font-display); font-size: 1.05rem; font-weight: 800;
+    color: #fff; line-height: 1.35; letter-spacing: 0.5px;
+    text-shadow: 0 0 10px var(--theme-glow);
+  }
+
+  /* 7-Tone Extraterrestrial Synthesizer Keys (Jadoo / Close Encounters) */
+  .alien-keys-label {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.68rem; font-weight: 800; color: #94a3b8;
+  }
+  .alien-synth-board {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;
+  }
+  .synth-key {
+    background: rgba(255, 255, 255, 0.05); border: 1.5px solid var(--theme-border);
+    border-radius: 8px; height: 56px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 2px;
+    cursor: pointer; transition: all 0.12s; touch-action: none;
+  }
+  .synth-key:hover {
+    background: var(--theme-dim); border-color: var(--theme-color);
+    transform: translateY(-2px); box-shadow: 0 0 14px var(--theme-glow);
+  }
+  .synth-key:active, .synth-key.active {
+    background: var(--theme-color); color: #000; border-color: #fff;
+    transform: scale(0.94); box-shadow: 0 0 22px var(--theme-color);
+  }
+  .key-freq { font-size: 0.62rem; font-weight: 700; color: #94a3b8; }
+  .synth-key:active .key-freq, .synth-key.active .key-freq { color: #000; }
+  .key-note { font-family: var(--font-display); font-size: 1rem; font-weight: 900; }
+
+  /* Fullscreen Shockwave Flash */
+  #shockwave-flash {
+    position: fixed; inset: 0; pointer-events: none; z-index: 500;
+    background: #00f0ff; opacity: 0; transition: opacity 0.4s ease-out;
+  }
+
+  @media (max-width: 960px) {
+    .deck-grid { grid-template-columns: 1fr; grid-template-rows: auto; overflow-y: auto; }
+    .deck-panel { min-height: 260px; }
+    .deck-wrap { height: auto; min-height: 100vh; overflow-y: auto; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Retro CRT Scanline & Phosphor Overlay -->
+  <div class="crt-overlay"></div>
+
+  <!-- Fullscreen Flash on Deep Space Uplink -->
+  <div id="shockwave-flash"></div>
+
+  <!-- Main Cyber Deck Wrapper -->
+  <div class="deck-wrap">
+    <!-- Top Command Console -->
+    <header class="deck-header">
+      <div class="title-group">
+        <div class="classification-tag">CLASSIFIED // E.T. INTERCEPT</div>
+        <div class="deck-title">
+          PROJECT <span>A.E.T.H.E.R.</span> // DEEP SPACE COMMAND
+        </div>
+      </div>
+
+      <div class="telemetry-row">
+        <div class="tel-item active">● VLA ARRAY: <span>DISH 07 LOCK</span></div>
+        <div class="tel-item">FREQ: <span>1.420405 GHz (H-LINE)</span></div>
+        <div class="tel-item">SNR: <span>+44.8 dB</span></div>
+        <div class="tel-item" id="utc-clock">UTC: <span>00:00:00.000</span></div>
+      </div>
+
+      <div class="header-actions">
+        <button id="btn-transmit-seq" class="btn-cmd btn-transmit">📡 TRANSMIT JADOO SEQUENCE</button>
+        <button id="btn-theme-cycle" class="btn-cmd">🎨 THEME</button>
+        <button id="btn-audio-toggle" class="btn-cmd">🔊 AUDIO: ON</button>
+        <button id="btn-fullscreen" class="btn-cmd">⛶ FULLSCREEN</button>
+        <a href="index.html" class="btn-cmd">🏠 EXIT</a>
+      </div>
+    </header>
+
+    <!-- 4-Quadrant Command Grid -->
+    <main class="deck-grid">
+      <!-- QUADRANT 1: Radio Spectrum Waterfall & Multi-Harmonic Oscilloscope -->
+      <section class="deck-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>📡 RADIO SPECTROGRAM & WATERFALL (1.420 GHz WATER HOLE)</span>
+          </div>
+          <div class="panel-status">
+            <span class="status-dot"></span>
+            <span>CARRIER DETECTED</span>
+          </div>
+        </div>
+        <div class="panel-body">
+          <canvas id="spectrogram-canvas"></canvas>
+          <div class="spectro-hud">
+            <div>CENTRAL FREQ: <b>1,420,405,751 Hz</b></div>
+            <div>DOPPLER SHIFT: <span class="carrier-tag">-14.2 kHz</span></div>
+            <div>MODULATION: <b>PHASE RESIDUAL (NON-RANDOM)</b></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- QUADRANT 2: 3D Holographic Celestial Starmap & Radar Sweep -->
+      <section class="deck-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>🌌 CELESTIAL TARGET TRIANGULATION RADAR</span>
+          </div>
+          <div class="panel-status">
+            <span class="status-dot"></span>
+            <span>COORDINATE LOCK</span>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="target-select-bar">
+            <button class="btn-target active" data-target="kepler">KEPLER-452b</button>
+            <button class="btn-target" data-target="proxima">PROXIMA b</button>
+            <button class="btn-target" data-target="trappist">TRAPPIST-1e</button>
+            <button class="btn-target" data-target="oumuamua">'OUMUAMUA</button>
+            <button class="btn-target" data-target="wow">WOW! ORIGIN</button>
+          </div>
+          <div id="celestial-container"></div>
+          <div class="target-info-card">
+            <div class="target-name" id="tgt-name">TARGET: KEPLER-452b ("EARTH 2.0")</div>
+            <div id="tgt-coords">RA 19h 44m 00s | Dec +44° 16′ 39″ | Dist: 1,402 ly</div>
+            <div id="tgt-status" style="color:var(--gold);">STATUS: HARMONIC INTERSTELLAR BEACON ACTIVE</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- QUADRANT 3: Live Hacker Terminal & Interactive Exploit Shell -->
+      <section class="deck-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>💻 EXPLOIT INJECTOR & QUANTUM KERNEL INTERCEPT</span>
+          </div>
+          <div class="panel-status">
+            <span>TYPE ON KEYBOARD TO HACK</span>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div id="terminal-log"></div>
+          <div class="terminal-input-bar">
+            <span class="input-prompt">root@aether-sat:~#</span>
+            <input type="text" id="term-input" placeholder="Type ANY keys on keyboard to inject code..." readonly>
+            <span class="type-hint">⌨️ ACTIVE HACKER MODE</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- QUADRANT 4: Decoded Extraterrestrial Transmission & Jadoo Synthesizer -->
+      <section class="deck-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>👽 ALIEN TRANSMISSION DE-OBFUSCATOR & HARMONIC TRANSCEIVER</span>
+          </div>
+          <div class="panel-status">
+            <span class="status-dot"></span>
+            <span>DECRYPTION 100%</span>
+          </div>
+        </div>
+        <div class="panel-body alien-decrypt-wrap">
+          <div class="decoded-message-box">
+            <div class="dec-header">
+              <span>DECODED EXTRATERRESTRIAL COMMUNIQUÉ</span>
+              <span id="dec-prime-tag">UNIVERSAL PRIME CARRIER</span>
+            </div>
+            <div id="decoded-text">
+              INITIALIZING DEEP SPACE NEURAL DEMODULATION...
+            </div>
+          </div>
+
+          <!-- Jadoo 7-Tone Harmonic Synthesizer Board -->
+          <div class="alien-keys-label">
+            <span>EXTRATERRESTRIAL CONTACT HARMONICS (7 RESONANCE FREQUENCIES):</span>
+            <span style="color:var(--theme-color);">PRESS 1–7 OR CLICK KEYS</span>
+          </div>
+          <div class="alien-synth-board" id="synth-board">
+            <div class="synth-key" data-note="0" data-freq="261.63">
+              <span class="key-note">C4</span>
+              <span class="key-freq">261 Hz</span>
+            </div>
+            <div class="synth-key" data-note="1" data-freq="293.66">
+              <span class="key-note">D4</span>
+              <span class="key-freq">294 Hz</span>
+            </div>
+            <div class="synth-key" data-note="2" data-freq="329.63">
+              <span class="key-note">E4</span>
+              <span class="key-freq">330 Hz</span>
+            </div>
+            <div class="synth-key" data-note="3" data-freq="349.23">
+              <span class="key-note">F4</span>
+              <span class="key-freq">349 Hz</span>
+            </div>
+            <div class="synth-key" data-note="4" data-freq="392.00">
+              <span class="key-note">G4</span>
+              <span class="key-freq">392 Hz</span>
+            </div>
+            <div class="synth-key" data-note="5" data-freq="440.00">
+              <span class="key-note">A4</span>
+              <span class="key-freq">440 Hz</span>
+            </div>
+            <div class="synth-key" data-note="6" data-freq="523.25">
+              <span class="key-note">C5</span>
+              <span class="key-freq">523 Hz</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+<script>
+/**
+ * PROJECT A.E.T.H.E.R. — Deep Space Alien Signal Interceptor & Cyber Command
+ * Multi-Harmonic Spectrogram, 3D Celestial Hologram, Interactive Hacker Shell,
+ * Extraterrestrial 7-Tone Synthesizer (Koi Mil Gaya / Jadoo style), Web Audio
+ */
+
+// 1. Procedural Web Audio Engine (Extraterrestrial Tones & Cosmic Ambience)
+class CosmicAudioEngine {
+  constructor() {
+    this.ctx = null;
+    this.masterGain = null;
+    this.cosmicHissGain = null;
+    this.enabled = true;
+    this.scale = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 523.25];
+  }
+
+  init() {
+    if (this.ctx) {
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      return;
+    }
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    this.ctx = new AudioCtx();
+
+    this.masterGain = this.ctx.createGain();
+    this.masterGain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+    this.masterGain.connect(this.ctx.destination);
+
+    // Cosmic background radiation hiss
+    this.startCosmicHiss();
+  }
+
+  startCosmicHiss() {
+    const bufferSize = this.ctx.sampleRate * 2;
+    const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+
+    const whiteNoise = this.ctx.createBufferSource();
+    whiteNoise.buffer = noiseBuffer;
+    whiteNoise.loop = true;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 1420;
+    filter.Q.value = 4.5;
+
+    this.cosmicHissGain = this.ctx.createGain();
+    this.cosmicHissGain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+
+    whiteNoise.connect(filter);
+    filter.connect(this.cosmicHissGain);
+    this.cosmicHissGain.connect(this.masterGain);
+    whiteNoise.start();
+  }
+
+  // Play Pure Resonant Alien Tone (Jadoo / Koi Mil Gaya Synthesizer)
+  playAlienTone(freq, duration = 0.55) {
+    if (!this.enabled || !this.ctx) return;
+    const t = this.ctx.currentTime;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const subOsc = this.ctx.createOscillator();
+    const subGain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, t);
+    gain.gain.setValueAtTime(0.3, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+    // Sub-harmonic undertone
+    subOsc.type = 'triangle';
+    subOsc.frequency.setValueAtTime(freq * 0.5, t);
+    subGain.gain.setValueAtTime(0.15, t);
+    subGain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+    osc.connect(gain);
+    subOsc.connect(subGain);
+    gain.connect(this.masterGain);
+    subGain.connect(this.masterGain);
+
+    osc.start(t);
+    subOsc.start(t);
+    osc.stop(t + duration + 0.05);
+    subOsc.stop(t + duration + 0.05);
+  }
+
+  // Mechanical Terminal Keystroke Click
+  playKeyClack() {
+    if (!this.enabled || !this.ctx) return;
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(1400 + Math.random() * 400, t);
+    osc.frequency.exponentialRampToValueAtTime(200, t + 0.03);
+
+    gain.gain.setValueAtTime(0.12, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.035);
+
+    osc.connect(gain);
+    gain.connect(this.masterGain);
+    osc.start(t);
+    osc.stop(t + 0.04);
+  }
+
+  // Telemetry Radar Ping
+  playRadarPing() {
+    if (!this.enabled || !this.ctx) return;
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1864, t);
+    gain.gain.setValueAtTime(0.15, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+
+    osc.connect(gain);
+    gain.connect(this.masterGain);
+    osc.start(t);
+    osc.stop(t + 0.36);
+  }
+
+  // Red Alert Klaxon
+  playRedAlert() {
+    if (!this.enabled || !this.ctx) return;
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(680, t);
+    osc.frequency.linearRampToValueAtTime(880, t + 0.25);
+    osc.frequency.linearRampToValueAtTime(680, t + 0.5);
+
+    gain.gain.setValueAtTime(0.25, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+
+    osc.connect(gain);
+    gain.connect(this.masterGain);
+    osc.start(t);
+    osc.stop(t + 0.56);
+  }
+
+  toggle() {
+    this.enabled = !this.enabled;
+    if (this.masterGain) {
+      this.masterGain.gain.setValueAtTime(this.enabled ? 0.35 : 0.0, this.ctx.currentTime);
+    }
+    return this.enabled;
+  }
+}
+
+const audio = new CosmicAudioEngine();
+
+// 2. Color Themes
+const DECK_THEMES = {
+  cyan: {
+    color: '#00f0ff',
+    glow: 'rgba(0, 240, 255, 0.45)',
+    dim: 'rgba(0, 240, 255, 0.12)',
+    border: 'rgba(0, 240, 255, 0.35)',
+    bg: '#040810'
+  },
+  emerald: {
+    color: '#10b981',
+    glow: 'rgba(16, 185, 129, 0.45)',
+    dim: 'rgba(16, 185, 129, 0.12)',
+    border: 'rgba(16, 185, 129, 0.35)',
+    bg: '#030f0a'
+  },
+  amber: {
+    color: '#f59e0b',
+    glow: 'rgba(245, 158, 11, 0.45)',
+    dim: 'rgba(245, 158, 11, 0.12)',
+    border: 'rgba(245, 158, 11, 0.35)',
+    bg: '#120b03'
+  },
+  crimson: {
+    color: '#ef4444',
+    glow: 'rgba(239, 68, 68, 0.45)',
+    dim: 'rgba(239, 68, 68, 0.12)',
+    border: 'rgba(239, 68, 68, 0.35)',
+    bg: '#140305'
+  }
+};
+
+// 3. Deep Space Targets Database
+const CELESTIAL_TARGETS = {
+  kepler: {
+    name: 'KEPLER-452b ("EARTH 2.0")',
+    coords: 'RA 19h 44m 00s | Dec +44° 16′ 39″ | Dist: 1,402 ly',
+    status: 'HARMONIC INTERSTELLAR BEACON ACTIVE',
+    color: 0x00f0ff,
+    pos: [18, 12, -22]
+  },
+  proxima: {
+    name: 'PROXIMA CENTAURI b',
+    coords: 'RA 14h 29m 42s | Dec −62° 40′ 46″ | Dist: 4.24 ly',
+    status: 'LOW-FREQUENCY CARRIER INTERCEPTED',
+    color: 0xef4444,
+    pos: [-14, -8, 16]
+  },
+  trappist: {
+    name: 'TRAPPIST-1e TEMPERATE EXOPLANET',
+    coords: 'RA 23h 06m 29s | Dec −05° 02′ 28″ | Dist: 39.5 ly',
+    status: 'RESONANT CHIRP SEQUENCE CONFIRMED',
+    color: 0x10b981,
+    pos: [22, -15, 8]
+  },
+  oumuamua: {
+    name: '1I/2017 U1 (\'OUMUAMUA)',
+    coords: 'HYPERBOLIC INTERSTELLAR TRAJECTORY | Dist: 34 AU',
+    status: 'ARTIFICIAL METALLIC REFLECTANCE SIGNATURE',
+    color: 0xf59e0b,
+    pos: [8, 24, -12]
+  },
+  wow: {
+    name: 'THE "WOW!" SIGNAL ORIGIN (SAGITTARIUS)',
+    coords: 'RA 19h 22m 24s | Dec −27° 03′ | Dist: UNKNOWN',
+    status: 'HISTORIC 72-SECOND NARROWBAND BURST',
+    color: 0xff00ff,
+    pos: [-20, 18, -14]
+  }
+};
+
+// 4. Realistic Hacker Exploit Code Snippets
+const HACKER_CODE_BANK = [
+  "int sys_quantum_demodulate(struct sat_link *link, u64 carrier_hz) {",
+  "  void __user *buf = (void __user *)link->carrier_register;",
+  "  if (copy_from_user(&reg_cache, buf, sizeof(reg_cache))) return -EFAULT;",
+  "  asm volatile(\"movq %0, %%rax; xorq %%rbx, %%rbx; syscall\" : : \"r\"(carrier_hz) : \"rax\");",
+  "  pr_info(\"[SAT_DOWNLINK] Intercepting 1.42040575 GHz narrow-band hydrogen resonance...\\n\");",
+  "  return 0;",
+  "}",
+  "",
+  "/* BYPASSING SHA-512 ASYMMETRIC ALIEN CIPHER MATRIX */",
+  "matrix_decrypt_pipeline(&payload, 0x7F4B0018, CIPHER_PRIME_STREAM);",
+  "qword_ptr [rsp+0x48] = 0xDEADC0DEBEEF; // Injecting shellcode payload",
+  "connect_suborbital_node(\"192.168.0.42\", 1420); // Handshake established",
+  "recv_quantum_telemetry(STREAM_FAST_FOURIER, &waterfall_buffer);",
+  "[CRITICAL] Buffer overflow detected at 0x7FFFFFFFDE80: Overwriting EIP...",
+  "STATUS: ELEVATED TO ROOT PRIVILEGES ON ORBITAL TRANSCEIVER DISH 07",
+  "DEMODULATING POLARIZED PHASE ENCODING [SUCCESS]",
+  "EXTRATERRESTRIAL INTEL: PRIME SEQUENCE { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31 }",
+  "SYNTHESIZING 7-HARMONIC RESPONSE CARRIER BURST..."
+];
+
+// 5. Main Terminal & Interceptor Controller
+class ProjectAetherDeck {
+  constructor() {
+    this.themeKey = 'cyan';
+    this.activeTargetKey = 'kepler';
+
+    // Quadrant 1: Spectrogram
+    this.spectroCanvas = document.getElementById('spectrogram-canvas');
+    this.spectroCtx = this.spectroCanvas.getContext('2d');
+    this.waterfallLines = [];
+
+    // Quadrant 2: 3D Celestial Hologram
+    this.initCelestialThree();
+
+    // Quadrant 3: Hacker Terminal
+    this.terminalLog = document.getElementById('terminal-log');
+    this.termInput = document.getElementById('term-input');
+    this.codeBankIdx = 0;
+    this.initTerminalStream();
+
+    // Quadrant 4: Alien Decryptor
+    this.decodedTextEl = document.getElementById('decoded-text');
+    this.alienMessages = [
+      "WE HAVE MONITORED YOUR PALE BLUE DOT FOR 4,000 CYCLES. WE ARE THE CHRONOS COGNITION.",
+      "UNIVERSAL CONSTANT CONFIRMED: SPEED OF LIGHT c = 299,792,458 m/s. WE RECEIVE YOU.",
+      "CONGRATULATIONS HUMANITY. YOU HAVE PENETRATED THE HYDROGEN RESONANCE BAND (1.420 GHz).",
+      "COMMENCING DEEP SPACE TELEPATHIC TRANSMISSION. COMMUNE WITH THE SEVEN HARMONIC TONES."
+    ];
+    this.activeMsgIdx = 0;
+    this.charIdx = 0;
+
+    this.bindEvents();
+    this.resizeCanvases();
+    this.animate();
+  }
+
+  resizeCanvases() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const rect = this.spectroCanvas.parentElement.getBoundingClientRect();
+    this.spectroCanvas.width = rect.width * dpr;
+    this.spectroCanvas.height = rect.height * dpr;
+    this.spectroCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    if (this.celestialRenderer) {
+      const cRect = document.getElementById('celestial-container').getBoundingClientRect();
+      this.celestialCamera.aspect = cRect.width / cRect.height;
+      this.celestialCamera.updateProjectionMatrix();
+      this.celestialRenderer.setSize(cRect.width, cRect.height);
+    }
+  }
+
+  initCelestialThree() {
+    const container = document.getElementById('celestial-container');
+    const rect = container.getBoundingClientRect();
+
+    this.celestialScene = new THREE.Scene();
+    this.celestialCamera = new THREE.PerspectiveCamera(45, (rect.width || 400) / (rect.height || 300), 0.1, 1000);
+    this.celestialCamera.position.set(0, 18, 48);
+    this.celestialCamera.lookAt(0, 0, 0);
+
+    this.celestialRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    this.celestialRenderer.setSize(rect.width || 400, rect.height || 300);
+    this.celestialRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(this.celestialRenderer.domElement);
+
+    // Holographic Celestial Sphere Wireframe
+    const sphereGeo = new THREE.SphereGeometry(18, 24, 18);
+    const sphereMat = new THREE.MeshBasicMaterial({
+      color: 0x00f0ff,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.14
+    });
+    this.celestialSphere = new THREE.Mesh(sphereGeo, sphereMat);
+    this.celestialScene.add(this.celestialSphere);
+
+    // Orbital Rings
+    [22, 28, 34].forEach((radius, idx) => {
+      const ringGeo = new THREE.RingGeometry(radius - 0.15, radius, 48);
+      ringGeo.rotateX(Math.PI / 2 + idx * 0.2);
+      const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, side: THREE.DoubleSide, transparent: true, opacity: 0.12 });
+      this.celestialScene.add(new THREE.Mesh(ringGeo, ringMat));
+    });
+
+    // Deep Space Target Markers
+    this.targetMeshes = {};
+    Object.keys(CELESTIAL_TARGETS).forEach(key => {
+      const tgt = CELESTIAL_TARGETS[key];
+      const group = new THREE.Group();
+
+      const marker = new THREE.Mesh(
+        new THREE.OctahedronGeometry(0.9, 0),
+        new THREE.MeshBasicMaterial({ color: tgt.color, wireframe: true })
+      );
+      group.add(marker);
+
+      const pulseRing = new THREE.Mesh(
+        new THREE.RingGeometry(1.2, 1.4, 24),
+        new THREE.MeshBasicMaterial({ color: tgt.color, side: THREE.DoubleSide, transparent: true, opacity: 0.8 })
+      );
+      group.add(pulseRing);
+
+      group.position.set(tgt.pos[0], tgt.pos[1], tgt.pos[2]);
+      this.celestialScene.add(group);
+      this.targetMeshes[key] = group;
+    });
+
+    // Rotating Radar Beam Line
+    const radarBeamGeo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, 0, 36)
+    ]);
+    this.radarBeam = new THREE.Line(radarBeamGeo, new THREE.LineBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.6 }));
+    this.celestialScene.add(this.radarBeam);
+  }
+
+  initTerminalStream() {
+    this.appendLog("INITIATING QUANTUM DAEMON (pid 4082)...", "cyan glow");
+    this.appendLog("BINDING SDR RADIO TRANSCIEVER TO 1.420405 GHz", "gold");
+    this.appendLog("VLA RADIO ARRAY: 27 DISHES PHASE-LOCKED TO DEEP SPACE", "green");
+    this.appendLog("STATUS: READY FOR INTERACTIVE HACKING & EXPLOIT INJECTION", "cyan");
+
+    // Continuous ambient telemetry ticker
+    setInterval(() => {
+      if (Math.random() > 0.45) {
+        const hex = Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0').toUpperCase();
+        const snr = (42 + Math.random() * 6).toFixed(1);
+        const line = `[DOWNLINK PKT 0x${hex}] CARRIER PWR: -82.4 dBm | SNR: +${snr} dB | CHKSUM: OK`;
+        this.appendLog(line, "cyan");
+      }
+    }, 1800);
+  }
+
+  appendLog(text, className = "") {
+    const div = document.createElement('div');
+    div.className = `term-line ${className}`;
+    div.textContent = `[${new Date().toISOString().substring(11, 23)}] ${text}`;
+    this.terminalLog.appendChild(div);
+
+    if (this.terminalLog.children.length > 70) {
+      this.terminalLog.removeChild(this.terminalLog.firstChild);
+    }
+    this.terminalLog.scrollTop = this.terminalLog.scrollHeight;
+  }
+
+  injectHackerCode() {
+    audio.init();
+    audio.playKeyClack();
+
+    const snippet = HACKER_CODE_BANK[this.codeBankIdx % HACKER_CODE_BANK.length];
+    this.codeBankIdx++;
+
+    this.appendLog(snippet, snippet.includes("CRITICAL") || snippet.includes("PAYLOAD") ? "red glow" : "green");
+
+    this.termInput.value = snippet;
+    setTimeout(() => { this.termInput.value = ""; }, 250);
+  }
+
+  // 7-Tone Extraterrestrial Synthesizer Sequence (Koi Mil Gaya / Jadoo style!)
+  transmitJadooSequence() {
+    audio.init();
+    const flash = document.getElementById('shockwave-flash');
+    flash.style.opacity = '0.7';
+    setTimeout(() => { flash.style.opacity = '0'; }, 350);
+
+    this.appendLog("⚡ TRANSMITTING 7-TONE ALIEN HARMONIC CONTACT SEQUENCE TO DEEP SPACE...", "red glow");
+    audio.playRedAlert();
+
+    const keys = document.querySelectorAll('.synth-key');
+    const seq = [0, 2, 4, 1, 3, 5, 6]; // Iconic extraterrestrial melodic arpeggio
+
+    seq.forEach((noteIdx, step) => {
+      setTimeout(() => {
+        const freq = audio.scale[noteIdx];
+        audio.playAlienTone(freq, 0.5);
+
+        const keyEl = keys[noteIdx];
+        if (keyEl) {
+          keyEl.classList.add('active');
+          setTimeout(() => keyEl.classList.remove('active'), 400);
+        }
+      }, step * 480);
+    });
+
+    // Decoded response appears after transmission completes
+    setTimeout(() => {
+      this.activeMsgIdx = (this.activeMsgIdx + 1) % this.alienMessages.length;
+      this.typeDecodedMessage(this.alienMessages[this.activeMsgIdx]);
+      audio.playRadarPing();
+      this.appendLog("📡 ALIEN CARRIER DEMODULATED: NEW EXTRATERRESTRIAL COMMUNIQUÉ RECEIVED!", "gold glow");
+    }, seq.length * 480 + 300);
+  }
+
+  typeDecodedMessage(msg) {
+    this.charIdx = 0;
+    this.decodedTextEl.textContent = "";
+
+    const typeStep = () => {
+      if (this.charIdx < msg.length) {
+        this.decodedTextEl.textContent += msg[this.charIdx];
+        this.charIdx++;
+        setTimeout(typeStep, 25);
+      }
+    };
+    typeStep();
+  }
+
+  bindEvents() {
+    window.addEventListener('resize', () => this.resizeCanvases());
+
+    // ANY KEYBOARD KEY PRESS TRIGGERS LIVE HACKER CODE INJECTION
+    window.addEventListener('keydown', (e) => {
+      if (e.key >= '1' && e.key <= '7') {
+        const idx = parseInt(e.key, 10) - 1;
+        const freq = audio.scale[idx];
+        audio.init();
+        audio.playAlienTone(freq);
+        const keys = document.querySelectorAll('.synth-key');
+        if (keys[idx]) {
+          keys[idx].classList.add('active');
+          setTimeout(() => keys[idx].classList.remove('active'), 250);
+        }
+      } else {
+        this.injectHackerCode();
+      }
+    });
+
+    // 7-Tone Synthesizer Click Handlers
+    document.querySelectorAll('.synth-key').forEach(btn => {
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        const noteIdx = parseInt(btn.dataset.note, 10);
+        const freq = parseFloat(btn.dataset.freq);
+        audio.init();
+        audio.playAlienTone(freq);
+        btn.classList.add('active');
+        this.appendLog(`[CARRIER SYNTH] Tx Harmonic Note C${noteIdx + 1}: ${freq} Hz`, "cyan");
+      });
+      btn.addEventListener('pointerup', () => btn.classList.remove('active'));
+      btn.addEventListener('pointercancel', () => btn.classList.remove('active'));
+    });
+
+    // Transmit Sequence Button
+    document.getElementById('btn-transmit-seq').addEventListener('click', () => {
+      this.transmitJadooSequence();
+    });
+
+    // Theme Switcher
+    document.getElementById('btn-theme-cycle').addEventListener('click', () => {
+      const keys = Object.keys(DECK_THEMES);
+      const nextIdx = (keys.indexOf(this.themeKey) + 1) % keys.length;
+      this.applyTheme(keys[nextIdx]);
+    });
+
+    // Audio Toggle
+    document.getElementById('btn-audio-toggle').addEventListener('click', () => {
+      audio.init();
+      const on = audio.toggle();
+      document.getElementById('btn-audio-toggle').textContent = on ? '🔊 AUDIO: ON' : '🔇 AUDIO: OFF';
+    });
+
+    // Fullscreen Toggle
+    document.getElementById('btn-fullscreen').addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    // Celestial Target Selector
+    document.querySelectorAll('.btn-target').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.btn-target').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.selectTarget(btn.dataset.target);
+      });
+    });
+  }
+
+  selectTarget(targetKey) {
+    this.activeTargetKey = targetKey;
+    const tgt = CELESTIAL_TARGETS[targetKey];
+    if (!tgt) return;
+
+    audio.init();
+    audio.playRadarPing();
+
+    document.getElementById('tgt-name').textContent = `TARGET: ${tgt.name}`;
+    document.getElementById('tgt-coords').textContent = tgt.coords;
+    document.getElementById('tgt-status').textContent = `STATUS: ${tgt.status}`;
+
+    this.appendLog(`[STEERING VLA ARRAY] Re-pointing dish array to ${tgt.name}...`, "gold");
+
+    // Camera smoothly pans towards target in 3D
+    const pos = tgt.pos;
+    this.celestialCamera.position.set(pos[0] * 1.5, pos[1] * 1.5 + 10, pos[2] * 1.5 + 24);
+    this.celestialCamera.lookAt(pos[0], pos[1], pos[2]);
+  }
+
+  applyTheme(themeKey) {
+    this.themeKey = themeKey;
+    const t = DECK_THEMES[themeKey];
+
+    document.documentElement.style.setProperty('--theme-color', t.color);
+    document.documentElement.style.setProperty('--theme-glow', t.glow);
+    document.documentElement.style.setProperty('--theme-dim', t.dim);
+    document.documentElement.style.setProperty('--theme-border', t.border);
+    document.documentElement.style.setProperty('--bg-dark', t.bg);
+
+    if (this.celestialSphere) {
+      this.celestialSphere.material.color.set(t.color);
+    }
+  }
+
+  // Draw Quadrant 1: Real-Time High-Tech Radio Spectrogram & Oscilloscope
+  drawSpectrogram(time) {
+    const ctx = this.spectroCtx;
+    const w = this.spectroCanvas.parentElement.clientWidth;
+    const h = this.spectroCanvas.parentElement.clientHeight;
+
+    ctx.save();
+    ctx.clearRect(0, 0, w, h);
+
+    // Dark grid background
+    ctx.fillStyle = 'rgba(2, 6, 14, 0.9)';
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < w; x += 30) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+    }
+    for (let y = 0; y < h; y += 25) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+    }
+
+    // Live Multi-Harmonic FFT Frequency Bars
+    const numBars = 64;
+    const barW = (w - 20) / numBars;
+    const themeColor = DECK_THEMES[this.themeKey].color;
+
+    ctx.shadowColor = themeColor;
+    ctx.shadowBlur = 10;
+
+    for (let i = 0; i < numBars; i++) {
+      const freqRatio = i / numBars;
+      // Hydrogen Line Peak around bar 32 (1.420 GHz carrier!)
+      const distFromCarrier = Math.abs(i - 32);
+      const carrierSpike = Math.max(0, 1 - distFromCarrier / 4) * 0.85;
+
+      const noise = Math.sin(time * 0.005 + i * 0.4) * 0.15 + Math.random() * 0.12;
+      const barH = (carrierSpike + noise + 0.1) * (h * 0.42);
+
+      const bx = 10 + i * barW;
+      const by = h * 0.45 - barH;
+
+      ctx.fillStyle = distFromCarrier <= 2 ? '#f59e0b' : themeColor;
+      ctx.fillRect(bx, by, barW - 1.5, barH);
+    }
+
+    // Oscilloscope Live Sine Wave Modulation in Lower Half
+    ctx.beginPath();
+    ctx.strokeStyle = themeColor;
+    ctx.lineWidth = 2;
+    const waveY = h * 0.68;
+
+    for (let x = 0; x < w; x += 3) {
+      const rad = (x / w) * Math.PI * 8 + time * 0.008;
+      const carrierMod = Math.sin(rad * 4) * Math.cos(rad * 0.5);
+      const amp = Math.sin(rad) * 28 * (1 + carrierMod * 0.4);
+      const y = waveY + amp + (Math.random() - 0.5) * 4;
+
+      if (x === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Hydrogen Carrier 1.420 GHz Marker Line
+    const carrierX = 10 + 32 * barW;
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(carrierX, 10);
+    ctx.lineTo(carrierX, h - 35);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = '#f59e0b';
+    ctx.font = 'bold 10px monospace';
+    ctx.fillText('1.420405 GHz (HYDROGEN LINE)', carrierX + 6, 22);
+
+    ctx.restore();
+  }
+
+  // Animation Loop
+  animate() {
+    requestAnimationFrame((t) => this.animate());
+
+    const now = performance.now();
+
+    // 1. Live UTC Clock
+    document.getElementById('utc-clock').innerHTML = `UTC: <span>${new Date().toISOString().substring(11, 23)}</span>`;
+
+    // 2. Spectrogram Waveform
+    this.drawSpectrogram(now);
+
+    // 3. 3D Celestial Hologram
+    if (this.celestialSphere) {
+      this.celestialSphere.rotation.y += 0.003;
+      this.celestialSphere.rotation.x = Math.sin(now * 0.0005) * 0.2;
+    }
+
+    if (this.radarBeam) {
+      this.radarBeam.rotation.y = (now * 0.0018) % (Math.PI * 2);
+    }
+
+    Object.keys(this.targetMeshes).forEach(k => {
+      const m = this.targetMeshes[k];
+      m.children[0].rotation.y += 0.02;
+      m.children[0].rotation.x += 0.01;
+      const pulse = 1 + Math.sin(now * 0.006) * 0.25;
+      m.children[1].scale.set(pulse, pulse, pulse);
+    });
+
+    if (this.celestialRenderer) {
+      this.celestialRenderer.render(this.celestialScene, this.celestialCamera);
+    }
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  new ProjectAetherDeck();
+});
+</script>
+</body>
+</html>

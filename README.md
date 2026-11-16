@@ -6,7 +6,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 
 ---
 
-## 🎮 The 16 Experiments
+## 🎮 The 17 Experiments
 
 | # | Experiment | Technology | Highlights |
 |---|---|---|---|
@@ -26,6 +26,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 | **14** | [**Royal Ludo Master 3D**](ludo.html) | Standard 15x15 Grid, Heuristic AI Bots, Web Audio | Authentic regulation Ludo board with 4 colored bases (Red, Green, Yellow, Blue), 52-step outer circuit, 8 star safe spots, 3D rolling dice, step-by-step token hops, cutting bonus turns, pass & play local multiplayer, and smart AI bots. |
 | **15** | [**Cyber Drift 3D: Tokyo Midnight**](drift.html) | Three.js WebGL, 60 FPS Vehicle Physics, Procedural Audio | Professional 3D Grand Prix racer with Armco steel guardrails, real rubber tire skidmarks, independent suspension body roll & dive, modified Super Booster hypercar (380+ km/h), radial speed streaks, circuit radar, and competitive AI rivals. |
 | **16** | [**Neon Snake Pulse**](snake.html) | Canvas 2D, 60fps Sub-tick Interpolation, Web Audio | Ultra-smooth cyber arcade snake game featuring live animated prey animals (frogs, mice, bunnies, chicks) for rapid growth, mega titan beast feasts (+12 length & swollen body width), strict laser walls vs free warp-around mode, sub-tick 60fps interpolation, dynamic tracking eyes, and procedural Web Audio synthesizers. |
+| **17** | [**Project A.E.T.H.E.R. (Alien Signal Deck)**](alien.html) | Three.js WebGL, Canvas FFT Spectrogram, Web Audio Synthesizer | Deep-space alien radio interceptor & elite cyber hacking command deck. Features 1.420 GHz Hydrogen line waterfall spectrogram, 3D celestial triangulation radar, interactive Any-Key hacker terminal, and 7-tone harmonic extraterrestrial synthesizer (Jadoo / Koi Mil Gaya style). |
 
 ---
 
@@ -103,6 +104,27 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 - **Evolution Ranks**: Live progression from Baby Python -> Swift Cobra -> Green Anaconda -> Cyber Hydra -> Titan World Eater.
 - **60 FPS Sub-Tick Interpolation**: Separates discrete grid ticks (~8-12 Hz) from visual rendering (60-120 Hz) for fluid slithering without grid snapping.
 - **Expressive Eye Tracking**: Pupils calculate `atan2(prey.y - head.y, prey.x - head.x)` to track nearest prey, turning into playful "X X" on collision.
+
+### 9. Deep-Space Interceptor & Elite Cyber Command (`alien.html`)
+- **1.42040575 GHz Hydrogen "Water Hole" FFT Spectrogram**:
+  - Live animated radio waterfall frequency analysis visualizing real-time electromagnetic telemetry.
+  - Interactive frequency tuning slider (1.410 - 1.430 GHz), Doppler shift readout ($\Delta f \approx -14.28\text{ kHz}$), signal-to-noise ratio meter (SNR ~34.8 dB), and dual-channel high-frequency oscilloscope.
+- **3D Celestial Triangulation Radar (Three.js WebGL)**:
+  - Wireframe holographic celestial coordinate sphere with orbital inclination rings, rotating 360° sweeping radar beam, and distant starfield.
+  - Interactive deep-space signal targets: Kepler-452b (Exoplanet Earth 2.0), Proxima Centauri b, TRAPPIST-1e, Interstellar Probe 'Oumuamua, and the iconic 1977 Wow! Signal (6EQUJ5).
+- **Interactive Any-Key Cyber Hacker Terminal**:
+  - Typing any key on the physical keyboard rapidly streams realistic Linux kernel exploit code (`mprotect`, `sys_ptrace`, buffer overflow shellcodes, zero-day payload injection) with crisp mechanical click audio.
+  - Terminal controls for Quick Hack stream, clear buffer, and log inspection.
+- **Extraterrestrial Harmonic Synthesizer (*Jadoo / Koi... Mil Gaya* Experience)**:
+  - 7-tone harmonic musical keypad (`C4`, `D4`, `E4`, `F4`, `G4`, `A4`, `C5`) tuned to the iconic alien communication frequencies.
+  - Pressing keyboard keys `1-7` or clicking on-screen nodes plays pure resonant sine waveforms with glowing radial acoustic ripple animations.
+  - **"TRANSMIT JADOO SEQUENCE" Button**: Plays the authentic multi-octave harmonic sequence (*Sa Re Ga Ma Pa Dha Ni Sa* alien contact motif) accompanied by a screen-wide hyper-flash warp wave.
+  - **Alien Glyph De-Obfuscator**: Cycles random encrypted alien symbols through continuous UTF-8 matrix decoding to decipher incoming extraterrestrial transmissions into plain English.
+- **Procedural Cosmic Audio Engine**:
+  - Real-time synthesized cosmic microwave background radiation hiss, dual-tone radar telemetry pings, alien harmonic resonance, and mechanical keystroke clacks using pure browser Web Audio API (zero external sound files).
+- **Hacker Command Center UX**:
+  - 4 switchable HUD themes: **Cyan Matrix**, **Jadoo Emerald**, **Solar Amber**, and **Red Alert**.
+  - CRT scanlines, phosphor glow bloom, dynamic HUD clock, and 1-click full-screen immersion.
 
 ---
 
