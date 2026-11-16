@@ -64,15 +64,15 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 - **Official Tournament Rules**: Need a 6 to deploy tokens from base; consecutive 6 penalties; bonus rolls awarded on rolling a 6, capturing an opponent, or entering a token into the home triangle.
 - **Smart AI Bot Engine**: 4-tier decision priority (1. Capture opponent, 2. Enter home, 3. Deploy from base on a 6, 4. Advance safest token).
 
-### 7. 3D Vehicle Dynamics & Racing Championship (`drift.html`)
-- **Pro Racing Game Architecture**: 3 full game modes:
-  - 🏁 **Circuit Grand Prix (3 Laps)**: Grid start countdown, competitive racing against 3 smart AI rival supercars (Viper, Shadow, Ghost), dynamic drafting, live race position tracking (`1st / 4`), and podium ceremony.
-  - ⚡ **Tokyo Midnight Drift Trial**: High-speed traffic weaving, drift angle combos, multiplier chains (up to 5.0x), near-miss rewards, and drift rank grades.
-  - 🚨 **Police Pursuit**: High-speed escape mode with aggressive police cruisers and siren strobe lights.
-- **Detailed Procedural Supercars & Custom Garage**: Choose between **Apex GT-R** (Balanced 4WD), **Kyoto Spirit RX** (Drift King RWD), and **Hyperion Zero** (V16 Hypercar), with 6 custom metallic paint finishes, widebody aero kits, GT wings, Brembo brake calipers, and custom neon underglow.
-- **Aero Physics & Drift Slip Mechanics**: Real-time tire slip angles, lateral momentum, body roll suspension lean, progressive steering with counter-steer assist, and persistent tire smoke billows.
-- **Nitro NOS & Visual Speed FX**: Dual-exhaust flaming thrust, dynamic camera FOV warp expansion (65° to 84°), and speedometer gauge with tachometer RPM arc.
-- **Audio & Electronic Music Engine**: Dual-oscillator roaring engine, turbo blow-off valve flutter, tire squeal, and a built-in 125 BPM synthwave electronic electronic music synthesizer created entirely via native Web Audio API (zero external audio files).
+### 7. 3D Vehicle Dynamics & Neo-Tokyo Grand Prix (`drift.html`)
+- **Pro Racing Championship (2-Lap Circuit, ~90s Race)**:
+  - 🏁 **Neo-Tokyo Grand Prix (2 Laps)**: Authentic closed-circuit track (~2.3 km length) with fast straights, sweeping curves, elevated apex kerbs, hairpins, chicanes, and a cyber tunnel.
+  - **3 Competitive AI Rivals**: **Viper** (Yellow), **Shadow** (Crimson), and **Ghost** (Emerald) with realistic racing lines, corner braking, overtaking, and drafting.
+  - **Aerodynamic Slipstream (Drafting)**: Pulling behind a rival car activates aerodynamic slipstream vortex with a +25 km/h drafting slingshot boost!
+  - **Drift Slip Mechanics & Mini-Turbo**: Initiate powerslides with Handbrake (`Space` / `⚡ DRIFT`), counter-steer to hold the angle, and snap out of the drift for a mini-turbo acceleration burst!
+- **Detailed Procedural Supercars & Garage**: Choose between **Apex GT-R** (Balanced 4WD), **Kyoto Spirit RX** (Drift King RWD), and **Hyperion Zero** (V16 Hypercar), with 6 metallic paint finishes, widebody aero kits, GT wings, Brembo brake calipers, and custom neon underglow.
+- **HUD & Real-Time Minimap Radar**: Digital speedometer (up to 330+ km/h), 9,000 RPM tachometer arc bar, 6-speed gearbox, live race stopwatch, position tracker (`1st / 4`), and a 2D circuit minimap radar.
+- **Audio & Electronic Music Engine**: Dual-oscillator roaring engine acoustics scaling with RPM and gear, turbo blow-off valve flutter, tire squeal, and a built-in 125 BPM synthwave electronic music synthesizer created entirely via native Web Audio API (zero external audio files).
 
 ---
 
