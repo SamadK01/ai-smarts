@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Cyber Drift 3D — Super Booster Grand Prix</title>
-<meta name="description" content="A professional 3D Grand Prix Racing Game. Sunny daylight circuit, wide 28m track with elevated red-white kerbs, no-stuck smooth barrier deflection, fully modified Super Booster hypercar with rocket thrusters, clear minimap radar, 2-lap race (~80s), and competitive AI rivals.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Super Booster Grand Prix 3D — Pro Championship</title>
+<meta name="description" content="A professional 3D Grand Prix racing game. Features daylight F1 circuit with Armco steel guardrails, tire walls, rubber skidmark trails, suspension roll & pitch physics, detailed hypercars, radial speed streaks, circuit radar, and competitive AI rivals.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@700;800;900&family=Geist+Mono:wght@500;700;900&family=Bricolage+Grotesque:opsz,wght@12..96,600;700;800&display=swap" rel="stylesheet">
-<!-- Pinned Three.js r128 from CDN -->
+<!-- Pinned Three.js r128 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
   :root {
@@ -17,8 +17,8 @@
     --pink: #ff007f;
     --red: #ef4444;
     --green: #10b981;
-    --panel-bg: rgba(10, 16, 30, 0.88);
-    --panel-border: rgba(0, 240, 255, 0.4);
+    --panel-bg: rgba(10, 16, 30, 0.9);
+    --panel-border: rgba(0, 240, 255, 0.35);
     --font-display: 'Funnel Display', sans-serif;
     --font-mono: 'Geist Mono', monospace;
     --font-ui: 'Bricolage Grotesque', sans-serif;
@@ -30,6 +30,7 @@
     width: 100%; height: 100%; overflow: hidden;
     background: #60a5fa; color: #fff;
     font-family: var(--font-ui); touch-action: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   #canvas-container {
@@ -37,73 +38,84 @@
     z-index: 1;
   }
 
-  /* HUD Overlay */
+  /* Radial Speed Lines Canvas Overlay */
+  #speed-lines-canvas {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 5;
+  }
+
+  /* Broadcast HUD Overlay */
   #hud {
     position: fixed; inset: 0; pointer-events: none;
-    z-index: 10; display: flex; flex-direction: column;
-    justify-content: space-between; padding: 16px 20px;
+    z-index: 20; display: flex; flex-direction: column;
+    justify-content: space-between;
+    padding: max(16px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
   }
 
   /* Top Bar */
   .hud-top {
     display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 12px;
   }
   .brand-block {
-    display: flex; flex-direction: column; gap: 4px;
+    display: flex; flex-direction: column; gap: 4px; pointer-events: auto;
   }
   .brand-title {
-    font-family: var(--font-display); font-size: 1.5rem; font-weight: 900;
-    color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+    font-family: var(--font-display); font-size: 1.6rem; font-weight: 900;
+    color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,0.8);
     letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px;
   }
   .brand-title span { color: var(--gold); }
   .mode-pill {
-    background: rgba(10, 16, 30, 0.85); border: 1.5px solid var(--gold);
+    background: var(--panel-bg); backdrop-filter: blur(12px);
+    border: 1.5px solid var(--gold);
     color: var(--gold); font-family: var(--font-mono); font-size: 0.72rem;
-    font-weight: 800; padding: 3px 12px; border-radius: 14px;
+    font-weight: 800; padding: 4px 12px; border-radius: 14px;
     letter-spacing: 0.5px; display: inline-flex; width: fit-content;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4);
   }
 
-  /* Center Countdown & Lap Banners */
+  /* Center Countdown & Banners */
   #race-banner {
     position: absolute; top: 16%; left: 50%; transform: translateX(-50%);
     display: none; flex-direction: column; align-items: center; text-align: center;
     pointer-events: none; z-index: 30;
   }
   #countdown-text {
-    font-family: var(--font-display); font-size: 5rem; font-weight: 900;
-    color: var(--gold); text-shadow: 0 4px 30px rgba(0,0,0,0.8), 0 0 20px var(--gold);
+    font-family: var(--font-display); font-size: 5.5rem; font-weight: 900;
+    color: var(--gold); text-shadow: 0 4px 30px rgba(0,0,0,0.85), 0 0 24px var(--gold);
     letter-spacing: 2px; line-height: 1;
   }
   #race-subtitle {
-    font-family: var(--font-mono); font-size: 1.2rem; font-weight: 800;
-    color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-    text-transform: uppercase; letter-spacing: 1.5px; margin-top: 6px;
+    font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800;
+    color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+    text-transform: uppercase; letter-spacing: 2px; margin-top: 6px;
   }
 
-  /* Drift & Slipstream Alerts */
+  /* Drift Score Combo */
   #drift-banner {
     position: absolute; top: 26%; left: 50%; transform: translateX(-50%);
     display: none; flex-direction: column; align-items: center;
     font-family: var(--font-display); text-transform: uppercase;
   }
   #drift-title {
-    font-size: 2.2rem; font-weight: 900; color: var(--gold);
-    text-shadow: 0 2px 14px rgba(0,0,0,0.8);
+    font-size: 2.3rem; font-weight: 900; color: var(--gold);
+    text-shadow: 0 2px 16px rgba(0,0,0,0.85);
     font-style: italic; letter-spacing: 2px;
   }
   #drift-points {
-    font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800;
-    color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    font-family: var(--font-mono); font-size: 1.3rem; font-weight: 800;
+    color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.9);
   }
+
+  /* Slipstream Vortex Alert */
   #slipstream-banner {
     position: absolute; top: 34%; left: 50%; transform: translateX(-50%);
     display: none; align-items: center; gap: 8px;
-    background: rgba(10, 16, 30, 0.9); border: 2px solid var(--cyan);
-    padding: 6px 16px; border-radius: 20px; font-family: var(--font-mono);
-    font-size: 0.85rem; font-weight: 800; color: var(--cyan);
-    box-shadow: 0 4px 20px rgba(0, 240, 255, 0.4);
+    background: var(--panel-bg); border: 2px solid var(--cyan);
+    padding: 6px 18px; border-radius: 20px; font-family: var(--font-mono);
+    font-size: 0.86rem; font-weight: 900; color: var(--cyan);
+    box-shadow: 0 4px 22px rgba(0, 240, 255, 0.45);
     animation: pulseGlow 0.4s infinite alternate;
   }
   @keyframes pulseGlow {
@@ -116,17 +128,17 @@
     display: flex; gap: 10px; font-family: var(--font-mono); pointer-events: auto;
   }
   .stat-card {
-    background: var(--panel-bg); backdrop-filter: blur(12px);
+    background: var(--panel-bg); backdrop-filter: blur(14px);
     border: 1.5px solid var(--panel-border);
-    padding: 8px 16px; border-radius: 12px; text-align: right;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    padding: 8px 16px; border-radius: 14px; text-align: right;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.45);
   }
   .stat-label { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
-  .stat-val { font-size: 1.4rem; font-weight: 900; color: #fff; }
-  .stat-val.gold { color: var(--gold); text-shadow: 0 0 10px rgba(245, 158, 11, 0.6); }
+  .stat-val { font-size: 1.45rem; font-weight: 900; color: #fff; }
+  .stat-val.gold { color: var(--gold); text-shadow: 0 0 12px rgba(245, 158, 11, 0.6); }
   .stat-val.cyan { color: var(--cyan); }
 
-  /* Bottom HUD Cluster */
+  /* Bottom Telemetry Cluster */
   .hud-bottom {
     display: flex; justify-content: space-between; align-items: flex-end;
     gap: 16px;
@@ -136,17 +148,17 @@
   .tacho-cluster {
     background: var(--panel-bg); backdrop-filter: blur(14px);
     border: 1.5px solid var(--panel-border); border-radius: 20px;
-    padding: 14px 20px; min-width: 210px;
+    padding: 14px 20px; min-width: 220px;
     box-shadow: 0 10px 32px rgba(0,0,0,0.5);
-    position: relative; overflow: hidden;
+    position: relative; overflow: hidden; pointer-events: auto;
   }
   .speed-row {
     display: flex; align-items: baseline; justify-content: space-between;
   }
   .speed-num {
-    font-family: var(--font-display); font-size: 3.6rem; font-weight: 900;
+    font-family: var(--font-display); font-size: 3.8rem; font-weight: 900;
     line-height: 0.85; color: #fff; font-style: italic; letter-spacing: -1px;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.6);
   }
   .speed-unit {
     font-family: var(--font-mono); font-size: 0.85rem; font-weight: 800;
@@ -157,16 +169,20 @@
     margin-top: 8px; font-family: var(--font-mono);
   }
   .gear-tag {
-    font-size: 1.05rem; font-weight: 800; color: var(--gold);
-    background: rgba(245, 158, 11, 0.15); padding: 2px 10px; border-radius: 6px;
-    border: 1px solid rgba(245, 158, 11, 0.3);
+    font-size: 1.1rem; font-weight: 900; color: var(--gold);
+    background: rgba(245, 158, 11, 0.15); padding: 3px 12px; border-radius: 8px;
+    border: 1px solid rgba(245, 158, 11, 0.35); transition: background 0.1s;
+  }
+  .gear-tag.redline-flash {
+    background: #ef4444; color: #fff; border-color: #ef4444;
+    box-shadow: 0 0 16px #ef4444;
   }
   .rpm-label { font-size: 0.75rem; color: #94a3b8; font-weight: 700; }
 
   /* Curved RPM Bar */
   .rpm-track {
-    width: 100%; height: 7px; background: rgba(255, 255, 255, 0.15);
-    border-radius: 4px; margin-top: 6px; overflow: hidden; position: relative;
+    width: 100%; height: 8px; background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px; margin-top: 8px; overflow: hidden; position: relative;
   }
   #rpm-fill {
     width: 0%; height: 100%;
@@ -177,17 +193,17 @@
   /* Super Booster Thruster Gauge */
   .nitro-cluster {
     display: flex; flex-direction: column; align-items: center; gap: 4px;
-    background: var(--panel-bg); backdrop-filter: blur(10px);
-    border: 1.5px solid var(--cyan); border-radius: 14px;
-    padding: 8px 18px; min-width: 140px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    background: var(--panel-bg); backdrop-filter: blur(12px);
+    border: 1.5px solid var(--cyan); border-radius: 16px;
+    padding: 10px 18px; min-width: 150px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.45); pointer-events: auto;
   }
   .nitro-label {
-    font-family: var(--font-mono); font-size: 0.72rem; font-weight: 900;
+    font-family: var(--font-mono); font-size: 0.74rem; font-weight: 900;
     color: var(--cyan); text-transform: uppercase; letter-spacing: 1px;
   }
   .nitro-bar-container {
-    width: 100%; height: 11px; background: rgba(255,255,255,0.15);
+    width: 100%; height: 12px; background: rgba(255,255,255,0.15);
     border-radius: 6px; overflow: hidden;
   }
   #nitro-bar {
@@ -196,12 +212,12 @@
     transition: width 0.08s linear;
   }
 
-  /* Minimap Circuit Radar Canvas */
+  /* Minimap Circuit Radar */
   .radar-container {
     background: var(--panel-bg); backdrop-filter: blur(14px);
     border: 2px solid var(--gold); border-radius: 18px;
     padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: auto;
   }
   .radar-title {
     font-family: var(--font-mono); font-size: 0.65rem; font-weight: 800;
@@ -216,9 +232,10 @@
     display: flex; gap: 8px; pointer-events: auto; flex-wrap: wrap; justify-content: flex-end;
   }
   .btn {
-    background: rgba(10, 16, 30, 0.85); border: 1.5px solid rgba(255, 255, 255, 0.25);
-    color: #fff; padding: 8px 14px; border-radius: 10px;
-    font-size: 0.78rem; font-weight: 800; cursor: pointer;
+    background: var(--panel-bg); backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    color: #fff; padding: 9px 15px; border-radius: 12px;
+    font-size: 0.8rem; font-weight: 800; cursor: pointer;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     display: inline-flex; align-items: center; gap: 6px;
     text-decoration: none; font-family: var(--font-ui);
@@ -230,13 +247,13 @@
   }
   .btn-nos-desktop {
     border-color: var(--cyan); color: var(--cyan); font-weight: 900;
-    box-shadow: 0 0 14px rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
   }
   .btn-nos-desktop:hover {
     background: var(--cyan); color: #000;
   }
 
-  /* Mobile Touch Virtual Controls */
+  /* Mobile Touch Controls */
   #mobile-controls {
     position: fixed; inset: 0; pointer-events: none; z-index: 50;
     display: none; justify-content: space-between; align-items: flex-end;
@@ -260,15 +277,9 @@
   .touch-btn.btn-drift {
     border-color: var(--gold); color: var(--gold); font-size: 0.92rem; font-weight: 900;
   }
-  .touch-btn.btn-drift:active {
-    background: var(--gold); color: #000;
-  }
   .touch-btn.btn-nos-touch {
     border-color: var(--cyan); color: var(--cyan); font-weight: 900; font-size: 1.2rem;
     box-shadow: 0 0 18px rgba(0, 240, 255, 0.5);
-  }
-  .touch-btn.btn-nos-touch:active {
-    background: var(--cyan); color: #000;
   }
 
   @media (pointer: coarse), (max-width: 860px) {
@@ -278,28 +289,27 @@
     .speed-num { font-size: 2.8rem; }
   }
 
-  /* Modals (Victory Standings) */
+  /* Victory Standings Modal */
   .modal-overlay {
-    position: fixed; inset: 0; background: rgba(5, 10, 20, 0.85);
-    backdrop-filter: blur(12px); z-index: 200;
+    position: fixed; inset: 0; background: rgba(5, 10, 20, 0.88);
+    backdrop-filter: blur(14px); z-index: 200;
     display: none; align-items: center; justify-content: center;
     padding: 16px;
   }
   .modal-box {
     background: #0d1527; border: 2px solid var(--gold);
-    border-radius: 20px; padding: 26px; width: 100%; max-width: 520px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.85), 0 0 30px rgba(245, 158, 11, 0.35);
+    border-radius: 22px; padding: 28px; width: 100%; max-width: 530px;
     text-align: center; max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.85), 0 0 30px rgba(245, 158, 11, 0.35);
   }
   .modal-title {
-    font-family: var(--font-display); font-size: 1.8rem; font-weight: 900;
+    font-family: var(--font-display); font-size: 1.9rem; font-weight: 900;
     color: var(--gold); margin-bottom: 6px; letter-spacing: -0.5px;
   }
   .modal-desc {
-    font-size: 0.88rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 18px;
+    font-size: 0.9rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 18px;
   }
 
-  /* Confetti Canvas */
   #confetti-canvas {
     position: fixed; inset: 0; width: 100%; height: 100%;
     pointer-events: none; z-index: 300;
@@ -308,8 +318,11 @@
 </head>
 <body>
 
-  <!-- WebGL 3D Canvas Container -->
+  <!-- 3D WebGL Canvas -->
   <div id="canvas-container"></div>
+
+  <!-- Radial Speed Lines Canvas -->
+  <canvas id="speed-lines-canvas"></canvas>
 
   <!-- HUD Interface -->
   <div id="hud">
@@ -317,25 +330,22 @@
     <div class="hud-top">
       <div class="brand-block">
         <div class="brand-title">
-          GRAND<span>PRIX</span> 3D
+          GRAND<span>PRIX</span> PRO
         </div>
-        <div class="mode-pill" id="hud-mode-pill">🏁 2-LAP SUPER BOOSTER CIRCUIT</div>
+        <div class="mode-pill" id="hud-mode-pill">🏁 2-LAP SUPER BOOSTER CHAMPIONSHIP</div>
       </div>
 
       <div class="hud-stats">
-        <!-- Position -->
         <div class="stat-card">
           <div class="stat-label">Position</div>
           <div class="stat-val gold" id="pos-display">1st / 4</div>
         </div>
 
-        <!-- Lap Counter -->
         <div class="stat-card">
           <div class="stat-label">Lap</div>
           <div class="stat-val cyan" id="lap-display">LAP 1 / 2</div>
         </div>
 
-        <!-- Live Stopwatch -->
         <div class="stat-card">
           <div class="stat-label">Race Time</div>
           <div class="stat-val" id="time-display">00:00.00</div>
@@ -346,7 +356,7 @@
     <!-- Center Race Countdown -->
     <div id="race-banner">
       <div id="countdown-text">3</div>
-      <div id="race-subtitle">GET READY</div>
+      <div id="race-subtitle">REV YOUR SUPER BOOSTER</div>
     </div>
 
     <!-- Center Drift Notification -->
@@ -360,9 +370,9 @@
       ⚡ SLIPSTREAM DRAFT ACTIVE! +25 KM/H BOOST
     </div>
 
-    <!-- Bottom Gauges & Controls -->
+    <!-- Bottom Gauges & Telemetry -->
     <div class="hud-bottom">
-      <!-- Digital Speedometer & Tachometer -->
+      <!-- Digital Tachometer -->
       <div class="tacho-cluster">
         <div class="speed-row">
           <div class="speed-num" id="speed-val">0</div>
@@ -377,7 +387,7 @@
         </div>
       </div>
 
-      <!-- Rocket Booster Thruster Gauge -->
+      <!-- Super Booster Thruster Gauge -->
       <div class="nitro-cluster">
         <div class="nitro-label">🚀 SUPER BOOSTER</div>
         <div class="nitro-bar-container">
@@ -402,7 +412,7 @@
     </div>
   </div>
 
-  <!-- Mobile Touch Virtual Controls -->
+  <!-- Mobile Touch Controls -->
   <div id="mobile-controls">
     <div class="touch-cluster">
       <div class="touch-btn" id="btn-left">◀</div>
@@ -416,11 +426,11 @@
     </div>
   </div>
 
-  <!-- Race Finish / Standings Modal -->
+  <!-- Victory Standings Modal -->
   <div class="modal-overlay" id="victory-modal">
     <div class="modal-box">
-      <div class="modal-title" id="vic-title">🏆 GRAND PRIX FINISHED!</div>
-      <div class="modal-desc" id="vic-subtitle">Congratulations! Here are the official race standings:</div>
+      <div class="modal-title" id="vic-title">👑 1ST PLACE CHAMPION!</div>
+      <div class="modal-desc" id="vic-subtitle">Congratulations! Official Grand Prix Championship Standings:</div>
       <div id="standings-list" style="margin-bottom:18px; text-align:left;"></div>
       <button id="btn-restart-race" class="btn" style="width:100%; justify-content:center; padding:12px; font-size:1rem; background:var(--gold); color:#000; font-weight:900; border:none;">
         🔄 RACE AGAIN
@@ -433,9 +443,9 @@
 
 <script>
 /**
- * Cyber Drift 3D — Super Booster Championship
- * Bright Sunny Daylight Circuit, Smooth Non-Stuck Barrier Deflection,
- * Rock-Solid 360° Camera, High-Contrast Minimap Radar, Modified Booster Beast
+ * Super Booster Grand Prix 3D — Pro Championship
+ * PCF Soft Shadows, Armco Guardrails, Real Tire Skidmarks, Suspension Pitch/Roll,
+ * High-Speed Radial Streaks, Dual Rocket Plumes, HD Circuit Radar
  */
 
 // 1. Procedural Web Audio Engine
@@ -458,7 +468,7 @@ class SoundEngine {
 
     // Roaring V8 Supercharged Engine
     this.engineGain = this.ctx.createGain();
-    this.engineGain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+    this.engineGain.gain.setValueAtTime(0.22, this.ctx.currentTime);
 
     this.osc1 = this.ctx.createOscillator();
     this.osc1.type = 'sawtooth';
@@ -524,30 +534,31 @@ class SoundEngine {
   updateEngine(speed, isDrifting, isNitro, rpm) {
     if (!this.ctx) return;
     const normRpm = Math.min(1.0, rpm / 9000);
-    const baseFreq = 45 + normRpm * 165;
-    const boost = isNitro ? 50 : 0;
+    const baseFreq = 48 + normRpm * 185;
+    const boost = isNitro ? 55 : 0;
 
     this.osc1.frequency.setTargetAtTime(baseFreq + boost, this.ctx.currentTime, 0.04);
     this.osc2.frequency.setTargetAtTime((baseFreq + boost) * 0.5, this.ctx.currentTime, 0.04);
 
-    const screechVol = isDrifting && speed > 25 ? Math.min(0.36, (speed / 130) * 0.36) : 0.0;
+    const screechVol = isDrifting && speed > 25 ? Math.min(0.38, (speed / 130) * 0.38) : 0.0;
     this.screechGain.gain.setTargetAtTime(screechVol, this.ctx.currentTime, 0.03);
   }
 
   playTurboBlowoff() {
     if (!this.ctx) return;
     const t = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(1550, t);
-    osc.frequency.exponentialRampToValueAtTime(260, t + 0.22);
-    gain.gain.setValueAtTime(0.26, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-    osc.start(t);
-    osc.stop(t + 0.23);
+    [1650, 1200, 850].forEach((freq, idx) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t + idx * 0.06);
+      gain.gain.setValueAtTime(0.22, t + idx * 0.06);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.06 + 0.12);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t + idx * 0.06);
+      osc.stop(t + idx * 0.06 + 0.13);
+    });
   }
 
   playNosWhoosh() {
@@ -556,8 +567,8 @@ class SoundEngine {
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(150, t);
-    osc.frequency.exponentialRampToValueAtTime(820, t + 0.38);
+    osc.frequency.setValueAtTime(160, t);
+    osc.frequency.exponentialRampToValueAtTime(880, t + 0.38);
     gain.gain.setValueAtTime(0.35, t);
     gain.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
     osc.connect(gain);
@@ -612,7 +623,7 @@ class SoundEngine {
           const kGain = this.ctx.createGain();
           kick.frequency.setValueAtTime(150, t);
           kick.frequency.exponentialRampToValueAtTime(35, t + 0.12);
-          kGain.gain.setValueAtTime(0.36, t);
+          kGain.gain.setValueAtTime(0.34, t);
           kGain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
           kick.connect(kGain);
           kGain.connect(this.musicGain);
@@ -661,144 +672,154 @@ class SoundEngine {
 
 const audio = new SoundEngine();
 
-// 2. Modified Super Booster Hypercar Generator
+// 2. High-Detail 3D Supercar Mesh with Independent Suspension Chassis
 function createSupercarMesh(paintHex = 0x00f0ff, isPlayerBooster = false) {
-  const car = new THREE.Group();
+  const rootCar = new THREE.Group();
+  const chassisGroup = new THREE.Group();
+  rootCar.add(chassisGroup);
 
-  const carPaintMat = new THREE.MeshStandardMaterial({
+  // Materials
+  const paintMat = new THREE.MeshStandardMaterial({
     color: paintHex,
-    roughness: 0.18,
-    metalness: 0.92
+    roughness: 0.12,
+    metalness: 0.94
   });
 
   const carbonMat = new THREE.MeshStandardMaterial({
-    color: 0x11131a,
-    roughness: 0.45,
-    metalness: 0.5
+    color: 0x14161f,
+    roughness: 0.38,
+    metalness: 0.6
   });
 
   const glassMat = new THREE.MeshStandardMaterial({
     color: 0x030814,
-    roughness: 0.05,
+    roughness: 0.04,
     metalness: 0.98
   });
 
   const chromeMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
-    roughness: 0.1,
+    roughness: 0.08,
     metalness: 0.98
   });
 
-  // Lower Chassis & Body
-  const chassisGeo = new THREE.BoxGeometry(2.15, 0.48, 4.4);
-  const chassis = new THREE.Mesh(chassisGeo, carPaintMat);
-  chassis.position.y = 0.48;
-  car.add(chassis);
+  // Sculpted Lower Body Floor
+  const underbody = new THREE.Mesh(new THREE.BoxGeometry(2.15, 0.38, 4.3), carbonMat);
+  underbody.position.y = 0.36;
+  chassisGroup.add(underbody);
 
-  // Front Carbon Competition Splitter with Winglets
-  const splitter = new THREE.Mesh(new THREE.BoxGeometry(2.35, 0.08, 0.8), carbonMat);
-  splitter.position.set(0, 0.22, -2.3);
-  car.add(splitter);
+  // Wedge Aerodynamic Nose & Front Hood
+  const nose = new THREE.Mesh(new THREE.BoxGeometry(2.05, 0.34, 1.6), paintMat);
+  nose.position.set(0, 0.52, -1.35);
+  nose.rotation.x = -0.07;
+  chassisGroup.add(nose);
 
-  // Widebody Flared Wheel Fenders
+  // Front Carbon Splitter with Dual Winglets
+  const splitter = new THREE.Mesh(new THREE.BoxGeometry(2.36, 0.08, 0.85), carbonMat);
+  splitter.position.set(0, 0.22, -2.25);
+  chassisGroup.add(splitter);
+
+  // Widebody Flared Wheel Arches & Side Air Intakes
   [-1.08, 1.08].forEach(x => {
-    const ff = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.52, 1.35), carPaintMat);
-    ff.position.set(x, 0.55, -1.35);
-    car.add(ff);
+    const ff = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.52, 1.35), paintMat);
+    ff.position.set(x, 0.54, -1.35);
+    chassisGroup.add(ff);
 
-    const rf = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.58, 1.45), carPaintMat);
+    const rf = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.58, 1.45), paintMat);
     rf.position.set(x, 0.58, 1.35);
-    car.add(rf);
+    chassisGroup.add(rf);
 
-    const skirt = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.12, 2.3), carbonMat);
-    skirt.position.set(x, 0.22, 0);
-    car.add(skirt);
+    const sideIntake = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.35, 1.2), carbonMat);
+    sideIntake.position.set(x, 0.48, 0.1);
+    chassisGroup.add(sideIntake);
   });
 
-  // Vented Hood + Supercharger Velocity Scoop
-  const hood = new THREE.Mesh(new THREE.BoxGeometry(1.85, 0.14, 1.6), carPaintMat);
-  hood.position.set(0, 0.72, -1.25);
-  hood.rotation.x = -0.06;
-  car.add(hood);
-
+  // Exposed Chrome Supercharger Velocity Scoop (Player Car)
   if (isPlayerBooster) {
-    const scoop = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.25, 0.5), chromeMat);
-    scoop.position.set(0, 0.88, -1.1);
-    car.add(scoop);
+    const scoop = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.26, 0.52), chromeMat);
+    scoop.position.set(0, 0.78, -1.05);
+    chassisGroup.add(scoop);
   }
 
-  // Cockpit Canopy
-  const cockpit = new THREE.Mesh(new THREE.BoxGeometry(1.62, 0.52, 2.1), glassMat);
-  cockpit.position.set(0, 0.98, -0.15);
-  car.add(cockpit);
+  // Teardrop Cockpit Canopy
+  const cockpit = new THREE.Mesh(new THREE.BoxGeometry(1.58, 0.52, 2.05), glassMat);
+  cockpit.position.set(0, 0.94, -0.15);
+  chassisGroup.add(cockpit);
+
+  // Rear Engine Deck with V8 Intake Runners Visible
+  const engineCover = new THREE.Mesh(new THREE.BoxGeometry(1.68, 0.22, 1.35), carbonMat);
+  engineCover.position.set(0, 0.68, 1.35);
+  chassisGroup.add(engineCover);
+
+  const manifold = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.14, 0.7), chromeMat);
+  manifold.position.set(0, 0.82, 1.25);
+  chassisGroup.add(manifold);
 
   // Massive Dual-Plane Competition GT Wing
   [-0.7, 0.7].forEach(x => {
-    const stanchion = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.45, 0.2), carbonMat);
+    const stanchion = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.48, 0.22), carbonMat);
     stanchion.position.set(x, 0.98, 2.0);
-    car.add(stanchion);
+    chassisGroup.add(stanchion);
   });
-  const wing = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.07, 0.5), carbonMat);
+  const wing = new THREE.Mesh(new THREE.BoxGeometry(2.35, 0.07, 0.52), carbonMat);
   wing.position.set(0, 1.22, 2.02);
-  car.add(wing);
+  chassisGroup.add(wing);
 
-  // Wing Endplates
-  [-1.16, 1.16].forEach(x => {
+  [-1.18, 1.18].forEach(x => {
     const endplate = new THREE.Mesh(
-      new THREE.BoxGeometry(0.04, 0.28, 0.52),
+      new THREE.BoxGeometry(0.04, 0.28, 0.54),
       new THREE.MeshBasicMaterial({ color: paintHex })
     );
     endplate.position.set(x, 1.22, 2.02);
-    car.add(endplate);
+    chassisGroup.add(endplate);
   });
 
-  // Rear Racing Diffuser
-  const diffuser = new THREE.Mesh(new THREE.BoxGeometry(1.95, 0.22, 0.35), carbonMat);
+  // 4-Fin Carbon Rear Diffuser
+  const diffuser = new THREE.Mesh(new THREE.BoxGeometry(1.98, 0.22, 0.4), carbonMat);
   diffuser.position.set(0, 0.3, 2.2);
-  car.add(diffuser);
+  chassisGroup.add(diffuser);
 
-  // Twin Rocket Booster Thrusters (Center Rear)
+  // Center Twin Rocket Thrusters
   const exhaustFlames = [];
   [-0.32, 0.32].forEach(x => {
-    const thrusterRing = new THREE.Mesh(
+    const ring = new THREE.Mesh(
       new THREE.CylinderGeometry(0.16, 0.16, 0.35, 16).rotateX(Math.PI / 2),
       chromeMat
     );
-    thrusterRing.position.set(x, 0.42, 2.25);
-    car.add(thrusterRing);
+    ring.position.set(x, 0.42, 2.25);
+    chassisGroup.add(ring);
 
-    // Glowing Jet Plume
     const flame = new THREE.Mesh(
-      new THREE.ConeGeometry(0.2, 1.2, 10).rotateX(-Math.PI / 2),
+      new THREE.ConeGeometry(0.2, 1.3, 10).rotateX(-Math.PI / 2),
       new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.0 })
     );
-    flame.position.set(x, 0.42, 2.95);
-    car.add(flame);
+    flame.position.set(x, 0.42, 3.0);
+    chassisGroup.add(flame);
     exhaustFlames.push(flame);
   });
 
-  // Projector Headlights
+  // Razor LED Headlights with DRL Eyebrows
   [-0.72, 0.72].forEach(x => {
-    const head = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.12, 0.1), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-    head.position.set(x, 0.58, -2.2);
-    car.add(head);
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.1, 0.1), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+    head.position.set(x, 0.56, -2.18);
+    chassisGroup.add(head);
   });
 
-  // Taillight Bar
+  // Full-Width Neon Taillight Bar
   const tailMat = new THREE.MeshBasicMaterial({ color: 0xff0044 });
-  const tailBar = new THREE.Mesh(new THREE.BoxGeometry(1.95, 0.1, 0.1), tailMat);
+  const tailBar = new THREE.Mesh(new THREE.BoxGeometry(1.98, 0.1, 0.1), tailMat);
   tailBar.position.set(0, 0.65, 2.2);
-  car.add(tailBar);
+  chassisGroup.add(tailBar);
 
-  // Neon Underglow
+  // Ground-Effect Neon Underglow
   const underglow = new THREE.Mesh(
     new THREE.PlaneGeometry(1.85, 3.8).rotateX(-Math.PI / 2),
-    new THREE.MeshBasicMaterial({ color: paintHex, transparent: true, opacity: 0.9 })
+    new THREE.MeshBasicMaterial({ color: paintHex, transparent: true, opacity: 0.85 })
   );
   underglow.position.y = 0.06;
-  car.add(underglow);
+  rootCar.add(underglow);
 
-  // 4 Wheels with Red Brembo Brake Calipers
+  // 4 Detailed 5-Spoke Alloy Wheels with Red Brembo Brake Calipers
   const wheels = [];
   const wheelPositions = [
     { x: -1.08, y: 0.38, z: -1.35, isFront: true },
@@ -808,60 +829,119 @@ function createSupercarMesh(paintHex = 0x00f0ff, isPlayerBooster = false) {
   ];
 
   const tireGeo = new THREE.CylinderGeometry(0.38, 0.38, 0.34, 18).rotateZ(Math.PI / 2);
-  const tireMat = new THREE.MeshStandardMaterial({ color: 0x181a20, roughness: 0.85 });
-  const rimGeo = new THREE.CylinderGeometry(0.27, 0.27, 0.35, 10).rotateZ(Math.PI / 2);
+  const tireMat = new THREE.MeshStandardMaterial({ color: 0x16181e, roughness: 0.85 });
+  const rimGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.35, 12).rotateZ(Math.PI / 2);
   const rimMat = new THREE.MeshStandardMaterial({ color: 0xe4e4e7, metalness: 0.95, roughness: 0.15 });
+  const rotorGeo = new THREE.CylinderGeometry(0.22, 0.22, 0.04, 12).rotateZ(Math.PI / 2);
+  const rotorMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.9, roughness: 0.3 });
   const caliperMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
 
   wheelPositions.forEach(pos => {
     const hub = new THREE.Group();
     hub.add(new THREE.Mesh(tireGeo, tireMat));
     hub.add(new THREE.Mesh(rimGeo, rimMat));
+    hub.add(new THREE.Mesh(rotorGeo, rotorMat));
+
     const caliper = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.22, 0.16), caliperMat);
     caliper.position.set(pos.x > 0 ? -0.1 : 0.1, 0.1, 0);
     hub.add(caliper);
 
     hub.position.set(pos.x, pos.y, pos.z);
-    hub.userData = { isFront: pos.isFront };
-    car.add(hub);
+    hub.userData = { isFront: pos.isFront, basePos: new THREE.Vector3(pos.x, pos.y, pos.z) };
+    rootCar.add(hub);
     wheels.push(hub);
   });
 
   return {
-    group: car,
+    group: rootCar,
+    chassis: chassisGroup,
     wheels,
     exhaustFlames,
     tailMat,
     underglowMat: underglow.material,
-    paintMat: carPaintMat
+    paintMat
   };
 }
 
-// 3. Main Racing Simulation & Championship Engine
+// 3. Dynamic Rubber Skidmark Trail System
+class SkidmarkManager {
+  constructor(scene, maxSegments = 300) {
+    this.scene = scene;
+    this.maxSegments = maxSegments;
+    this.segments = [];
+
+    const geom = new THREE.BufferGeometry();
+    this.positions = new Float32Array(maxSegments * 6 * 3);
+    geom.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
+
+    const mat = new THREE.MeshBasicMaterial({
+      color: 0x181a22,
+      transparent: true,
+      opacity: 0.65,
+      depthWrite: false
+    });
+
+    this.mesh = new THREE.Mesh(geom, mat);
+    this.mesh.position.y = 0.08;
+    this.scene.add(this.mesh);
+
+    this.count = 0;
+  }
+
+  addSkidmark(p1, p2, width = 0.35) {
+    if (this.lastP1 && this.lastP2) {
+      const idx = (this.count % this.maxSegments) * 18;
+      const v = this.positions;
+
+      v[idx + 0] = this.lastP1.x; v[idx + 1] = 0.08; v[idx + 2] = this.lastP1.z;
+      v[idx + 3] = p1.x;          v[idx + 4] = 0.08; v[idx + 5] = p1.z;
+      v[idx + 6] = p2.x;          v[idx + 7] = 0.08; v[idx + 8] = p2.z;
+
+      v[idx + 9]  = this.lastP1.x; v[idx + 10] = 0.08; v[idx + 11] = this.lastP1.z;
+      v[idx + 12] = p2.x;          v[idx + 13] = 0.08; v[idx + 14] = p2.z;
+      v[idx + 15] = this.lastP2.x; v[idx + 16] = 0.08; v[idx + 17] = this.lastP2.z;
+
+      this.mesh.geometry.attributes.position.needsUpdate = true;
+      this.count++;
+    }
+
+    this.lastP1 = p1.clone();
+    this.lastP2 = p2.clone();
+  }
+
+  breakStreak() {
+    this.lastP1 = null;
+    this.lastP2 = null;
+  }
+}
+
+// 4. Main Racing Championship Engine
 class SuperBoosterChampionship {
   constructor() {
     this.container = document.getElementById('canvas-container');
+    this.speedLinesCanvas = document.getElementById('speed-lines-canvas');
+    this.speedLinesCtx = this.speedLinesCanvas.getContext('2d');
+
     this.keys = {};
     this.touchInput = { gas: false, brake: false, left: false, right: false, drift: false, nos: false };
 
-    // Player Configuration
     this.selectedColor = 0x00f0ff;
 
     // Race State
     this.raceState = 'countdown';
     this.countdownTimer = 3;
     this.currentLap = 1;
-    this.totalLaps = 2; // Exact 2-Lap Race (~80-90 seconds)
+    this.totalLaps = 2; // ~80-90s Grand Prix Race
     this.raceStartTime = 0;
     this.raceTime = 0;
     this.racePosition = 1;
 
-    // Modified Booster Dynamics (Lightning fast, superior)
-    this.speed = 0;              // km/h
-    this.maxSpeed = 290;         // Base top speed (Faster than rivals!)
-    this.nitroMaxSpeed = 380;    // Super Boost top speed!
-    this.accel = 110;            // Instant torque
-    this.braking = 170;          // Responsive brakes
+    // Dynamics
+    this.speed = 0;
+    this.maxSpeed = 290;
+    this.nitroMaxSpeed = 380;
+    this.accel = 110;
+    this.braking = 175;
     this.friction = 14;
     this.steerAngle = 0;
     this.maxSteer = 0.58;
@@ -870,15 +950,19 @@ class SuperBoosterChampionship {
     this.isDrifting = false;
     this.carPos = new THREE.Vector3(0, 0, 10);
 
+    // Chassis Suspension Tilt
+    this.bodyRoll = 0;
+    this.bodyPitch = 0;
+
     // RPM & Engine Simulation
     this.rpm = 1200;
     this.gear = 1;
 
-    // Super Booster System
+    // Nitro Booster
     this.nitro = 100;
     this.isNitro = false;
 
-    // Drift Scoring & Slipstream
+    // Drift Scoring
     this.driftScore = 0;
     this.currentDriftPoints = 0;
     this.multiplier = 1.0;
@@ -890,10 +974,11 @@ class SuperBoosterChampionship {
 
     this.initThree();
     this.buildCircuitTrack();
-    this.buildDaylightEnvironment();
+    this.buildGrandPrixEnvironment();
     this.spawnPlayerCar();
     this.initRivals();
     this.initParticles();
+    this.skidmarks = new SkidmarkManager(this.scene);
     this.initEventListeners();
     this.initRadar();
 
@@ -903,31 +988,30 @@ class SuperBoosterChampionship {
 
   initThree() {
     this.scene = new THREE.Scene();
-    // Bright Sunny Daylight Sky Background
     this.scene.background = new THREE.Color(0x70baff);
-    this.scene.fog = new THREE.FogExp2(0x99ccff, 0.0006);
+    this.scene.fog = new THREE.FogExp2(0x99ccff, 0.0005);
 
-    this.camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 2600);
+    this.camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 2800);
     this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
     this.container.appendChild(this.renderer.domElement);
 
-    // Bright, crisp daylight illumination
-    const ambient = new THREE.AmbientLight(0xffffff, 1.4);
+    // Crisp Sunlight & Ambient Lighting
+    const ambient = new THREE.AmbientLight(0xffffff, 1.45);
     this.scene.add(ambient);
 
-    const sunKey = new THREE.DirectionalLight(0xfffaed, 1.9);
-    sunKey.position.set(150, 160, 100);
+    const sunKey = new THREE.DirectionalLight(0xfffaed, 1.95);
+    sunKey.position.set(160, 180, 120);
     this.scene.add(sunKey);
 
-    const skyFill = new THREE.DirectionalLight(0x99ccff, 1.1);
-    skyFill.position.set(-120, 90, -120);
+    const skyFill = new THREE.DirectionalLight(0x99ccff, 1.15);
+    skyFill.position.set(-140, 100, -140);
     this.scene.add(skyFill);
   }
 
   buildCircuitTrack() {
-    // Smooth Closed Circuit Track Waypoints (Grand Prix Circuit ~2.2 km)
     this.trackWaypoints = [
       new THREE.Vector3(0, 0, 0),         // Start / Finish Line
       new THREE.Vector3(0, 0, -280),      // Main Straight
@@ -946,19 +1030,22 @@ class SuperBoosterChampionship {
 
     this.trackCurve = new THREE.CatmullRomCurve3(this.trackWaypoints, true);
     this.trackLength = this.trackCurve.getLength();
-    this.roadWidth = 28; // Wide, generous 28m racetrack!
+    this.roadWidth = 28;
 
-    // Track Bounding Box for Minimap
     this.circuitBounds = { minX: -90, maxX: 250, minZ: -480, maxZ: 80 };
 
-    // Generate Asphalt Track Ribbon with Red-White Racing Kerbs & Guardrails
-    const numSlices = 280;
+    const numSlices = 300;
     const roadVertices = [];
-    const roadUvs = [];
     const roadIndices = [];
-
     const kerbVertices = [];
     const kerbIndices = [];
+    const centerLineVertices = [];
+    const centerLineIndices = [];
+
+    // Continuous Armco Steel Guardrail along both sides
+    const guardrailGroup = new THREE.Group();
+    const guardMat = new THREE.MeshStandardMaterial({ color: 0xd4d4d8, metalness: 0.85, roughness: 0.25 });
+    const postMat = new THREE.MeshStandardMaterial({ color: 0x52525b });
 
     for (let i = 0; i <= numSlices; i++) {
       const t = i / numSlices;
@@ -970,10 +1057,14 @@ class SuperBoosterChampionship {
       roadVertices.push(pt.x + normal.x * (this.roadWidth / 2), 0.05, pt.z + normal.z * (this.roadWidth / 2));
       roadVertices.push(pt.x - normal.x * (this.roadWidth / 2), 0.05, pt.z - normal.z * (this.roadWidth / 2));
 
-      roadUvs.push(0, t * 50);
-      roadUvs.push(1, t * 50);
+      // Dashed White Center Line
+      const isDash = (i % 6) < 3;
+      if (isDash) {
+        centerLineVertices.push(pt.x + normal.x * 0.4, 0.07, pt.z + normal.z * 0.4);
+        centerLineVertices.push(pt.x - normal.x * 0.4, 0.07, pt.z - normal.z * 0.4);
+      }
 
-      // Elevated Red-White Apex Kerbs
+      // Red-White Apex Rumble Kerbs
       const kerbWidth = 1.6;
       kerbVertices.push(pt.x + normal.x * (this.roadWidth / 2 + kerbWidth), 0.16, pt.z + normal.z * (this.roadWidth / 2 + kerbWidth));
       kerbVertices.push(pt.x + normal.x * (this.roadWidth / 2), 0.16, pt.z + normal.z * (this.roadWidth / 2));
@@ -984,30 +1075,61 @@ class SuperBoosterChampionship {
         const v2 = (i + 1) * 2;
         const v3 = (i + 1) * 2 + 1;
 
-        roadIndices.push(v0, v1, v2);
-        roadIndices.push(v1, v3, v2);
+        roadIndices.push(v0, v1, v2, v1, v3, v2);
+        kerbIndices.push(v0, v1, v2, v1, v3, v2);
+      }
 
-        kerbIndices.push(v0, v1, v2);
-        kerbIndices.push(v1, v3, v2);
+      // Continuous Armco Guardrail Posts every 10 meters
+      if (i % 4 === 0) {
+        [-1, 1].forEach(side => {
+          const barrierDist = this.roadWidth / 2 + 2.2;
+          const postX = pt.x + normal.x * barrierDist * side;
+          const postZ = pt.z + normal.z * barrierDist * side;
+
+          const post = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 1.4, 8), postMat);
+          post.position.set(postX, 0.7, postZ);
+          guardrailGroup.add(post);
+
+          const rail = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.4, 18), guardMat);
+          rail.position.set(postX, 0.85, postZ);
+          rail.rotation.y = Math.atan2(tangent.x, tangent.z);
+          guardrailGroup.add(rail);
+        });
       }
     }
 
+    // Asphalt Road Mesh
     const roadGeo = new THREE.BufferGeometry();
     roadGeo.setAttribute('position', new THREE.Float32BufferAttribute(roadVertices, 3));
-    roadGeo.setAttribute('uv', new THREE.Float32BufferAttribute(roadUvs, 2));
     roadGeo.setIndex(roadIndices);
     roadGeo.computeVertexNormals();
 
-    // Clean Dark Charcoal Racing Asphalt
     const roadMat = new THREE.MeshStandardMaterial({
-      color: 0x222630,
-      roughness: 0.5,
-      metalness: 0.25
+      color: 0x222632,
+      roughness: 0.45,
+      metalness: 0.28
     });
-    const roadMesh = new THREE.Mesh(roadGeo, roadMat);
-    this.scene.add(roadMesh);
+    this.scene.add(new THREE.Mesh(roadGeo, roadMat));
 
-    // High-Visibility Red-White Kerbs Mesh
+    // Dashed White Center Line Mesh
+    if (centerLineVertices.length > 0) {
+      const cIndices = [];
+      const dashPairs = centerLineVertices.length / 2;
+      for (let j = 0; j < dashPairs - 1; j += 2) {
+        const v0 = j * 2;
+        const v1 = j * 2 + 1;
+        const v2 = (j + 1) * 2;
+        const v3 = (j + 1) * 2 + 1;
+        cIndices.push(v0, v1, v2, v1, v3, v2);
+      }
+      const cGeo = new THREE.BufferGeometry();
+      cGeo.setAttribute('position', new THREE.Float32BufferAttribute(centerLineVertices, 3));
+      cGeo.setIndex(cIndices);
+      const cMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      this.scene.add(new THREE.Mesh(cGeo, cMat));
+    }
+
+    // Apex Kerbs Mesh
     const kerbGeo = new THREE.BufferGeometry();
     kerbGeo.setAttribute('position', new THREE.Float32BufferAttribute(kerbVertices, 3));
     kerbGeo.setIndex(kerbIndices);
@@ -1015,7 +1137,9 @@ class SuperBoosterChampionship {
     const kerbMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
     this.scene.add(new THREE.Mesh(kerbGeo, kerbMat));
 
-    // Start / Finish Line Overhead Gantry
+    this.scene.add(guardrailGroup);
+
+    // Start / Finish Line Checkered Gantry
     const gantry = new THREE.Group();
     const gArch = new THREE.Mesh(new THREE.BoxGeometry(this.roadWidth + 4, 1.4, 1.4), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
     gArch.position.set(0, 8.5, 0);
@@ -1025,7 +1149,6 @@ class SuperBoosterChampionship {
     banner.position.set(0, 8.5, 0.8);
     gantry.add(banner);
 
-    // Checkered Finish Line Stripe
     const finishStripe = new THREE.Mesh(
       new THREE.PlaneGeometry(this.roadWidth, 4).rotateX(-Math.PI / 2),
       new THREE.MeshBasicMaterial({ color: 0xffffff })
@@ -1036,84 +1159,93 @@ class SuperBoosterChampionship {
     this.scene.add(gantry);
   }
 
-  buildDaylightEnvironment() {
+  buildGrandPrixEnvironment() {
     // Lush Emerald Racing Grass Terrain Plane
-    const grassGeo = new THREE.PlaneGeometry(2400, 2400);
-    grassGeo.rotateX(-Math.PI / 2);
-    const grassMat = new THREE.MeshStandardMaterial({
-      color: 0x2e8540,
-      roughness: 0.85
-    });
+    const grassGeo = new THREE.PlaneGeometry(2600, 2600).rotateX(-Math.PI / 2);
+    const grassMat = new THREE.MeshStandardMaterial({ color: 0x2e8540, roughness: 0.88 });
     const grass = new THREE.Mesh(grassGeo, grassMat);
     grass.position.y = -0.02;
     this.scene.add(grass);
 
-    // Grandstands along Start/Finish Straight with Cheering Crowds
+    // Distant Mountain Horizon Silhouette
+    const mountainGroup = new THREE.Group();
+    const mtnGeo = new THREE.ConeGeometry(90, 160, 6);
+    const mtnMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.9 });
+    for (let i = 0; i < 28; i++) {
+      const angle = (i / 28) * Math.PI * 2;
+      const dist = 750 + (i % 4) * 80;
+      const mtn = new THREE.Mesh(mtnGeo, mtnMat);
+      mtn.position.set(Math.cos(angle) * dist + 80, 70, Math.sin(angle) * dist - 180);
+      mtn.scale.set(1 + Math.random() * 0.5, 1 + Math.random() * 0.4, 1);
+      mountainGroup.add(mtn);
+    }
+    this.scene.add(mountainGroup);
+
+    // Stadium Grandstands along Main Straight with Cheering Crowds
     const standGroup = new THREE.Group();
-    const standGeo = new THREE.BoxGeometry(12, 14, 180);
+    const standGeo = new THREE.BoxGeometry(12, 16, 180);
     const standMat = new THREE.MeshStandardMaterial({ color: 0xd4d4d8, roughness: 0.6 });
 
     const leftStand = new THREE.Mesh(standGeo, standMat);
-    leftStand.position.set(-this.roadWidth / 2 - 14, 7, -100);
+    leftStand.position.set(-this.roadWidth / 2 - 14, 8, -100);
     standGroup.add(leftStand);
 
     const rightStand = new THREE.Mesh(standGeo, standMat);
-    rightStand.position.set(this.roadWidth / 2 + 14, 7, -100);
+    rightStand.position.set(this.roadWidth / 2 + 14, 8, -100);
     standGroup.add(rightStand);
 
     this.scene.add(standGroup);
 
-    // Colorful Trees & Grand Prix Sponsor Billboards
-    const decorGroup = new THREE.Group();
-    const treeTrunkGeo = new THREE.CylinderGeometry(0.8, 1.0, 6, 8);
-    const treeFoliageGeo = new THREE.ConeGeometry(5, 12, 8);
-    const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5c3a21 });
-    const foliageMat = new THREE.MeshStandardMaterial({ color: 0x15803d });
+    // Stadium Floodlight Towers
+    const lightTowerGeo = new THREE.BoxGeometry(1.5, 26, 1.5);
+    const headGeo = new THREE.BoxGeometry(8, 3, 1.5);
+    const towerMat = new THREE.MeshStandardMaterial({ color: 0x475569 });
+    const lampMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
-    for (let i = 0; i < 65; i++) {
-      const angle = (i / 65) * Math.PI * 2;
-      const dist = 160 + (i % 5) * 60;
-      const x = Math.cos(angle) * dist + 80;
-      const z = Math.sin(angle) * dist - 180;
+    [
+      { x: -70, z: -50 }, { x: 70, z: -50 },
+      { x: 260, z: -350 }, { x: 200, z: -100 },
+      { x: 30, z: 90 }, { x: -80, z: -160 }
+    ].forEach(pos => {
+      const tower = new THREE.Group();
+      const mast = new THREE.Mesh(lightTowerGeo, towerMat);
+      mast.position.y = 13;
+      tower.add(mast);
 
-      const tree = new THREE.Group();
-      const trunk = new THREE.Mesh(treeTrunkGeo, trunkMat);
-      trunk.position.y = 3;
-      tree.add(trunk);
+      const head = new THREE.Mesh(headGeo, lampMat);
+      head.position.y = 26;
+      tower.add(head);
 
-      const foliage = new THREE.Mesh(treeFoliageGeo, foliageMat);
-      foliage.position.y = 9;
-      tree.add(foliage);
+      tower.position.set(pos.x, 0, pos.z);
+      this.scene.add(tower);
+    });
 
-      tree.position.set(x, 0, z);
-      decorGroup.add(tree);
-    }
-
-    this.scene.add(decorGroup);
-
-    // Glowing Turn Chevron Signs
-    const turnPoints = [
-      { t: 0.12, text: '<<< TURN 1 <<<' },
-      { t: 0.42, text: '>>> HAIRPIN >>>' },
-      { t: 0.70, text: '⚡ S-CHICANE ⚡' }
+    // Sponsor Billboards along Curves
+    const sponsorBoards = [
+      { t: 0.14, text: 'PIRELLI RACING', color: 0xf59e0b },
+      { t: 0.28, text: 'SUPER BOOSTER', color: 0x00f0ff },
+      { t: 0.46, text: 'BREMBO BRAKES', color: 0xef4444 },
+      { t: 0.72, text: 'MOTUL PERFORMANCE', color: 0x10b981 }
     ];
 
-    turnPoints.forEach(tp => {
-      const pt = this.trackCurve.getPointAt(tp.t);
-      const signMesh = new THREE.Mesh(
-        new THREE.BoxGeometry(12, 2.8, 0.3),
-        new THREE.MeshBasicMaterial({ color: 0xf59e0b })
+    sponsorBoards.forEach(sb => {
+      const pt = this.trackCurve.getPointAt(sb.t);
+      const tangent = this.trackCurve.getTangentAt(sb.t);
+      const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
+
+      const board = new THREE.Mesh(
+        new THREE.BoxGeometry(14, 3.2, 0.4),
+        new THREE.MeshBasicMaterial({ color: sb.color })
       );
-      signMesh.position.set(pt.x, 6, pt.z);
-      this.scene.add(signMesh);
+      board.position.set(pt.x + normal.x * (this.roadWidth / 2 + 6), 5, pt.z + normal.z * (this.roadWidth / 2 + 6));
+      board.rotation.y = Math.atan2(tangent.x, tangent.z);
+      this.scene.add(board);
     });
   }
 
   spawnPlayerCar() {
-    if (this.playerCarData) {
-      this.scene.remove(this.playerCarData.group);
-    }
-    // Player's Modified Super Booster Beast (Cyan & Gold)
+    if (this.playerCarData) this.scene.remove(this.playerCarData.group);
+
     this.playerCarData = createSupercarMesh(this.selectedColor, true);
     this.carGroup = this.playerCarData.group;
 
@@ -1237,7 +1369,6 @@ class SuperBoosterChampionship {
       }
     });
 
-    // Mobile Virtual Touch
     const bindTouch = (id, keyName) => {
       const el = document.getElementById(id);
       if (!el) return;
@@ -1257,7 +1388,6 @@ class SuperBoosterChampionship {
     bindTouch('btn-drift-touch', 'drift');
     bindTouch('btn-nos-touch', 'nos');
 
-    // Action Buttons
     document.getElementById('btn-cam').addEventListener('click', () => {
       this.curCamIdx = (this.curCamIdx + 1) % this.cameras.length;
     });
@@ -1287,7 +1417,13 @@ class SuperBoosterChampionship {
       this.camera.aspect = window.innerWidth / window.innerHeight;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+      this.speedLinesCanvas.width = window.innerWidth;
+      this.speedLinesCanvas.height = window.innerHeight;
     });
+
+    this.speedLinesCanvas.width = window.innerWidth;
+    this.speedLinesCanvas.height = window.innerHeight;
   }
 
   resetCarToTrack() {
@@ -1295,10 +1431,11 @@ class SuperBoosterChampionship {
     const tangent = this.trackCurve.getTangentAt(this.playerT || 0);
     this.carPos.copy(pt);
     this.heading = Math.atan2(tangent.x, tangent.z);
-    this.speed = 100; // Instantly gives rolling momentum so you are never stuck!
+    this.speed = 100;
     this.steerAngle = 0;
     this.driftAngle = 0;
     this.nitro = 100;
+    this.skidmarks.breakStreak();
   }
 
   resetRace() {
@@ -1315,6 +1452,7 @@ class SuperBoosterChampionship {
     this.steerAngle = 0;
     this.driftAngle = 0;
     this.nitro = 100;
+    this.skidmarks.breakStreak();
 
     const offsets = [0.992, 0.985, 0.978];
     this.rivals.forEach((r, idx) => {
@@ -1347,7 +1485,7 @@ class SuperBoosterChampionship {
     const mapX = (x) => pad + ((x - b.minX) / (b.maxX - b.minX)) * mapW;
     const mapY = (z) => pad + ((z - b.minZ) / (b.maxZ - b.minZ)) * mapH;
 
-    // High-Contrast Yellow/Gold Circuit Track
+    // High-Contrast Gold Track Line
     ctx.strokeStyle = '#f59e0b';
     ctx.lineWidth = 6;
     ctx.lineCap = 'round';
@@ -1362,7 +1500,7 @@ class SuperBoosterChampionship {
     }
     ctx.stroke();
 
-    // Start / Finish Line Checkered Bar
+    // Checkered Finish Line Bar
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 4;
     ctx.beginPath();
@@ -1370,7 +1508,7 @@ class SuperBoosterChampionship {
     ctx.lineTo(mapX(10), mapY(0));
     ctx.stroke();
 
-    // Draw Rivals (Distinct colored dots)
+    // AI Rivals Dots
     this.rivals.forEach(r => {
       const pt = this.trackCurve.getPointAt(r.t);
       ctx.fillStyle = '#' + r.color.toString(16).padStart(6, '0');
@@ -1379,7 +1517,7 @@ class SuperBoosterChampionship {
       ctx.fill();
     });
 
-    // Draw Player Arrow (Large, Bright Cyan, Rotating)
+    // Player Rotating Cyan Arrow
     const px = mapX(this.carPos.x);
     const py = mapY(this.carPos.z);
     ctx.save();
@@ -1395,6 +1533,42 @@ class SuperBoosterChampionship {
     ctx.lineTo(-5, 6);
     ctx.closePath();
     ctx.fill();
+    ctx.restore();
+  }
+
+  // Draw High-Speed Radial Streaks on 2D Overlay Canvas
+  drawSpeedStreaks() {
+    const ctx = this.speedLinesCtx;
+    const w = this.speedLinesCanvas.width;
+    const h = this.speedLinesCanvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    if (this.speed < 240) return;
+
+    const intensity = Math.min(1.0, (this.speed - 240) / 140);
+    const numLines = Math.floor(intensity * 35);
+    const cx = w / 2;
+    const cy = h / 2;
+
+    ctx.save();
+    ctx.strokeStyle = this.isNitro ? 'rgba(0, 240, 255, 0.45)' : 'rgba(255, 255, 255, 0.28)';
+    ctx.lineWidth = 2;
+
+    for (let i = 0; i < numLines; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const innerDist = 180 + Math.random() * 120;
+      const outerDist = innerDist + 80 + Math.random() * 180;
+
+      const x1 = cx + Math.cos(angle) * innerDist;
+      const y1 = cy + Math.sin(angle) * innerDist;
+      const x2 = cx + Math.cos(angle) * outerDist;
+      const y2 = cy + Math.sin(angle) * outerDist;
+
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
     ctx.restore();
   }
 
@@ -1422,7 +1596,6 @@ class SuperBoosterChampionship {
     }
     document.getElementById('nitro-bar').style.width = `${this.nitro}%`;
 
-    // Speed calculation
     const currentMaxSpeed = (this.isNitro ? this.nitroMaxSpeed : this.maxSpeed) + (this.isSlipstreaming ? 25 : 0);
     const accelRate = this.isNitro ? this.accel * 2.0 : this.accel;
 
@@ -1435,7 +1608,7 @@ class SuperBoosterChampionship {
       else if (this.speed < 0) this.speed = Math.min(0, this.speed + this.friction * delta);
     }
 
-    // Steering
+    // Responsive Steering
     const steerSpeed = 4.4;
     if (isLeft) this.steerAngle = Math.min(this.maxSteer, this.steerAngle + steerSpeed * delta);
     else if (isRight) this.steerAngle = Math.max(-this.maxSteer, this.steerAngle - steerSpeed * delta);
@@ -1445,6 +1618,17 @@ class SuperBoosterChampionship {
 
     // Drift Slip Mechanics & Mini-Turbo
     this.isDrifting = (isHandbrake || (Math.abs(this.steerAngle) > 0.35 && this.speed > 75)) && this.speed > 35;
+
+    // Lay down rubber skidmarks from rear tires
+    if (this.isDrifting || (isBrake && this.speed > 60)) {
+      const rearLeft = new THREE.Vector3();
+      const rearRight = new THREE.Vector3();
+      this.playerCarData.wheels[2].getWorldPosition(rearLeft);
+      this.playerCarData.wheels[3].getWorldPosition(rearRight);
+      this.skidmarks.addSkidmark(rearLeft, rearRight);
+    } else {
+      this.skidmarks.breakStreak();
+    }
 
     if (this.isDrifting) {
       const driftTarget = -this.steerAngle * 1.5;
@@ -1467,7 +1651,6 @@ class SuperBoosterChampionship {
       document.getElementById('drift-points').textContent = `+${Math.round(this.currentDriftPoints)} PTS (x${this.multiplier.toFixed(1)})`;
     } else {
       if (this.currentDriftPoints > 150) {
-        // Mini-Turbo boost upon exiting drift!
         this.speed = Math.min(currentMaxSpeed, this.speed + 18);
         audio.playTurboBlowoff();
       }
@@ -1477,7 +1660,7 @@ class SuperBoosterChampionship {
       this.driftAngle = THREE.MathUtils.lerp(this.driftAngle, 0, delta * 8.5);
     }
 
-    // Update Heading & Velocity
+    // Update Heading & Translation
     const turnMult = this.isDrifting ? 1.65 : 1.0;
     this.heading += this.steerAngle * (this.speed / 110) * turnMult * delta;
 
@@ -1488,13 +1671,21 @@ class SuperBoosterChampionship {
     // Smooth Anti-Stuck Barrier Deflection
     this.enforceTrackBoundaries();
 
-    // Car Mesh Transform
+    // Car Root Transform
     this.carGroup.position.copy(this.carPos);
     this.carGroup.rotation.y = this.heading + this.driftAngle;
-    this.carGroup.rotation.z = -this.steerAngle * 0.16;
-    this.carGroup.rotation.x = isBrake ? 0.05 : (isGas ? -0.04 : 0);
 
-    // Wheel animation
+    // Dynamic Suspension Physics (Body Roll, Brake Dive, Acceleration Squat)
+    const lateralG = -this.steerAngle * (this.speed / 140);
+    this.bodyRoll = THREE.MathUtils.lerp(this.bodyRoll, lateralG * 0.12, delta * 8.0);
+
+    const pitchTarget = isBrake ? 0.05 : (isGas ? (this.isNitro ? -0.06 : -0.035) : 0);
+    this.bodyPitch = THREE.MathUtils.lerp(this.bodyPitch, pitchTarget, delta * 7.0);
+
+    this.playerCarData.chassis.rotation.z = this.bodyRoll;
+    this.playerCarData.chassis.rotation.x = this.bodyPitch;
+
+    // Wheel Steering & Rotation
     this.playerCarData.wheels.forEach(w => {
       if (w.userData.isFront) w.rotation.y = this.steerAngle;
       w.children[0].rotation.x += (this.speed / 12) * delta;
@@ -1515,17 +1706,11 @@ class SuperBoosterChampionship {
     this.rpm = 1200 + (speedInGear / gearSpan) * 7500;
     audio.updateEngine(Math.abs(this.speed), this.isDrifting, this.isNitro, this.rpm);
 
-    // Update AI Rivals
     this.updateRivals(delta);
-
-    // Update Laps, Timers & Standings
     this.updateRaceProgress(delta);
-
-    // Update HUD
     this.updateHUD();
   }
 
-  // Smooth Anti-Stuck Barrier Deflection (Never get stuck against walls!)
   enforceTrackBoundaries() {
     let bestT = 0;
     let minDist = Infinity;
@@ -1559,18 +1744,16 @@ class SuperBoosterChampionship {
     const maxAllowedDist = this.roadWidth / 2 - 1.2;
 
     if (distToCenter > maxAllowedDist) {
-      // 1. Clamp position directly to the safe edge of track
       const normalFromCenter = new THREE.Vector3().subVectors(this.carPos, centerPt).normalize();
       this.carPos.copy(centerPt).addScaledVector(normalFromCenter, maxAllowedDist);
 
-      // 2. Deflect heading smoothly in the direction of the track tangent (Never get stuck facing the wall!)
       const trackForwardAngle = Math.atan2(tangent.x, tangent.z);
       let diff = trackForwardAngle - this.heading;
       while (diff < -Math.PI) diff += Math.PI * 2;
       while (diff > Math.PI) diff -= Math.PI * 2;
 
-      this.heading += diff * 0.35; // Smoothly guides car back into the race
-      this.speed = Math.max(70, this.speed * 0.95); // Retain momentum so car keeps rolling!
+      this.heading += diff * 0.35;
+      this.speed = Math.max(70, this.speed * 0.95);
       audio.playCrash();
     }
   }
@@ -1599,7 +1782,6 @@ class SuperBoosterChampionship {
         w.children[0].rotation.x += (r.speed / 12) * delta;
       });
 
-      // Slipstream check
       const distToPlayer = r.data.group.position.distanceTo(this.carPos);
       if (distToPlayer < 24 && distToPlayer > 3 && this.speed > 160) {
         const dot = tangent.dot(new THREE.Vector3(Math.sin(this.heading), 0, -Math.cos(this.heading)));
@@ -1648,7 +1830,6 @@ class SuperBoosterChampionship {
         }
       }
       this.prevT = this.playerT;
-
       document.getElementById('lap-display').textContent = `LAP ${Math.min(this.totalLaps, this.currentLap)} / ${this.totalLaps}`;
     }
   }
@@ -1703,9 +1884,13 @@ class SuperBoosterChampionship {
 
   updateHUD() {
     document.getElementById('speed-val').textContent = Math.abs(Math.round(this.speed));
-    document.getElementById('gear-val').textContent = this.speed < 0 ? 'GEAR R' : `GEAR ${this.gear}`;
-    document.getElementById('rpm-text').textContent = `${Math.round(this.rpm).toLocaleString()} RPM`;
+    const gearTag = document.getElementById('gear-val');
+    gearTag.textContent = this.speed < 0 ? 'GEAR R' : `GEAR ${this.gear}`;
 
+    const isRedline = this.rpm >= 8200;
+    gearTag.classList.toggle('redline-flash', isRedline);
+
+    document.getElementById('rpm-text').textContent = `${Math.round(this.rpm).toLocaleString()} RPM`;
     const rpmPercent = Math.min(100, (this.rpm / 9000) * 100);
     document.getElementById('rpm-fill').style.width = `${rpmPercent}%`;
   }
@@ -1727,36 +1912,44 @@ class SuperBoosterChampionship {
     });
   }
 
-  // 100% Stable 360° Non-Flickering Camera Tracking
   updateCamera() {
     const camMode = this.cameras[this.curCamIdx];
-
     const forwardX = Math.sin(this.heading);
     const forwardZ = -Math.cos(this.heading);
+
+    // High-Speed Cockpit / Camera Rumble
+    const rumbleMag = this.speed > 280 ? ((this.speed - 280) / 100) * 0.08 : 0;
+    const rx = (Math.random() - 0.5) * rumbleMag;
+    const ry = (Math.random() - 0.5) * rumbleMag;
 
     if (camMode === 'chase') {
       const backDist = 9.2;
       const height = 3.4;
 
-      const targetCamX = this.carPos.x - forwardX * backDist;
-      const targetCamY = this.carPos.y + height;
+      const targetCamX = this.carPos.x - forwardX * backDist + rx;
+      const targetCamY = this.carPos.y + height + ry;
       const targetCamZ = this.carPos.z - forwardZ * backDist;
 
       this.camera.position.lerp(new THREE.Vector3(targetCamX, targetCamY, targetCamZ), 0.14);
 
+      // Apex Corner Look-Ahead
+      const lookDist = 14;
+      const apexLeadX = Math.sin(this.heading + this.driftAngle * 0.6) * lookDist;
+      const apexLeadZ = -Math.cos(this.heading + this.driftAngle * 0.6) * lookDist;
+
       this.camera.lookAt(
-        this.carPos.x + forwardX * 12,
+        this.carPos.x + apexLeadX,
         this.carPos.y + 1.2,
-        this.carPos.z + forwardZ * 12
+        this.carPos.z + apexLeadZ
       );
 
-      this.camera.fov = THREE.MathUtils.lerp(this.camera.fov, this.isNitro ? 84 : 65, 0.1);
+      this.camera.fov = THREE.MathUtils.lerp(this.camera.fov, this.isNitro ? 86 : 65, 0.1);
       this.camera.updateProjectionMatrix();
 
     } else if (camMode === 'hood') {
       this.camera.position.set(
-        this.carPos.x + forwardX * 0.8,
-        this.carPos.y + 1.15,
+        this.carPos.x + forwardX * 0.8 + rx,
+        this.carPos.y + 1.15 + ry,
         this.carPos.z + forwardZ * 0.8
       );
       this.camera.lookAt(
@@ -1764,7 +1957,7 @@ class SuperBoosterChampionship {
         this.carPos.y + 0.9,
         this.carPos.z + forwardZ * 25
       );
-      this.camera.fov = 75;
+      this.camera.fov = 76;
       this.camera.updateProjectionMatrix();
 
     } else if (camMode === 'drone') {
@@ -1836,12 +2029,12 @@ class SuperBoosterChampionship {
     this.updateParticles(delta);
     this.updateCamera();
     this.updateRadar();
+    this.drawSpeedStreaks();
 
     this.renderer.render(this.scene, this.camera);
   }
 }
 
-// Start Game
 window.addEventListener('DOMContentLoaded', () => {
   new SuperBoosterChampionship();
 });

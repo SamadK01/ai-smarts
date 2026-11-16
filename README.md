@@ -24,7 +24,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 | **12** | [**Foosball Pro**](foosball.html) | Canvas 2D, 240Hz Sub-step CCD, Web Audio | Tournament table soccer simulation with continuous collision detection, 8 regulation interleaved rods (GK, DEF, MID, ATT), realistic figure trapping and bank shots, 3-tier bot AI, instant slow-motion goal replay, and local 2P multiplayer. |
 | **13** | [**BodyScope 3D: Medical Anatomy Atlas**](bodyscope/index.html) | Three.js v0.160.0, BodyParts3D & Z-Anatomy 3D Models, Web Audio | Production-grade 3D medical anatomy explorer built with authentic open-licensed 3D models (all 206+ bones with individual names, skull, mandible, full hands and feet), translucent peach/pink PBR physical skin (`MeshPhysicalMaterial`), soft studio lighting, cardiovascular tree with instanced glowing blood particles and "Blood Path" circulation tour, real-time beating heart with dual-tone lub-dub valve acoustics, live scrolling ECG (Lead II), biophysical glycemic/insulin simulation, cross-section slicing, bilingual English/Urdu details, and anatomy quiz. |
 | **14** | [**Royal Ludo Master 3D**](ludo.html) | Standard 15x15 Grid, Heuristic AI Bots, Web Audio | Authentic regulation Ludo board with 4 colored bases (Red, Green, Yellow, Blue), 52-step outer circuit, 8 star safe spots, 3D rolling dice, step-by-step token hops, cutting bonus turns, pass & play local multiplayer, and smart AI bots. |
-| **15** | [**Cyber Drift 3D: Tokyo Midnight**](drift.html) | Three.js WebGL, 60 FPS Vehicle Physics, Procedural Audio | Adrenaline-fueled 3D Grand Prix racer with daylight circuit, anti-stuck barrier deflection, modified Super Booster hypercar, dual rocket thrusters, minimap radar, and procedural audio. |
+| **15** | [**Cyber Drift 3D: Tokyo Midnight**](drift.html) | Three.js WebGL, 60 FPS Vehicle Physics, Procedural Audio | Professional 3D Grand Prix racer with Armco steel guardrails, real rubber tire skidmarks, independent suspension body roll & dive, modified Super Booster hypercar (380+ km/h), radial speed streaks, circuit radar, and competitive AI rivals. |
 | **16** | [**Neon Snake Pulse**](snake.html) | Canvas 2D, 60fps Sub-tick Interpolation, Web Audio | Ultra-smooth cyber arcade snake game featuring live animated prey animals (frogs, mice, bunnies, chicks) for rapid growth, mega titan beast feasts (+12 length & swollen body width), strict laser walls vs free warp-around mode, sub-tick 60fps interpolation, dynamic tracking eyes, and procedural Web Audio synthesizers. |
 
 ---
@@ -65,15 +65,28 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 - **Official Tournament Rules**: Need a 6 to deploy tokens from base; consecutive 6 penalties; bonus rolls awarded on rolling a 6, capturing an opponent, or entering a token into the home triangle.
 - **Smart AI Bot Engine**: 4-tier decision priority (1. Capture opponent, 2. Enter home, 3. Deploy from base on a 6, 4. Advance safest token).
 
-### 7. 3D Vehicle Dynamics & Neo-Tokyo Grand Prix (`drift.html`)
-- **Pro Racing Championship (2-Lap Circuit, ~90s Race)**:
-  - 🏁 **Neo-Tokyo Grand Prix (2 Laps)**: Authentic closed-circuit track (~2.3 km length) with fast straights, sweeping curves, elevated apex kerbs, hairpins, chicanes, and a cyber tunnel.
-  - **3 Competitive AI Rivals**: **Viper** (Yellow), **Shadow** (Crimson), and **Ghost** (Emerald) with realistic racing lines, corner braking, overtaking, and drafting.
-  - **Aerodynamic Slipstream (Drafting)**: Pulling behind a rival car activates aerodynamic slipstream vortex with a +25 km/h drafting slingshot boost!
-  - **Drift Slip Mechanics & Mini-Turbo**: Initiate powerslides with Handbrake (`Space` / `⚡ DRIFT`), counter-steer to hold the angle, and snap out of the drift for a mini-turbo acceleration burst!
-- **Detailed Procedural Supercars & Garage**: Choose between **Apex GT-R** (Balanced 4WD), **Kyoto Spirit RX** (Drift King RWD), and **Hyperion Zero** (V16 Hypercar), with 6 metallic paint finishes, widebody aero kits, GT wings, Brembo brake calipers, and custom neon underglow.
-- **HUD & Real-Time Minimap Radar**: Digital speedometer (up to 330+ km/h), 9,000 RPM tachometer arc bar, 6-speed gearbox, live race stopwatch, position tracker (`1st / 4`), and a 2D circuit minimap radar.
-- **Audio & Electronic Music Engine**: Dual-oscillator roaring engine acoustics scaling with RPM and gear, turbo blow-off valve flutter, tire squeal, and a built-in 125 BPM synthwave electronic music synthesizer created entirely via native Web Audio API (zero external audio files).
+### 7. 3D Vehicle Dynamics & Pro Grand Prix Circuit (`drift.html`)
+- **Pro Grand Prix Circuit Architecture (~2.2 km)**:
+  - Continuous corrugated steel Armco guardrails with reflective posts line both sides of the circuit.
+  - Dashed white center divider line, solid outer boundary lines, and 3D raised apex rumble kerbs.
+  - Numbered starting grid boxes (P1, P2, P3, P4) and checkered start gantry.
+  - High-visibility sponsor boards (Pirelli, Brembo, Motul, Super Booster) and distance marker boards (150m, 100m, 50m).
+  - Multi-tier covered grandstands packed with cheering crowds and perimeter stadium floodlight towers.
+  - Distant mountain silhouettes for spatial horizon depth.
+- **Dynamic Rubber Skidmark System**:
+  - Real-time mesh ribbon buffer lays down continuous dark rubber skidmarks on the asphalt when drifting or braking hard at speed.
+- **Suspension Roll, Pitch & Squat Physics**:
+  - Independent chassis roll into turns (`-lateralG * 0.12`), nose dive under heavy braking, and acceleration squat during Super Boost (380+ km/h), while all 4 alloy wheels stay firmly planted on the road.
+- **Radial Speed Streaks & Apex Camera Lead**:
+  - High-speed aerodynamic wind streaks radiate outward from the screen center at speeds above 240 km/h.
+  - Camera leads into the apex of corners during drifts and vibrates with subtle cockpit rumble at top speed.
+- **3 Competitive AI Rivals & Aerodynamic Slipstream**:
+  - Viper (Yellow), Shadow (Red), and Ghost (Green) compete along realistic racing lines.
+  - Drafting in their slipstream triggers aerodynamic vortex acceleration (+25 km/h boost).
+- **Smooth Anti-Stuck Barrier Deflection**:
+  - Cars smoothly glide along barriers upon impact, rotating heading towards the track tangent with rolling momentum so the player never gets stuck against walls.
+- **Audio & Broadcast Telemetry HUD**:
+  - Roaring V8 engine synthesizer scaling with RPM, turbo flutter blow-off, redline gear shift flashing, and electronic synthwave music.
 
 ### 8. Sub-Tick Smooth Interpolation, Animated Prey & Titan Growth (`snake.html`)
 - **Strict Laser Walls vs Free Warp Mode**:
