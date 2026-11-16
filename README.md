@@ -25,7 +25,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 | **13** | [**BodyScope 3D: Medical Anatomy Atlas**](bodyscope/index.html) | Three.js v0.160.0, BodyParts3D & Z-Anatomy 3D Models, Web Audio | Production-grade 3D medical anatomy explorer built with authentic open-licensed 3D models (all 206+ bones with individual names, skull, mandible, full hands and feet), translucent peach/pink PBR physical skin (`MeshPhysicalMaterial`), soft studio lighting, cardiovascular tree with instanced glowing blood particles and "Blood Path" circulation tour, real-time beating heart with dual-tone lub-dub valve acoustics, live scrolling ECG (Lead II), biophysical glycemic/insulin simulation, cross-section slicing, bilingual English/Urdu details, and anatomy quiz. |
 | **14** | [**Royal Ludo Master 3D**](ludo.html) | Standard 15x15 Grid, Heuristic AI Bots, Web Audio | Authentic regulation Ludo board with 4 colored bases (Red, Green, Yellow, Blue), 52-step outer circuit, 8 star safe spots, 3D rolling dice, step-by-step token hops, cutting bonus turns, pass & play local multiplayer, and smart AI bots. |
 | **15** | [**Cyber Drift 3D: Tokyo Midnight**](drift.html) | Three.js WebGL, 60 FPS Vehicle Physics, Procedural Audio | Adrenaline-fueled 3D Grand Prix racer with daylight circuit, anti-stuck barrier deflection, modified Super Booster hypercar, dual rocket thrusters, minimap radar, and procedural audio. |
-| **16** | [**Neon Snake Pulse**](snake.html) | Canvas 2D, 60fps Sub-tick Interpolation, Web Audio | Ultra-smooth cyber arcade snake game with sub-tick 60fps interpolation, dynamic animated eyes that track target food, juicy particle explosions, energy cores, star diamonds, lightning speed surges, combo multipliers, 4 themes (Emerald, Synthwave, Solar, Glacier), and 3 game modes (Classic, Zen Warp, Time Rush). |
+| **16** | [**Neon Snake Pulse**](snake.html) | Canvas 2D, 60fps Sub-tick Interpolation, Web Audio | Ultra-smooth cyber arcade snake game featuring live animated prey animals (frogs, mice, bunnies, chicks) for rapid growth, mega titan beast feasts (+12 length & swollen body width), strict laser walls vs free warp-around mode, sub-tick 60fps interpolation, dynamic tracking eyes, and procedural Web Audio synthesizers. |
 
 ---
 
@@ -75,11 +75,21 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 - **HUD & Real-Time Minimap Radar**: Digital speedometer (up to 330+ km/h), 9,000 RPM tachometer arc bar, 6-speed gearbox, live race stopwatch, position tracker (`1st / 4`), and a 2D circuit minimap radar.
 - **Audio & Electronic Music Engine**: Dual-oscillator roaring engine acoustics scaling with RPM and gear, turbo blow-off valve flutter, tire squeal, and a built-in 125 BPM synthwave electronic music synthesizer created entirely via native Web Audio API (zero external audio files).
 
-### 8. Sub-Tick Smooth Interpolation & Eye-Tracking Snake (`snake.html`)
-- **60 FPS Sub-Tick Interpolation**: Separates the discrete grid game ticks (~8-12 Hz) from visual rendering (60-120 Hz). Body segments smoothly interpolate `prevPos + (currPos - prevPos) * alpha`, providing buttery smooth slithering without grid snapping.
-- **Expressive Eye Tracking**: Head pupils dynamically calculate `atan2(targetFood.y - head.y, targetFood.x - head.x)` to look directly at the nearest active energy orb or diamond star. Pupils expand when close to food and turn into playful "X X" on collision crashes.
-- **Juicy Multiplier Combos & Procedural Synthesizer**: Eating food in rapid succession scales the combo streak up to 8x with musical pentatonic scale pitches, radiant shockwave rings, and screen shake.
-- **Multiple Game Modes & Themes**: Classic Arena (walled), Zen Warp (wrap-around infinite borders), and Time Rush (60s frenzy), selectable across 4 vibrant neon palettes (Emerald, Synthwave, Solar, Glacier).
+### 8. Sub-Tick Smooth Interpolation, Animated Prey & Titan Growth (`snake.html`)
+- **Strict Laser Walls vs Free Warp Mode**:
+  - ⚡ **Strict Mode**: Hitting the perimeter walls triggers an instant electric laser crash!
+  - 🌀 **Free Warp Mode**: Pass smoothly through any wall to emerge seamlessly on the opposite side. **Only colliding with your own body causes death**!
+  - Live 1-click toggle button directly in the HUD allows switching modes at any second.
+- **Live Animated Prey Creatures**: Instead of static fruits, live animated animals roam the board:
+  - 🐸 **Frog / Toady**: Green hopping frog with breathing puffs (+3 growth, +150 pts).
+  - 🐭 **Mouse / Squeaky**: Grey mouse with twitching whiskers and tail (+4 growth, +200 pts).
+  - 🐰 **Bunny**: Fluffy pink rabbit with wiggling ears (+5 growth, +250 pts).
+  - 🐥 **Chick**: Flapping yellow chick (+2 growth, +100 pts).
+  - Prey animals show frightened alert marks (`!`) and tremble when the snake approaches.
+- **Mega Beast Feast & Titan Mode**: Radiant golden steaks spawn periodically. Eating one yields **+12 instant length growth**, swells the snake's body thickness by +50%, surrounds it in a fiery golden aura, and rumbles with deep sub-bass audio.
+- **Evolution Ranks**: Live progression from Baby Python -> Swift Cobra -> Green Anaconda -> Cyber Hydra -> Titan World Eater.
+- **60 FPS Sub-Tick Interpolation**: Separates discrete grid ticks (~8-12 Hz) from visual rendering (60-120 Hz) for fluid slithering without grid snapping.
+- **Expressive Eye Tracking**: Pupils calculate `atan2(prey.y - head.y, prey.x - head.x)` to track nearest prey, turning into playful "X X" on collision.
 
 ---
 
