@@ -2,316 +2,821 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>AI Smarts Play — Interactive Experiments</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>AI Smarts Play — 19 Interactive Experiments & Masterpieces</title>
+  <meta name="description" content="A curated suite of 19 physics-driven, 3D WebGL, and neural-powered browser games and experiments. 100% offline, zero build tools.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Funnel+Display:wght@700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Mono&family=Funnel+Display:wght@700;800&display=swap');
-    * { box-sizing: border-box; }
-    body { margin: 0; background: #090a0e; color: #ece8dd; font-family: Arial, sans-serif; }
-    .wrap { max-width: 1200px; margin: auto; padding: 28px 5vw 42px; }
-    .top, footer { display: flex; justify-content: space-between; font: 12px 'DM Mono', monospace; color: #92949b; }
-    .logo { color: #ece8dd; text-decoration: none; }
-    .logo:before { content: '● '; color: #ff7548; }
-    .online { color: #b4ef7d; }
-    .hero { padding: 80px 0 45px; }
-    .hero small { font: 12px 'DM Mono', monospace; color: #ff7548; }
-    .hero h1 { margin: 17px 0 0; font: 800 clamp(50px, 8.5vw, 110px) / 0.84 'Funnel Display', sans-serif; letter-spacing: -0.07em; }
-    .hero em { font-style: normal; color: #ff7548; }
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    :root {
+      --bg: #090a0f;
+      --surface: #12141c;
+      --surface-card: #151824;
+      --surface-hover: #1b1e2e;
+      --border: #262938;
+      --border-hover: #475569;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent: #ff7548;
+      --accent-glow: rgba(255, 117, 72, 0.35);
+      --green-online: #22c55e;
+      --card-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+      --card-shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.7);
+      --font-mono: 'DM Mono', monospace;
+      --font-display: 'Funnel Display', sans-serif;
+      --font-ui: 'Bricolage Grotesque', sans-serif;
+    }
+
+    body[data-theme="light"] {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-card: #ffffff;
+      --surface-hover: #f1f5f9;
+      --border: #e2e8f0;
+      --border-hover: #94a3b8;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --accent: #ea580c;
+      --accent-glow: rgba(234, 88, 12, 0.25);
+      --green-online: #16a34a;
+      --card-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+      --card-shadow-hover: 0 14px 34px rgba(0, 0, 0, 0.14);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      transition: background 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .wrap {
+      max-width: 1240px;
+      margin: auto;
+      padding: 24px 5vw 60px;
+    }
+
+    /* Top Navigation */
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 0.5px;
+    }
+    .logo::before {
+      content: '';
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .top-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .online-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--green-online);
+      font-weight: 600;
+      font-size: 12px;
+      background: rgba(34, 197, 94, 0.1);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(34, 197, 94, 0.25);
+    }
+    .online-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green-online);
+      animation: pulseGreen 1.6s infinite;
+    }
+    @keyframes pulseGreen {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    /* Theme Toggle Button */
+    .theme-toggle-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: var(--card-shadow);
+    }
+    .theme-toggle-btn:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 55px 0 35px;
+    }
+    .hero-tag {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+    .hero h1 {
+      margin: 0;
+      font: 900 clamp(44px, 7.5vw, 98px) / 0.88 var(--font-display);
+      letter-spacing: -0.05em;
+      color: var(--text-primary);
+    }
+    .hero em {
+      font-style: normal;
+      color: var(--accent);
+    }
+    .hero p {
+      margin-top: 16px;
+      font-size: clamp(14px, 2vw, 17px);
+      color: var(--text-secondary);
+      max-width: 620px;
+      line-height: 1.5;
+    }
+
+    /* Filter & Search Bar */
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .category-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .pill:hover {
+      color: var(--text-primary);
+      border-color: var(--border-hover);
+    }
+    .pill.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+
+    .search-box {
+      position: relative;
+      min-width: 240px;
+    }
+    .search-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 8px 14px 8px 34px;
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 13px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Experiments Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
     .card {
-      height: 280px; position: relative; overflow: hidden; padding: 20px;
-      border: 1px solid #292b31; color: #ece8dd; text-decoration: none;
-      background: #131419; transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s;
-      border-radius: 4px;
+      height: 290px;
+      position: relative;
+      overflow: hidden;
+      padding: 24px;
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      text-decoration: none;
+      background: var(--surface-card);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.25s ease,
+                  box-shadow 0.25s ease;
+      border-radius: 14px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
-    .card:hover { transform: translateY(-4px); border-color: #888; }
-    .card small, .num, .go { font: 11px 'DM Mono', monospace; color: #a2a3aa; }
-    .num { position: absolute; right: 20px; top: 20px; }
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: var(--border-hover);
+      box-shadow: var(--card-shadow-hover);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      position: relative;
+      z-index: 2;
+    }
+    .card small {
+      font: 700 11px var(--font-mono);
+      color: var(--text-secondary);
+      letter-spacing: 0.5px;
+    }
+    .num {
+      font: 700 12px var(--font-mono);
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2px 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .card-bottom {
+      position: relative;
+      z-index: 2;
+    }
     .card h2 {
-      position: absolute; left: 20px; bottom: 40px; margin: 0;
-      font: 800 38px / 0.9 'Funnel Display', sans-serif; letter-spacing: -0.05em;
+      margin: 0 0 10px 0;
+      font: 800 clamp(32px, 2.5vw, 40px) / 0.92 var(--font-display);
+      letter-spacing: -0.04em;
+      color: var(--text-primary);
     }
-    .go { position: absolute; bottom: 20px; left: 20px; }
-    .lamp { background: radial-gradient(circle at 70% 30%, #53401d, #131419 48%); }
-    .galaxy { background: radial-gradient(circle at 65% 35%, #17466b, #10141d 50%); }
-    .fish { background: radial-gradient(circle at 65% 35%, #20bac7, #061721 52%); }
-    .egg { background: radial-gradient(circle at 65% 35%, #1c4a5e, #0c131a 50%); }
-    .tic { background: radial-gradient(circle at 65% 35%, #c1a1ff, #24204a 54%); }
-    .neuro { background: radial-gradient(circle at 65% 35%, #00f0ff, #0a172c 54%); }
-    .carrom { background: radial-gradient(circle at 65% 35%, #92400e, #291004 54%); }
-    .smash { background: radial-gradient(circle at 65% 35%, #b45309, #1c0a04 54%); }
-    .candle { background: radial-gradient(circle at 65% 35%, #d97706, #1c0d02 54%); }
-    .billiards { background: radial-gradient(circle at 65% 35%, #0c5c36, #061f12 54%); }
-    .birds { background: radial-gradient(circle at 65% 35%, #0284c7, #071726 54%); }
-    .fruit { background: radial-gradient(circle at 65% 35%, #059669, #091a18 54%); }
-    .foosball { background: radial-gradient(circle at 65% 35%, #0284c7, #07172b 54%); }
-    .bodyscope { background: radial-gradient(circle at 65% 35%, #0284c7, #030d1a 54%); }
-    .ludo { background: radial-gradient(circle at 65% 35%, #b91c1c, #1a0808 54%); }
-    .drift { background: radial-gradient(circle at 65% 35%, #d946ef, #10061e 54%); }
-    .snake { background: radial-gradient(circle at 65% 35%, #10b981, #041d14 54%); }
-    .alien { background: radial-gradient(circle at 65% 35%, #00f0ff, #03141f 54%); }
-    .singularity { background: radial-gradient(circle at 65% 35%, #f59e0b, #120902 54%); }
-    .piano { background: radial-gradient(circle at 65% 35%, #818cf8, #0c102b 54%); }
-    .art { position: absolute; right: 12%; top: 16%; font-size: 104px; filter: drop-shadow(0 15px 15px #0008); pointer-events: none; display: flex; align-items: center; justify-content: center; }
-    .art svg { width: 108px; height: 108px; display: block; filter: drop-shadow(0 14px 18px rgba(0,0,0,0.65)); }
-    footer { border-top: 1px solid #292b31; margin-top: 55px; padding-top: 20px; }
-    @media (max-width: 860px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 540px) {
-      .wrap { padding: 20px; }
-      .hero { padding: 60px 0 35px; }
+    .go {
+      font: 600 11px var(--font-mono);
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: transform 0.15s ease;
+    }
+    .card:hover .go {
+      transform: translateX(4px);
+    }
+
+    /* Ambient Background Glow for Cards */
+    .lamp { background: radial-gradient(circle at 75% 25%, rgba(217, 119, 6, 0.25), var(--surface-card) 60%); }
+    .tic { background: radial-gradient(circle at 75% 25%, rgba(168, 85, 247, 0.25), var(--surface-card) 60%); }
+    .carrom { background: radial-gradient(circle at 75% 25%, rgba(180, 83, 9, 0.25), var(--surface-card) 60%); }
+    .drift { background: radial-gradient(circle at 75% 25%, rgba(217, 70, 239, 0.25), var(--surface-card) 60%); }
+    .snake { background: radial-gradient(circle at 75% 25%, rgba(16, 185, 129, 0.25), var(--surface-card) 60%); }
+    .ludo { background: radial-gradient(circle at 75% 25%, rgba(239, 68, 68, 0.25), var(--surface-card) 60%); }
+    .piano { background: radial-gradient(circle at 75% 25%, rgba(129, 140, 248, 0.25), var(--surface-card) 60%); }
+    .singularity { background: radial-gradient(circle at 75% 25%, rgba(245, 158, 11, 0.25), var(--surface-card) 60%); }
+    .alien { background: radial-gradient(circle at 75% 25%, rgba(0, 240, 255, 0.25), var(--surface-card) 60%); }
+    .bodyscope { background: radial-gradient(circle at 75% 25%, rgba(2, 132, 199, 0.25), var(--surface-card) 60%); }
+    .egg { background: radial-gradient(circle at 75% 25%, rgba(28, 74, 94, 0.25), var(--surface-card) 60%); }
+    .foosball { background: radial-gradient(circle at 75% 25%, rgba(3, 105, 161, 0.25), var(--surface-card) 60%); }
+    .fish { background: radial-gradient(circle at 75% 25%, rgba(32, 186, 199, 0.25), var(--surface-card) 60%); }
+    .smash { background: radial-gradient(circle at 75% 25%, rgba(217, 119, 6, 0.25), var(--surface-card) 60%); }
+    .fruit { background: radial-gradient(circle at 75% 25%, rgba(5, 150, 105, 0.25), var(--surface-card) 60%); }
+    .birds { background: radial-gradient(circle at 75% 25%, rgba(2, 132, 199, 0.25), var(--surface-card) 60%); }
+    .neuro { background: radial-gradient(circle at 75% 25%, rgba(0, 240, 255, 0.25), var(--surface-card) 60%); }
+    .candle { background: radial-gradient(circle at 75% 25%, rgba(217, 119, 6, 0.25), var(--surface-card) 60%); }
+    .galaxy { background: radial-gradient(circle at 75% 25%, rgba(23, 70, 107, 0.25), var(--surface-card) 60%); }
+
+    /* Artwork on card */
+    .art {
+      position: absolute;
+      right: 10%;
+      top: 14%;
+      font-size: 100px;
+      filter: drop-shadow(0 15px 15px rgba(0,0,0,0.45));
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      opacity: 0.9;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+    .card:hover .art {
+      transform: scale(1.06) rotate(2deg);
+      opacity: 1;
+    }
+    .art svg {
+      width: 108px;
+      height: 108px;
+      display: block;
+      filter: drop-shadow(0 12px 16px rgba(0,0,0,0.45));
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      margin-top: 60px;
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 960px) {
+      .grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+      .hero { padding: 40px 0 25px; }
+    }
+
+    @media (max-width: 580px) {
+      .wrap { padding: 18px 4vw 40px; }
       .grid { grid-template-columns: 1fr; }
-      .card { height: 240px; }
+      .card { height: 250px; padding: 20px; }
+      .hero h1 { font-size: clamp(38px, 11vw, 54px); }
+      .filter-bar { flex-direction: column; align-items: stretch; }
+      .search-box { min-width: 100%; }
     }
   </style>
 </head>
-<body>
+<body data-theme="dark">
   <main class="wrap">
+    <!-- Top Bar -->
     <header class="top">
       <a class="logo" href="index.html">AI SMARTS / PLAY</a>
-      <span class="online">19 experiments online</span>
+      <div class="top-right">
+        <span class="online-badge">19 EXPERIMENTS ONLINE</span>
+        <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Dark/Light Mode">
+          <span id="theme-icon">☀️</span> <span id="theme-label">LIGHT</span>
+        </button>
+      </div>
     </header>
 
+    <!-- Hero Header -->
     <section class="hero">
-      <small>SMALL THINGS TO PLAY WITH</small>
-      <h1>Take a <em>small</em><br>break.</h1>
+      <span class="hero-tag">A Curated Playground of Physics & Mind Games</span>
+      <h1>Play. Explore.<br><em>Never</em> settle.</h1>
+      <p>19 zero-dependency, physics-driven simulations and masterclasses crafted with pure Three.js, Canvas, and synthesized Web Audio.</p>
     </section>
 
-    <section class="grid">
-      <a class="card lamp" href="lamp.html">
-        <small>INTERACTIVE TOY</small>
-        <b class="num">01</b>
+    <!-- Search & Category Filters -->
+    <section class="filter-bar">
+      <div class="category-pills">
+        <button class="pill active" data-filter="all">All (19)</button>
+        <button class="pill" data-filter="flagship">⭐ Masterpieces</button>
+        <button class="pill" data-filter="games">🎮 Arcade & Racing</button>
+        <button class="pill" data-filter="space">🚀 Space & Cyber</button>
+        <button class="pill" data-filter="zen">🧘 Relaxing & Music</button>
+      </div>
+
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" class="search-input" placeholder="Search experiments...">
+      </div>
+    </section>
+
+    <!-- 19 Ordered Experiments Grid -->
+    <section class="grid" id="experiments-grid">
+
+      <!-- ROW 1 (As explicitly requested by user) -->
+
+      <!-- 01: Slingshot Lamp (Always No. 1) -->
+      <a class="card lamp" href="lamp.html" data-category="flagship zen" data-name="slingshot lamp verlet physics interactive toy">
+        <div class="card-top">
+          <small>INTERACTIVE TOY</small>
+          <span class="num">01</span>
+        </div>
         <i class="art">💡</i>
-        <h2>Slingshot<br>Lamp</h2>
-        <span class="go">open experiment ↗</span>
+        <div class="card-bottom">
+          <h2>Slingshot<br>Lamp</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
       </a>
 
-      <a class="card galaxy" href="orbit.html">
-        <small>PLAYFUL GALAXY</small>
-        <b class="num">02</b>
-        <i class="art">🪐</i>
-        <h2>Galaxy<br>Giggles</h2>
-        <span class="go">open experiment ↗</span>
-      </a>
-
-      <a class="card fish" href="fish.html">
-        <small>DEEP WATER GAME</small>
-        <b class="num">03</b>
-        <i class="art">🐟</i>
-        <h2>Catch the<br>Fish</h2>
-        <span class="go">open experiment ↗</span>
-      </a>
-
-      <a class="card egg" href="wiggle.html">
-        <small>3D RETRO TECH</small>
-        <b class="num">04</b>
-        <i class="art">💻</i>
-        <h2>Retro<br>Laptop</h2>
-        <span class="go">open experiment ↗</span>
-      </a>
-
-      <a class="card tic" href="tictactoe.html">
-        <small>TACTICAL ENGINE</small>
-        <b class="num">05</b>
+      <!-- 02: Tic Tac Toe Pro (No. 2 in 1st Row) -->
+      <a class="card tic" href="tictactoe.html" data-category="flagship games" data-name="tic tac toe pro ultimate minimax tactical engine">
+        <div class="card-top">
+          <small>TACTICAL ENGINE</small>
+          <span class="num">02</span>
+        </div>
         <i class="art">❌</i>
-        <h2>Tic Tac<br>Toe Pro</h2>
-        <span class="go">open experiment ↗</span>
+        <div class="card-bottom">
+          <h2>Tic Tac<br>Toe Pro</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
       </a>
 
-      <a class="card neuro" href="neuro.html">
-        <small>NEURAL AI ECOSYSTEM</small>
-        <b class="num">06</b>
-        <i class="art">🧠</i>
-        <h2>Neuro<br>Life 3D</h2>
-        <span class="go">open experiment ↗</span>
-      </a>
-
-      <a class="card carrom" href="carrom.html">
-        <small>ROYAL CARROM CLUB</small>
-        <b class="num">07</b>
+      <!-- 03: Royal Carrom Club 3D (No. 3 in 1st Row) -->
+      <a class="card carrom" href="carrom.html" data-category="flagship games" data-name="royal carrom club 3d board physics multiplayer">
+        <div class="card-top">
+          <small>ROYAL CARROM CLUB</small>
+          <span class="num">03</span>
+        </div>
         <i class="art">
           <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="3" y="3" width="94" height="94" rx="6" fill="#2c1208" stroke="#d4af37" stroke-width="2.5"/>
             <rect x="11" y="11" width="78" height="78" rx="3" fill="#f4e3c3"/>
-            <!-- 4 Corner Pockets -->
             <circle cx="17" cy="17" r="5" fill="#08090d" stroke="#d4af37" stroke-width="1.2"/>
             <circle cx="83" cy="17" r="5" fill="#08090d" stroke="#d4af37" stroke-width="1.2"/>
             <circle cx="17" cy="83" r="5" fill="#08090d" stroke="#d4af37" stroke-width="1.2"/>
             <circle cx="83" cy="83" r="5" fill="#08090d" stroke="#d4af37" stroke-width="1.2"/>
-            <!-- Baselines -->
             <line x1="26" y1="75" x2="74" y2="75" stroke="#111" stroke-width="1.2"/>
             <line x1="26" y1="78" x2="74" y2="78" stroke="#111" stroke-width="1.2"/>
             <circle cx="26" cy="76.5" r="2.2" fill="#dc2626"/>
             <circle cx="74" cy="76.5" r="2.2" fill="#dc2626"/>
-            <!-- Center Rosette & Queen -->
             <circle cx="50" cy="50" r="13" stroke="#222" stroke-width="1.2" fill="none"/>
             <circle cx="50" cy="50" r="4.5" fill="#dc2626" stroke="#ffd700" stroke-width="1"/>
-            <!-- Carrom Men Around Queen -->
             <circle cx="43" cy="46" r="2.8" fill="#fdfaf2" stroke="#888" stroke-width="0.6"/>
             <circle cx="57" cy="46" r="2.8" fill="#1c1917"/>
             <circle cx="45" cy="55" r="2.8" fill="#1c1917"/>
             <circle cx="55" cy="55" r="2.8" fill="#fdfaf2" stroke="#888" stroke-width="0.6"/>
-            <!-- Striker on baseline -->
             <circle cx="50" cy="76.5" r="4.2" fill="#ffffff" stroke="#059669" stroke-width="1.5"/>
             <circle cx="50" cy="76.5" r="1.6" fill="#059669"/>
           </svg>
         </i>
-        <h2>Royal Carrom<br>Club 3D</h2>
-        <span class="go">open experiment ↗</span>
+        <div class="card-bottom">
+          <h2>Royal Carrom<br>Club 3D</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
       </a>
 
-      <a class="card smash" href="smash.html">
-        <small>TACTILE SLINGSHOT TOY</small>
-        <b class="num">08</b>
+      <!-- MASTERPIECES (User requested top priority games next) -->
+
+      <!-- 04: Cyber Drift 3D -->
+      <a class="card drift" href="drift.html" data-category="flagship games" data-name="cyber drift 3d tokyo midnight grand prix racer cars racing">
+        <div class="card-top">
+          <small>3D CYBERPUNK RACER</small>
+          <span class="num">04</span>
+        </div>
+        <i class="art">🏎️</i>
+        <div class="card-bottom">
+          <h2>Cyber Drift<br>3D</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
+      </a>
+
+      <!-- 05: Neon Snake Pulse -->
+      <a class="card snake" href="snake.html" data-category="flagship games" data-name="neon snake pulse arcade animals titan feast">
+        <div class="card-top">
+          <small>NEON CYBER ARCADE</small>
+          <span class="num">05</span>
+        </div>
+        <i class="art">🐍</i>
+        <div class="card-bottom">
+          <h2>Neon Snake<br>Pulse</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
+      </a>
+
+      <!-- 06: Royal Ludo Master 3D -->
+      <a class="card ludo" href="ludo.html" data-category="flagship games" data-name="royal ludo master 3d classic championship dice ai">
+        <div class="card-top">
+          <small>CLASSIC CHAMPIONSHIP</small>
+          <span class="num">06</span>
+        </div>
+        <i class="art">🎲</i>
+        <div class="card-bottom">
+          <h2>Royal Ludo<br>Master</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
+      </a>
+
+      <!-- 07: Lumina Grand Piano (Project Serenade) -->
+      <a class="card piano" href="piano.html" data-category="flagship zen" data-name="lumina grand piano serenade acoustic felt sanctuary relaxing music rain">
+        <div class="card-top">
+          <small>ACOUSTIC FELT SANCTUARY</small>
+          <span class="num">07</span>
+        </div>
+        <i class="art">🎹</i>
+        <div class="card-bottom">
+          <h2>Lumina<br>Grand Piano</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
+      </a>
+
+      <!-- 08: Project Singularity (3D Black Hole) -->
+      <a class="card singularity" href="singularity.html" data-category="flagship space" data-name="project singularity 3d kerr black hole gravitational lensing relativity interstellar ligo">
+        <div class="card-top">
+          <small>3D GENERAL RELATIVITY</small>
+          <span class="num">08</span>
+        </div>
+        <i class="art">🕳️</i>
+        <div class="card-bottom">
+          <h2>Project<br>Singularity</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
+      </a>
+
+      <!-- 09: Project A.E.T.H.E.R. (Alien Signal Deck & Hacker Terminal) -->
+      <a class="card alien" href="alien.html" data-category="flagship space" data-name="aether signal deck deep space cyber hacker jadoo alien contact terminal">
+        <div class="card-top">
+          <small>DEEP SPACE CYBER HACKER</small>
+          <span class="num">09</span>
+        </div>
+        <i class="art">📡</i>
+        <div class="card-bottom">
+          <h2>A.E.T.H.E.R.<br>Signal Deck</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
+      </a>
+
+      <!-- 10: BodyScope 3D -->
+      <a class="card bodyscope" href="bodyscope/index.html" data-category="flagship space" data-name="bodyscope 3d medical anatomy atlas heart blood bones">
+        <div class="card-top">
+          <small>3D MEDICAL ANATOMY ATLAS</small>
+          <span class="num">10</span>
+        </div>
+        <i class="art">🫀</i>
+        <div class="card-bottom">
+          <h2>Body<br>Scope 3D</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
+      </a>
+
+      <!-- 11: Retro Laptop 2006 (ThinkRetro T42) -->
+      <a class="card egg" href="wiggle.html" data-category="games" data-name="retro laptop 2006 thinkretro t42 3d tech minesweeper">
+        <div class="card-top">
+          <small>3D RETRO TECH</small>
+          <span class="num">11</span>
+        </div>
+        <i class="art">💻</i>
+        <div class="card-bottom">
+          <h2>Retro<br>Laptop</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
+      </a>
+
+      <!-- 12: Foosball Pro -->
+      <a class="card foosball" href="foosball.html" data-category="games" data-name="foosball pro table soccer tournament sports">
+        <div class="card-top">
+          <small>TABLE SOCCER TOURNAMENT</small>
+          <span class="num">12</span>
+        </div>
+        <i class="art">⚽</i>
+        <div class="card-bottom">
+          <h2>Foosball<br>Pro</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
+      </a>
+
+      <!-- 13: Reef Angler (Catch the Fish) -->
+      <a class="card fish" href="fish.html" data-category="games zen" data-name="catch the fish reef angler apex marine hunt deep water game sharks">
+        <div class="card-top">
+          <small>DEEP WATER GAME</small>
+          <span class="num">13</span>
+        </div>
+        <i class="art">🐟</i>
+        <div class="card-bottom">
+          <h2>Catch the<br>Fish</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
+      </a>
+
+      <!-- 14: Slingshot Smash -->
+      <a class="card smash" href="smash.html" data-category="games zen" data-name="slingshot smash antique tabletop alley destruction physics">
+        <div class="card-top">
+          <small>TACTILE SLINGSHOT TOY</small>
+          <span class="num">14</span>
+        </div>
         <i class="art">
           <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Table Shelf -->
             <rect x="6" y="82" width="88" height="10" rx="2" fill="#451a03" stroke="#d97706" stroke-width="1.5"/>
-            <!-- Green Glass Bottle -->
             <rect x="58" y="44" width="18" height="38" rx="4" fill="#2dd4bf" fill-opacity="0.85"/>
             <rect x="63" y="32" width="8" height="12" fill="#2dd4bf" fill-opacity="0.85"/>
             <rect x="62" y="28" width="10" height="4" rx="1" fill="#b45309"/>
-            <!-- Shatter Shards -->
             <polygon points="78,35 84,31 82,40" fill="#38bdf8"/>
             <polygon points="80,50 88,48 85,56" fill="#2dd4bf"/>
             <polygon points="52,42 46,38 48,46" fill="#fef08a"/>
-            <!-- Wooden Slingshot Fork -->
             <path d="M14 42 L22 62 L22 82 M34 42 L26 62" stroke="#d97706" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-            <!-- Stretched Rubber Bands -->
             <line x1="14" y1="42" x2="28" y2="52" stroke="#ea580c" stroke-width="2.5"/>
             <line x1="34" y1="42" x2="28" y2="52" stroke="#ea580c" stroke-width="2.5"/>
-            <!-- Flying Pebble -->
             <circle cx="44" cy="46" r="4.5" fill="#f8fafc" stroke="#64748b" stroke-width="1"/>
-            <!-- Motion Lines -->
             <line x1="32" y1="49" x2="40" y2="47" stroke="#ffbe3b" stroke-width="1.5" stroke-dasharray="2 2"/>
           </svg>
         </i>
-        <h2>Slingshot<br>Smash</h2>
-        <span class="go">open experiment ↗</span>
+        <div class="card-bottom">
+          <h2>Slingshot<br>Smash</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
       </a>
 
-      <a class="card candle" href="candle.html">
-        <small>ATMOSPHERIC TIMER</small>
-        <b class="num">09</b>
+      <!-- 15: Fruit Slash -->
+      <a class="card fruit" href="fruit.html" data-category="games" data-name="fruit slash neon blade arcade ninja slice">
+        <div class="card-top">
+          <small>BLADE ARCADE</small>
+          <span class="num">15</span>
+        </div>
+        <i class="art">🍉</i>
+        <div class="card-bottom">
+          <h2>Fruit<br>Slash</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
+      </a>
+
+      <!-- 16: Angry Bird Hunt -->
+      <a class="card birds" href="birds.html" data-category="games" data-name="angry bird hunt arcade shooter target crosshair shotgun">
+        <div class="card-top">
+          <small>ARCADE SHOOTER</small>
+          <span class="num">16</span>
+        </div>
+        <i class="art">🎯</i>
+        <div class="card-bottom">
+          <h2>Angry Bird<br>Hunt</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
+      </a>
+
+      <!-- 17: NeuroLife 3D -->
+      <a class="card neuro" href="neuro.html" data-category="space zen" data-name="neurolife 3d neural ai ecosystem evolution neural networks">
+        <div class="card-top">
+          <small>NEURAL AI ECOSYSTEM</small>
+          <span class="num">17</span>
+        </div>
+        <i class="art">🧠</i>
+        <div class="card-bottom">
+          <h2>Neuro<br>Life 3D</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
+      </a>
+
+      <!-- 18: The Focus Candle -->
+      <a class="card candle" href="candle.html" data-category="zen" data-name="the focus candle atmospheric melting timer wax flame relaxing">
+        <div class="card-top">
+          <small>ATMOSPHERIC TIMER</small>
+          <span class="num">18</span>
+        </div>
         <i class="art">
           <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Brass Saucer Dish -->
             <ellipse cx="50" cy="84" rx="34" ry="7" fill="#92400e" stroke="#d4af37" stroke-width="1.8"/>
             <ellipse cx="50" cy="82" rx="28" ry="4" fill="#d4af37"/>
-            <!-- Finger Loop -->
             <circle cx="20" cy="78" r="7" stroke="#d4af37" stroke-width="2.5" fill="none"/>
-            <!-- Candle Cylinder Body -->
             <rect x="36" y="38" width="28" height="44" rx="2" fill="#fafaf9" stroke="#fde68a" stroke-width="1.2"/>
-            <!-- Wax Melt Pool Top -->
             <ellipse cx="50" cy="38" rx="14" ry="4.5" fill="#fef3c7" stroke="#fbbf24" stroke-width="1"/>
-            <!-- Solidified Wax Drips -->
             <rect x="35" y="44" width="3" height="18" rx="1.5" fill="#fffbeb"/>
             <circle cx="36.5" cy="62" r="2.2" fill="#fffbeb"/>
             <rect x="62" y="42" width="2.8" height="12" rx="1.4" fill="#fffbeb"/>
             <circle cx="63.4" cy="54" r="2" fill="#fffbeb"/>
-            <!-- Braided Cotton Wick -->
             <line x1="50" y1="38" x2="49" y2="28" stroke="#1c1917" stroke-width="2.2" stroke-linecap="round"/>
-            <!-- Glowing Red Ember -->
             <circle cx="49" cy="28" r="1.5" fill="#ef4444"/>
-            <!-- Multi-layer Flame -->
-            <!-- Outer Orange Flame -->
             <path d="M44 28 C41 22 46 11 49 4 C52 11 57 22 54 28 C52 31 46 31 44 28 Z" fill="#ea580c"/>
-            <!-- Inner Yellow Flame -->
             <path d="M46 27 C43 23 47 15 49 10 C51 15 55 23 52 27 C51 29 47 29 46 27 Z" fill="#fde047"/>
-            <!-- White Core -->
             <path d="M47.5 27 C46 24 48 18 49 14 C50 18 52 24 50.5 27 Z" fill="#ffffff"/>
-            <!-- Blue Root Base -->
             <ellipse cx="49" cy="28.5" rx="2.5" ry="1.2" fill="#38bdf8"/>
           </svg>
         </i>
-        <h2>The Focus<br>Candle</h2>
-        <span class="go">open experiment ↗</span>
+        <div class="card-bottom">
+          <h2>The Focus<br>Candle</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
       </a>
 
-      <a class="card birds" href="birds.html">
-        <small>ARCADE SHOOTER</small>
-        <b class="num">10</b>
-        <i class="art">🎯</i>
-        <h2>Angry Bird<br>Hunt</h2>
-        <span class="go">open experiment ↗</span>
+      <!-- 19: Galaxy Giggles (Orbital Sandbox) -->
+      <a class="card galaxy" href="orbit.html" data-category="space zen" data-name="galaxy giggles playful galaxy solar system orbital kepler">
+        <div class="card-top">
+          <small>PLAYFUL GALAXY</small>
+          <span class="num">19</span>
+        </div>
+        <i class="art">🪐</i>
+        <div class="card-bottom">
+          <h2>Galaxy<br>Giggles</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
       </a>
 
-      <a class="card fruit" href="fruit.html">
-        <small>BLADE ARCADE</small>
-        <b class="num">11</b>
-        <i class="art">🍉</i>
-        <h2>Fruit<br>Slash</h2>
-        <span class="go">open experiment ↗</span>
-      </a>
-
-      <a class="card foosball" href="foosball.html">
-        <small>TABLE SOCCER TOURNAMENT</small>
-        <b class="num">12</b>
-        <i class="art">⚽</i>
-        <h2>Foosball<br>Pro</h2>
-        <span class="go">open experiment ↗</span>
-      </a>
-
-      <a class="card bodyscope" href="bodyscope/index.html">
-        <small>3D MEDICAL ANATOMY ATLAS</small>
-        <b class="num">13</b>
-        <i class="art">🫀</i>
-        <h2>Body<br>Scope 3D</h2>
-        <span class="go">open experiment ↗</span>
-      </a>
-
-      <a class="card ludo" href="ludo.html">
-        <small>CLASSIC CHAMPIONSHIP</small>
-        <b class="num">14</b>
-        <i class="art">🎲</i>
-        <h2>Royal Ludo<br>Master</h2>
-        <span class="go">open experiment ↗</span>
-      </a>
-
-      <a class="card drift" href="drift.html">
-        <small>3D CYBERPUNK RACER</small>
-        <b class="num">15</b>
-        <i class="art">🏎️</i>
-        <h2>Cyber Drift<br>3D</h2>
-        <span class="go">open experiment ↗</span>
-      </a>
-
-      <a class="card snake" href="snake.html">
-        <small>NEON CYBER ARCADE</small>
-        <b class="num">16</b>
-        <i class="art">🐍</i>
-        <h2>Neon Snake<br>Pulse</h2>
-        <span class="go">open experiment ↗</span>
-      </a>
-
-      <a class="card alien" href="alien.html">
-        <small>DEEP SPACE CYBER HACKER</small>
-        <b class="num">17</b>
-        <i class="art">📡</i>
-        <h2>A.E.T.H.E.R.<br>Signal Deck</h2>
-        <span class="go">open experiment ↗</span>
-      </a>
-
-      <a class="card singularity" href="singularity.html">
-        <small>3D GENERAL RELATIVITY</small>
-        <b class="num">18</b>
-        <i class="art">🕳️</i>
-        <h2>Project<br>Singularity</h2>
-        <span class="go">open experiment ↗</span>
-      </a>
-
-      <a class="card piano" href="piano.html">
-        <small>ACOUSTIC FELT SANCTUARY</small>
-        <b class="num">19</b>
-        <i class="art">🎹</i>
-        <h2>Lumina<br>Grand Piano</h2>
-        <span class="go">open experiment ↗</span>
-      </a>
     </section>
 
+    <!-- Footer -->
     <footer>
-      <span>AI SMARTS / 2026</span>
-      <span>relaxing physics & tactical masterclasses</span>
+      <span>AI SMARTS / 2026 • Curated Interactive Suite</span>
+      <span>19 zero-dependency physics & cognitive experiments</span>
     </footer>
   </main>
+
+  <script>
+    // 1. Dark / Light Theme Setting with LocalStorage Persistence
+    const body = document.body;
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const themeLabel = document.getElementById('theme-label');
+
+    function applyTheme(theme) {
+      body.setAttribute('data-theme', theme);
+      localStorage.setItem('ai_smarts_theme', theme);
+      if (theme === 'light') {
+        themeIcon.textContent = '🌙';
+        themeLabel.textContent = 'DARK';
+      } else {
+        themeIcon.textContent = '☀️';
+        themeLabel.textContent = 'LIGHT';
+      }
+    }
+
+    // Initialize from LocalStorage or system preference
+    const savedTheme = localStorage.getItem('ai_smarts_theme') ||
+      (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    applyTheme(savedTheme);
+
+    themeToggleBtn.addEventListener('click', () => {
+      const current = body.getAttribute('data-theme');
+      applyTheme(current === 'light' ? 'dark' : 'light');
+    });
+
+    // 2. Real-Time Search & Category Filter System
+    const pills = document.querySelectorAll('.pill');
+    const searchInput = document.getElementById('search-input');
+    const cards = document.querySelectorAll('.card');
+
+    let activeFilter = 'all';
+    let searchQuery = '';
+
+    function filterCards() {
+      cards.forEach(card => {
+        const cat = card.dataset.category || '';
+        const name = (card.dataset.name || '').toLowerCase();
+
+        const matchesCat = (activeFilter === 'all') || cat.includes(activeFilter);
+        const matchesSearch = !searchQuery || name.includes(searchQuery);
+
+        if (matchesCat && matchesSearch) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    pills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        pills.forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        activeFilter = pill.dataset.filter;
+        filterCards();
+      });
+    });
+
+    searchInput.addEventListener('input', (e) => {
+      searchQuery = e.target.value.trim().toLowerCase();
+      filterCards();
+    });
+  </script>
 </body>
 </html>
