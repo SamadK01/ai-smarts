@@ -16,7 +16,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 | **04** | [**Grandmaster Chess Pro**](chess.html) | Full FIDE Rules Engine, Depth-4 Minimax AI, Web Audio | 100% compliant FIDE chess engine with Staunton vector pieces, 4 luxury board themes (Tournament Emerald, Walnut Wood, Cyber Midnight, Frost Glass), Alpha-Beta pruning AI with quiescence search, real-time golden move coach suggestions in Easy mode, live evaluation advantage bar, pass & play local 2P multiplayer, digital clocks (Casual/10m/5m/3m), and interactive 4-tab beginner rules guide with demo mini-board. |
 | **05** | [**Cyber Drift 3D: Tokyo Midnight**](drift.html) | Three.js WebGL, 60 FPS Vehicle Physics, Procedural Audio | Professional 3D Grand Prix racer with Armco steel guardrails, real rubber tire skidmarks, independent suspension body roll & dive, modified Super Booster hypercar (380+ km/h), radial speed streaks, circuit radar, and competitive AI rivals. |
 | **06** | [**Neon Snake Pulse**](snake.html) | Canvas 2D, 60fps Sub-tick Interpolation, Web Audio | Ultra-smooth cyber arcade snake game featuring live animated prey animals (frogs, mice, bunnies, chicks) for rapid growth, mega titan beast feasts (+12 length & swollen body width), strict laser walls vs free warp-around mode, sub-tick 60fps interpolation, dynamic tracking eyes, and procedural Web Audio synthesizers. |
-| **07** | [**Royal Ludo Master 3D**](ludo.html) | Standard 15x15 Grid, Heuristic AI Bots, Web Audio | Authentic regulation Ludo board with 4 colored bases (Red, Green, Yellow, Blue), 52-step outer circuit, 8 star safe spots, 3D rolling dice, step-by-step token hops, cutting bonus turns, pass & play local multiplayer, and smart AI bots. |
+| **07** | [**Royal Ludo Master 3D**](ludo.html) | Standard 15x15 Grid, 1 & 2 Dice Modes, Fair Entropy AI | Authentic regulation Ludo board with 4 colored bases (Red, Green, Yellow, Blue), 52-step outer circuit, 8 star safe spots, 1 Die & 2 Dice ("2 Chakke") modes, cryptographic anti-repeat fair dice engine, subpixel goti centering, step-by-step token hops, pass & play multiplayer, and balanced AI bots. |
 | **08** | [**Project Serenade (Lumina Grand Piano)**](piano.html) | Procedural Web Audio Physical Modeling, Algorithmic Reverb, Canvas FX | Ultra-relaxing, therapeutic acoustic felt piano & ambient sanctuary. Features harmonic overtone string modeling, soft wooden hammer strike transients, stereo acoustic panning, lush cathedral convolution reverb, sustain pedal, falling note waterfall visualizer, procedural soft rain and fireplace ambience, and calming auto-play classical pieces (*Gymnopédie*, *Clair de Lune*, *River Flows in You*, *Interstellar*). Fully touch and glissando responsive on mobile. |
 | **09** | [**Project Singularity (3D Black Hole)**](singularity.html) | Three.js WebGL, Custom GLSL Shaders, Procedural Web Audio | General Relativity Kerr Black Hole & Gravitational Lensing simulator. Features real-time Einstein photon ring bending, relativistic Doppler beaming, accretion disk plasma physics, celestial matter spaghettification, gravitational time dilation clocks (Ship vs Earth), and LIGO gravitational wave chirp synthesizer. |
 | **10** | [**Project A.E.T.H.E.R. (Alien Signal Deck)**](alien.html) | Three.js WebGL, Canvas FFT Spectrogram, Web Audio Synthesizer | Deep-space alien radio interceptor & elite cyber hacking command deck. Features 1.420 GHz Hydrogen line waterfall spectrogram, 3D celestial triangulation radar, interactive Any-Key hacker terminal, and 7-tone harmonic extraterrestrial synthesizer (Jadoo / Koi Mil Gaya style). |
@@ -64,10 +64,21 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 - Built using the native browser **Web Audio API** (`AudioContext`).
 - Generates dynamic square, sawtooth, triangle, and sine waveforms with custom ADSR envelopes for key clicks, phenolic ball collisions, biological chirps, and laser strikes without loading external `.mp3` or `.wav` files.
 
-### 6. Authentic Ludo Logic & Heuristic Engine (`ludo.html`)
-- **Regulation 15x15 Grid**: Exact geometry with 4 colored bases (Red, Green, Yellow, Blue), 52 outer track steps, 8 Star safe zones where tokens cannot be captured, and 4 colored home columns leading to the center finish triangle.
-- **Official Tournament Rules**: Need a 6 to deploy tokens from base; consecutive 6 penalties; bonus rolls awarded on rolling a 6, capturing an opponent, or entering a token into the home triangle.
-- **Smart AI Bot Engine**: 4-tier decision priority (1. Capture opponent, 2. Enter home, 3. Deploy from base on a 6, 4. Advance safest token).
+### 6. Authentic Ludo Logic, 2-Dice Mode & Fair Engine (`ludo.html`)
+- **Regulation 15x15 Grid with Subpixel Centering**:
+  - Exact geometry with 4 colored bases (Red, Green, Yellow, Blue), 52 outer track steps, 8 Star safe zones, and central finish triangle.
+  - Subpixel DOM measurement anchors resting gotis directly in the dead center of the 4 circular base slots across any screen size or zoom level.
+  - Symmetrical scaling (`0.76` for 2 tokens, `0.68` for 3, `0.62` for 4) keeps shared cells crisp, beautiful, and strictly within cell boundary borders.
+  - 4 designated home pedestal spots per color in the central 3x3 preserve the central golden crown.
+- **1 Die vs 2 Dice ("2 Chakke Box") Dual Mode**:
+  - Seamless toggle between Classic 1-Die and Fast-Paced 2-Dice ("Double Chakka") Mode.
+  - In 2-Dice mode: roll two 3D tumbling dice cubes side-by-side; use values on separate tokens or combine onto one token; any 6 releases a token from base; doubles (e.g. 5-5 or 6-6) grant bonus extra rolls!
+- **Cryptographic Fair Dice Engine**:
+  - Uses `crypto.getRandomValues` for true uniform entropy.
+  - Anti-repetition balancing suppresses immediate back-to-back repeats by 60% and strictly prevents 3 consecutive identical rolls.
+  - Fair-play drought counter prevents players with all tokens trapped in base from being locked out for long dry spells.
+- **Multi-Tier Strategic AI Bot Engine**:
+  - Multi-tier priority: 1. Deploy from base on a 6 (+95), 2. Capture enemy token (+110), 3. Enter Home (+90), 4. Land on safe star spot (+45), 5. Step into home column (+40), 6. Escape danger from trailing enemies (+45), 7. Forward race progress (+15..+35). Ensures all 4 colors have competitive, dynamic, fair chances to win.
 
 ### 7. 3D Vehicle Dynamics & Pro Grand Prix Circuit (`drift.html`)
 - **Pro Grand Prix Circuit Architecture (~2.2 km)**:

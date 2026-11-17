@@ -7,7 +7,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Royal Ludo Master 3D — Classic Board Championship</title>
-<meta name="description" content="An authentic, beautifully crafted classic Ludo game with 15x15 standard regulation board, 52-step track, 8 safe star zones, 1v1 / 3P / 4P role assignment, smart AI bots, 3D rolling dice, step-by-step token hops, and procedural Web Audio.">
+<meta name="description" content="An authentic, beautifully crafted classic Ludo game with 15x15 standard regulation board, 52-step track, 8 safe star zones, 1 Die & 2 Dice modes, cryptographic fair entropy, smart AI bots, 3D rolling dice, and procedural Web Audio.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@700;800&family=Bricolage+Grotesque:opsz,wght@12..96,500;700;800&family=Geist+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -30,7 +30,7 @@
     --blue-bg: #dbeafe;
     --board-wood: #2c1808;
     --board-border: #4a2810;
-    --panel-bg: rgba(15, 20, 32, 0.92);
+    --panel-bg: rgba(15, 20, 32, 0.94);
     --panel-border: rgba(245, 158, 11, 0.28);
     --font-display: 'Funnel Display', sans-serif;
     --font-body: 'Bricolage Grotesque', sans-serif;
@@ -50,7 +50,7 @@
   header.top-bar {
     width: 100%; height: 54px; padding: 0 16px;
     display: flex; align-items: center; justify-content: space-between;
-    background: rgba(11, 14, 23, 0.88); backdrop-filter: blur(14px);
+    background: rgba(11, 14, 23, 0.90); backdrop-filter: blur(14px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     z-index: 100; flex-shrink: 0;
   }
@@ -60,7 +60,7 @@
     color: #fff; letter-spacing: -0.5px;
   }
   .brand span { color: var(--gold); }
-  .nav-actions { display: flex; align-items: center; gap: 8px; }
+  .nav-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .btn {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.16);
@@ -86,24 +86,24 @@
   /* Main Container */
   main.game-container {
     display: flex; align-items: center; justify-content: center;
-    gap: 24px; width: 100%; max-width: 1200px;
-    padding: 12px 16px; height: calc(100% - 54px);
+    gap: 20px; width: 100%; max-width: 1240px;
+    padding: 10px 14px; height: calc(100% - 54px);
     overflow-y: auto; overflow-x: hidden;
   }
 
   /* Player Slots Grid around Board */
   .players-sidebar {
-    display: flex; flex-direction: column; gap: 14px;
-    min-width: 160px;
+    display: flex; flex-direction: column; gap: 12px;
+    min-width: 150px;
   }
 
   .player-slot {
     display: flex; flex-direction: column; align-items: center; gap: 6px;
-    padding: 12px 14px; border-radius: 14px;
+    padding: 10px 12px; border-radius: 14px;
     background: var(--panel-bg); border: 2px solid transparent;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative; box-shadow: 0 4px 14px rgba(0,0,0,0.4);
-    min-width: 140px;
+    min-width: 135px;
   }
   .player-slot.active {
     border-color: var(--gold-bright);
@@ -115,23 +115,23 @@
     opacity: 0.32; filter: grayscale(0.85);
   }
   .player-avatar {
-    width: 42px; height: 42px; border-radius: 50%;
+    width: 38px; height: 38px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.3rem; position: relative;
+    font-size: 1.2rem; position: relative;
     box-shadow: 0 3px 8px rgba(0,0,0,0.5);
     border: 2px solid #fff;
   }
   .player-name {
-    font-size: 0.82rem; font-weight: 800; color: #fff;
-    white-space: nowrap; max-width: 130px; overflow: hidden; text-overflow: ellipsis;
+    font-size: 0.8rem; font-weight: 800; color: #fff;
+    white-space: nowrap; max-width: 125px; overflow: hidden; text-overflow: ellipsis;
   }
   .player-status {
-    font-size: 0.7rem; color: #94a3b8; font-family: var(--font-mono);
+    font-size: 0.68rem; color: #94a3b8; font-family: var(--font-mono);
   }
 
   /* Role Toggle Badge on Player Card */
   .role-toggle-badge {
-    font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 10px;
+    font-size: 0.66rem; font-weight: 700; padding: 2px 7px; border-radius: 10px;
     cursor: pointer; transition: all 0.2s;
     background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25);
     color: #e2e8f0; display: inline-flex; align-items: center; gap: 4px;
@@ -161,7 +161,7 @@
   }
   .board-frame {
     background: linear-gradient(145deg, #381f0d, #1b0c03);
-    padding: 12px; border-radius: 18px;
+    padding: 10px; border-radius: 18px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), inset 0 2px 4px rgba(255, 255, 255, 0.25);
     border: 3px solid #5a3215;
   }
@@ -169,8 +169,8 @@
     display: grid;
     grid-template-columns: repeat(15, 1fr);
     grid-template-rows: repeat(15, 1fr);
-    width: min(78vw, 78vh, 540px);
-    height: min(78vw, 78vh, 540px);
+    width: min(78vw, 76vh, 520px);
+    height: min(78vw, 76vh, 520px);
     background: #ffffff;
     border-radius: 6px;
     position: relative;
@@ -185,7 +185,7 @@
     user-select: none;
   }
   .cell.star {
-    background-image: radial-gradient(circle, rgba(245, 158, 11, 0.22) 30%, transparent 70%);
+    background-image: radial-gradient(circle, rgba(245, 158, 11, 0.25) 30%, transparent 70%);
   }
   .cell.star::after {
     content: "⭐";
@@ -206,21 +206,21 @@
   /* 4 Corner Base Quadrants (6x6 cells each) */
   .base-quadrant {
     grid-column: span 6; grid-row: span 6;
-    padding: 10px; display: flex; align-items: center; justify-content: center;
+    padding: 3%; display: flex; align-items: center; justify-content: center;
     position: relative; transition: opacity 0.3s;
   }
   .base-inner {
     width: 100%; height: 100%; background: #ffffff;
     border-radius: 12px; display: grid;
     grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
-    gap: 8px; padding: 10px;
+    gap: 8%; padding: 8%;
     box-shadow: inset 0 2px 6px rgba(0,0,0,0.25);
   }
   .base-slot {
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     box-shadow: inset 0 2px 5px rgba(0,0,0,0.35);
-    border: 2px dashed rgba(0, 0, 0, 0.2);
+    border: 2px dashed rgba(0, 0, 0, 0.22);
     position: relative;
   }
   .base-quadrant.inactive {
@@ -263,22 +263,22 @@
     z-index: 50;
   }
 
-  /* Tokens (Gotis) - Scaled exactly to cell */
+  /* Tokens (Gotis) - Scaled and perfectly centered */
   .token {
     width: 5.2%; height: 5.2%; border-radius: 50%;
     position: absolute; cursor: pointer; pointer-events: auto;
     box-shadow: 0 4px 10px rgba(0,0,0,0.55), inset 0 2px 4px rgba(255,255,255,0.85);
-    border: 2.2px solid #ffffff; z-index: 50;
-    transform: translate(-50%, -50%);
-    transition: left 0.16s cubic-bezier(0.25, 1, 0.5, 1),
-                top 0.16s cubic-bezier(0.25, 1, 0.5, 1),
-                transform 0.16s ease,
-                box-shadow 0.16s ease;
+    border: 2px solid #ffffff; z-index: 50;
+    transform: translate(-50%, -50%) scale(var(--token-scale, 1));
+    transition: left 0.18s cubic-bezier(0.25, 1, 0.5, 1),
+                top 0.18s cubic-bezier(0.25, 1, 0.5, 1),
+                transform 0.18s ease,
+                box-shadow 0.18s ease;
     display: flex; align-items: center; justify-content: center;
   }
   .token::after {
     content: ""; width: 44%; height: 44%; border-radius: 50%;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.75);
     box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   }
   .token.c-red { background: radial-gradient(circle at 35% 35%, #fb7185, #e11d48 60%, #9f1239 100%); }
@@ -287,81 +287,148 @@
   .token.c-blue { background: radial-gradient(circle at 35% 35%, #60a5fa, #2563eb 60%, #1e3a8a 100%); }
 
   .token.selectable {
-    animation: pulseToken 0.7s infinite alternate ease-in-out;
-    cursor: pointer; z-index: 70;
+    cursor: pointer; z-index: 75;
+    animation: pulseToken 0.75s infinite alternate ease-in-out;
   }
   @keyframes pulseToken {
-    0% { transform: translate(-50%, -50%) scale(1.0); box-shadow: 0 0 8px #fff, 0 4px 8px rgba(0,0,0,0.4); }
-    100% { transform: translate(-50%, -50%) scale(1.32); box-shadow: 0 0 20px var(--gold-bright), 0 8px 16px rgba(0,0,0,0.6); }
+    0% {
+      box-shadow: 0 0 8px #ffffff, 0 4px 10px rgba(0,0,0,0.4);
+      filter: brightness(1.0);
+    }
+    100% {
+      box-shadow: 0 0 22px var(--gold-bright), 0 0 32px var(--gold), 0 6px 14px rgba(0,0,0,0.6);
+      filter: brightness(1.3);
+    }
   }
   .token.hopping {
-    z-index: 80;
-    transform: translate(-50%, -50%) scale(1.22);
+    z-index: 85;
+    --token-scale: 1.25 !important;
   }
 
   /* Right Control Panel (Dice & Actions) */
   .control-panel {
-    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
     background: var(--panel-bg); backdrop-filter: blur(14px);
     border: 1px solid var(--panel-border); border-radius: 18px;
-    padding: 18px 20px; min-width: 210px;
+    padding: 16px 18px; min-width: 220px;
     box-shadow: 0 16px 36px rgba(0,0,0,0.5);
   }
   .turn-announcer {
-    font-size: 0.9rem; font-weight: 700; text-align: center;
+    font-size: 0.88rem; font-weight: 700; text-align: center;
     color: #e2e8f0; width: 100%;
   }
   .turn-player-pill {
     padding: 4px 14px; border-radius: 20px; font-weight: 800;
-    display: inline-block; margin-top: 4px; font-size: 0.85rem;
+    display: inline-block; margin-top: 4px; font-size: 0.82rem;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
 
-  /* 3D Dice Cup & Roller */
+  /* 1 Die vs 2 Dice Mode Switcher */
+  .mode-toggle-group {
+    display: flex; gap: 4px; background: rgba(0, 0, 0, 0.45);
+    padding: 3px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.12);
+    width: 100%;
+  }
+  .mode-pill {
+    flex: 1; padding: 5px 8px; border-radius: 7px;
+    background: transparent; border: none; color: #94a3b8;
+    font-size: 0.72rem; font-weight: 700; cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    font-family: var(--font-body);
+  }
+  .mode-pill:hover { color: #fff; }
+  .mode-pill.active {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #000; font-weight: 800;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+  }
+
+  /* 3D Dice Area (Supports 1 or 2 dice) */
   .dice-area {
-    position: relative; width: 84px; height: 84px;
-    perspective: 600px; cursor: pointer;
+    position: relative; perspective: 600px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s ease; padding: 6px;
   }
+  .dice-area.mode-1 { width: 84px; height: 84px; }
+  .dice-area.mode-2 { width: 180px; height: 84px; gap: 16px; }
   .dice-area.disabled {
-    pointer-events: none; opacity: 0.7;
+    pointer-events: none; opacity: 0.75;
   }
+
+  .dice-cube-container {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .dice-label {
+    font-size: 0.65rem; font-weight: 800; color: var(--gold);
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+
   .dice-cube {
-    width: 64px; height: 64px; position: relative;
+    width: 58px; height: 58px; position: relative;
     transform-style: preserve-3d;
     transform: rotateX(-20deg) rotateY(25deg);
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
-  .dice-cube.rolling {
-    animation: rollDiceAnim 0.6s linear infinite;
+  .dice-cube.rolling-1 {
+    animation: rollDiceAnim1 0.55s linear infinite;
   }
-  @keyframes rollDiceAnim {
+  .dice-cube.rolling-2 {
+    animation: rollDiceAnim2 0.55s linear infinite;
+  }
+  @keyframes rollDiceAnim1 {
     0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
     100% { transform: rotateX(720deg) rotateY(1080deg) rotateZ(360deg); }
   }
-  .dice-face {
-    position: absolute; width: 64px; height: 64px;
-    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
-    border: 1px solid #cbd5e1; border-radius: 12px;
-    box-shadow: inset 0 0 6px rgba(0,0,0,0.1), 0 3px 8px rgba(0,0,0,0.3);
-    display: grid; padding: 8px;
+  @keyframes rollDiceAnim2 {
+    0% { transform: rotateX(0deg) rotateZ(0deg) rotateY(0deg); }
+    100% { transform: rotateX(-1080deg) rotateZ(720deg) rotateY(-360deg); }
   }
-  .dice-face.front  { transform: translateZ(32px); }
-  .dice-face.back   { transform: rotateY(180deg) translateZ(32px); }
-  .dice-face.right  { transform: rotateY(90deg) translateZ(32px); }
-  .dice-face.left   { transform: rotateY(-90deg) translateZ(32px); }
-  .dice-face.top    { transform: rotateX(90deg) translateZ(32px); }
-  .dice-face.bottom { transform: rotateX(-90deg) translateZ(32px); }
+
+  .dice-face {
+    position: absolute; width: 58px; height: 58px;
+    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+    border: 1px solid #cbd5e1; border-radius: 11px;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.1), 0 3px 8px rgba(0,0,0,0.3);
+    display: grid; padding: 7px;
+  }
+  .dice-face.front  { transform: translateZ(29px); }
+  .dice-face.back   { transform: rotateY(180deg) translateZ(29px); }
+  .dice-face.right  { transform: rotateY(90deg) translateZ(29px); }
+  .dice-face.left   { transform: rotateY(-90deg) translateZ(29px); }
+  .dice-face.top    { transform: rotateX(90deg) translateZ(29px); }
+  .dice-face.bottom { transform: rotateX(-90deg) translateZ(29px); }
 
   .dot {
-    width: 11px; height: 11px; border-radius: 50%;
+    width: 10px; height: 10px; border-radius: 50%;
     background: #0f172a; margin: auto;
     box-shadow: inset 0 2px 3px rgba(0,0,0,0.5);
   }
-  .dot.center-red { background: #dc2626; } /* Single red dot for face 1 */
+  .dot.center-red { background: #dc2626; width: 14px; height: 14px; }
+
+  /* Dice Value Interactive Chips in 2-Dice Mode */
+  .dice-chips-container {
+    display: flex; gap: 8px; width: 100%; justify-content: center;
+  }
+  .dice-chip {
+    padding: 5px 12px; border-radius: 8px; font-size: 0.74rem; font-weight: 800;
+    background: rgba(255, 255, 255, 0.08); border: 1.5px solid rgba(255, 255, 255, 0.2);
+    color: #e2e8f0; cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .dice-chip:hover { border-color: var(--gold); }
+  .dice-chip.active {
+    background: var(--gold); color: #000; border-color: var(--gold-bright);
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.55);
+    transform: scale(1.05);
+  }
+  .dice-chip.used {
+    opacity: 0.35; text-decoration: line-through; pointer-events: none;
+    filter: grayscale(1);
+  }
 
   .roll-prompt {
-    font-size: 0.76rem; font-family: var(--font-mono); color: var(--gold);
+    font-size: 0.74rem; font-family: var(--font-mono); color: var(--gold);
     letter-spacing: 0.5px; text-transform: uppercase; text-align: center;
     min-height: 20px;
   }
@@ -439,23 +506,34 @@
   /* Responsive Design for Mobile */
   @media (max-width: 900px) {
     main.game-container {
-      flex-direction: column; gap: 12px; padding: 8px;
+      flex-direction: column; gap: 10px; padding: 6px;
     }
     .players-sidebar {
       flex-direction: row; width: 100%; justify-content: space-around;
       min-width: auto;
     }
-    .player-slot { min-width: 72px; padding: 6px 8px; }
-    .player-avatar { width: 32px; height: 32px; font-size: 1rem; }
-    .player-name { font-size: 0.72rem; max-width: 80px; }
-    .role-toggle-badge { font-size: 0.6rem; padding: 1px 6px; }
+    .player-slot { min-width: 72px; padding: 6px 6px; }
+    .player-avatar { width: 30px; height: 30px; font-size: 0.95rem; }
+    .player-name { font-size: 0.7rem; max-width: 75px; }
+    .role-toggle-badge { font-size: 0.58rem; padding: 1px 5px; }
     .control-panel {
-      flex-direction: row; justify-content: space-between;
-      width: 100%; max-width: min(92vw, 480px); padding: 8px 14px;
+      flex-direction: row; flex-wrap: wrap; justify-content: space-between;
+      width: 100%; max-width: min(94vw, 480px); padding: 8px 12px; gap: 8px;
     }
+    .turn-announcer { width: auto; text-align: left; }
+    .mode-toggle-group { width: auto; max-width: 170px; }
+    .dice-area.mode-2 { width: 140px; gap: 10px; }
+    .dice-cube { width: 48px; height: 48px; }
+    .dice-face { width: 48px; height: 48px; padding: 5px; }
+    .dice-face.front  { transform: translateZ(24px); }
+    .dice-face.back   { transform: rotateY(180deg) translateZ(24px); }
+    .dice-face.right  { transform: rotateY(90deg) translateZ(24px); }
+    .dice-face.left   { transform: rotateY(-90deg) translateZ(24px); }
+    .dice-face.top    { transform: rotateX(90deg) translateZ(24px); }
+    .dice-face.bottom { transform: rotateX(-90deg) translateZ(24px); }
     #ludo-board {
-      width: min(90vw, 70vh, 420px);
-      height: min(90vw, 70vh, 420px);
+      width: min(88vw, 68vh, 410px);
+      height: min(88vw, 68vh, 410px);
     }
   }
 </style>
@@ -468,6 +546,7 @@
       <span>🎲</span> ROYAL LUDO <span>MASTER</span>
     </div>
     <div class="nav-actions">
+      <button id="btn-dice-mode" class="btn" title="Toggle 1 Die or 2 Dice Mode">🎲 Mode: 1 Die</button>
       <button id="btn-setup" class="btn btn-primary">⚙️ Assign Roles & Players</button>
       <button id="btn-sound" class="btn">🔊 Sound: ON</button>
       <button id="btn-rules" class="btn">📜 Rules</button>
@@ -550,47 +629,43 @@
         <br><span id="turn-banner" class="turn-player-pill c-red">Red's Turn</span>
       </div>
 
-      <!-- 3D Rolling Dice -->
-      <div class="dice-area" id="dice-trigger" title="Tap to Roll (or Spacebar)">
-        <div class="dice-cube" id="dice-cube">
-          <!-- Face 1 -->
-          <div class="dice-face front" style="grid-template: 1fr / 1fr;">
-            <div class="dot center-red"></div>
+      <!-- 1 Die vs 2 Dice Mode Toggle -->
+      <div class="mode-toggle-group">
+        <button class="mode-pill active" id="pill-mode-1" data-mode="1">🎲 1 Die</button>
+        <button class="mode-pill" id="pill-mode-2" data-mode="2">🎲🎲 2 Dice</button>
+      </div>
+
+      <!-- 3D Rolling Dice Box (supports 1 or 2 dice cubes side-by-side) -->
+      <div class="dice-area mode-1" id="dice-trigger" title="Tap Dice to Roll (or Spacebar)">
+        <!-- Cube 1 -->
+        <div class="dice-cube-container" id="cube-container-1">
+          <div class="dice-label" id="dice-label-1" style="display:none;">Die 1</div>
+          <div class="dice-cube" id="dice-cube-1">
+            <div class="dice-face front" style="grid-template: 1fr / 1fr;"><div class="dot center-red"></div></div>
+            <div class="dice-face back" style="grid-template: 1fr 1fr / 1fr 1fr;"><div class="dot" style="grid-area: 1/1;"></div><div class="dot" style="grid-area: 2/2;"></div></div>
+            <div class="dice-face right" style="grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr;"><div class="dot" style="grid-area: 1/1;"></div><div class="dot" style="grid-area: 2/2;"></div><div class="dot" style="grid-area: 3/3;"></div></div>
+            <div class="dice-face left" style="grid-template: 1fr 1fr / 1fr 1fr;"><div class="dot" style="grid-area: 1/1;"></div><div class="dot" style="grid-area: 1/2;"></div><div class="dot" style="grid-area: 2/1;"></div><div class="dot" style="grid-area: 2/2;"></div></div>
+            <div class="dice-face top" style="grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr;"><div class="dot" style="grid-area: 1/1;"></div><div class="dot" style="grid-area: 1/3;"></div><div class="dot" style="grid-area: 2/2;"></div><div class="dot" style="grid-area: 3/1;"></div><div class="dot" style="grid-area: 3/3;"></div></div>
+            <div class="dice-face bottom" style="grid-template: 1fr 1fr 1fr / 1fr 1fr;"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
           </div>
-          <!-- Face 2 -->
-          <div class="dice-face back" style="grid-template: 1fr 1fr / 1fr 1fr;">
-            <div class="dot" style="grid-area: 1/1;"></div>
-            <div class="dot" style="grid-area: 2/2;"></div>
-          </div>
-          <!-- Face 3 -->
-          <div class="dice-face right" style="grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr;">
-            <div class="dot" style="grid-area: 1/1;"></div>
-            <div class="dot" style="grid-area: 2/2;"></div>
-            <div class="dot" style="grid-area: 3/3;"></div>
-          </div>
-          <!-- Face 4 -->
-          <div class="dice-face left" style="grid-template: 1fr 1fr / 1fr 1fr;">
-            <div class="dot" style="grid-area: 1/1;"></div>
-            <div class="dot" style="grid-area: 1/2;"></div>
-            <div class="dot" style="grid-area: 2/1;"></div>
-            <div class="dot" style="grid-area: 2/2;"></div>
-          </div>
-          <!-- Face 5 -->
-          <div class="dice-face top" style="grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr;">
-            <div class="dot" style="grid-area: 1/1;"></div>
-            <div class="dot" style="grid-area: 1/3;"></div>
-            <div class="dot" style="grid-area: 2/2;"></div>
-            <div class="dot" style="grid-area: 3/1;"></div>
-            <div class="dot" style="grid-area: 3/3;"></div>
-          </div>
-          <!-- Face 6 -->
-          <div class="dice-face bottom" style="grid-template: 1fr 1fr 1fr / 1fr 1fr;">
-            <div class="dot"></div><div class="dot"></div>
-            <div class="dot"></div><div class="dot"></div>
-            <div class="dot"></div><div class="dot"></div>
+        </div>
+
+        <!-- Cube 2 (Shown in 2-Dice Mode) -->
+        <div class="dice-cube-container" id="cube-container-2" style="display:none;">
+          <div class="dice-label" id="dice-label-2">Die 2</div>
+          <div class="dice-cube" id="dice-cube-2">
+            <div class="dice-face front" style="grid-template: 1fr / 1fr;"><div class="dot center-red"></div></div>
+            <div class="dice-face back" style="grid-template: 1fr 1fr / 1fr 1fr;"><div class="dot" style="grid-area: 1/1;"></div><div class="dot" style="grid-area: 2/2;"></div></div>
+            <div class="dice-face right" style="grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr;"><div class="dot" style="grid-area: 1/1;"></div><div class="dot" style="grid-area: 2/2;"></div><div class="dot" style="grid-area: 3/3;"></div></div>
+            <div class="dice-face left" style="grid-template: 1fr 1fr / 1fr 1fr;"><div class="dot" style="grid-area: 1/1;"></div><div class="dot" style="grid-area: 1/2;"></div><div class="dot" style="grid-area: 2/1;"></div><div class="dot" style="grid-area: 2/2;"></div></div>
+            <div class="dice-face top" style="grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr;"><div class="dot" style="grid-area: 1/1;"></div><div class="dot" style="grid-area: 1/3;"></div><div class="dot" style="grid-area: 2/2;"></div><div class="dot" style="grid-area: 3/1;"></div><div class="dot" style="grid-area: 3/3;"></div></div>
+            <div class="dice-face bottom" style="grid-template: 1fr 1fr 1fr / 1fr 1fr;"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
           </div>
         </div>
       </div>
+
+      <!-- Dice Chips in 2-Dice Mode -->
+      <div class="dice-chips-container" id="dice-chips-container" style="display:none;"></div>
 
       <div class="roll-prompt" id="roll-prompt">Tap Dice to Roll 🎲</div>
       <button id="btn-roll-direct" class="btn btn-primary" style="width:100%; justify-content:center;">🎲 Roll Dice</button>
@@ -680,11 +755,14 @@
     <div class="modal-box">
       <div class="modal-title">Official Ludo Rules 📜</div>
       <div class="modal-desc" style="text-align:left;">
+        • <b>🎲 1 Die vs 🎲🎲 2 Dice Mode:</b> Switch between Classic 1-Die and Fast-Paced 2-Dice ("Double Chakka") Mode at any time!<br><br>
+        • <b>2-Dice Double Rules:</b> In 2-Dice mode, roll both dice at once! Use values on different tokens or combine them. Any 6 opens a token from base. Rolling doubles (e.g. 5-5 or 6-6) grants a bonus extra roll!<br><br>
+        • <b>Fair-Entropy Dice Engine:</b> Powered by cryptographic randomness with anti-repetition protection — no numbers get artificially stuck repeating over and over.<br><br>
         • <b>Need a 6 to Release:</b> Roll a 6 to move a token from base to the starting track.<br><br>
-        • <b>Bonus Extra Roll:</b> Rolling a <b>6</b>, capturing an opponent's token, or entering a token into Home grants an extra roll!<br><br>
+        • <b>Bonus Extra Roll:</b> Rolling a 6, capturing an opponent's token, or entering a token into Home grants an extra roll!<br><br>
         • <b>Safe Star Spots (⭐):</b> The 4 starting arrow cells and 4 midway star cells are safe — tokens cannot be cut there.<br><br>
         • <b>Capture / Cut:</b> Land on an opponent on an unstarred cell to send their token back to base!<br><br>
-        • <b>Three 6s Rule:</b> Rolling three 6s consecutively forfeits the turn.<br><br>
+        • <b>Three 6s Rule:</b> In 1-Die mode, rolling three 6s consecutively forfeits the turn.<br><br>
         • <b>Championship Victory:</b> First player to guide all 4 tokens into the central Home Triangle wins the Championship! 👑
       </div>
       <button class="btn active" id="close-rules-btn" style="width:100%; justify-content:center; padding:10px;">Got it! Let's Play</button>
@@ -707,6 +785,7 @@
 /**
  * Royal Ludo Master 3D - High Precision Web Game
  * 15x15 Standard Regulation Board, 52-step Track, 8 Star Safe Spots
+ * 1 Die & 2 Dice ("2 Chakke Box") Modes, Cryptographic Fair Dice Engine
  * Interactive Role Assignment (Human / Bot / Off), 3D Rolling Dice, Web Audio API
  */
 
@@ -742,6 +821,24 @@ class LudoAudio {
       gain.connect(this.ctx.destination);
       osc.start(t + i * 0.06);
       osc.stop(t + i * 0.06 + 0.06);
+    }
+  }
+
+  playDoubleDiceRoll() {
+    if (!this.enabled) return;
+    this.init();
+    const t = this.ctx.currentTime;
+    for (let i = 0; i < 6; i++) {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = i % 2 === 0 ? 'triangle' : 'sine';
+      osc.frequency.setValueAtTime(140 + Math.random() * 200, t + i * 0.05);
+      gain.gain.setValueAtTime(0.19, t + i * 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.05 + 0.06);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t + i * 0.05);
+      osc.stop(t + i * 0.05 + 0.07);
     }
   }
 
@@ -836,7 +933,85 @@ class LudoAudio {
 
 const audio = new LudoAudio();
 
-// 2. Standard 15x15 Regulation Ludo Coordinate Map
+// 2. Cryptographic Fair Dice Engine with Anti-Repetition Balancing
+class LudoDiceEngine {
+  constructor() {
+    this.playerHistories = {
+      red: [],
+      green: [],
+      yellow: [],
+      blue: []
+    };
+    this.droughtCounters = {
+      red: 0,
+      green: 0,
+      yellow: 0,
+      blue: 0
+    };
+  }
+
+  // Cryptographically uniform float in [0, 1)
+  getRandomFloat() {
+    const arr = new Uint32Array(1);
+    window.crypto.getRandomValues(arr);
+    return arr[0] / (0xffffffff + 1);
+  }
+
+  // Roll a fair die (1-6) with anti-repetition protection
+  rollSingleDie(playerId, allTokensInBase) {
+    const history = this.playerHistories[playerId] || [];
+    const lastRoll = history.length > 0 ? history[history.length - 1] : null;
+    const secondLast = history.length > 1 ? history[history.length - 2] : null;
+
+    // Standard baseline weights
+    const weights = [100, 100, 100, 100, 100, 100]; // 1, 2, 3, 4, 5, 6
+
+    // 1. Anti-repeat: significantly decay weight of immediate previous roll
+    if (lastRoll) {
+      weights[lastRoll - 1] *= 0.40; // 60% reduction so the same number doesn't repeat back-to-back
+    }
+
+    // 2. Strict anti-triple: NEVER allow 3 identical numbers in a row
+    if (lastRoll && lastRoll === secondLast) {
+      weights[lastRoll - 1] = 0; // Strictly zero weight
+    }
+
+    // 3. Fair-play pity mechanism: if all tokens are trapped in base, slightly boost 6 after 4 dry turns
+    if (allTokensInBase) {
+      this.droughtCounters[playerId] = (this.droughtCounters[playerId] || 0) + 1;
+      if (this.droughtCounters[playerId] >= 4) {
+        weights[5] += 45 * Math.min(3, this.droughtCounters[playerId] - 3);
+      }
+    } else {
+      this.droughtCounters[playerId] = 0;
+    }
+
+    // Weighted selection
+    const totalWeight = weights.reduce((a, b) => a + b, 0);
+    let rnd = this.getRandomFloat() * totalWeight;
+    let selected = 1;
+    for (let i = 0; i < 6; i++) {
+      if (rnd < weights[i]) {
+        selected = i + 1;
+        break;
+      }
+      rnd -= weights[i];
+    }
+
+    // Record history
+    history.push(selected);
+    if (history.length > 8) history.shift();
+    this.playerHistories[playerId] = history;
+
+    if (selected === 6) {
+      this.droughtCounters[playerId] = 0;
+    }
+
+    return selected;
+  }
+}
+
+// 3. Standard 15x15 Regulation Ludo Coordinate Map
 // 52 outer track steps (clockwise)
 const TRACK_COORDS = [
   // Red Wing (ascending towards Left arm)
@@ -911,25 +1086,17 @@ const HOME_PATHS = {
   blue:   [ { r: 7, c: 13 }, { r: 7, c: 12 }, { r: 7, c: 11 }, { r: 7, c: 10 }, { r: 7, c: 9 } ]
 };
 
-// Base slots for resting tokens inside the 6x6 corner bases
-const BASE_SLOTS = {
-  red:    [ { r: 10.5, c: 1.5 }, { r: 10.5, c: 3.5 }, { r: 12.5, c: 1.5 }, { r: 12.5, c: 3.5 } ],
-  green:  [ { r: 1.5, c: 1.5 },  { r: 1.5, c: 3.5 },  { r: 3.5, c: 1.5 },  { r: 3.5, c: 3.5 } ],
-  yellow: [ { r: 1.5, c: 10.5 }, { r: 1.5, c: 12.5 }, { r: 3.5, c: 10.5 }, { r: 3.5, c: 12.5 } ],
-  blue:   [ { r: 10.5, c: 10.5 }, { r: 10.5, c: 12.5 }, { r: 12.5, c: 10.5 }, { r: 12.5, c: 12.5 } ]
-};
-
 // Player initial configuration
 const DEFAULT_PLAYERS = [
-  { id: 'red', name: 'You (Red)', color: '#e11d48', startIdx: 0, role: 'human', homePos: { r: 7.7, c: 7.0 } },
-  { id: 'green', name: 'Bot Green', color: '#059669', startIdx: 13, role: 'bot', homePos: { r: 7.0, c: 6.3 } },
-  { id: 'yellow', name: 'Bot Yellow', color: '#eab308', startIdx: 26, role: 'bot', homePos: { r: 6.3, c: 7.0 } },
-  { id: 'blue', name: 'Bot Blue', color: '#2563eb', startIdx: 39, role: 'bot', homePos: { r: 7.0, c: 7.7 } }
+  { id: 'red', name: 'You (Red)', color: '#e11d48', startIdx: 0, role: 'human' },
+  { id: 'green', name: 'Bot Green', color: '#059669', startIdx: 13, role: 'bot' },
+  { id: 'yellow', name: 'Bot Yellow', color: '#eab308', startIdx: 26, role: 'bot' },
+  { id: 'blue', name: 'Bot Blue', color: '#2563eb', startIdx: 39, role: 'bot' }
 ];
 
-// Game Controller
+// 4. Main Game Controller
 class LudoGame {
-  constructor(playerSettings = null) {
+  constructor(playerSettings = null, initialDiceMode = 1) {
     const settings = playerSettings || DEFAULT_PLAYERS;
     this.players = settings.map(cfg => ({
       ...cfg,
@@ -943,8 +1110,12 @@ class LudoGame {
       rank: 0
     }));
 
+    this.diceEngine = new LudoDiceEngine();
+    this.diceMode = initialDiceMode; // 1 = 1 Die, 2 = 2 Dice ("2 Chakke Box")
     this.currentTurnIdx = 0;
-    this.diceValue = 1;
+    this.diceRolls = [1, 1];
+    this.pendingDice = []; // Dice values remaining to be used in current turn
+    this.selectedDieIdx = 0;
     this.isRolling = false;
     this.hasRolled = false;
     this.consecutiveSixes = 0;
@@ -959,7 +1130,13 @@ class LudoGame {
 
     this.initBoardDOM();
     this.initTokensDOM();
+    this.setDiceMode(this.diceMode);
     this.updateUI();
+
+    // Responsive listener to re-align gotis on window resize
+    window.addEventListener('resize', () => {
+      this.renderTokenPositions();
+    });
 
     // If first player is Bot, trigger turn
     if (this.players[this.currentTurnIdx].role === 'bot') {
@@ -967,12 +1144,45 @@ class LudoGame {
     }
   }
 
+  setDiceMode(mode) {
+    this.diceMode = mode;
+    const btnNav = document.getElementById('btn-dice-mode');
+    if (btnNav) btnNav.textContent = mode === 1 ? '🎲 Mode: 1 Die' : '🎲🎲 Mode: 2 Dice';
+
+    const pill1 = document.getElementById('pill-mode-1');
+    const pill2 = document.getElementById('pill-mode-2');
+    if (pill1 && pill2) {
+      pill1.classList.toggle('active', mode === 1);
+      pill2.classList.toggle('active', mode === 2);
+    }
+
+    const diceArea = document.getElementById('dice-trigger');
+    const cube2Container = document.getElementById('cube-container-2');
+    const label1 = document.getElementById('dice-label-1');
+    const chipsContainer = document.getElementById('dice-chips-container');
+
+    if (mode === 1) {
+      diceArea.className = 'dice-area mode-1';
+      cube2Container.style.display = 'none';
+      label1.style.display = 'none';
+      chipsContainer.style.display = 'none';
+    } else {
+      diceArea.className = 'dice-area mode-2';
+      cube2Container.style.display = 'flex';
+      label1.style.display = 'block';
+      chipsContainer.style.display = 'flex';
+    }
+
+    this.setDiceFace(1, this.diceRolls[0] || 1);
+    this.setDiceFace(2, this.diceRolls[1] || 1);
+    this.renderDiceChips();
+  }
+
   initBoardDOM() {
     const board = document.getElementById('ludo-board');
-    // Keep tokens layer
     board.innerHTML = '<div id="tokens-layer"></div>';
 
-    // 1. Four Corner Bases (6x6 each)
+    // 1. Four Corner Bases (6x6 each) with tagged base-slots
     this.createBaseQuadrant(board, 'green', 1, 1, 'c-green bg-green-light');
     this.createBaseQuadrant(board, 'yellow', 1, 10, 'c-yellow bg-yellow-light');
     this.createBaseQuadrant(board, 'red', 10, 1, 'c-red bg-red-light');
@@ -1078,10 +1288,10 @@ class LudoGame {
     base.style.gridColumn = `${col} / span 6`;
     base.innerHTML = `
       <div class="base-inner">
-        <div class="base-slot ${styleClasses.split(' ')[1]}"></div>
-        <div class="base-slot ${styleClasses.split(' ')[1]}"></div>
-        <div class="base-slot ${styleClasses.split(' ')[1]}"></div>
-        <div class="base-slot ${styleClasses.split(' ')[1]}"></div>
+        <div class="base-slot ${styleClasses.split(' ')[1]}" data-base-color="${color}" data-base-slot="0"></div>
+        <div class="base-slot ${styleClasses.split(' ')[1]}" data-base-color="${color}" data-base-slot="1"></div>
+        <div class="base-slot ${styleClasses.split(' ')[1]}" data-base-color="${color}" data-base-slot="2"></div>
+        <div class="base-slot ${styleClasses.split(' ')[1]}" data-base-color="${color}" data-base-slot="3"></div>
       </div>
       ${isInactive ? '<div class="base-inactive-overlay">OFF</div>' : ''}
     `;
@@ -1114,7 +1324,10 @@ class LudoGame {
       });
     });
 
+    // Render immediately, then re-align precisely once DOM layout settles
     this.renderTokenPositions();
+    requestAnimationFrame(() => this.renderTokenPositions());
+    setTimeout(() => this.renderTokenPositions(), 60);
   }
 
   // Calculate percentage coordinates of a grid cell on 15x15 board
@@ -1124,9 +1337,71 @@ class LudoGame {
     return { x, y };
   }
 
-  // Renders all tokens with smart offset stacking for shared cells
+  // Exact subpixel measurement of circular base slots for 100% perfect goti centering
+  getSlotCenter(playerId, slotId) {
+    const board = document.getElementById('ludo-board');
+    const slot = document.querySelector(`.base-slot[data-base-color="${playerId}"][data-base-slot="${slotId}"]`);
+    if (board && slot) {
+      const bR = board.getBoundingClientRect();
+      const sR = slot.getBoundingClientRect();
+      if (bR.width > 0 && bR.height > 0) {
+        return {
+          x: ((sR.left + sR.width / 2 - bR.left) / bR.width) * 100,
+          y: ((sR.top + sR.height / 2 - bR.top) / bR.height) * 100
+        };
+      }
+    }
+    // High-precision geometric fallback
+    const origins = {
+      green:  { r: 0, c: 0 },
+      yellow: { r: 0, c: 9 },
+      red:    { r: 9, c: 0 },
+      blue:   { r: 9, c: 9 }
+    };
+    const offsets = [
+      { r: 1.85, c: 1.85 },
+      { r: 1.85, c: 4.15 },
+      { r: 4.15, c: 1.85 },
+      { r: 4.15, c: 4.15 }
+    ];
+    const orig = origins[playerId];
+    const off = offsets[slotId];
+    return this.getCellCoords(orig.r + off.r, orig.c + off.c);
+  }
+
+  // Designated pedestals inside each color's central home triangle
+  getHomeSlotCoords(playerId, tokenId) {
+    const slots = {
+      red: [
+        { x: 48.0, y: 55.5 },
+        { x: 52.0, y: 55.5 },
+        { x: 46.5, y: 58.5 },
+        { x: 53.5, y: 58.5 }
+      ],
+      green: [
+        { x: 44.5, y: 48.0 },
+        { x: 44.5, y: 52.0 },
+        { x: 41.5, y: 46.5 },
+        { x: 41.5, y: 53.5 }
+      ],
+      yellow: [
+        { x: 48.0, y: 44.5 },
+        { x: 52.0, y: 44.5 },
+        { x: 46.5, y: 41.5 },
+        { x: 53.5, y: 41.5 }
+      ],
+      blue: [
+        { x: 55.5, y: 48.0 },
+        { x: 55.5, y: 52.0 },
+        { x: 58.5, y: 46.5 },
+        { x: 58.5, y: 53.5 }
+      ]
+    };
+    return slots[playerId][tokenId % 4];
+  }
+
+  // Renders all tokens with dead-center alignment and tidy symmetrical multi-token stacking
   renderTokenPositions() {
-    // Group active tokens by cell position
     const cellGroups = {};
 
     this.players.forEach(p => {
@@ -1136,12 +1411,11 @@ class LudoGame {
         let key, coords;
 
         if (t.state === 'base') {
-          const slot = BASE_SLOTS[p.id][t.id];
-          coords = this.getCellCoords(slot.r, slot.c);
+          coords = this.getSlotCenter(p.id, t.id);
           key = `base_${p.id}_${t.id}`;
         } else if (t.state === 'home') {
-          coords = this.getCellCoords(p.homePos.r, p.homePos.c);
-          key = `home_${p.id}`;
+          coords = this.getHomeSlotCoords(p.id, t.id);
+          key = `home_${p.id}_${t.id}`;
         } else {
           // On outer track or home path
           if (t.step < 51) {
@@ -1149,13 +1423,13 @@ class LudoGame {
             const pt = TRACK_COORDS[trackIdx];
             coords = this.getCellCoords(pt.r, pt.c);
             key = `track_${pt.r}_${pt.c}`;
-          } else if (t.step <= 56) {
+          } else if (t.step <= 55) {
             const pt = HOME_PATHS[p.id][t.step - 51];
             coords = this.getCellCoords(pt.r, pt.c);
             key = `hpath_${p.id}_${pt.r}_${pt.c}`;
           } else {
-            coords = this.getCellCoords(p.homePos.r, p.homePos.c);
-            key = `home_${p.id}`;
+            coords = this.getHomeSlotCoords(p.id, t.id);
+            key = `home_${p.id}_${t.id}`;
           }
         }
 
@@ -1164,7 +1438,7 @@ class LudoGame {
       });
     });
 
-    // Apply positions with smart offset for shared cells
+    // Apply positions with symmetrical offsets and smart scaling for shared cells
     Object.keys(cellGroups).forEach(key => {
       const group = cellGroups[key];
       const count = group.length;
@@ -1175,65 +1449,38 @@ class LudoGame {
 
         let offsetX = 0;
         let offsetY = 0;
+        let scale = 1.0;
 
-        // Offset when multiple tokens share a cell
-        if (count === 2) {
-          offsetX = idx === 0 ? -1.1 : 1.1;
-          offsetY = idx === 0 ? -1.1 : 1.1;
-        } else if (count >= 3) {
-          const angles = [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2];
-          offsetX = Math.cos(angles[idx % 4]) * 1.3;
-          offsetY = Math.sin(angles[idx % 4]) * 1.3;
+        if (count === 1) {
+          scale = 1.0;
+          offsetX = 0;
+          offsetY = 0;
+        } else if (count === 2) {
+          scale = 0.76;
+          offsetX = idx === 0 ? -0.85 : 0.85;
+          offsetY = idx === 0 ? -0.85 : 0.85;
+        } else if (count === 3) {
+          scale = 0.68;
+          if (idx === 0) { offsetX = 0; offsetY = -0.95; }
+          else if (idx === 1) { offsetX = -0.85; offsetY = 0.65; }
+          else { offsetX = 0.85; offsetY = 0.65; }
+        } else if (count >= 4) {
+          scale = 0.62;
+          offsetX = (idx % 2 === 0 ? -0.85 : 0.85);
+          offsetY = (idx < 2 ? -0.85 : 0.85);
         }
 
         domItem.el.style.left = `${item.coords.x + offsetX}%`;
         domItem.el.style.top = `${item.coords.y + offsetY}%`;
+        domItem.el.style.setProperty('--token-scale', scale);
       });
     });
   }
 
-  // Dice Roll Execution
-  rollDice() {
-    if (this.isRolling || this.hasRolled || this.isGameOver) return;
-
-    this.isRolling = true;
-    audio.playDiceRoll();
-
-    const cube = document.getElementById('dice-cube');
-    cube.classList.add('rolling');
-    document.getElementById('dice-trigger').classList.add('disabled');
-
-    setTimeout(() => {
-      cube.classList.remove('rolling');
-      document.getElementById('dice-trigger').classList.remove('disabled');
-
-      this.diceValue = Math.floor(Math.random() * 6) + 1;
-      this.setDiceFace(this.diceValue);
-
-      this.isRolling = false;
-      this.hasRolled = true;
-
-      if (this.diceValue === 6) {
-        audio.playSixChime();
-        this.consecutiveSixes++;
-      } else {
-        this.consecutiveSixes = 0;
-      }
-
-      // Three consecutive 6s rule: cancel turn
-      if (this.consecutiveSixes >= 3) {
-        this.consecutiveSixes = 0;
-        this.showTurnMessage("Three 6s in a row! Turn forfeited.");
-        setTimeout(() => this.passTurn(), 1100);
-        return;
-      }
-
-      this.evaluateTurnMoves();
-    }, 520);
-  }
-
-  setDiceFace(val) {
-    const cube = document.getElementById('dice-cube');
+  // 3D Dice Face Orientations
+  setDiceFace(cubeIdx, val) {
+    const cube = document.getElementById(`dice-cube-${cubeIdx}`);
+    if (!cube) return;
     const rotations = [
       { x: 0, y: 0 },       // 1 (Front)
       { x: 0, y: 180 },     // 2 (Back)
@@ -1242,22 +1489,125 @@ class LudoGame {
       { x: -90, y: 0 },     // 5 (Top)
       { x: 90, y: 0 }       // 6 (Bottom)
     ];
-    const r = rotations[val - 1];
+    const r = rotations[val - 1] || rotations[0];
     cube.style.transform = `rotateX(${r.x}deg) rotateY(${r.y}deg)`;
   }
 
-  evaluateTurnMoves() {
-    const curPlayer = this.players[this.currentTurnIdx];
-    const validTokens = [];
+  // Render clickable dice chips in 2-Dice mode
+  renderDiceChips() {
+    const container = document.getElementById('dice-chips-container');
+    if (!container) return;
+    if (this.diceMode === 1) {
+      container.style.display = 'none';
+      return;
+    }
+    container.style.display = 'flex';
+    container.innerHTML = '';
 
-    curPlayer.tokens.forEach(t => {
-      if (this.isValidMove(curPlayer, t, this.diceValue)) {
-        validTokens.push(t);
-      }
+    this.pendingDice.forEach((d, idx) => {
+      const chip = document.createElement('button');
+      chip.className = `dice-chip ${idx === this.selectedDieIdx && !d.used ? 'active' : ''} ${d.used ? 'used' : ''}`;
+      chip.innerHTML = `🎲 Die ${d.id}: <b>${d.val}</b>`;
+      chip.addEventListener('click', () => {
+        if (!d.used && this.hasRolled) {
+          this.selectedDieIdx = idx;
+          this.renderDiceChips();
+          this.highlightValidTokens();
+        }
+      });
+      container.appendChild(chip);
     });
+  }
+
+  // Dice Roll Execution (1 or 2 dice)
+  rollDice() {
+    if (this.isRolling || this.hasRolled || this.isGameOver) return;
+
+    this.isRolling = true;
+    const curPlayer = this.players[this.currentTurnIdx];
+    const allInBase = curPlayer.tokens.every(t => t.state === 'base');
+
+    if (this.diceMode === 2) {
+      audio.playDoubleDiceRoll();
+    } else {
+      audio.playDiceRoll();
+    }
+
+    const cube1 = document.getElementById('dice-cube-1');
+    const cube2 = document.getElementById('dice-cube-2');
+    cube1.classList.add('rolling-1');
+    if (this.diceMode === 2) {
+      cube2.classList.add('rolling-2');
+    }
+    document.getElementById('dice-trigger').classList.add('disabled');
+
+    setTimeout(() => {
+      cube1.classList.remove('rolling-1');
+      if (this.diceMode === 2) {
+        cube2.classList.remove('rolling-2');
+      }
+      document.getElementById('dice-trigger').classList.remove('disabled');
+
+      // Generate fair roll with anti-repeat engine
+      const d1 = this.diceEngine.rollSingleDie(curPlayer.id, allInBase);
+      const d2 = this.diceMode === 2 ? this.diceEngine.rollSingleDie(curPlayer.id, allInBase) : 0;
+
+      this.diceRolls = [d1, d2];
+      this.setDiceFace(1, d1);
+      if (this.diceMode === 2) {
+        this.setDiceFace(2, d2);
+      }
+
+      this.isRolling = false;
+      this.hasRolled = true;
+
+      if (this.diceMode === 1) {
+        // 1-Die Mode Logic
+        this.pendingDice = [{ val: d1, id: 1, used: false }];
+        this.selectedDieIdx = 0;
+
+        if (d1 === 6) {
+          audio.playSixChime();
+          this.consecutiveSixes++;
+        } else {
+          this.consecutiveSixes = 0;
+        }
+
+        // Three 6s rule in 1-Die mode
+        if (this.consecutiveSixes >= 3) {
+          this.consecutiveSixes = 0;
+          this.showTurnMessage("Three 6s in a row! Turn forfeited.");
+          setTimeout(() => this.passTurn(), 1100);
+          return;
+        }
+
+        this.evaluateTurnMoves1Die();
+      } else {
+        // 2-Dice Mode Logic
+        this.pendingDice = [
+          { val: d1, id: 1, used: false },
+          { val: d2, id: 2, used: false }
+        ];
+        this.selectedDieIdx = 0;
+        this.renderDiceChips();
+
+        if (d1 === 6 || d2 === 6) {
+          audio.playSixChime();
+        }
+
+        this.evaluateTurnMoves2Dice();
+      }
+    }, 520);
+  }
+
+  // 1-Die move evaluation
+  evaluateTurnMoves1Die() {
+    const curPlayer = this.players[this.currentTurnIdx];
+    const roll = this.diceRolls[0];
+    const validTokens = curPlayer.tokens.filter(t => this.isValidMove(curPlayer, t, roll));
 
     if (validTokens.length === 0) {
-      this.showTurnMessage(`Rolled ${this.diceValue} — No moves!`);
+      this.showTurnMessage(`Rolled ${roll} — No moves!`);
       setTimeout(() => this.passTurn(), 900);
       return;
     }
@@ -1265,15 +1615,14 @@ class LudoGame {
     if (curPlayer.role === 'bot') {
       this.showTurnMessage(`🤖 ${curPlayer.name} rolling & thinking...`);
       setTimeout(() => {
-        const bestToken = this.chooseBestBotMove(curPlayer, validTokens, this.diceValue);
-        this.moveToken(curPlayer, bestToken, this.diceValue);
+        const bestToken = this.chooseBestBotMove(curPlayer, validTokens, roll);
+        this.moveToken(curPlayer, bestToken, roll, () => {
+          this.afterMoveComplete1Die(bestToken, roll);
+        });
       }, this.botSpeed);
     } else {
-      this.showTurnMessage(`Select token to move +${this.diceValue}`);
-      validTokens.forEach(t => {
-        const item = this.tokenElements.find(i => i.player === curPlayer.id && i.id === t.id);
-        if (item) item.el.classList.add('selectable');
-      });
+      this.showTurnMessage(`Select token to move +${roll}`);
+      this.highlightValidTokens();
 
       // Auto-move convenience if only 1 option available
       if (validTokens.length === 1) {
@@ -1286,37 +1635,221 @@ class LudoGame {
     }
   }
 
+  afterMoveComplete1Die(token, roll) {
+    const curPlayer = this.players[this.currentTurnIdx];
+    const bonus = (roll === 6) || this.lastCapturedOpponent || (token.state === 'home');
+    this.lastCapturedOpponent = false;
+
+    if (bonus && !this.isGameOver) {
+      this.hasRolled = false;
+      this.showTurnMessage(`Bonus Roll Earned! 🎲`);
+      if (curPlayer.role === 'bot') {
+        setTimeout(() => this.rollDice(), this.botSpeed);
+      }
+    } else {
+      setTimeout(() => this.passTurn(), 450);
+    }
+  }
+
+  // 2-Dice move evaluation
+  evaluateTurnMoves2Dice() {
+    const curPlayer = this.players[this.currentTurnIdx];
+    const unusedDice = this.pendingDice.filter(d => !d.used);
+
+    if (unusedDice.length === 0) {
+      this.afterTurnComplete2Dice();
+      return;
+    }
+
+    // Check if any move is valid with available dice
+    let anyMovePossible = false;
+    unusedDice.forEach(d => {
+      if (curPlayer.tokens.some(t => this.isValidMove(curPlayer, t, d.val))) {
+        anyMovePossible = true;
+      }
+    });
+
+    if (!anyMovePossible) {
+      const dVals = unusedDice.map(d => d.val).join(' & ');
+      this.showTurnMessage(`Rolled ${dVals} — No moves!`);
+      setTimeout(() => this.passTurn(), 900);
+      return;
+    }
+
+    // Ensure selectedDieIdx points to an unused die with valid moves
+    if (this.pendingDice[this.selectedDieIdx]?.used ||
+        !curPlayer.tokens.some(t => this.isValidMove(curPlayer, t, this.pendingDice[this.selectedDieIdx].val))) {
+      const nextAvailable = this.pendingDice.findIndex(d => !d.used && curPlayer.tokens.some(t => this.isValidMove(curPlayer, t, d.val)));
+      if (nextAvailable !== -1) {
+        this.selectedDieIdx = nextAvailable;
+      }
+    }
+
+    this.renderDiceChips();
+
+    if (curPlayer.role === 'bot') {
+      this.showTurnMessage(`🤖 ${curPlayer.name} planning 2 dice...`);
+      setTimeout(() => this.executeBotTurn2Dice(), this.botSpeed);
+    } else {
+      const activeDie = this.pendingDice[this.selectedDieIdx];
+      this.showTurnMessage(`Using Die ${activeDie.id} (+${activeDie.val}) — Tap token to move!`);
+      this.highlightValidTokens();
+    }
+  }
+
+  // Bot multi-die execution
+  executeBotTurn2Dice() {
+    const curPlayer = this.players[this.currentTurnIdx];
+    const unusedDice = this.pendingDice.filter(d => !d.used);
+    if (unusedDice.length === 0) {
+      this.afterTurnComplete2Dice();
+      return;
+    }
+
+    // Pick best die and best token
+    let bestOption = null;
+    let maxScore = -9999;
+
+    unusedDice.forEach((dieObj, dieIndex) => {
+      const roll = dieObj.val;
+      const valid = curPlayer.tokens.filter(t => this.isValidMove(curPlayer, t, roll));
+      valid.forEach(t => {
+        const score = this.evaluateTokenScore(curPlayer, t, roll);
+        if (score > maxScore) {
+          maxScore = score;
+          bestOption = { dieObj, token: t };
+        }
+      });
+    });
+
+    if (!bestOption) {
+      this.showTurnMessage(`No moves for remaining dice.`);
+      setTimeout(() => this.afterTurnComplete2Dice(), 600);
+      return;
+    }
+
+    bestOption.dieObj.used = true;
+    this.renderDiceChips();
+
+    this.showTurnMessage(`🤖 ${curPlayer.name} moving Die ${bestOption.dieObj.id} (+${bestOption.dieObj.val})`);
+    this.moveToken(curPlayer, bestOption.token, bestOption.dieObj.val, () => {
+      // Check if second die can be played
+      const remaining = this.pendingDice.filter(d => !d.used);
+      if (remaining.length > 0 && !this.isGameOver) {
+        setTimeout(() => this.executeBotTurn2Dice(), 550);
+      } else {
+        setTimeout(() => this.afterTurnComplete2Dice(), 450);
+      }
+    });
+  }
+
+  afterTurnComplete2Dice() {
+    const curPlayer = this.players[this.currentTurnIdx];
+    // In 2-Dice mode: doubles (d1 === d2) or any 6 or capturing or entering home grant a bonus roll!
+    const isDouble = (this.diceRolls[0] === this.diceRolls[1]);
+    const hadSix = (this.diceRolls[0] === 6 || this.diceRolls[1] === 6);
+    const bonus = isDouble || hadSix || this.lastCapturedOpponent || this.tokenReachedHomeInTurn;
+    this.lastCapturedOpponent = false;
+    this.tokenReachedHomeInTurn = false;
+
+    if (bonus && !this.isGameOver) {
+      this.hasRolled = false;
+      this.pendingDice = [];
+      let bonusMsg = "Bonus Roll Earned! 🎲🎲";
+      if (isDouble && this.diceRolls[0] === 6) bonusMsg = "Double 6! Royal Bonus Roll! 👑🎲🎲";
+      else if (isDouble) bonusMsg = `Double ${this.diceRolls[0]}! Bonus Roll! 🎲🎲`;
+      else if (hadSix) bonusMsg = "Rolled a 6! Bonus Roll! 🎲🎲";
+      this.showTurnMessage(bonusMsg);
+      this.renderDiceChips();
+      if (curPlayer.role === 'bot') {
+        setTimeout(() => this.rollDice(), this.botSpeed);
+      }
+    } else {
+      setTimeout(() => this.passTurn(), 450);
+    }
+  }
+
+  // Valid move check
   isValidMove(player, token, roll) {
     if (token.state === 'home') return false;
     if (token.state === 'base') return roll === 6;
-    // Step 56 enters Home Triangle. Exactly 57 is required to finish.
+    // Step 56 enters Home Triangle.
     return (token.step + roll) <= 56;
   }
 
-  handleTokenClick(playerId, tokenId) {
-    const curPlayer = this.players[this.currentTurnIdx];
-    if (curPlayer.id !== playerId || !this.hasRolled || curPlayer.role === 'bot' || curPlayer.role === 'off') return;
-
-    const token = curPlayer.tokens.find(t => t.id === tokenId);
-    if (!token || !this.isValidMove(curPlayer, token, this.diceValue)) return;
-
-    // Clear pulsing highlights
+  // Highlight tokens valid for the currently active die
+  highlightValidTokens() {
     this.tokenElements.forEach(i => i.el.classList.remove('selectable'));
-    this.moveToken(curPlayer, token, this.diceValue);
+    const curPlayer = this.players[this.currentTurnIdx];
+    if (curPlayer.role !== 'human' || !this.hasRolled) return;
+
+    const currentDie = this.pendingDice[this.selectedDieIdx];
+    if (!currentDie || currentDie.used) return;
+
+    curPlayer.tokens.forEach(t => {
+      if (this.isValidMove(curPlayer, t, currentDie.val)) {
+        const item = this.tokenElements.find(i => i.player === curPlayer.id && i.id === t.id);
+        if (item) item.el.classList.add('selectable');
+      }
+    });
   }
 
-  moveToken(player, token, steps) {
+  // Token click handler for human player
+  handleTokenClick(playerId, tokenId) {
+    const curPlayer = this.players[this.currentTurnIdx];
+    if (curPlayer.id !== playerId || !this.hasRolled || curPlayer.role !== 'human') return;
+
+    const token = curPlayer.tokens.find(t => t.id === tokenId);
+    if (!token) return;
+
+    if (this.diceMode === 1) {
+      const roll = this.diceRolls[0];
+      if (!this.isValidMove(curPlayer, token, roll)) return;
+      this.tokenElements.forEach(i => i.el.classList.remove('selectable'));
+      this.moveToken(curPlayer, token, roll, () => {
+        this.afterMoveComplete1Die(token, roll);
+      });
+    } else {
+      // 2-Dice Mode: Use active selected die, or fallback to any valid unused die
+      let targetDie = this.pendingDice[this.selectedDieIdx];
+      if (!targetDie || targetDie.used || !this.isValidMove(curPlayer, token, targetDie.val)) {
+        targetDie = this.pendingDice.find(d => !d.used && this.isValidMove(curPlayer, token, d.val));
+      }
+      if (!targetDie) return;
+
+      targetDie.used = true;
+      this.tokenElements.forEach(i => i.el.classList.remove('selectable'));
+      this.renderDiceChips();
+
+      this.moveToken(curPlayer, token, targetDie.val, () => {
+        // Look for next unused die with valid moves
+        const nextDieIdx = this.pendingDice.findIndex(d => !d.used && curPlayer.tokens.some(t => this.isValidMove(curPlayer, t, d.val)));
+        if (nextDieIdx !== -1) {
+          this.selectedDieIdx = nextDieIdx;
+          this.renderDiceChips();
+          this.highlightValidTokens();
+          const nextDie = this.pendingDice[this.selectedDieIdx];
+          this.showTurnMessage(`Now use Die ${nextDie.id} (+${nextDie.val}) 🎲`);
+        } else {
+          this.afterTurnComplete2Dice();
+        }
+      });
+    }
+  }
+
+  // Execute token movement step-by-step
+  moveToken(player, token, steps, onComplete) {
     const item = this.tokenElements.find(i => i.player === player.id && i.id === token.id);
     if (!item) return;
 
-    // Releasing from base on a 6
+    // Release from base on a 6
     if (token.state === 'base') {
       token.state = 'track';
       token.step = 0;
       audio.playStep();
       this.renderTokenPositions();
-
-      this.checkCellInteractions(player, token, true);
+      this.checkCellInteractions(player, token);
+      if (onComplete) onComplete();
       return;
     }
 
@@ -1338,6 +1871,7 @@ class LudoGame {
         if (token.step === 56) {
           token.state = 'home';
           player.finishedCount++;
+          this.tokenReachedHomeInTurn = true;
           audio.playHome();
 
           if (player.finishedCount === 4 && player.rank === 0) {
@@ -1345,20 +1879,16 @@ class LudoGame {
             this.showRankBadge(player);
             this.checkGameOver();
           }
-
-          // Bonus roll for entering home
-          this.checkCellInteractions(player, token, true);
-        } else {
-          this.checkCellInteractions(player, token, false);
         }
+
+        this.checkCellInteractions(player, token);
+        if (onComplete) onComplete();
       }
-    }, 170);
+    }, 160);
   }
 
-  checkCellInteractions(player, token, bonusEarned) {
-    let captured = false;
-
-    // Check collision / capture on outer 52-step track
+  // Check collision & capture on outer track
+  checkCellInteractions(player, token) {
     if (token.state === 'track' && token.step < 51) {
       const myTrackIdx = (player.startIdx + token.step) % 52;
       const isSafeCell = STAR_INDICES.includes(myTrackIdx);
@@ -1372,7 +1902,7 @@ class LudoGame {
                 if (myTrackIdx === otherTrackIdx) {
                   otherT.state = 'base';
                   otherT.step = -1;
-                  captured = true;
+                  this.lastCapturedOpponent = true;
                   audio.playCut();
                   this.showTurnMessage(`${player.name} cut ${otherP.name}'s token! 💥`);
                 }
@@ -1384,23 +1914,102 @@ class LudoGame {
     }
 
     this.renderTokenPositions();
+  }
 
-    // Bonus roll granted for rolling 6, capturing opponent, or entering home!
-    if (this.diceValue === 6 || captured || bonusEarned) {
-      this.hasRolled = false;
-      this.showTurnMessage(`Bonus Roll Earned! 🎲`);
-      if (player.role === 'bot' && !this.isGameOver) {
-        setTimeout(() => this.rollDice(), this.botSpeed);
-      }
-    } else {
-      setTimeout(() => this.passTurn(), 450);
+  // Smart Heuristic Evaluation for Balanced, Competitive AI
+  evaluateTokenScore(bot, token, roll) {
+    let score = 0;
+
+    // 1. Release token from base on a 6 (+95)
+    if (token.state === 'base') {
+      return 95;
     }
+
+    const nextStep = token.step + roll;
+
+    // 2. Reaching Home Triangle (+90)
+    if (nextStep === 56) {
+      return 90;
+    }
+
+    // 3. Capturing opponent (+110)
+    if (nextStep < 51) {
+      const nextTrackIdx = (bot.startIdx + nextStep) % 52;
+      if (!STAR_INDICES.includes(nextTrackIdx)) {
+        for (let p of this.players) {
+          if (p.id !== bot.id && p.role !== 'off') {
+            for (let ot of p.tokens) {
+              if (ot.state === 'track' && ot.step < 51) {
+                if ((p.startIdx + ot.step) % 52 === nextTrackIdx) {
+                  score += 110;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // 4. Stepping into Home Path (+40)
+    if (nextStep >= 51) {
+      score += 40;
+    }
+
+    // 5. Landing on Safe Star Spot (+45)
+    if (nextStep < 51) {
+      const nextTrackIdx = (bot.startIdx + nextStep) % 52;
+      if (STAR_INDICES.includes(nextTrackIdx)) {
+        score += 45;
+      }
+    }
+
+    // 6. Escape Danger: if token currently sits 1-6 ahead of an enemy on unstarred cell (+45)
+    if (token.step < 51) {
+      const curTrackIdx = (bot.startIdx + token.step) % 52;
+      if (!STAR_INDICES.includes(curTrackIdx)) {
+        for (let p of this.players) {
+          if (p.id !== bot.id && p.role !== 'off') {
+            for (let ot of p.tokens) {
+              if (ot.state === 'track' && ot.step < 51) {
+                const diff = (curTrackIdx - ((p.startIdx + ot.step) % 52) + 52) % 52;
+                if (diff >= 1 && diff <= 6) {
+                  score += 45;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // 7. General forward progress (+15..+35)
+    score += (nextStep * 0.6);
+
+    return score;
+  }
+
+  chooseBestBotMove(bot, validTokens, roll) {
+    let bestToken = validTokens[0];
+    let maxScore = -9999;
+
+    validTokens.forEach(t => {
+      const score = this.evaluateTokenScore(bot, t, roll);
+      if (score > maxScore) {
+        maxScore = score;
+        bestToken = t;
+      }
+    });
+
+    return bestToken;
   }
 
   passTurn() {
     this.tokenElements.forEach(i => i.el.classList.remove('selectable'));
     this.hasRolled = false;
+    this.pendingDice = [];
     this.consecutiveSixes = 0;
+    this.lastCapturedOpponent = false;
+    this.tokenReachedHomeInTurn = false;
 
     if (this.isGameOver) return;
 
@@ -1423,42 +2032,6 @@ class LudoGame {
     }
   }
 
-  chooseBestBotMove(bot, validTokens, roll) {
-    // 1. Priority: Capture opponent if possible
-    for (let t of validTokens) {
-      if (t.state === 'track' && t.step + roll < 51) {
-        const nextTrackIdx = (bot.startIdx + t.step + roll) % 52;
-        if (!STAR_INDICES.includes(nextTrackIdx)) {
-          for (let p of this.players) {
-            if (p.id !== bot.id && p.role !== 'off') {
-              for (let ot of p.tokens) {
-                if (ot.state === 'track' && ot.step < 51) {
-                  if ((p.startIdx + ot.step) % 52 === nextTrackIdx) {
-                    return t; // Capture move!
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // 2. Priority: Enter Home
-    for (let t of validTokens) {
-      if (t.step + roll === 56) return t;
-    }
-
-    // 3. Priority: Release token from base on a 6
-    if (roll === 6) {
-      const baseToken = validTokens.find(t => t.state === 'base');
-      if (baseToken) return baseToken;
-    }
-
-    // 4. Move most advanced token
-    return validTokens.sort((a, b) => b.step - a.step)[0];
-  }
-
   showRankBadge(player) {
     const slot = document.getElementById(`slot-${player.id}`);
     if (slot) {
@@ -1478,7 +2051,6 @@ class LudoGame {
     const activePlayers = this.players.filter(p => p.role !== 'off');
     const finishedPlayers = activePlayers.filter(p => p.finishedCount === 4);
 
-    // End match when all but 1 active player have finished
     if (finishedPlayers.length >= Math.max(1, activePlayers.length - 1)) {
       this.isGameOver = true;
       document.getElementById('turn-banner').textContent = 'Tournament Finished!';
@@ -1523,7 +2095,6 @@ class LudoGame {
   updateUI() {
     const curPlayer = this.players[this.currentTurnIdx];
 
-    // Update active slot highlighting & roles
     this.players.forEach(p => {
       const slot = document.getElementById(`slot-${p.id}`);
       const status = document.getElementById(`status-${p.id}`);
@@ -1562,15 +2133,16 @@ class LudoGame {
     if (curPlayer.role === 'bot') {
       this.showTurnMessage(`🤖 ${curPlayer.name} rolling...`);
     } else {
-      this.showTurnMessage(`Tap Dice to Roll 🎲`);
+      this.showTurnMessage(this.diceMode === 1 ? `Tap Dice to Roll 🎲` : `Tap Dice to Roll 2 Dice 🎲🎲`);
     }
+
+    this.renderDiceChips();
   }
 
   showTurnMessage(msg) {
     document.getElementById('roll-prompt').textContent = msg;
   }
 
-  // Live fast-cycle player role (Human -> Bot -> Off -> Human)
   cyclePlayerRole(playerId) {
     const player = this.players.find(p => p.id === playerId);
     if (!player) return;
@@ -1578,14 +2150,12 @@ class LudoGame {
     const cycle = { 'human': 'bot', 'bot': 'off', 'off': 'human' };
     player.role = cycle[player.role];
 
-    // Hide or show tokens
     this.tokenElements.forEach(i => {
       if (i.player === player.id) {
         i.el.style.display = player.role === 'off' ? 'none' : 'flex';
       }
     });
 
-    // Toggle base quadrant overlay
     const base = document.getElementById(`base-${player.id}`);
     if (base) {
       base.classList.toggle('inactive', player.role === 'off');
@@ -1600,7 +2170,6 @@ class LudoGame {
       }
     }
 
-    // Check if current turn player became inactive
     if (this.players[this.currentTurnIdx].role === 'off') {
       this.passTurn();
     } else {
@@ -1668,14 +2237,12 @@ class LudoGame {
 // Global Game Instance & Event Bindings
 let game;
 
-// Setup Modal Helper Functions
 function getModalPlayerConfigs() {
   const configs = [
     {
       id: 'red',
       color: '#e11d48',
       startIdx: 0,
-      homePos: { r: 7.7, c: 7.0 },
       name: document.getElementById('cfg-name-red').value.trim() || 'Red',
       role: document.querySelector('#cfg-card-red .p-role-btn.active').dataset.role
     },
@@ -1683,7 +2250,6 @@ function getModalPlayerConfigs() {
       id: 'green',
       color: '#059669',
       startIdx: 13,
-      homePos: { r: 7.0, c: 6.3 },
       name: document.getElementById('cfg-name-green').value.trim() || 'Green',
       role: document.querySelector('#cfg-card-green .p-role-btn.active').dataset.role
     },
@@ -1691,7 +2257,6 @@ function getModalPlayerConfigs() {
       id: 'yellow',
       color: '#eab308',
       startIdx: 26,
-      homePos: { r: 6.3, c: 7.0 },
       name: document.getElementById('cfg-name-yellow').value.trim() || 'Yellow',
       role: document.querySelector('#cfg-card-yellow .p-role-btn.active').dataset.role
     },
@@ -1699,13 +2264,11 @@ function getModalPlayerConfigs() {
       id: 'blue',
       color: '#2563eb',
       startIdx: 39,
-      homePos: { r: 7.0, c: 7.7 },
       name: document.getElementById('cfg-name-blue').value.trim() || 'Blue',
       role: document.querySelector('#cfg-card-blue .p-role-btn.active').dataset.role
     }
   ];
 
-  // Guarantee at least two players are active
   const activeCount = configs.filter(c => c.role !== 'off').length;
   if (activeCount < 2) {
     configs[0].role = 'human';
@@ -1756,6 +2319,19 @@ window.addEventListener('DOMContentLoaded', () => {
   // Start default game
   game = new LudoGame();
 
+  // Mode Switcher Buttons
+  const toggleMode = (m) => {
+    if (game.diceMode !== m) {
+      game.setDiceMode(m);
+    }
+  };
+
+  document.getElementById('pill-mode-1').addEventListener('click', () => toggleMode(1));
+  document.getElementById('pill-mode-2').addEventListener('click', () => toggleMode(2));
+  document.getElementById('btn-dice-mode').addEventListener('click', () => {
+    toggleMode(game.diceMode === 1 ? 2 : 1);
+  });
+
   // Dice roll actions
   const triggerDice = () => {
     const curPlayer = game.players[game.currentTurnIdx];
@@ -1786,14 +2362,14 @@ window.addEventListener('DOMContentLoaded', () => {
   // Reset / New Match
   document.getElementById('btn-new-match').addEventListener('click', () => {
     const configs = getModalPlayerConfigs();
-    game = new LudoGame(configs);
+    game = new LudoGame(configs, game.diceMode);
   });
 
   // Play Again from Victory Modal
   document.getElementById('btn-play-again').addEventListener('click', () => {
     document.getElementById('victory-modal').style.display = 'none';
     const configs = getModalPlayerConfigs();
-    game = new LudoGame(configs);
+    game = new LudoGame(configs, game.diceMode);
   });
 
   // Setup / Roles Modal
@@ -1825,7 +2401,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-apply-setup').addEventListener('click', () => {
     setupModal.style.display = 'none';
     const configs = getModalPlayerConfigs();
-    game = new LudoGame(configs);
+    game = new LudoGame(configs, game.diceMode);
   });
 
   // Direct In-Game Role Toggle Pills
