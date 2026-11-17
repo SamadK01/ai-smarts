@@ -178,6 +178,21 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 - **Procedural Web Audio Synthesizer**:
   - Realistic wooden board clacks, heavy capture strikes, double alert chimes for check, ascending promotion fanfare, and triumphal victory brass chords.
 
+### 13. Slingshot Smash: Antique Tabletop Physics Alley (`smash.html`)
+- **Shared Tactile Physics Architecture with Slingshot Lamp**:
+  - Exact 120Hz sub-stepped physics model matching `lamp.html`: carved wooden Y-fork with rich woodgrain gradient, dynamic elastic bands that thin under tension ($4.2 - 2.2 \times \text{stretch}$), rotating leather pouch aligning with pull vector, and damped spring recoil.
+  - Procedural soundscape: natural stretching wood/leather creaks, snappy elastic band whoosh, and satisfying leather release snap.
+- **Antique Glass & Brass Destruction Gallery**:
+  - Real-time shattering physics: crystal glass bottles, whisky flasks, and decanters break into $26+$ geometric polygonal shards with velocity, angular spin, and shelf/floor bounces.
+  - Sloshing liquid meniscus inside bottles with dynamic surface tilt and splash droplets upon impact.
+  - Resonant brass chime bells hanging on chains that swing and ring with authentic pentatonic overtone decay ($C_5, D_5, E_5, G_5, A_5, C_6$).
+  - Wooden domino cascade chain reactions and swinging chandelier with destructible light bulb that pops and showers electric sparks.
+  - Antique wall switch on the right wall that can be toggled by hand or struck with a pebble to flip alley lighting.
+- **Dual Lighting Buffers & Atmospheric Aesthetic**:
+  - Dual canvas lighting engine (`glowCanvas` and `darkCanvas`) casting warm radial spotlight cones across the mahogany shelves and floor.
+  - 4 Selectable Ammunition Types: River Pebble, Heavy Steel Bearing, Plasma Glow Orb, and Super Bouncy Rubber Ball.
+  - 4 Interactive Stages: *Crystal Bar*, *Chimes & Lamp*, *Domino Cascade*, and *Free Sandbox*.
+
 ---
 
 ## 🚀 Running Locally
