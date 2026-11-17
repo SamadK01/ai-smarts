@@ -335,6 +335,11 @@ class BodyScopeApp {
       this.ui.updateLabels();
     }
 
+    // 6b. Dynamic Highlight Emissive Pulse for Selected Organs
+    if (this.materials && this.materials.highlight) {
+      this.materials.highlight.emissiveIntensity = 0.85 + Math.sin(Date.now() * 0.005) * 0.35;
+    }
+
     // 7. Render with Post-Processing Bloom
     this.postprocessing.render();
   }

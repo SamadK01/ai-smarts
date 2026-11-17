@@ -1,6 +1,7 @@
 /**
  * BodyScope 3D - High-Precision Interactive UI Controller
- * Search Autocomplete, Anatomy Tree, Leader-Line Labels, Quiz, Layers & Language Switcher
+ * Anatomical Parts Explorer, 3D Multi-Mesh Highlighter, HUD Navigator,
+ * Search Autocomplete, Leader-Line Labels, Quiz, Layers & Bilingual Language Switcher
  */
 
 import * as THREE from 'three';
@@ -13,12 +14,21 @@ export class UIManager {
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2();
 
+    this.selectedMeshes = [];
     this.selectedMesh = null;
     this.hoveredMesh = null;
     this.isolatedMesh = null;
 
+    this.organKeys = Object.keys(ANATOMY_DATA);
+    this.selectedId = 'heart';
+    this.organIndex = this.organKeys.indexOf('heart');
+    this.activeFilter = 'all';
+    this.searchQuery = '';
+
     this.initDOMElements();
     this.setupEventListeners();
+    this.buildPartsExplorer();
+    this.buildQuickOrgansBar();
     this.buildAnatomyTree();
   }
 
@@ -29,8 +39,30 @@ export class UIManager {
       ttName: document.getElementById('tt-name'),
       ttSub: document.getElementById('tt-sub'),
 
-      // Info Card
+      // Top Floating Active Part HUD
+      activePartHud: document.getElementById('active-part-hud'),
+      hudIcon: document.getElementById('hud-icon'),
+      hudName: document.getElementById('hud-name'),
+      hudUrdu: document.getElementById('hud-urdu'),
+      hudSystem: document.getElementById('hud-system'),
+      hudLatin: document.getElementById('hud-latin'),
+      hudDetailsBtn: document.getElementById('hud-details-btn'),
+      prevPartBtn: document.getElementById('prev-part-btn'),
+      nextPartBtn: document.getElementById('next-part-btn'),
+
+      // Left Drawer Tabs & Views
+      drawerTabParts: document.getElementById('drawer-tab-parts'),
+      drawerTabControls: document.getElementById('drawer-tab-controls'),
+      drawerPartsView: document.getElementById('drawer-parts-view'),
+      drawerControlsView: document.getElementById('drawer-controls-view'),
+      partsSearchInput: document.getElementById('parts-search-input'),
+      partsFilterChips: document.getElementById('parts-filter-chips'),
+      partsListContainer: document.getElementById('parts-list-container'),
+
+      // Right Drawer / Info Card
       infoCard: document.getElementById('info-card'),
+      closeInfoBtn: document.getElementById('close-info-btn'),
+      quickOrgansContainer: document.getElementById('quick-organs-container'),
       infoName: document.getElementById('info-name'),
       infoLatin: document.getElementById('info-latin'),
       infoUrdu: document.getElementById('info-urdu'),
@@ -44,11 +76,11 @@ export class UIManager {
       infoActionText: document.getElementById('info-action-text'),
       demonstrateActionBtn: document.getElementById('demonstrate-action-btn'),
 
-      // Search & Autocomplete
+      // Top Search & Autocomplete
       searchInput: document.getElementById('search-input'),
       searchDropdown: document.getElementById('search-dropdown'),
 
-      // Anatomy Tree
+      // Legacy Tree Container
       treeContainer: document.getElementById('anatomy-tree-content'),
 
       // Physiology Controls
@@ -86,10 +118,72 @@ export class UIManager {
     };
   }
 
+  getOrganIcon(id) {
+    const icons = {
+      lungs: '🫁',
+      trachea: '🌬️',
+      diaphragm: '🌬️',
+      heart: '❤️',
+      aorta: '🩸',
+      vena_cava: '🔵',
+      pulmonary_artery: '🔴',
+      coronary_arteries: '🫀',
+      brain: '🧠',
+      spinal_cord: '⚡',
+      cranium: '💀',
+      mandible: '🦴',
+      cervical_spine: '🦴',
+      thoracic_spine: '🦴',
+      lumbar_spine: '🦴',
+      pelvis: '🦴',
+      ribcage: '🩻',
+      clavicle_scapula: '🦴',
+      arm_bones: '🦾',
+      hand_bones: '🖐️',
+      leg_bones: '🦵',
+      foot_bones: '🦶',
+      stomach: '🥣',
+      liver: '🫀',
+      gallbladder: '💧',
+      pancreas: '🧬',
+      spleen: '🟣',
+      intestines: '🧬',
+      kidneys: '🥜',
+      bladder: '💧',
+      muscles_major: '💪',
+      skin: '👤',
+      mammary_glands: '🌸',
+      uterus: '🤰',
+      ovaries: '🥚',
+      male_reproductive: '♂️'
+    };
+    return icons[id] || '🩺';
+  }
+
+  getSystemForOrgan(id, data) {
+    const sysMap = {
+      lungs: 'respiratory', trachea: 'respiratory', diaphragm: 'respiratory',
+      heart: 'cardiovascular', aorta: 'cardiovascular', vena_cava: 'cardiovascular',
+      pulmonary_artery: 'cardiovascular', coronary_arteries: 'cardiovascular',
+      stomach: 'digestive', liver: 'digestive', gallbladder: 'digestive',
+      pancreas: 'digestive', spleen: 'digestive', intestines: 'digestive',
+      kidneys: 'renal', bladder: 'renal',
+      brain: 'nervous', spinal_cord: 'nervous',
+      cranium: 'skeleton', mandible: 'skeleton', cervical_spine: 'skeleton',
+      thoracic_spine: 'skeleton', lumbar_spine: 'skeleton', pelvis: 'skeleton',
+      ribcage: 'skeleton', clavicle_scapula: 'skeleton', arm_bones: 'skeleton',
+      hand_bones: 'skeleton', leg_bones: 'skeleton', foot_bones: 'skeleton',
+      muscles_major: 'muscles',
+      mammary_glands: 'femaleMammary', uterus: 'femaleReproductive', ovaries: 'femaleReproductive',
+      male_reproductive: 'maleReproductive'
+    };
+    return sysMap[id] || (data && data.system ? data.system.toLowerCase() : null);
+  }
+
   setupEventListeners() {
     const canvas = this.dom.canvas;
 
-    // Raycast on pointer move (hover tooltip)
+    // Pointer move for hover tooltips
     canvas.addEventListener('pointermove', (e) => {
       if (this.app.scene.controls.state !== -1) {
         this.hideTooltip();
@@ -98,9 +192,16 @@ export class UIManager {
       this.handlePointerMove(e);
     });
 
-    // Raycast on click (selection)
+    // Raycast on click with drag suppression (avoids misfires during orbit/drag)
+    let pointerDownPos = { x: 0, y: 0 };
+    canvas.addEventListener('pointerdown', (e) => {
+      pointerDownPos = { x: e.clientX, y: e.clientY };
+    });
     canvas.addEventListener('click', (e) => {
-      this.handleClick(e);
+      const dist = Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y);
+      if (dist < 8) {
+        this.handleClick(e);
+      }
     });
 
     // Double-click focus
@@ -108,26 +209,89 @@ export class UIManager {
       this.handleDoubleClick(e);
     });
 
-    // Search input
-    this.dom.searchInput.addEventListener('input', (e) => {
-      this.handleSearch(e.target.value);
-    });
+    // HUD Navigation Buttons
+    if (this.dom.prevPartBtn) {
+      this.dom.prevPartBtn.addEventListener('click', () => this.navigateOrgan(-1));
+    }
+    if (this.dom.nextPartBtn) {
+      this.dom.nextPartBtn.addEventListener('click', () => this.navigateOrgan(1));
+    }
+    if (this.dom.hudDetailsBtn) {
+      this.dom.hudDetailsBtn.addEventListener('click', () => {
+        this.dom.infoCard.classList.toggle('visible');
+      });
+    }
+
+    // Close Details Panel Button
+    if (this.dom.closeInfoBtn) {
+      this.dom.closeInfoBtn.addEventListener('click', () => {
+        this.dom.infoCard.classList.remove('visible');
+      });
+    }
+
+    // Left Drawer Tabs (Parts Explorer vs Controls)
+    if (this.dom.drawerTabParts && this.dom.drawerTabControls) {
+      this.dom.drawerTabParts.addEventListener('click', () => {
+        this.dom.drawerTabParts.classList.add('active');
+        this.dom.drawerTabControls.classList.remove('active');
+        if (this.dom.drawerPartsView) this.dom.drawerPartsView.style.display = 'block';
+        if (this.dom.drawerControlsView) this.dom.drawerControlsView.style.display = 'none';
+      });
+
+      this.dom.drawerTabControls.addEventListener('click', () => {
+        this.dom.drawerTabControls.classList.add('active');
+        this.dom.drawerTabParts.classList.remove('active');
+        if (this.dom.drawerPartsView) this.dom.drawerPartsView.style.display = 'none';
+        if (this.dom.drawerControlsView) this.dom.drawerControlsView.style.display = 'block';
+      });
+    }
+
+    // Parts Search Input in Left Drawer
+    if (this.dom.partsSearchInput) {
+      this.dom.partsSearchInput.addEventListener('input', (e) => {
+        this.searchQuery = (e.target.value || '').trim().toLowerCase();
+        this.renderPartsList();
+      });
+    }
+
+    // Filter Chips in Left Drawer
+    if (this.dom.partsFilterChips) {
+      this.dom.partsFilterChips.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          this.dom.partsFilterChips.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          this.activeFilter = chip.getAttribute('data-filter') || 'all';
+          this.renderPartsList();
+        });
+      });
+    }
+
+    // Top Search Input
+    if (this.dom.searchInput) {
+      this.dom.searchInput.addEventListener('input', (e) => {
+        this.handleSearch(e.target.value);
+      });
+    }
 
     // Physiology BPM Slider
-    this.dom.bpmSlider.addEventListener('input', (e) => {
-      const val = parseInt(e.target.value);
-      this.app.physiology.setBPM(val);
-      this.dom.bpmValue.textContent = `${val} BPM`;
-      this.updatePhysiologyExplanations();
-    });
+    if (this.dom.bpmSlider) {
+      this.dom.bpmSlider.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        this.app.physiology.setBPM(val);
+        this.dom.bpmValue.textContent = `${val} BPM`;
+        this.updatePhysiologyExplanations();
+      });
+    }
 
     // Physiology Glucose Slider
-    this.dom.glucoseSlider.addEventListener('input', (e) => {
-      const val = parseInt(e.target.value);
-      this.app.physiology.setGlucose(val);
-      this.dom.glucoseValue.textContent = `${val} mg/dL`;
-      this.updatePhysiologyExplanations();
-    });
+    if (this.dom.glucoseSlider) {
+      this.dom.glucoseSlider.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        this.app.physiology.setGlucose(val);
+        this.dom.glucoseValue.textContent = `${val} mg/dL`;
+        this.updatePhysiologyExplanations();
+      });
+    }
 
     // Skin Opacity
     if (this.dom.skinOpacitySlider) {
@@ -174,7 +338,6 @@ export class UIManager {
 
     if (this.dom.bodyFleshBtn) {
       this.dom.bodyFleshBtn.addEventListener('click', () => {
-        // Show full muscular system (Maas) + transparent ghost skin
         this.app.models.setLayerVisibility('muscles', true);
         const muscCb = document.querySelector('input[data-system="muscles"]');
         if (muscCb) muscCb.checked = true;
@@ -233,34 +396,174 @@ export class UIManager {
     // Demonstrate Biological Action in Info Card
     if (this.dom.demonstrateActionBtn) {
       this.dom.demonstrateActionBtn.addEventListener('click', () => {
-        const id = this.selectedMesh ? this.selectedMesh.userData.id : 'heart';
+        const id = this.selectedId || 'heart';
         this.app.physiology.triggerOrganAction(id);
       });
     }
 
     // Slicing Tool
-    this.dom.sliceToggle.addEventListener('change', (e) => {
-      const enabled = e.target.checked;
-      const axis = this.dom.sliceAxisSelect.value;
-      const offset = parseFloat(this.dom.sliceSlider.value);
-      this.app.materials.setClipping(enabled, axis, offset);
-    });
+    if (this.dom.sliceToggle) {
+      this.dom.sliceToggle.addEventListener('change', (e) => {
+        const enabled = e.target.checked;
+        const axis = this.dom.sliceAxisSelect.value;
+        const offset = parseFloat(this.dom.sliceSlider.value);
+        this.app.materials.setClipping(enabled, axis, offset);
+      });
+    }
 
-    this.dom.sliceSlider.addEventListener('input', (e) => {
-      const offset = parseFloat(e.target.value);
-      const axis = this.dom.sliceAxisSelect.value;
-      if (this.dom.sliceToggle.checked) {
-        this.app.materials.setClipping(true, axis, offset);
-      }
-    });
+    if (this.dom.sliceSlider) {
+      this.dom.sliceSlider.addEventListener('input', (e) => {
+        const offset = parseFloat(e.target.value);
+        const axis = this.dom.sliceAxisSelect.value;
+        if (this.dom.sliceToggle && this.dom.sliceToggle.checked) {
+          this.app.materials.setClipping(true, axis, offset);
+        }
+      });
+    }
 
-    this.dom.sliceAxisSelect.addEventListener('change', (e) => {
-      const axis = e.target.value;
-      const offset = parseFloat(this.dom.sliceSlider.value);
-      if (this.dom.sliceToggle.checked) {
-        this.app.materials.setClipping(true, axis, offset);
-      }
+    if (this.dom.sliceAxisSelect) {
+      this.dom.sliceAxisSelect.addEventListener('change', (e) => {
+        const axis = e.target.value;
+        const offset = parseFloat(this.dom.sliceSlider.value);
+        if (this.dom.sliceToggle && this.dom.sliceToggle.checked) {
+          this.app.materials.setClipping(true, axis, offset);
+        }
+      });
+    }
+  }
+
+  buildQuickOrgansBar() {
+    const container = this.dom.quickOrgansContainer;
+    if (!container) return;
+
+    const quickList = [
+      { id: 'lungs', name: 'Lungs', urdu: 'پھیپھڑے', icon: '🫁' },
+      { id: 'heart', name: 'Heart', urdu: 'دل', icon: '❤️' },
+      { id: 'brain', name: 'Brain', urdu: 'دماغ', icon: '🧠' },
+      { id: 'ribcage', name: 'Ribcage', urdu: 'پسلیوں کا پنجرہ', icon: '🩻' },
+      { id: 'liver', name: 'Liver', urdu: 'جگر', icon: '🫀' },
+      { id: 'stomach', name: 'Stomach', urdu: 'معدہ', icon: '🥣' },
+      { id: 'kidneys', name: 'Kidneys', urdu: 'گردے', icon: '🥜' },
+      { id: 'intestines', name: 'Intestines', urdu: 'آنتیں', icon: '🧬' },
+      { id: 'cranium', name: 'Skull', urdu: 'کھوپڑی', icon: '💀' },
+      { id: 'thoracic_spine', name: 'Spine', urdu: 'ریڑھ کی ہڈی', icon: '🦴' },
+      { id: 'muscles_major', name: 'Muscles', urdu: 'عضلات', icon: '💪' },
+      { id: 'aorta', name: 'Aorta', urdu: 'شہ رگ', icon: '🩸' }
+    ];
+
+    container.innerHTML = quickList.map(item => `
+      <div class="quick-organ-pill ${item.id === this.selectedId ? 'active' : ''}" data-id="${item.id}">
+        <span>${item.icon}</span>
+        <span>${item.name}</span>
+        <small style="opacity:0.8;">(${item.urdu})</small>
+      </div>
+    `).join('');
+
+    container.querySelectorAll('.quick-organ-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const id = pill.getAttribute('data-id');
+        this.selectById(id, true);
+      });
     });
+  }
+
+  buildPartsExplorer() {
+    this.renderPartsList();
+  }
+
+  renderPartsList() {
+    const container = this.dom.partsListContainer;
+    if (!container) return;
+
+    let items = Object.values(ANATOMY_DATA);
+
+    // Apply category filter
+    if (this.activeFilter !== 'all') {
+      items = items.filter(it => {
+        const s = (it.system || '').toLowerCase();
+        if (this.activeFilter === 'respiratory') return s.includes('respiratory');
+        if (this.activeFilter === 'cardiovascular') return s.includes('cardio');
+        if (this.activeFilter === 'nervous') return s.includes('nervous');
+        if (this.activeFilter === 'skeletal') return s.includes('skeletal');
+        if (this.activeFilter === 'digestive') return s.includes('digestive');
+        if (this.activeFilter === 'renal') return s.includes('renal') || s.includes('excretory') || s.includes('urinary');
+        if (this.activeFilter === 'muscular') return s.includes('muscular');
+        return true;
+      });
+    }
+
+    // Apply search query
+    if (this.searchQuery) {
+      items = items.filter(it => {
+        const name = (it.name || '').toLowerCase();
+        const urdu = (it.urdu || '').toLowerCase();
+        const latin = (it.latin || '').toLowerCase();
+        const sys = (it.system || '').toLowerCase();
+        return name.includes(this.searchQuery) || urdu.includes(this.searchQuery) || latin.includes(this.searchQuery) || sys.includes(this.searchQuery);
+      });
+    }
+
+    if (items.length === 0) {
+      container.innerHTML = `<div style="padding:14px; color:#94a3b8; font-size:0.8rem; text-align:center;">No matching anatomical parts found.</div>`;
+      return;
+    }
+
+    container.innerHTML = items.map(it => {
+      const icon = this.getOrganIcon(it.id);
+      const isActive = it.id === this.selectedId;
+      return `
+        <div class="part-card-item ${isActive ? 'active' : ''}" data-id="${it.id}">
+          <div class="part-card-left">
+            <span class="part-card-icon">${icon}</span>
+            <div class="part-card-info">
+              <span class="part-card-name">${it.name}</span>
+              <span class="part-card-urdu">${it.urdu}</span>
+            </div>
+          </div>
+          <span class="part-card-badge">${it.system.split('/')[0].trim()}</span>
+        </div>
+      `;
+    }).join('');
+
+    container.querySelectorAll('.part-card-item').forEach(card => {
+      card.addEventListener('click', () => {
+        const id = card.getAttribute('data-id');
+        this.selectById(id, true);
+      });
+    });
+  }
+
+  updatePartsListActive(selectedId) {
+    if (!this.dom.partsListContainer) return;
+    this.dom.partsListContainer.querySelectorAll('.part-card-item').forEach(card => {
+      card.classList.toggle('active', card.getAttribute('data-id') === selectedId);
+    });
+  }
+
+  updateQuickOrgansActive(selectedId) {
+    if (!this.dom.quickOrgansContainer) return;
+    this.dom.quickOrgansContainer.querySelectorAll('.quick-organ-pill').forEach(pill => {
+      pill.classList.toggle('active', pill.getAttribute('data-id') === selectedId);
+    });
+  }
+
+  updateActiveHUD(data) {
+    if (!data) return;
+    const isUr = this.app.state.language === 'ur';
+    const icon = this.getOrganIcon(data.id);
+
+    if (this.dom.hudIcon) this.dom.hudIcon.textContent = icon;
+    if (this.dom.hudName) this.dom.hudName.textContent = isUr ? data.urdu : data.name;
+    if (this.dom.hudUrdu) this.dom.hudUrdu.textContent = isUr ? data.name : data.urdu;
+    if (this.dom.hudSystem) this.dom.hudSystem.textContent = data.system;
+    if (this.dom.hudLatin) this.dom.hudLatin.textContent = data.latin || '';
+  }
+
+  navigateOrgan(direction) {
+    if (!this.organKeys || this.organKeys.length === 0) return;
+    this.organIndex = (this.organIndex + direction + this.organKeys.length) % this.organKeys.length;
+    const nextId = this.organKeys[this.organIndex];
+    this.selectById(nextId, true);
   }
 
   isMeshVisible(mesh) {
@@ -290,7 +593,7 @@ export class UIManager {
       this.dom.tooltip.style.left = `${e.clientX + 14}px`;
       this.dom.tooltip.style.top = `${e.clientY + 14}px`;
       this.dom.ttName.textContent = this.app.state.language === 'ur' ? data.urdu : data.name;
-      this.dom.ttSub.textContent = data.system;
+      this.dom.ttSub.textContent = `${data.system} (Click to inspect)`;
     } else {
       this.hideTooltip();
     }
@@ -311,58 +614,135 @@ export class UIManager {
 
     if (hits.length > 0) {
       const hit = hits[0].object;
-      this.selectMesh(hit);
+      const dataId = hit.userData.id;
+      if (dataId) {
+        this.selectById(dataId, true);
+      } else {
+        this.selectMesh(hit, true);
+      }
     }
   }
 
   handleDoubleClick(e) {
-    if (this.selectedMesh) {
-      const box = new THREE.Box3().setFromObject(this.selectedMesh);
+    if (this.selectedMeshes && this.selectedMeshes.length > 0) {
+      const box = new THREE.Box3();
+      this.selectedMeshes.forEach(m => box.expandByObject(m));
       const center = new THREE.Vector3();
       box.getCenter(center);
       const size = new THREE.Vector3();
       box.getSize(size);
       const maxDim = Math.max(size.x, size.y, size.z);
-      this.app.scene.flyTo(center, Math.max(0.45, maxDim * 2.2), null, null, 0.8);
+      this.app.scene.flyTo(center, Math.max(0.42, maxDim * 2.0), null, null, 0.8);
     }
   }
 
   selectMesh(mesh, flyCamera = true) {
-    // Un-highlight previous
-    if (this.selectedMesh && this.selectedMesh.material === this.app.materials.highlight) {
-      this.selectedMesh.material = this.selectedMesh.userData.originalMaterial;
+    if (!mesh) return;
+    const dataId = mesh.userData.id;
+    if (dataId && ANATOMY_DATA[dataId]) {
+      this.selectById(dataId, flyCamera);
+    } else {
+      // Revert previous highlights
+      if (this.selectedMeshes && this.selectedMeshes.length > 0) {
+        this.selectedMeshes.forEach(m => {
+          if (m.userData && m.userData.originalMaterial) {
+            m.material = m.userData.originalMaterial;
+          }
+        });
+        this.selectedMeshes = [];
+      }
+
+      if (!mesh.userData.originalMaterial) {
+        mesh.userData.originalMaterial = mesh.material;
+      }
+      mesh.material = this.app.materials.highlight;
+      this.selectedMeshes = [mesh];
+      this.selectedMesh = mesh;
+
+      const data = ANATOMY_DATA[dataId] || ANATOMY_DATA.cranium;
+      this.displayInfoCard(data);
+      this.updateActiveHUD(data);
+
+      if (flyCamera) {
+        const box = new THREE.Box3().setFromObject(mesh);
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+        const size = new THREE.Vector3();
+        box.getSize(size);
+        const maxDim = Math.max(size.x, size.y, size.z);
+        this.app.scene.flyTo(center, Math.max(0.48, maxDim * 2.2), null, null, 0.85);
+      }
+    }
+  }
+
+  selectById(dataId, flyCamera = true) {
+    if (!dataId) return;
+    const data = ANATOMY_DATA[dataId] || ANATOMY_DATA.heart;
+    this.selectedId = dataId;
+    this.organIndex = this.organKeys.indexOf(dataId);
+    if (this.organIndex === -1) this.organIndex = 0;
+
+    // 1. Revert previous selected meshes
+    if (this.selectedMeshes && this.selectedMeshes.length > 0) {
+      this.selectedMeshes.forEach(m => {
+        if (m.userData && m.userData.originalMaterial) {
+          m.material = m.userData.originalMaterial;
+        }
+      });
+      this.selectedMeshes = [];
     }
 
-    this.selectedMesh = mesh;
-    if (!mesh) return;
+    // 2. Find ALL matching meshes for this organ id (e.g. all 5 lung lobes, both kidneys, all ribs)
+    let targetMeshes = this.app.models.clickableMeshes.filter(m => m.userData && m.userData.id === dataId);
+    if (targetMeshes.length === 0) {
+      const matchSub = this.app.models.clickableMeshes.find(m => m.name && m.name.toLowerCase().includes(dataId.toLowerCase()));
+      if (matchSub) targetMeshes = [matchSub];
+    }
 
-    // Apply cyan highlight
-    mesh.material = this.app.materials.highlight;
+    // 3. Highlight all matching meshes with bioluminescent glowing material
+    targetMeshes.forEach(m => {
+      if (!m.userData.originalMaterial) {
+        m.userData.originalMaterial = m.material;
+      }
+      m.material = this.app.materials.highlight;
+    });
+    this.selectedMeshes = targetMeshes;
+    this.selectedMesh = targetMeshes[0] || null;
 
-    const dataId = mesh.userData.id;
-    const data = ANATOMY_DATA[dataId] || ANATOMY_DATA.cranium;
+    // 4. Ensure system layer is visible
+    const sys = this.getSystemForOrgan(dataId, data);
+    if (sys && this.app.models.systems[sys]) {
+      this.app.models.systems[sys].visible = true;
+      const cb = document.querySelector(`input[data-system="${sys}"]`);
+      if (cb) cb.checked = true;
+    }
 
-    this.displayInfoCard(data);
+    // 5. Adjust skin opacity if needed so internal organs are clearly seen
+    const isInternal = sys !== 'skeleton' && sys !== 'muscles' && dataId !== 'skin';
+    if (isInternal && this.app.materials.skinActive && this.app.materials.skinActive.opacity > 0.35) {
+      this.app.materials.setSkinOpacity(0.22);
+      if (this.dom.skinOpacitySlider) this.dom.skinOpacitySlider.value = 0.22;
+      if (this.dom.skinOpacityVal) this.dom.skinOpacityVal.textContent = '22%';
+    }
 
-    if (flyCamera) {
-      const box = new THREE.Box3().setFromObject(mesh);
+    // 6. Camera fly-to unified bounding box
+    if (flyCamera && targetMeshes.length > 0) {
+      const box = new THREE.Box3();
+      targetMeshes.forEach(m => box.expandByObject(m));
       const center = new THREE.Vector3();
       box.getCenter(center);
       const size = new THREE.Vector3();
       box.getSize(size);
       const maxDim = Math.max(size.x, size.y, size.z);
-      this.app.scene.flyTo(center, Math.max(0.55, maxDim * 2.5), null, null, 0.85);
+      const camDist = Math.max(0.48, Math.min(2.2, maxDim * 2.3));
+      this.app.scene.flyTo(center, camDist, null, null, 0.85);
     }
-  }
 
-  selectById(dataId, flyCamera = true) {
-    const mesh = this.app.models.clickableMeshes.find(m => m.userData.id === dataId);
-    if (mesh) {
-      this.selectMesh(mesh, flyCamera);
-    } else {
-      const data = ANATOMY_DATA[dataId];
-      if (data) this.displayInfoCard(data);
-    }
+    // 7. Update UI panels
+    this.displayInfoCard(data);
+    this.updateActiveHUD(data);
+    this.updateQuickOrgansActive(dataId);
+    this.updatePartsListActive(dataId);
   }
 
   displayInfoCard(data) {
@@ -474,9 +854,10 @@ export class UIManager {
     const isUr = lang === 'ur';
     document.body.classList.toggle('urdu-mode', isUr);
 
-    if (this.selectedMesh) {
-      const data = ANATOMY_DATA[this.selectedMesh.userData.id];
-      if (data) this.displayInfoCard(data);
+    const activeData = ANATOMY_DATA[this.selectedId];
+    if (activeData) {
+      this.displayInfoCard(activeData);
+      this.updateActiveHUD(activeData);
     }
   }
 
@@ -588,4 +969,3 @@ export class UIManager {
     a.click();
   }
 }
-

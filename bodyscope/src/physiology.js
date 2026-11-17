@@ -123,12 +123,30 @@ export class PhysiologyEngine {
     }
 
     // 2. RESPIRATION & LUNG EXPANSION
-    const respFreq = this.respirationRate / 60.0;
+    const isLungSpotlight = this.activeActionOrgan === 'lungs';
+    const currentRespRate = isLungSpotlight ? 24 : this.respirationRate;
+    const respFreq = currentRespRate / 60.0;
     this.breathingPhase = (this.breathingPhase + delta * respFreq) % 1.0;
-    const lungExpansion = 1.0 + Math.sin(this.breathingPhase * Math.PI * 2) * 0.035;
+    const expansionAmp = isLungSpotlight ? 0.038 : 0.022;
+    const lungExpansion = 1.0 + Math.sin(this.breathingPhase * Math.PI * 2) * expansionAmp;
 
     if (this.models.lungsGroup) {
-      this.models.lungsGroup.scale.set(lungExpansion, lungExpansion * 1.02, lungExpansion * 1.04);
+      // Anatomical centroid pivot preserves fixed center inside ribcage without forward or upward drift
+      const pivotY = 1.295;
+      const pivotZ = -0.005;
+      const baseY = -0.006;
+      const baseZ = -0.016;
+
+      const sx = lungExpansion * 1.01;
+      const sy = 1.0 + (lungExpansion - 1.0) * 0.75;
+      const sz = lungExpansion * 1.02;
+
+      this.models.lungsGroup.position.set(
+        0,
+        baseY + pivotY * (1.0 - sy),
+        baseZ + pivotZ * (1.0 - sz)
+      );
+      this.models.lungsGroup.scale.set(sx, sy, sz);
     }
 
     this.simulationTime += delta;

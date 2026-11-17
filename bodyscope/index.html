@@ -361,6 +361,311 @@
       margin-top: 12px;
     }
 
+    /* Floating Top HUD for Selected Anatomical Part */
+    .active-hud {
+      position: absolute;
+      top: 76px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10, 16, 28, 0.90);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(45, 226, 230, 0.45);
+      border-radius: 40px;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 25;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65), 0 0 20px rgba(45, 226, 230, 0.22);
+      transition: all 0.25s ease;
+      cursor: default;
+    }
+    .active-hud:hover {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 8px 36px rgba(0, 0, 0, 0.75), 0 0 26px rgba(45, 226, 230, 0.38);
+    }
+    .hud-nav-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .hud-nav-btn:hover {
+      background: rgba(45, 226, 230, 0.3);
+      border-color: var(--accent-cyan);
+      transform: scale(1.1);
+    }
+    .hud-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .hud-icon {
+      font-size: 1.35rem;
+      filter: drop-shadow(0 0 6px rgba(45, 226, 230, 0.6));
+    }
+    .hud-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .hud-title {
+      font-size: 0.88rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hud-urdu-tag {
+      font-family: var(--font-urdu);
+      color: var(--accent-gold);
+      font-size: 1.05rem;
+      font-weight: 600;
+      direction: rtl;
+    }
+    .hud-sub {
+      font-size: 0.72rem;
+      color: #94a3b8;
+    }
+    .hud-action-btn {
+      background: linear-gradient(135deg, rgba(45, 226, 230, 0.25), rgba(56, 189, 248, 0.15));
+      border: 1px solid var(--accent-cyan);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .hud-action-btn:hover {
+      background: var(--accent-cyan);
+      color: #050811;
+      box-shadow: 0 0 14px rgba(45, 226, 230, 0.5);
+    }
+
+    /* Drawer Tabs */
+    .drawer-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 8px;
+    }
+    .drawer-tab-btn {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      padding: 7px 8px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s;
+      text-align: center;
+    }
+    .drawer-tab-btn:hover {
+      background: rgba(45, 226, 230, 0.15);
+      color: #fff;
+    }
+    .drawer-tab-btn.active {
+      background: rgba(45, 226, 230, 0.25);
+      border-color: var(--accent-cyan);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(45, 226, 230, 0.25);
+    }
+
+    /* Parts Search & Filter */
+    .parts-search-box {
+      margin-bottom: 10px;
+    }
+    .parts-search-box input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #fff;
+      font-size: 0.8rem;
+      outline: none;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+    .parts-search-box input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 8px rgba(45, 226, 230, 0.3);
+    }
+    .filter-chips-row {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+      scrollbar-width: none;
+    }
+    .filter-chips-row::-webkit-scrollbar { display: none; }
+    .filter-chip {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 3px 8px;
+      font-size: 0.7rem;
+      color: #cbd5e1;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .filter-chip:hover {
+      background: rgba(45, 226, 230, 0.18);
+      color: #fff;
+    }
+    .filter-chip.active {
+      background: var(--accent-cyan);
+      border-color: var(--accent-cyan);
+      color: #050811;
+      font-weight: 700;
+    }
+
+    /* Parts List Cards */
+    .parts-list-container {
+      max-height: calc(100vh - 290px);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-right: 2px;
+    }
+    .part-card-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 8px 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.18s;
+    }
+    .part-card-item:hover {
+      background: rgba(45, 226, 230, 0.15);
+      border-color: rgba(45, 226, 230, 0.4);
+      transform: translateX(3px);
+    }
+    .part-card-item.active {
+      background: rgba(45, 226, 230, 0.22);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(45, 226, 230, 0.3);
+    }
+    .part-card-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .part-card-icon {
+      font-size: 1.15rem;
+    }
+    .part-card-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .part-card-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #fff;
+    }
+    .part-card-urdu {
+      font-family: var(--font-urdu);
+      font-size: 0.88rem;
+      color: var(--accent-gold);
+      direction: rtl;
+    }
+    .part-card-badge {
+      font-size: 0.65rem;
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 2px 6px;
+      border-radius: 8px;
+    }
+
+    /* Quick Organs Pills */
+    .quick-organs-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      margin-top: 4px;
+    }
+    .quick-organs-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      scrollbar-width: thin;
+    }
+    .quick-organ-pill {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      color: #cbd5e1;
+      white-space: nowrap;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.18s;
+      flex-shrink: 0;
+    }
+    .quick-organ-pill:hover {
+      background: rgba(45, 226, 230, 0.2);
+      border-color: var(--accent-cyan);
+      color: #fff;
+    }
+    .quick-organ-pill.active {
+      background: rgba(45, 226, 230, 0.35);
+      border-color: var(--accent-cyan);
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 0 10px rgba(45, 226, 230, 0.3);
+    }
+    .close-card-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #94a3b8;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.18s;
+      z-index: 10;
+    }
+    .close-card-btn:hover {
+      background: rgba(239, 68, 68, 0.3);
+      border-color: #ef4444;
+      color: #fff;
+    }
+
     /* Bottom Dock: Physiology & Live ECG */
     footer.bottom-dock {
       position: absolute;
@@ -645,116 +950,168 @@
     </div>
   </header>
 
+  <!-- Floating Top HUD: Active Selected Anatomical Part -->
+  <div id="active-part-hud" class="active-hud">
+    <button id="prev-part-btn" class="hud-nav-btn" title="Previous Organ (پچھلا عضو)">◀</button>
+    <div id="hud-content" class="hud-content">
+      <span id="hud-icon" class="hud-icon">❤️</span>
+      <div class="hud-text">
+        <div class="hud-title"><b id="hud-name">Heart</b> <span id="hud-urdu" class="hud-urdu-tag">دل (قلب)</span></div>
+        <div class="hud-sub"><span id="hud-system">Cardiovascular System</span> • <i id="hud-latin">Cor</i></div>
+      </div>
+    </div>
+    <button id="next-part-btn" class="hud-nav-btn" title="Next Organ (اگلا عضو)">▶</button>
+    <button id="hud-details-btn" class="hud-action-btn">ℹ️ Details (تفصیلات)</button>
+  </div>
+
   <!-- Left Drawer: Layer Toggles, Slicing & Views -->
   <aside class="left-drawer">
-    <!-- Real Human Body & Flesh Appearance Mode -->
-    <div class="drawer-section">
-      <div class="section-title">Body Appearance & Flesh (جسم کی ہیئت)</div>
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:8px;">
-        <button id="body-crystal-btn" class="preset-pill active" style="padding:6px 8px; text-align:center; font-weight:600; color:#38bdf8; border-color:#38bdf8; box-shadow:0 0 10px rgba(56,189,248,0.25);">💎 Crystal (کرسٹل شیشہ)</button>
-        <button id="body-real-btn" class="preset-pill" style="padding:6px 8px; text-align:center; font-weight:600; color:var(--accent-gold); border-color:var(--accent-gold);">👤 Real Human (حقیقی جسم)</button>
+    <!-- Drawer View Switcher Tabs -->
+    <div class="drawer-tabs">
+      <button id="drawer-tab-parts" class="drawer-tab-btn active">🫀 Anatomy Parts (اعضاء)</button>
+      <button id="drawer-tab-controls" class="drawer-tab-btn">⚙️ Controls (کنٹرولز)</button>
+    </div>
+
+    <!-- View 1: Comprehensive Anatomy Parts Directory -->
+    <div id="drawer-parts-view">
+      <div class="parts-search-box">
+        <input type="text" id="parts-search-input" placeholder="🔍 Search organ, bone, or muscle...">
       </div>
-      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:5px;">
-        <button id="body-flesh-btn" class="preset-pill" style="text-align:center; padding:5px 2px; font-size:0.75rem;">🥩 Flesh</button>
-        <button id="body-ghost-btn" class="preset-pill" style="text-align:center; padding:5px 2px; font-size:0.75rem;">Peach</button>
-        <button id="body-xray-btn" class="preset-pill" style="text-align:center; padding:5px 2px; font-size:0.75rem;">X-Ray</button>
-        <button id="body-bare-btn" class="preset-pill" style="text-align:center; padding:5px 2px; font-size:0.75rem;">Bare 0%</button>
+      <!-- Quick category filter chips -->
+      <div class="filter-chips-row" id="parts-filter-chips">
+        <span class="filter-chip active" data-filter="all">All (تمام)</span>
+        <span class="filter-chip" data-filter="respiratory">🫁 Lungs</span>
+        <span class="filter-chip" data-filter="cardiovascular">❤️ Heart</span>
+        <span class="filter-chip" data-filter="nervous">🧠 Brain</span>
+        <span class="filter-chip" data-filter="skeletal">🦴 Bones</span>
+        <span class="filter-chip" data-filter="digestive">🥣 Digestive</span>
+        <span class="filter-chip" data-filter="renal">🥜 Kidneys</span>
+        <span class="filter-chip" data-filter="muscular">💪 Muscles</span>
       </div>
-      <div class="slider-row" style="margin-top:10px;">
-        <span>Skin Opacity: <b id="skin-opacity-val" style="color:var(--accent-cyan);">22%</b></span>
-        <input type="range" id="skin-opacity-slider" min="0" max="1" step="0.02" value="0.22">
+      <div id="parts-list-container" class="parts-list-container">
+        <!-- Dynamically populated parts cards -->
       </div>
     </div>
 
-    <!-- Active Organs in Action (Clickable Interactive Demonstration) -->
-    <div class="drawer-section">
-      <div class="section-title">Organs in Action ⚡ (اعضاء کی کارکردگی)</div>
-      <div class="organs-action-grid">
-        <button class="organ-action-btn" data-organ="heart">🫀 Heart (دل)</button>
-        <button class="organ-action-btn" data-organ="lungs">🫁 Lungs (پھیپھڑے)</button>
-        <button class="organ-action-btn" data-organ="brain">🧠 Brain (دماغ)</button>
-        <button class="organ-action-btn" data-organ="stomach">🥩 Stomach (معدہ)</button>
-        <button class="organ-action-btn" data-organ="kidneys">🫘 Kidneys (گردے)</button>
-        <!-- Female-Specific Active Organs -->
-        <button class="organ-action-btn female-only-btn" data-organ="mammary_glands" style="display:none; border-color:#f472b6; color:#fbcfe8;">🤱 Breasts (دودھ کے غدود)</button>
-        <button class="organ-action-btn female-only-btn" data-organ="uterus" style="display:none; border-color:#f472b6; color:#fbcfe8;">🤰 Uterus (بچہ دانی)</button>
-        <!-- Male-Specific Active Organs -->
-        <button class="organ-action-btn male-only-btn" data-organ="male_reproductive" style="border-color:#38bdf8; color:#bae6fd;">♂️ Male Repro (مردانہ اعضاء)</button>
+    <!-- View 2: Controls, Layers, Slicing & Appearance -->
+    <div id="drawer-controls-view" style="display:none;">
+      <!-- Real Human Body & Flesh Appearance Mode -->
+      <div class="drawer-section">
+        <div class="section-title">Body Appearance & Flesh (جسم کی ہیئت)</div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:8px;">
+          <button id="body-crystal-btn" class="preset-pill active" style="padding:6px 8px; text-align:center; font-weight:600; color:#38bdf8; border-color:#38bdf8; box-shadow:0 0 10px rgba(56,189,248,0.25);">💎 Crystal (کرسٹل شیشہ)</button>
+          <button id="body-real-btn" class="preset-pill" style="padding:6px 8px; text-align:center; font-weight:600; color:var(--accent-gold); border-color:var(--accent-gold);">👤 Real Human (حقیقی جسم)</button>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:5px;">
+          <button id="body-flesh-btn" class="preset-pill" style="text-align:center; padding:5px 2px; font-size:0.75rem;">🥩 Flesh</button>
+          <button id="body-ghost-btn" class="preset-pill" style="text-align:center; padding:5px 2px; font-size:0.75rem;">Peach</button>
+          <button id="body-xray-btn" class="preset-pill" style="text-align:center; padding:5px 2px; font-size:0.75rem;">X-Ray</button>
+          <button id="body-bare-btn" class="preset-pill" style="text-align:center; padding:5px 2px; font-size:0.75rem;">Bare 0%</button>
+        </div>
+        <div class="slider-row" style="margin-top:10px;">
+          <span>Skin Opacity: <b id="skin-opacity-val" style="color:var(--accent-cyan);">22%</b></span>
+          <input type="range" id="skin-opacity-slider" min="0" max="1" step="0.02" value="0.22">
+        </div>
       </div>
-    </div>
 
-    <div class="drawer-section">
-      <div class="section-title">Anatomical Layers</div>
-      <div class="layers-grid">
-        <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="skin" checked> Skin Shell</label>
-        <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="skeleton" checked> Skeleton</label>
-        <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="muscles"> Muscles (Maas)</label>
-        <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="cardiovascular" checked> Cardiovascular</label>
-        <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="respiratory" checked> Respiratory</label>
-        <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="digestive" checked> Digestive</label>
-        <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="renal" checked> Renal</label>
-        <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="nervous" checked> Nervous</label>
+      <!-- Active Organs in Action (Clickable Interactive Demonstration) -->
+      <div class="drawer-section">
+        <div class="section-title">Organs in Action ⚡ (اعضاء کی کارکردگی)</div>
+        <div class="organs-action-grid">
+          <button class="organ-action-btn" data-organ="heart">🫀 Heart (دل)</button>
+          <button class="organ-action-btn" data-organ="lungs">🫁 Lungs (پھیپھڑے)</button>
+          <button class="organ-action-btn" data-organ="brain">🧠 Brain (دماغ)</button>
+          <button class="organ-action-btn" data-organ="stomach">🥩 Stomach (معدہ)</button>
+          <button class="organ-action-btn" data-organ="kidneys">🫘 Kidneys (گردے)</button>
+          <!-- Female-Specific Active Organs -->
+          <button class="organ-action-btn female-only-btn" data-organ="mammary_glands" style="display:none; border-color:#f472b6; color:#fbcfe8;">🤱 Breasts (دودھ کے غدود)</button>
+          <button class="organ-action-btn female-only-btn" data-organ="uterus" style="display:none; border-color:#f472b6; color:#fbcfe8;">🤰 Uterus (بچہ دانی)</button>
+          <!-- Male-Specific Active Organs -->
+          <button class="organ-action-btn male-only-btn" data-organ="male_reproductive" style="border-color:#38bdf8; color:#bae6fd;">♂️ Male Repro (مردانہ اعضاء)</button>
+        </div>
       </div>
-    </div>
 
-    <!-- Cross-Section Slicing Tool -->
-    <div class="drawer-section">
-      <div class="section-title">
-        <span>Cross-Section Slicing</span>
-        <input type="checkbox" id="slice-toggle" class="layer-checkbox">
+      <div class="drawer-section">
+        <div class="section-title">Anatomical Layers</div>
+        <div class="layers-grid">
+          <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="skin" checked> Skin Shell</label>
+          <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="skeleton" checked> Skeleton</label>
+          <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="muscles"> Muscles (Maas)</label>
+          <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="cardiovascular" checked> Cardiovascular</label>
+          <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="respiratory" checked> Respiratory</label>
+          <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="digestive" checked> Digestive</label>
+          <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="renal" checked> Renal</label>
+          <label class="layer-label"><input type="checkbox" class="layer-checkbox" data-system="nervous" checked> Nervous</label>
+        </div>
       </div>
-      <div class="slider-row">
-        <span>Axis</span>
-        <select id="slice-axis-select" style="background:#000; color:#fff; border:1px solid #333; border-radius:4px; padding:2px 6px;">
-          <option value="y" selected>Transverse (Y)</option>
-          <option value="x">Sagittal (X)</option>
-          <option value="z">Coronal (Z)</option>
-        </select>
-      </div>
-      <div class="slider-row">
-        <span>Offset</span>
-        <input type="range" id="slice-slider" min="0" max="2.0" step="0.02" value="1.25">
-      </div>
-    </div>
 
-    <!-- Camera View Presets -->
-    <div class="drawer-section">
-      <div class="section-title">Camera Presets</div>
-      <div class="presets-grid">
-        <button class="cam-preset-btn" data-preset="front">Front</button>
-        <button class="cam-preset-btn" data-preset="back">Back</button>
-        <button class="cam-preset-btn" data-preset="left">Left</button>
-        <button class="cam-preset-btn" data-preset="head">Head</button>
-        <button class="cam-preset-btn" data-preset="chest">Chest</button>
-        <button class="cam-preset-btn" data-preset="abdomen">Abdomen</button>
-        <button class="cam-preset-btn" data-preset="hands">Hands</button>
-        <button class="cam-preset-btn" data-preset="legs">Legs</button>
-        <button id="auto-rotate-btn" class="cam-preset-btn">🔄 Orbit</button>
+      <!-- Cross-Section Slicing Tool -->
+      <div class="drawer-section">
+        <div class="section-title">
+          <span>Cross-Section Slicing</span>
+          <input type="checkbox" id="slice-toggle" class="layer-checkbox">
+        </div>
+        <div class="slider-row">
+          <span>Axis</span>
+          <select id="slice-axis-select" style="background:#000; color:#fff; border:1px solid #333; border-radius:4px; padding:2px 6px;">
+            <option value="y" selected>Transverse (Y)</option>
+            <option value="x">Sagittal (X)</option>
+            <option value="z">Coronal (Z)</option>
+          </select>
+        </div>
+        <div class="slider-row">
+          <span>Offset</span>
+          <input type="range" id="slice-slider" min="0" max="2.0" step="0.02" value="1.25">
+        </div>
       </div>
-      <div style="margin-top:8px;">
-        <button id="labels-btn" class="btn" style="width:100%; justify-content:center;">🏷️ 3D Anatomy Labels</button>
-      </div>
-    </div>
 
-    <!-- Studio Background Switcher -->
-    <div class="drawer-section">
-      <div class="section-title">Studio Environment</div>
-      <div style="display:flex; gap:6px;">
-        <button class="btn theme-btn active" data-theme="dark" style="flex:1;">Obsidian</button>
-        <button class="btn theme-btn" data-theme="white" style="flex:1;">White</button>
-        <button class="btn theme-btn" data-theme="gradient" style="flex:1;">Neon</button>
+      <!-- Camera View Presets -->
+      <div class="drawer-section">
+        <div class="section-title">Camera Presets</div>
+        <div class="presets-grid">
+          <button class="cam-preset-btn" data-preset="front">Front</button>
+          <button class="cam-preset-btn" data-preset="back">Back</button>
+          <button class="cam-preset-btn" data-preset="left">Left</button>
+          <button class="cam-preset-btn" data-preset="head">Head</button>
+          <button class="cam-preset-btn" data-preset="chest">Chest</button>
+          <button class="cam-preset-btn" data-preset="abdomen">Abdomen</button>
+          <button class="cam-preset-btn" data-preset="hands">Hands</button>
+          <button class="cam-preset-btn" data-preset="legs">Legs</button>
+          <button id="auto-rotate-btn" class="cam-preset-btn">🔄 Orbit</button>
+        </div>
+        <div style="margin-top:8px;">
+          <button id="labels-btn" class="btn" style="width:100%; justify-content:center;">🏷️ 3D Anatomy Labels</button>
+        </div>
       </div>
-    </div>
 
-    <!-- Collapsible Anatomy Tree -->
-    <div class="drawer-section">
-      <div class="section-title">Anatomy Tree</div>
-      <div id="anatomy-tree-content" style="max-height:160px; overflow-y:auto; font-size:0.78rem;"></div>
+      <!-- Studio Background Switcher -->
+      <div class="drawer-section">
+        <div class="section-title">Studio Environment</div>
+        <div style="display:flex; gap:6px;">
+          <button class="btn theme-btn active" data-theme="dark" style="flex:1;">Obsidian</button>
+          <button class="btn theme-btn" data-theme="white" style="flex:1;">White</button>
+          <button class="btn theme-btn" data-theme="gradient" style="flex:1;">Neon</button>
+        </div>
+      </div>
+
+      <!-- Collapsible Anatomy Tree -->
+      <div class="drawer-section">
+        <div class="section-title">Anatomy Tree</div>
+        <div id="anatomy-tree-content" style="max-height:160px; overflow-y:auto; font-size:0.78rem;"></div>
+      </div>
     </div>
   </aside>
 
   <!-- Right Drawer: Comprehensive Anatomical Info Card -->
   <aside id="info-card" class="info-drawer">
+    <button id="close-info-btn" class="close-card-btn" title="Close Details Panel">✕</button>
+
+    <!-- Quick Organs Switcher Bar -->
+    <div class="quick-organs-label">QUICK SELECT ORGAN (فوری انتخاب):</div>
+    <div id="quick-organs-container" class="quick-organs-bar">
+      <!-- Populated dynamically via ui.js -->
+    </div>
+
     <div class="info-header">
       <div id="info-name" class="info-title">Heart</div>
       <div id="info-latin" class="info-sub">Cor</div>

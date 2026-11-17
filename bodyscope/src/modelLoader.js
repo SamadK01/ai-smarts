@@ -745,7 +745,8 @@ export class ModelLoader {
 
   processRespiratoryModel(scene) {
     scene.scale.set(1, 1, 1);
-    scene.position.set(0, 0, 0);
+    // Nest lungs comfortably inside the thoracic ribcage (-1.6cm Z, -0.6cm Y)
+    scene.position.set(0, -0.006, -0.016);
 
     const meshes = [];
     scene.traverse((child) => {
@@ -754,6 +755,13 @@ export class ModelLoader {
 
     meshes.forEach((child) => {
       const name = (child.name || "").toLowerCase();
+
+      // Filter out deformed Node 22 Pleura (500% scaled & displaced outside chest in source GLB)
+      if (name.includes("pleura")) {
+        child.visible = false;
+        return;
+      }
+
       child.material = (name.includes("trachea") || name.includes("bronch") || name.includes("larynx"))
         ? this.materials.trachea
         : this.materials.lung;
