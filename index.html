@@ -328,6 +328,7 @@
     .lamp { background: radial-gradient(circle at 75% 25%, rgba(217, 119, 6, 0.25), var(--surface-card) 60%); }
     .tic { background: radial-gradient(circle at 75% 25%, rgba(168, 85, 247, 0.25), var(--surface-card) 60%); }
     .carrom { background: radial-gradient(circle at 75% 25%, rgba(180, 83, 9, 0.25), var(--surface-card) 60%); }
+    .chess { background: radial-gradient(circle at 75% 25%, rgba(245, 158, 11, 0.25), var(--surface-card) 60%); }
     .drift { background: radial-gradient(circle at 75% 25%, rgba(217, 70, 239, 0.25), var(--surface-card) 60%); }
     .snake { background: radial-gradient(circle at 75% 25%, rgba(16, 185, 129, 0.25), var(--surface-card) 60%); }
     .ludo { background: radial-gradient(circle at 75% 25%, rgba(239, 68, 68, 0.25), var(--surface-card) 60%); }
@@ -407,7 +408,7 @@
     <header class="top">
       <a class="logo" href="index.html">AI SMARTS / PLAY</a>
       <div class="top-right">
-        <span class="online-badge">19 EXPERIMENTS ONLINE</span>
+        <span class="online-badge">20 EXPERIMENTS ONLINE</span>
         <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Dark/Light Mode">
           <span id="theme-icon">☀️</span> <span id="theme-label">LIGHT</span>
         </button>
@@ -418,13 +419,13 @@
     <section class="hero">
       <span class="hero-tag">A Curated Playground of Physics & Mind Games</span>
       <h1>Play. Explore.<br><em>Never</em> settle.</h1>
-      <p>19 zero-dependency, physics-driven simulations and masterclasses crafted with pure Three.js, Canvas, and synthesized Web Audio.</p>
+      <p>20 zero-dependency, physics-driven simulations and masterclasses crafted with pure Three.js, Canvas, and synthesized Web Audio.</p>
     </section>
 
     <!-- Search & Category Filters -->
     <section class="filter-bar">
       <div class="category-pills">
-        <button class="pill active" data-filter="all">All (19)</button>
+        <button class="pill active" data-filter="all">All (20)</button>
         <button class="pill" data-filter="flagship">⭐ Masterpieces</button>
         <button class="pill" data-filter="games">🎮 Arcade & Racing</button>
         <button class="pill" data-filter="space">🚀 Space & Cyber</button>
@@ -437,7 +438,7 @@
       </div>
     </section>
 
-    <!-- 19 Ordered Experiments Grid -->
+    <!-- 20 Ordered Experiments Grid -->
     <section class="grid" id="experiments-grid">
 
       <!-- ROW 1 (As explicitly requested by user) -->
@@ -504,11 +505,33 @@
 
       <!-- MASTERPIECES (User requested top priority games next) -->
 
-      <!-- 04: Cyber Drift 3D -->
+            <!-- 04: Grandmaster Chess Pro (Flagship AI & Tactical Engine) -->
+      <a class="card chess" href="chess.html" data-category="flagship games" data-name="grandmaster chess pro fide rules ai coach minimax stockfish pass and play multiplayer tactical">
+        <div class="card-top">
+          <small>FIDE ENGINE & COACH</small>
+          <span class="num">04</span>
+        </div>
+        <i class="art">
+          <svg viewBox="0 0 45 45" width="48" height="48" style="filter: drop-shadow(0 4px 12px rgba(245,158,11,0.4));">
+            <g fill="none" fill-rule="evenodd" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22.5 11.63V6M20 8h5" stroke-linejoin="miter"/>
+              <path d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5" fill="#fef08a" stroke-linecap="butt"/>
+              <path d="M11.5 37c5.5 3.5 16.5 3.5 22 0 0-4-3-4.5-4-6.5-1-2 1-4 1-6.5 0-3-2-5-4.5-5.5-2-.5-5-.5-7 0-2.5.5-4.5 2.5-4.5 5.5 0 2.5 2 4.5 1 6.5-1 2-4 2.5-4 6.5z" fill="#fef08a"/>
+              <path d="M11.5 30c5.5-3 16.5-3 22 0m-22 3.5c5.5-3 16.5-3 22 0m-22 3.5c5.5-3 16.5-3 22 0"/>
+            </g>
+          </svg>
+        </i>
+        <div class="card-bottom">
+          <h2>Grandmaster<br>Chess Pro</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
+      </a>
+
+      <!-- 05: Cyber Drift 3D -->
       <a class="card drift" href="drift.html" data-category="flagship games" data-name="cyber drift 3d tokyo midnight grand prix racer cars racing">
         <div class="card-top">
           <small>3D CYBERPUNK RACER</small>
-          <span class="num">04</span>
+          <span class="num">05</span>
         </div>
         <i class="art">🏎️</i>
         <div class="card-bottom">
@@ -517,11 +540,11 @@
         </div>
       </a>
 
-      <!-- 05: Neon Snake Pulse -->
+      <!-- 06: Neon Snake Pulse -->
       <a class="card snake" href="snake.html" data-category="flagship games" data-name="neon snake pulse arcade animals titan feast">
         <div class="card-top">
           <small>NEON CYBER ARCADE</small>
-          <span class="num">05</span>
+          <span class="num">06</span>
         </div>
         <i class="art">🐍</i>
         <div class="card-bottom">
@@ -530,11 +553,11 @@
         </div>
       </a>
 
-      <!-- 06: Royal Ludo Master 3D -->
+      <!-- 07: Royal Ludo Master 3D -->
       <a class="card ludo" href="ludo.html" data-category="flagship games" data-name="royal ludo master 3d classic championship dice ai">
         <div class="card-top">
           <small>CLASSIC CHAMPIONSHIP</small>
-          <span class="num">06</span>
+          <span class="num">07</span>
         </div>
         <i class="art">🎲</i>
         <div class="card-bottom">
@@ -543,11 +566,11 @@
         </div>
       </a>
 
-      <!-- 07: Lumina Grand Piano (Project Serenade) -->
+      <!-- 08: Lumina Grand Piano (Project Serenade) -->
       <a class="card piano" href="piano.html" data-category="flagship zen" data-name="lumina grand piano serenade acoustic felt sanctuary relaxing music rain">
         <div class="card-top">
           <small>ACOUSTIC FELT SANCTUARY</small>
-          <span class="num">07</span>
+          <span class="num">08</span>
         </div>
         <i class="art">🎹</i>
         <div class="card-bottom">
@@ -556,11 +579,11 @@
         </div>
       </a>
 
-      <!-- 08: Project Singularity (3D Black Hole) -->
+      <!-- 09: Project Singularity (3D Black Hole) -->
       <a class="card singularity" href="singularity.html" data-category="flagship space" data-name="project singularity 3d kerr black hole gravitational lensing relativity interstellar ligo">
         <div class="card-top">
           <small>3D GENERAL RELATIVITY</small>
-          <span class="num">08</span>
+          <span class="num">09</span>
         </div>
         <i class="art">🕳️</i>
         <div class="card-bottom">
@@ -569,11 +592,11 @@
         </div>
       </a>
 
-      <!-- 09: Project A.E.T.H.E.R. (Alien Signal Deck & Hacker Terminal) -->
+      <!-- 10: Project A.E.T.H.E.R. (Alien Signal Deck & Hacker Terminal) -->
       <a class="card alien" href="alien.html" data-category="flagship space" data-name="aether signal deck deep space cyber hacker jadoo alien contact terminal">
         <div class="card-top">
           <small>DEEP SPACE CYBER HACKER</small>
-          <span class="num">09</span>
+          <span class="num">10</span>
         </div>
         <i class="art">📡</i>
         <div class="card-bottom">
@@ -582,11 +605,11 @@
         </div>
       </a>
 
-      <!-- 10: BodyScope 3D -->
+      <!-- 11: BodyScope 3D -->
       <a class="card bodyscope" href="bodyscope/index.html" data-category="flagship space" data-name="bodyscope 3d medical anatomy atlas heart blood bones">
         <div class="card-top">
           <small>3D MEDICAL ANATOMY ATLAS</small>
-          <span class="num">10</span>
+          <span class="num">11</span>
         </div>
         <i class="art">🫀</i>
         <div class="card-bottom">
@@ -595,11 +618,11 @@
         </div>
       </a>
 
-      <!-- 11: Retro Laptop 2006 (ThinkRetro T42) -->
+      <!-- 12: Retro Laptop 2006 (ThinkRetro T42) -->
       <a class="card egg" href="wiggle.html" data-category="games" data-name="retro laptop 2006 thinkretro t42 3d tech minesweeper">
         <div class="card-top">
           <small>3D RETRO TECH</small>
-          <span class="num">11</span>
+          <span class="num">12</span>
         </div>
         <i class="art">💻</i>
         <div class="card-bottom">
@@ -608,11 +631,11 @@
         </div>
       </a>
 
-      <!-- 12: Foosball Pro -->
+      <!-- 13: Foosball Pro -->
       <a class="card foosball" href="foosball.html" data-category="games" data-name="foosball pro table soccer tournament sports">
         <div class="card-top">
           <small>TABLE SOCCER TOURNAMENT</small>
-          <span class="num">12</span>
+          <span class="num">13</span>
         </div>
         <i class="art">⚽</i>
         <div class="card-bottom">
@@ -621,11 +644,11 @@
         </div>
       </a>
 
-      <!-- 13: Reef Angler (Catch the Fish) -->
+      <!-- 14: Reef Angler (Catch the Fish) -->
       <a class="card fish" href="fish.html" data-category="games zen" data-name="catch the fish reef angler apex marine hunt deep water game sharks">
         <div class="card-top">
           <small>DEEP WATER GAME</small>
-          <span class="num">13</span>
+          <span class="num">14</span>
         </div>
         <i class="art">🐟</i>
         <div class="card-bottom">
@@ -634,11 +657,11 @@
         </div>
       </a>
 
-      <!-- 14: Slingshot Smash -->
+      <!-- 15: Slingshot Smash -->
       <a class="card smash" href="smash.html" data-category="games zen" data-name="slingshot smash antique tabletop alley destruction physics">
         <div class="card-top">
           <small>TACTILE SLINGSHOT TOY</small>
-          <span class="num">14</span>
+          <span class="num">15</span>
         </div>
         <i class="art">
           <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -662,11 +685,11 @@
         </div>
       </a>
 
-      <!-- 15: Fruit Slash -->
+      <!-- 16: Fruit Slash -->
       <a class="card fruit" href="fruit.html" data-category="games" data-name="fruit slash neon blade arcade ninja slice">
         <div class="card-top">
           <small>BLADE ARCADE</small>
-          <span class="num">15</span>
+          <span class="num">16</span>
         </div>
         <i class="art">🍉</i>
         <div class="card-bottom">
@@ -675,11 +698,11 @@
         </div>
       </a>
 
-      <!-- 16: Angry Bird Hunt -->
+      <!-- 17: Angry Bird Hunt -->
       <a class="card birds" href="birds.html" data-category="games" data-name="angry bird hunt arcade shooter target crosshair shotgun">
         <div class="card-top">
           <small>ARCADE SHOOTER</small>
-          <span class="num">16</span>
+          <span class="num">17</span>
         </div>
         <i class="art">🎯</i>
         <div class="card-bottom">
@@ -688,11 +711,11 @@
         </div>
       </a>
 
-      <!-- 17: NeuroLife 3D -->
+      <!-- 18: NeuroLife 3D -->
       <a class="card neuro" href="neuro.html" data-category="space zen" data-name="neurolife 3d neural ai ecosystem evolution neural networks">
         <div class="card-top">
           <small>NEURAL AI ECOSYSTEM</small>
-          <span class="num">17</span>
+          <span class="num">18</span>
         </div>
         <i class="art">🧠</i>
         <div class="card-bottom">
@@ -701,11 +724,11 @@
         </div>
       </a>
 
-      <!-- 18: The Focus Candle -->
+      <!-- 19: The Focus Candle -->
       <a class="card candle" href="candle.html" data-category="zen" data-name="the focus candle atmospheric melting timer wax flame relaxing">
         <div class="card-top">
           <small>ATMOSPHERIC TIMER</small>
-          <span class="num">18</span>
+          <span class="num">19</span>
         </div>
         <i class="art">
           <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -732,11 +755,11 @@
         </div>
       </a>
 
-      <!-- 19: Galaxy Giggles (Orbital Sandbox) -->
+      <!-- 20: Galaxy Giggles (Orbital Sandbox) -->
       <a class="card galaxy" href="orbit.html" data-category="space zen" data-name="galaxy giggles playful galaxy solar system orbital kepler">
         <div class="card-top">
           <small>PLAYFUL GALAXY</small>
-          <span class="num">19</span>
+          <span class="num">20</span>
         </div>
         <i class="art">🪐</i>
         <div class="card-bottom">
@@ -750,7 +773,7 @@
     <!-- Footer -->
     <footer>
       <span>AI SMARTS / 2026 • Curated Interactive Suite</span>
-      <span>19 zero-dependency physics & cognitive experiments</span>
+      <span>20 zero-dependency physics & cognitive experiments</span>
     </footer>
   </main>
 
