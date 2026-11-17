@@ -6,7 +6,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 
 ---
 
-## 🎮 The 18 Experiments
+## 🎮 The 19 Experiments
 
 | # | Experiment | Technology | Highlights |
 |---|---|---|---|
@@ -28,6 +28,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 | **16** | [**Neon Snake Pulse**](snake.html) | Canvas 2D, 60fps Sub-tick Interpolation, Web Audio | Ultra-smooth cyber arcade snake game featuring live animated prey animals (frogs, mice, bunnies, chicks) for rapid growth, mega titan beast feasts (+12 length & swollen body width), strict laser walls vs free warp-around mode, sub-tick 60fps interpolation, dynamic tracking eyes, and procedural Web Audio synthesizers. |
 | **17** | [**Project A.E.T.H.E.R. (Alien Signal Deck)**](alien.html) | Three.js WebGL, Canvas FFT Spectrogram, Web Audio Synthesizer | Deep-space alien radio interceptor & elite cyber hacking command deck. Features 1.420 GHz Hydrogen line waterfall spectrogram, 3D celestial triangulation radar, interactive Any-Key hacker terminal, and 7-tone harmonic extraterrestrial synthesizer (Jadoo / Koi Mil Gaya style). |
 | **18** | [**Project Singularity (3D Black Hole)**](singularity.html) | Three.js WebGL, Custom GLSL Shaders, Procedural Web Audio | General Relativity Kerr Black Hole & Gravitational Lensing simulator. Features real-time Einstein photon ring bending, relativistic Doppler beaming, accretion disk plasma physics, celestial matter spaghettification, gravitational time dilation clocks (Ship vs Earth), and LIGO gravitational wave chirp synthesizer. |
+| **19** | [**Project Serenade (Lumina Grand Piano)**](piano.html) | Procedural Web Audio Physical Modeling, Algorithmic Reverb, Canvas FX | Ultra-relaxing, therapeutic acoustic felt piano & ambient sanctuary. Features harmonic overtone string modeling, soft wooden hammer strike transients, stereo acoustic panning, lush cathedral convolution reverb, sustain pedal, falling note waterfall visualizer, procedural soft rain and fireplace ambience, and calming auto-play classical pieces (*Gymnopédie*, *Clair de Lune*, *River Flows in You*, *Interstellar*). Fully touch and glissando responsive on mobile. |
 
 ---
 
@@ -146,6 +147,21 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
   - Dynamic readout comparing Local Ship Time vs Earth Station Coordinate Time based on the ship's orbital radius.
 - **Procedural LIGO Gravitational Wave Synthesizer**:
   - Generates the authentic Nobel Prize-winning gravitational chirp waveform ($f(t) \propto (t_c - t)^{-3/8}$) rising from 38 Hz to 240 Hz with ringdown dampening, paired with 32 Hz spacetime fabric infrasound and plasma wind turbulence.
+
+### 11. Acoustic Felt Physical Modeling & Therapeutic Soundscape (`piano.html`)
+- **Harmonic String Overtone Modeling**:
+  - Each note calculates genuine string acoustics: fundamental $f_0$ paired with multiple non-linear overtones ($2f_0, 3f_0, 4f_0$) decaying at frequency-dependent exponential rates ($e^{-t / \tau_n}$).
+  - Felt hammer transient generator produces a warm, non-fatiguing wooden strike rather than synthetic electronic beeps.
+  - Frequency-dependent stereo panning ($x_{\text{pan}} \in [-0.7, +0.7]$) positions low bass strings on the left and high treble strings on the right.
+- **Algorithmic Cathedral / Acoustic Hall Reverb**:
+  - Stereo impulse response network simulating natural wooden soundboard resonance with a smooth 3.2-second tail.
+- **Multi-Layer Binaural Relaxation Mix**:
+  - Procedural soft rainfall generator (pink noise filtered through lowpass flutter).
+  - Cozy fireplace / vinyl crackle generator (stochastic bandpass clicks).
+  - Ethereal ambient fifth-interval pad drone ($C_3 + G_3$).
+- **Multi-Touch & Mobile Responsive Architecture**:
+  - Native multi-touch tracker (`e.changedTouches`) enabling 10-finger chords and smooth glissando on phones and tablets with zero pinch/zoom conflicts.
+  - Octave shifting engine allowing full keyboard navigation on compact screens.
 
 ---
 

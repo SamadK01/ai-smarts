@@ -210,10 +210,21 @@
     border: 1px solid rgba(255,255,255,0.08);
   }
 
-  @media (max-width: 900px) {
-    .center-row { flex-direction: column; }
-    .telemetry-card { width: 100%; max-width: 340px; }
-    .bottom-dock { flex-direction: column; align-items: stretch; }
+  @media (max-width: 860px) {
+    .hud-wrap { padding: 8px 10px; }
+    .title-card { padding: 6px 12px; }
+    .main-title { font-size: 1.1rem; }
+    .subtitle { display: none; }
+    .center-row {
+      flex-direction: column; gap: 8px; max-height: 44vh;
+      overflow-y: auto; pointer-events: auto;
+    }
+    .center-row.hud-hidden { display: none; }
+    .telemetry-card { width: 100%; max-width: none; padding: 8px 12px; font-size: 0.68rem; }
+    .bottom-dock { flex-direction: column; align-items: stretch; gap: 6px; }
+    .matter-injector-panel { padding: 6px 10px; gap: 6px; }
+    .btn-matter { font-size: 0.65rem; padding: 5px 8px; }
+    .orbit-hint { display: none; }
   }
 </style>
 </head>
@@ -242,6 +253,7 @@
       </div>
 
       <div class="header-actions">
+        <button id="btn-toggle-hud" class="btn-hud">📊 HUD: ON</button>
         <button id="btn-ligo-chirp" class="btn-hud btn-chirp">🔊 TRIGGER LIGO CHIRP</button>
         <button id="btn-theme-color" class="btn-hud">🎨 SPECTRUM</button>
         <button id="btn-audio-toggle" class="btn-hud">🔊 AUDIO: ON</button>
@@ -941,6 +953,14 @@ class BlackHoleSimulator {
     });
 
     // Action Buttons
+    const btnToggleHud = document.getElementById('btn-toggle-hud');
+    const centerRow = document.querySelector('.center-row');
+    btnToggleHud.addEventListener('click', () => {
+      centerRow.classList.toggle('hud-hidden');
+      const isHidden = centerRow.classList.contains('hud-hidden');
+      btnToggleHud.textContent = isHidden ? '📊 HUD: OFF' : '📊 HUD: ON';
+    });
+
     document.getElementById('btn-ligo-chirp').addEventListener('click', () => {
       audio.init();
       audio.playLigoChirp();

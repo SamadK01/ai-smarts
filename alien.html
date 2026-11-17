@@ -427,7 +427,7 @@
             <span>💻 EXPLOIT INJECTOR & QUANTUM KERNEL INTERCEPT</span>
           </div>
           <div class="panel-status">
-            <span>TYPE ON KEYBOARD TO HACK</span>
+            <button id="btn-tap-hack" class="btn-cmd" style="padding: 2px 8px; font-size: 0.65rem; border-color: var(--theme-color);">⚡ TAP TO HACK</button>
           </div>
         </div>
         <div class="panel-body">
@@ -1139,6 +1139,16 @@ class ProjectAetherDeck {
         this.injectHackerCode();
       }
     });
+
+    // Mobile / Touch Tap to Hack Listeners
+    const triggerTapHack = (e) => {
+      e.preventDefault();
+      this.injectHackerCode();
+    };
+    const tapHackBtn = document.getElementById('btn-tap-hack');
+    if (tapHackBtn) tapHackBtn.addEventListener('pointerdown', triggerTapHack);
+    this.terminalLog.addEventListener('pointerdown', triggerTapHack);
+    this.termInput.parentElement.addEventListener('pointerdown', triggerTapHack);
 
     // 7-Tone Synthesizer Click Handlers
     document.querySelectorAll('.synth-key').forEach(btn => {
