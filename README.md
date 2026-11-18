@@ -180,6 +180,18 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
   - All piece movements, castling ($O-O$ and $O-O-O$ with strict check obstruction rules), en passant captures on immediate subsequent turn, and pawn promotion modal ($Q, R, B, N$).
   - Terminal condition detection: Checkmate, Stalemate, 50-move rule ($100$ half-moves without pawn move or capture), Threefold repetition tracking via FEN hashing, and insufficient material draws ($K$ vs $K$, $K+B$ vs $K$, $K+N$ vs $K$, same-color bishops).
   - Benchmark perft validation: Depth 1 = $20$, Depth 2 = $400$, Depth 3 = $8,902$ exact nodes.
+- **Dedicated Dual-Shelf Captured Pieces Showcase ("Wickets / مہرے")**:
+  - Top player and Bottom player each feature their own dedicated `.captured-shelf` displaying opposing captured pieces grouped by type with SVG vector chips, dynamic count badges (`×2`, `×3`), and live material superiority indicator pills (`+3`, `+5`).
+  - Seamless, dynamic orientation flipping when the board perspective is switched.
+- **Professional Tournament End-Game Modals (Victory, Defeat & Draw)**:
+  - **🏆 Grand Victory**: Emerald and gold radiant aura, fanfare audio chord, victory hero trophy, and high-velocity confetti particle blast.
+  - **💀 Defeat**: Crimson warning aura, somber minor chord audio, AI analysis prompt, and bilingual encouraging feedback.
+  - **🤝 Draw / Stalemate**: Silver cyan aura, soft chime, and detailed rule breakdown (Stalemate, Insufficient Material, 50-Move Rule, Mutual Agreement).
+  - **Match Summary Metrics Grid**: Accurate match stopwatch time, total moves played, total pieces captured, and intelligent opening detection (*Ruy Lopez*, *Italian Game*, *Sicilian Defence*, *French Defence*, *Queen's Gambit*, *Indian Defence*, etc.).
+  - **One-Click PGN Export**: Copy complete tournament PGN notation string directly to the system clipboard for external engine review.
+- **In-Game Resignation & Mutual Draw Protocol**:
+  - `🏳️ Resign` button with dual-language confirmation dialog to gracefully concede defeat.
+  - `🤝 Offer Draw` button with Stockfish AI positional score evaluation check (AI declines when holding a decisive advantage).
 - **Minimax AI with Alpha-Beta Pruning & Quiescence Search**:
   - Easy ($~800$ ELO): Depth 1-2 evaluation with real-time golden SVG arrow coach suggestion and tactical strategic explanation.
   - Medium ($~1500$ ELO): Depth 3 Alpha-Beta search with Piece-Square Tables (PST) and on-demand hints.

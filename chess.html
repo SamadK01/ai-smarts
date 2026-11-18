@@ -241,19 +241,26 @@
     /* Player Cards */
     .player-card {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px 16px;
       background: var(--bg-card);
       backdrop-filter: blur(12px);
       border: 1px solid var(--bg-card-border);
-      border-radius: 12px;
+      border-radius: 14px;
       transition: all 0.3s ease;
     }
 
     .player-card.active-turn {
       border-color: var(--accent-gold);
-      box-shadow: 0 0 16px var(--accent-gold-glow);
+      box-shadow: 0 0 18px var(--accent-gold-glow);
+    }
+
+    .player-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
     }
 
     .player-info-left {
@@ -263,15 +270,16 @@
     }
 
     .player-avatar {
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.35rem;
+      font-size: 1.4rem;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--bg-card-border);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
     .player-details {
@@ -301,33 +309,100 @@
       color: var(--text-muted);
     }
 
-    .captured-tray {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      min-height: 20px;
-      font-size: 0.75rem;
+    .player-side-label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      letter-spacing: 0.3px;
     }
 
-    .captured-piece-mini {
-      width: 18px;
-      height: 18px;
+    /* Dedicated Captured Showcase Shelf */
+    .captured-shelf {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.38);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      min-height: 38px;
+      gap: 8px;
+    }
+
+    .captured-shelf-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .captured-shelf-items {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .captured-piece-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 7px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .captured-piece-chip:hover {
+      background: rgba(255, 255, 255, 0.16);
+      transform: translateY(-1px);
+    }
+
+    .captured-piece-chip.new-capture {
+      animation: captureKnockout 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes captureKnockout {
+      0% { transform: scale(1.6); background: rgba(245, 158, 11, 0.5); box-shadow: 0 0 16px var(--accent-gold); }
+      100% { transform: scale(1.0); }
+    }
+
+    .captured-piece-chip .captured-svg {
+      width: 22px;
+      height: 22px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
     }
 
-    .captured-piece-mini svg {
+    .captured-piece-chip .captured-svg svg {
       width: 100%;
       height: 100%;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));
     }
 
-    .material-advantage {
+    .captured-count-badge {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
-      font-weight: 700;
+      font-size: 0.72rem;
+      font-weight: 800;
       color: var(--accent-gold);
-      margin-left: 6px;
+    }
+
+    .material-advantage-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      color: var(--accent-gold);
+      white-space: nowrap;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
     }
 
     .player-clock {
@@ -755,6 +830,158 @@
       color: #fff;
     }
 
+    /* Confetti Celebration Canvas */
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 500;
+    }
+
+    /* Enhanced Game Over Modal Card */
+    .game-over-card {
+      position: relative;
+      text-align: center;
+      padding: 32px 28px;
+      overflow: hidden;
+      border-radius: 24px;
+      transition: all 0.3s ease;
+    }
+
+    .game-over-card.victory {
+      border: 2px solid rgba(245, 158, 11, 0.7);
+      box-shadow: 0 0 60px rgba(245, 158, 11, 0.35), 0 25px 50px rgba(0, 0, 0, 0.8);
+      background: radial-gradient(circle at 50% 15%, rgba(245, 158, 11, 0.16) 0%, #111827 75%);
+    }
+
+    .game-over-card.defeat {
+      border: 2px solid rgba(239, 68, 68, 0.7);
+      box-shadow: 0 0 60px rgba(239, 68, 68, 0.35), 0 25px 50px rgba(0, 0, 0, 0.8);
+      background: radial-gradient(circle at 50% 15%, rgba(239, 68, 68, 0.16) 0%, #111827 75%);
+    }
+
+    .game-over-card.draw {
+      border: 2px solid rgba(6, 182, 212, 0.7);
+      box-shadow: 0 0 60px rgba(6, 182, 212, 0.35), 0 25px 50px rgba(0, 0, 0, 0.8);
+      background: radial-gradient(circle at 50% 15%, rgba(6, 182, 212, 0.16) 0%, #111827 75%);
+    }
+
+    .game-over-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 16px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin: 0 auto 12px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.4);
+    }
+
+    .game-over-badge.victory {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: #000;
+    }
+
+    .game-over-badge.defeat {
+      background: linear-gradient(135deg, #ef4444, #991b1b);
+      color: #fff;
+    }
+
+    .game-over-badge.draw {
+      background: linear-gradient(135deg, #38bdf8, #06b6d4);
+      color: #000;
+    }
+
+    .game-over-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .game-over-icon {
+      font-size: 4rem;
+      line-height: 1;
+      margin-bottom: 6px;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+      animation: heroBounce 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes heroBounce {
+      0% { transform: scale(0.3); opacity: 0; }
+      60% { transform: scale(1.15); }
+      100% { transform: scale(1.0); opacity: 1; }
+    }
+
+    .game-over-title {
+      font-size: 1.75rem;
+      font-family: 'Cinzel', serif;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+    }
+
+    .game-over-reason {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--accent-gold);
+    }
+
+    .game-over-urdu {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      direction: rtl;
+      font-family: system-ui, -apple-system, sans-serif;
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    /* Match Summary Grid inside Modal */
+    .match-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin: 8px 0 16px;
+      text-align: left;
+    }
+
+    .summary-metric {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .metric-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .metric-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .modal-actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+
     /* Promotion Dialog Grid */
     .promo-options {
       display: grid;
@@ -996,6 +1223,9 @@
 </head>
 <body data-theme="emerald">
 
+  <!-- Confetti Celebration Canvas -->
+  <canvas id="confettiCanvas"></canvas>
+
   <!-- Header -->
   <header>
     <div class="brand-wrap">
@@ -1026,17 +1256,25 @@
       <div class="chess-arena">
         <!-- Top Player Card (Opponent / Black) -->
         <div class="player-card" id="topPlayerCard">
-          <div class="player-info-left">
-            <div class="player-avatar" id="topAvatar">🤖</div>
-            <div class="player-details">
-              <div class="player-name-row">
-                <span class="player-name" id="topPlayerName">Stockfish AI</span>
-                <span class="player-rating-badge" id="topPlayerRating">ELO 2200</span>
+          <div class="player-card-header">
+            <div class="player-info-left">
+              <div class="player-avatar" id="topAvatar">🤖</div>
+              <div class="player-details">
+                <div class="player-name-row">
+                  <span class="player-name" id="topPlayerName">Stockfish AI</span>
+                  <span class="player-rating-badge" id="topPlayerRating">ELO 2200</span>
+                </div>
+                <span class="player-side-label" id="topSideLabel">Black Pieces (کالے مہرے)</span>
               </div>
-              <div class="captured-tray" id="topCapturedTray"></div>
             </div>
+            <div class="player-clock" id="topClock">10:00</div>
           </div>
-          <div class="player-clock" id="topClock">10:00</div>
+          <!-- Dedicated Captured Shelf for Top Player -->
+          <div class="captured-shelf" id="topCapturedShelf">
+            <div class="captured-shelf-label" id="topCapturedLabel">Black Captured (کالے کے مہرے):</div>
+            <div class="captured-shelf-items" id="topCapturedTray"></div>
+            <div class="material-advantage-pill" id="topAdvantage" style="display:none;"></div>
+          </div>
         </div>
 
         <!-- 8x8 Chessboard Container -->
@@ -1063,17 +1301,25 @@
 
         <!-- Bottom Player Card (User / White) -->
         <div class="player-card active-turn" id="bottomPlayerCard">
-          <div class="player-info-left">
-            <div class="player-avatar" id="bottomAvatar">👑</div>
-            <div class="player-details">
-              <div class="player-name-row">
-                <span class="player-name" id="bottomPlayerName">You</span>
-                <span class="player-rating-badge" id="bottomPlayerRating">Grandmaster</span>
+          <div class="player-card-header">
+            <div class="player-info-left">
+              <div class="player-avatar" id="bottomAvatar">👑</div>
+              <div class="player-details">
+                <div class="player-name-row">
+                  <span class="player-name" id="bottomPlayerName">You</span>
+                  <span class="player-rating-badge" id="bottomPlayerRating">Grandmaster</span>
+                </div>
+                <span class="player-side-label" id="bottomSideLabel">White Pieces (سفید مہرے)</span>
               </div>
-              <div class="captured-tray" id="bottomCapturedTray"></div>
             </div>
+            <div class="player-clock" id="bottomClock">10:00</div>
           </div>
-          <div class="player-clock" id="bottomClock">10:00</div>
+          <!-- Dedicated Captured Shelf for Bottom Player -->
+          <div class="captured-shelf" id="bottomCapturedShelf">
+            <div class="captured-shelf-label" id="bottomCapturedLabel">White Captured (سفید کے مہرے):</div>
+            <div class="captured-shelf-items" id="bottomCapturedTray"></div>
+            <div class="material-advantage-pill" id="bottomAdvantage" style="display:none;"></div>
+          </div>
         </div>
 
         <!-- Coach Suggestion Card -->
@@ -1128,10 +1374,12 @@
 
         <!-- Action Buttons -->
         <div class="action-grid" style="margin-top:4px;">
-          <button class="icon-btn" id="hintBtn">💡 Best Move Hint</button>
+          <button class="icon-btn" id="hintBtn">💡 Best Hint</button>
           <button class="icon-btn" id="undoBtn">↩️ Undo Move</button>
           <button class="icon-btn" id="flipBtn">🔄 Flip Board</button>
           <button class="icon-btn" id="resetBtn">🔄 New Match</button>
+          <button class="icon-btn" id="offerDrawBtn" style="border-color:rgba(6,182,212,0.3);color:#7dd3fc;">🤝 Offer Draw</button>
+          <button class="icon-btn" id="resignBtn" style="border-color:rgba(239,68,68,0.3);color:#fca5a5;">🏳️ Resign</button>
         </div>
       </div>
 
@@ -1182,16 +1430,57 @@
     </div>
   </div>
 
-  <!-- Game Over Modal -->
+  <!-- Enhanced Professional Game Over Modal -->
   <div class="modal-backdrop" id="gameOverModal">
-    <div class="modal-card" style="max-width:460px;text-align:center;">
-      <div style="font-size:3.5rem;" id="gameOverIcon">🏆</div>
-      <div class="modal-title" id="gameOverTitle" style="font-size:1.6rem;">Victory for White!</div>
-      <p id="gameOverReason" style="color:var(--accent-gold);font-weight:600;font-size:1rem;">By Checkmate</p>
-      <p id="gameOverUrdu" style="color:var(--text-muted);direction:rtl;font-size:0.9rem;">شہہ مات کے ذریعے جیت حاصل ہوئی!</p>
-      <div style="display:flex;gap:12px;margin-top:12px;">
-        <button class="icon-btn primary" id="modalRematchBtn" style="flex:1;padding:12px;justify-content:center;">🔄 Play Rematch</button>
-        <button class="icon-btn" id="modalCloseReviewBtn" style="flex:1;padding:12px;justify-content:center;">🔍 Review Board</button>
+    <div class="modal-card game-over-card" id="gameOverCard" style="max-width:500px;">
+      <div class="game-over-badge" id="gameOverBadge">🏆 CHECKMATE — VICTORY</div>
+      <div class="game-over-hero">
+        <div class="game-over-icon" id="gameOverIcon">🏆</div>
+        <div class="modal-title game-over-title" id="gameOverTitle">Victory for White!</div>
+        <div class="game-over-reason" id="gameOverReason">By Checkmate</div>
+        <p class="game-over-urdu" id="gameOverUrdu">سفید مہروں نے شاندار انداز میں فتح حاصل کی!</p>
+      </div>
+
+      <!-- Match Summary Metrics Grid -->
+      <div class="match-summary-grid">
+        <div class="summary-metric">
+          <span class="metric-label">⏱️ Match Time</span>
+          <span class="metric-value" id="summaryTime">04:12</span>
+        </div>
+        <div class="summary-metric">
+          <span class="metric-label">♟️ Total Moves</span>
+          <span class="metric-value" id="summaryMoves">34 Moves</span>
+        </div>
+        <div class="summary-metric">
+          <span class="metric-label">⚔️ Pieces Captured</span>
+          <span class="metric-value" id="summaryCaptures">16 Pieces</span>
+        </div>
+        <div class="summary-metric">
+          <span class="metric-label">📖 Opening</span>
+          <span class="metric-value" id="summaryOpening">Standard Opening</span>
+        </div>
+      </div>
+
+      <div class="modal-actions-grid">
+        <button class="icon-btn primary" id="modalRematchBtn" style="padding:12px;font-size:0.9rem;justify-content:center;">🔄 Play Rematch</button>
+        <button class="icon-btn" id="modalCloseReviewBtn" style="padding:12px;font-size:0.9rem;justify-content:center;">🔍 Review Board</button>
+        <button class="icon-btn" id="modalCopyPgnBtn" style="padding:10px;font-size:0.8rem;justify-content:center;grid-column:span 2;">📋 Copy PGN Notation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resign Confirmation Modal -->
+  <div class="modal-backdrop" id="resignModal">
+    <div class="modal-card" style="max-width:400px;text-align:center;">
+      <div style="font-size:2.8rem;">🏳️</div>
+      <div class="modal-title" style="font-size:1.3rem;">Resign Match?</div>
+      <p style="font-size:0.85rem;color:var(--text-muted);margin:8px 0 16px;">
+        Are you sure you want to resign and concede victory to your opponent?
+        <br><span style="direction:rtl;display:block;margin-top:6px;color:#cbd5e1;">کیا آپ واقعی یہ میچ ہار تسلیم کرنا چاہتے ہیں؟</span>
+      </p>
+      <div style="display:flex;gap:10px;">
+        <button class="icon-btn" id="cancelResignBtn" style="flex:1;justify-content:center;padding:10px;">Cancel (نہیں)</button>
+        <button class="icon-btn" id="confirmResignBtn" style="flex:1;justify-content:center;padding:10px;background:#ef4444;color:#fff;border-color:#ef4444;">🏳️ Yes, Resign</button>
       </div>
     </div>
   </div>
@@ -1436,6 +1725,78 @@
         chord.forEach((f, i) => {
           setTimeout(() => this.playTone(f, 'sawtooth', 0.4, 0.2), i * 140);
         });
+      }
+
+      playDraw() {
+        const chord = [440, 523.25, 440];
+        chord.forEach((f, i) => {
+          setTimeout(() => this.playTone(f, 'sine', 0.25, 0.3), i * 120);
+        });
+      }
+    }
+
+    // 2.5 Confetti Particle System
+    class ConfettiCelebration {
+      constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas ? this.canvas.getContext('2d') : null;
+        this.particles = [];
+        this.animationId = null;
+      }
+
+      start() {
+        if (!this.canvas || !this.ctx) return;
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+        this.particles = [];
+        const colors = ['#f59e0b', '#fbbf24', '#10b981', '#34d399', '#38bdf8', '#ffffff'];
+
+        for (let i = 0; i < 160; i++) {
+          this.particles.push({
+            x: this.canvas.width / 2,
+            y: this.canvas.height / 2,
+            vx: (Math.random() - 0.5) * 20,
+            vy: (Math.random() - 0.8) * 22,
+            size: 6 + Math.random() * 8,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            rotation: Math.random() * 360,
+            vr: (Math.random() - 0.5) * 14,
+            alpha: 1.0
+          });
+        }
+
+        const animate = () => {
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          let alive = false;
+
+          this.particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.38;
+            p.rotation += p.vr;
+            p.alpha -= 0.009;
+
+            if (p.alpha > 0) {
+              alive = true;
+              this.ctx.save();
+              this.ctx.globalAlpha = Math.max(0, p.alpha);
+              this.ctx.translate(p.x, p.y);
+              this.ctx.rotate(p.rotation * Math.PI / 180);
+              this.ctx.fillStyle = p.color;
+              this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+              this.ctx.restore();
+            }
+          });
+
+          if (alive) {
+            this.animationId = requestAnimationFrame(animate);
+          } else {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          }
+        };
+
+        if (this.animationId) cancelAnimationFrame(this.animationId);
+        animate();
       }
     }
 
@@ -2204,6 +2565,9 @@
         this.blackTime = 600;
         this.timerInterval = null;
         this.boardFlipped = false;
+        this.gameStartTime = Date.now();
+        this.totalCapturesCount = 0;
+        this.isGameOver = false;
 
         this.selectedSquare = null;
         this.validMoves = [];
@@ -2230,6 +2594,10 @@
         this.bottomClock = document.getElementById('bottomClock');
         this.topCapturedTray = document.getElementById('topCapturedTray');
         this.bottomCapturedTray = document.getElementById('bottomCapturedTray');
+        this.topAdvantage = document.getElementById('topAdvantage');
+        this.bottomAdvantage = document.getElementById('bottomAdvantage');
+        this.topCapturedLabel = document.getElementById('topCapturedLabel');
+        this.bottomCapturedLabel = document.getElementById('bottomCapturedLabel');
         this.notationTbody = document.getElementById('notationTbody');
         this.notationContainer = document.getElementById('notationContainer');
         this.turnIndicatorBadge = document.getElementById('turnIndicatorBadge');
@@ -2241,7 +2609,19 @@
         this.promoModal = document.getElementById('promoModal');
         this.promoOptions = document.getElementById('promoOptions');
         this.gameOverModal = document.getElementById('gameOverModal');
+        this.gameOverCard = document.getElementById('gameOverCard');
+        this.gameOverBadge = document.getElementById('gameOverBadge');
+        this.gameOverIcon = document.getElementById('gameOverIcon');
+        this.gameOverTitle = document.getElementById('gameOverTitle');
+        this.gameOverReason = document.getElementById('gameOverReason');
+        this.gameOverUrdu = document.getElementById('gameOverUrdu');
+        this.summaryTime = document.getElementById('summaryTime');
+        this.summaryMoves = document.getElementById('summaryMoves');
+        this.summaryCaptures = document.getElementById('summaryCaptures');
+        this.summaryOpening = document.getElementById('summaryOpening');
+        this.resignModal = document.getElementById('resignModal');
         this.guideModal = document.getElementById('guideModal');
+        this.confetti = new ConfettiCelebration('confettiCanvas');
       }
 
       bindEvents() {
@@ -2299,6 +2679,82 @@
         document.getElementById('modalCloseReviewBtn').addEventListener('click', () => {
           this.gameOverModal.classList.remove('active');
         });
+
+        // Copy PGN button
+        const copyPgnBtn = document.getElementById('modalCopyPgnBtn');
+        if (copyPgnBtn) {
+          copyPgnBtn.addEventListener('click', () => {
+            const pgn = this.generatePgn();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(pgn).then(() => {
+                const orig = copyPgnBtn.textContent;
+                copyPgnBtn.textContent = '✅ Copied to Clipboard!';
+                setTimeout(() => { copyPgnBtn.textContent = orig; }, 2000);
+              }).catch(() => {
+                alert("PGN:\n" + pgn);
+              });
+            } else {
+              alert("PGN:\n" + pgn);
+            }
+          });
+        }
+
+        // Resign modal triggers
+        const resignBtn = document.getElementById('resignBtn');
+        if (resignBtn) {
+          resignBtn.addEventListener('click', () => {
+            if (this.isGameOver) return;
+            this.resignModal.classList.add('active');
+          });
+        }
+        const cancelResignBtn = document.getElementById('cancelResignBtn');
+        if (cancelResignBtn) {
+          cancelResignBtn.addEventListener('click', () => {
+            this.resignModal.classList.remove('active');
+          });
+        }
+        const confirmResignBtn = document.getElementById('confirmResignBtn');
+        if (confirmResignBtn) {
+          confirmResignBtn.addEventListener('click', () => {
+            this.resignModal.classList.remove('active');
+            const resigningColor = this.gameMode === 'ai' ? 'w' : this.engine.turn;
+            const winner = resigningColor === 'w' ? 'b' : 'w';
+            this.handleGameOver({
+              winner: winner,
+              reason: (resigningColor === 'w' ? 'White' : 'Black') + ' Resigned',
+              urdu: (resigningColor === 'w' ? 'سفید' : 'کالے') + ' کھلاڑی نے ہار تسلیم کر لی۔'
+            });
+          });
+        }
+
+        // Offer Draw trigger
+        const offerDrawBtn = document.getElementById('offerDrawBtn');
+        if (offerDrawBtn) {
+          offerDrawBtn.addEventListener('click', () => {
+            if (this.isGameOver) return;
+            if (this.gameMode === 'ai') {
+              const evalScore = evaluateBoard(this.engine.board);
+              if (evalScore < -150) {
+                alert("🤖 Stockfish AI Declines!\n\nStockfish AI ka kehna hai: 'Meri position mazboot hai, main jeetne ke liye khellonga!'");
+                return;
+              }
+              this.handleGameOver({
+                winner: null,
+                reason: 'Draw Agreed by Mutual Consent',
+                urdu: 'دونوں کھلاڑیوں نے باہمی رضامندی سے میچ ڈرا کیا۔'
+              });
+            } else {
+              const accept = confirm("Opponent offers a draw. Do you accept?\nکیا آپ میچ ڈرا (برابر) تسلیم کرتے ہیں؟");
+              if (accept) {
+                this.handleGameOver({
+                  winner: null,
+                  reason: 'Draw Agreed by Mutual Consent',
+                  urdu: 'دونوں کھلاڑیوں نے باہمی رضامندی سے میچ ڈرا کیا۔'
+                });
+              }
+            }
+          });
+        }
 
         // Game mode pills
         document.getElementById('modePillGroup').addEventListener('click', (e) => {
@@ -2371,6 +2827,9 @@
         this.validMoves = [];
         this.currentSuggestion = null;
         this.isAiThinking = false;
+        this.isGameOver = false;
+        this.gameStartTime = Date.now();
+        this.totalCapturesCount = 0;
         this.whiteTime = this.timeControl;
         this.blackTime = this.timeControl;
         this.clearArrow();
@@ -2378,6 +2837,7 @@
         this.updateMoveTable();
         this.updateEvalBar();
         this.updateCoachBar();
+        this.updateCapturedTrays();
         this.startClocks();
       }
 
@@ -2410,9 +2870,12 @@
 
       handleTimeout(winner) {
         clearInterval(this.timerInterval);
-        sound.playDefeat();
         const winnerName = winner === 'w' ? 'White' : 'Black';
-        this.showGameOverModal('⏰ Time Out!', winnerName + ' wins on time!', winnerName + ' وقت ختم ہونے پر جیت گیا!');
+        this.handleGameOver({
+          winner: winner,
+          reason: 'Time Out (' + winnerName + ' won on time)',
+          urdu: winnerName === 'White' ? 'سفید کھلاڑی وقت ختم ہونے پر جیت گیا!' : 'کالا کھلاڑی وقت ختم ہونے پر جیت گیا!'
+        });
       }
 
       updateClockDisplay() {
@@ -2572,14 +3035,24 @@
         this.clearArrow();
 
         const res = this.engine.playMove(m);
+        if (m.captured) {
+          this.totalCapturesCount = (this.totalCapturesCount || 0) + 1;
+        }
 
         // Sound effects
-        if (res.isCheckmate) sound.playVictory();
-        else if (res.isCheck) sound.playCheck();
-        else if (m.promotion) sound.playPromote();
-        else if (m.isCastleKingside || m.isCastleQueenside) sound.playCastle();
-        else if (m.captured) sound.playCapture();
-        else sound.playMove();
+        if (res.status === 'gameover') {
+          // Handled inside handleGameOver
+        } else if (res.isCheck) {
+          sound.playCheck();
+        } else if (m.promotion) {
+          sound.playPromote();
+        } else if (m.isCastleKingside || m.isCastleQueenside) {
+          sound.playCastle();
+        } else if (m.captured) {
+          sound.playCapture();
+        } else {
+          sound.playMove();
+        }
 
         this.renderBoard();
         this.updateMoveTable();
@@ -2741,45 +3214,83 @@
           }
         }
 
-        const capturedByWhite = []; // Black pieces taken
-        const capturedByBlack = []; // White pieces taken
+        // White captures Black's pieces:
+        const whiteCapturedMap = {};
+        // Black captures White's pieces:
+        const blackCapturedMap = {};
 
         for (const type of ['Q', 'R', 'B', 'N', 'P']) {
-          const diffW = (initialCounts[type] || 0) - (currentBlack[type] || 0);
-          for (let i = 0; i < diffW; i++) capturedByWhite.push('b' + type);
+          const lostBlack = (initialCounts[type] || 0) - (currentBlack[type] || 0);
+          if (lostBlack > 0) whiteCapturedMap['b' + type] = lostBlack;
 
-          const diffB = (initialCounts[type] || 0) - (currentWhite[type] || 0);
-          for (let i = 0; i < diffB; i++) capturedByBlack.push('w' + type);
+          const lostWhite = (initialCounts[type] || 0) - (currentWhite[type] || 0);
+          if (lostWhite > 0) blackCapturedMap['w' + type] = lostWhite;
         }
 
-        // Material score difference
+        // Material score difference (White total material minus Black total material)
         let whiteMaterial = 0, blackMaterial = 0;
         for (const [t, cnt] of Object.entries(currentWhite)) whiteMaterial += cnt * PIECE_VALS[t];
         for (const [t, cnt] of Object.entries(currentBlack)) blackMaterial += cnt * PIECE_VALS[t];
         const diff = Math.round((whiteMaterial - blackMaterial) / 100);
 
-        const renderTray = (trayEl, list, showAdvantage) => {
+        const renderShelf = (trayEl, advEl, labelEl, capturedMap, labelText, advDiff) => {
+          if (!trayEl) return;
           trayEl.innerHTML = '';
-          list.forEach(pieceCode => {
-            const span = document.createElement('span');
-            span.className = 'captured-piece-mini';
-            span.innerHTML = PIECE_SVGS[pieceCode];
-            trayEl.appendChild(span);
-          });
-          if (showAdvantage && diff !== 0) {
-            const advSpan = document.createElement('span');
-            advSpan.className = 'material-advantage';
-            advSpan.textContent = (diff > 0 ? '+' : '') + diff;
-            trayEl.appendChild(advSpan);
+          if (labelEl) labelEl.textContent = labelText;
+
+          const keys = Object.keys(capturedMap);
+          if (keys.length === 0) {
+            const emptySpan = document.createElement('span');
+            emptySpan.style.fontSize = '0.75rem';
+            emptySpan.style.color = 'var(--text-muted)';
+            emptySpan.style.fontStyle = 'italic';
+            emptySpan.textContent = 'None yet (ابھی کوئی مہرہ نہیں گرا)';
+            trayEl.appendChild(emptySpan);
+          } else {
+            keys.forEach(pieceCode => {
+              const count = capturedMap[pieceCode];
+              const chip = document.createElement('div');
+              chip.className = 'captured-piece-chip';
+              chip.title = pieceCode[1] + ' × ' + count;
+
+              const svgWrap = document.createElement('div');
+              svgWrap.style.width = '20px';
+              svgWrap.style.height = '20px';
+              svgWrap.style.display = 'flex';
+              svgWrap.style.alignItems = 'center';
+              svgWrap.style.justifyContent = 'center';
+              svgWrap.innerHTML = PIECE_SVGS[pieceCode];
+              chip.appendChild(svgWrap);
+
+              if (count > 1) {
+                const countBadge = document.createElement('span');
+                countBadge.className = 'captured-count-badge';
+                countBadge.textContent = '×' + count;
+                chip.appendChild(countBadge);
+              }
+
+              trayEl.appendChild(chip);
+            });
+          }
+
+          if (advEl) {
+            if (advDiff > 0) {
+              advEl.style.display = 'inline-block';
+              advEl.textContent = '+' + advDiff;
+            } else {
+              advEl.style.display = 'none';
+            }
           }
         };
 
         if (this.boardFlipped) {
-          renderTray(this.topCapturedTray, capturedByBlack, diff < 0);
-          renderTray(this.bottomCapturedTray, capturedByWhite, diff > 0);
+          // Top player is White, Bottom player is Black
+          renderShelf(this.topCapturedTray, this.topAdvantage, this.topCapturedLabel, whiteCapturedMap, 'White Captured (سفید کے مہرے):', diff > 0 ? diff : 0);
+          renderShelf(this.bottomCapturedTray, this.bottomAdvantage, this.bottomCapturedLabel, blackCapturedMap, 'Black Captured (کالے کے مہرے):', diff < 0 ? Math.abs(diff) : 0);
         } else {
-          renderTray(this.topCapturedTray, capturedByWhite, diff > 0);
-          renderTray(this.bottomCapturedTray, capturedByBlack, diff < 0);
+          // Top player is Black, Bottom player is White
+          renderShelf(this.topCapturedTray, this.topAdvantage, this.topCapturedLabel, blackCapturedMap, 'Black Captured (کالے کے مہرے):', diff < 0 ? Math.abs(diff) : 0);
+          renderShelf(this.bottomCapturedTray, this.bottomAdvantage, this.bottomCapturedLabel, whiteCapturedMap, 'White Captured (سفید کے مہرے):', diff > 0 ? diff : 0);
         }
       }
 
@@ -2810,35 +3321,125 @@
         this.updateMoveTable();
         this.updateEvalBar();
         this.updateCoachBar();
+        this.updateCapturedTrays();
+      }
+
+      generatePgn() {
+        const date = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
+        let pgn = `[Event "AI Smarts Grandmaster Chess"]\n[Site "AI Smarts"]\n[Date "${date}"]\n[White "${this.gameMode === 'ai' ? 'Player' : 'Player 1'}"]\n[Black "${this.gameMode === 'ai' ? 'Stockfish AI' : 'Player 2'}"]\n\n`;
+        const history = this.engine.history;
+        for (let i = 0; i < history.length; i += 2) {
+          const moveNum = Math.floor(i / 2) + 1;
+          const w = history[i] ? history[i].san : '';
+          const b = history[i + 1] ? history[i + 1].san : '';
+          pgn += `${moveNum}. ${w} ${b} `.trim() + ' ';
+        }
+        return pgn.trim();
+      }
+
+      detectOpening() {
+        const h = this.engine.history;
+        if (!h || h.length === 0) return 'Standard Opening';
+        const m1 = h[0] ? h[0].san : '';
+        const m2 = h[1] ? h[1].san : '';
+        const m3 = h[2] ? h[2].san : '';
+        const m4 = h[3] ? h[3].san : '';
+        const m5 = h[4] ? h[4].san : '';
+
+        if (m1 === 'e4' && m2 === 'e5') {
+          if (m3 === 'Nf3' && m4 === 'Nc6') {
+            if (m5 === 'Bb5') return 'Ruy Lopez (Spanish)';
+            if (m5 === 'Bc4') return 'Italian Game';
+            if (m5 === 'd4') return 'Scotch Game';
+            return "King's Knight Opening";
+          }
+          return "King's Pawn Game";
+        }
+        if (m1 === 'e4' && m2 === 'c5') return 'Sicilian Defence';
+        if (m1 === 'e4' && m2 === 'e6') return 'French Defence';
+        if (m1 === 'e4' && m2 === 'c6') return 'Caro-Kann Defence';
+        if (m1 === 'd4' && m2 === 'd5') {
+          if (m3 === 'c4') return "Queen's Gambit";
+          return "Queen's Pawn Game";
+        }
+        if (m1 === 'd4' && m2 === 'Nf6') return 'Indian Defence';
+        if (m1 === 'c4') return 'English Opening';
+        if (m1 === 'Nf3') return 'Réti Opening';
+        return 'Standard Opening';
       }
 
       handleGameOver(res) {
         clearInterval(this.timerInterval);
-        const icon = document.getElementById('gameOverIcon');
-        const title = document.getElementById('gameOverTitle');
-        const reason = document.getElementById('gameOverReason');
-        const urdu = document.getElementById('gameOverUrdu');
+        this.isGameOver = true;
+
+        // Calculate match metrics
+        const totalDurationSec = Math.max(1, Math.floor((Date.now() - this.gameStartTime) / 1000));
+        const durMin = Math.floor(totalDurationSec / 60);
+        const durSec = totalDurationSec % 60;
+        const timeFormatted = (durMin < 10 ? '0' : '') + durMin + ':' + (durSec < 10 ? '0' : '') + durSec;
+
+        const totalMoves = Math.floor(this.engine.history.length / 2) + (this.engine.history.length % 2 !== 0 ? 1 : 0);
+        const openingName = this.detectOpening();
+
+        if (this.summaryTime) this.summaryTime.textContent = timeFormatted;
+        if (this.summaryMoves) this.summaryMoves.textContent = totalMoves + (totalMoves === 1 ? ' Move' : ' Moves');
+        if (this.summaryCaptures) this.summaryCaptures.textContent = (this.totalCapturesCount || 0) + ' Pieces';
+        if (this.summaryOpening) this.summaryOpening.textContent = openingName;
+
+        const isAi = this.gameMode === 'ai';
 
         if (res.winner === 'w') {
-          icon.textContent = '🏆';
-          title.textContent = 'Victory for White!';
-          reason.textContent = res.reason;
-          urdu.textContent = 'سفید مہروں نے شاندار انداز میں فتح حاصل کی!';
+          if (isAi) {
+            this.gameOverCard.className = 'modal-card game-over-card victory';
+            this.gameOverBadge.textContent = '🏆 CHECKMATE — GRAND VICTORY';
+            this.gameOverIcon.textContent = '🏆';
+            this.gameOverTitle.textContent = 'Victory! Shandar Fatah!';
+            this.gameOverReason.textContent = res.reason || 'By Checkmate';
+            this.gameOverUrdu.textContent = 'مبارک ہو! آپ نے کمپیوٹر کو شکست دے کر شاندار فتح حاصل کی۔';
+            sound.playVictory();
+            this.confetti.start();
+          } else {
+            this.gameOverCard.className = 'modal-card game-over-card victory';
+            this.gameOverBadge.textContent = '🏆 WHITE VICTORY';
+            this.gameOverIcon.textContent = '👑';
+            this.gameOverTitle.textContent = 'White Wins The Match!';
+            this.gameOverReason.textContent = res.reason || 'By Checkmate';
+            this.gameOverUrdu.textContent = 'سفید کھلاڑی نے شاندار حکمت عملی سے بازی جیت لی!';
+            sound.playVictory();
+            this.confetti.start();
+          }
         } else if (res.winner === 'b') {
-          icon.textContent = this.gameMode === 'ai' ? '🤖' : '🏆';
-          title.textContent = this.gameMode === 'ai' ? 'Stockfish AI Won!' : 'Victory for Black!';
-          reason.textContent = res.reason;
-          urdu.textContent = 'کالے مہروں نے بازی جیت لی!';
+          if (isAi) {
+            this.gameOverCard.className = 'modal-card game-over-card defeat';
+            this.gameOverBadge.textContent = '💀 DEFEAT — AI VICTORY';
+            this.gameOverIcon.textContent = '🤖';
+            this.gameOverTitle.textContent = 'Stockfish AI Won';
+            this.gameOverReason.textContent = res.reason || 'By Checkmate';
+            this.gameOverUrdu.textContent = 'حوصلہ مت ہاریں! اپنی غلطیوں کا تجزیہ کریں اور دوبارہ کوشش کریں۔';
+            sound.playDefeat();
+          } else {
+            this.gameOverCard.className = 'modal-card game-over-card victory';
+            this.gameOverBadge.textContent = '🏆 BLACK VICTORY';
+            this.gameOverIcon.textContent = '👑';
+            this.gameOverTitle.textContent = 'Black Wins The Match!';
+            this.gameOverReason.textContent = res.reason || 'By Checkmate';
+            this.gameOverUrdu.textContent = 'کالے کھلاڑی نے زبردست کھیل پیش کرتے ہوئے جیت حاصل کی!';
+            sound.playVictory();
+            this.confetti.start();
+          }
         } else {
-          icon.textContent = '🤝';
-          title.textContent = "It's a Draw!";
-          reason.textContent = res.reason;
-          urdu.textContent = 'میچ برابری (Draw) پر ختم ہوا!';
+          this.gameOverCard.className = 'modal-card game-over-card draw';
+          this.gameOverBadge.textContent = '🤝 MATCH DRAWN (برابری)';
+          this.gameOverIcon.textContent = '🤝';
+          this.gameOverTitle.textContent = "It's a Draw!";
+          this.gameOverReason.textContent = res.reason || 'Drawn Position';
+          this.gameOverUrdu.textContent = res.urdu || 'میچ برابری (Draw) پر ختم ہوا، دونوں کھلاڑیوں نے سخت مقابلہ کیا۔';
+          sound.playDraw();
         }
 
         setTimeout(() => {
           this.gameOverModal.classList.add('active');
-        }, 600);
+        }, 500);
       }
 
       renderMiniBoard(pieceType) {
