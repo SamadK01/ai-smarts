@@ -4,250 +4,344 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="alternate icon" type="image/png" href="favicon.png">
 
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Angry Bird Hunt — AI Smarts</title>
-<meta name="description" content="A fun, fast-paced arcade shooting game featuring cartoonish angry birds, custom crosshairs, recoil, combos, and Web Audio sound effects.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@700;800&family=Bricolage+Grotesque:opsz,wght@12..96,500;700;800&family=Geist+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0b0c10;
-    --card: rgba(18, 22, 31, 0.92);
-    --border: rgba(53, 243, 223, 0.28);
-    --text: #f0ebe1;
-    --muted: #8c93a4;
-    --cyan: #35f3df;
-    --cyan-glow: rgba(53, 243, 223, 0.45);
-    --amber: #ffb732;
-    --coral: #ff4757;
-    --gold: #ffd32a;
-    --mono: "Geist Mono", ui-monospace, "SF Mono", monospace;
-    --display: "Funnel Display", "Bricolage Grotesque", sans-serif;
-    --body: "Bricolage Grotesque", sans-serif;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
-  html, body {
-    width: 100%; height: 100%; overflow: hidden;
-    background: var(--bg); color: var(--text);
-    font-family: var(--body);
-    touch-action: none;
-    cursor: none; /* Custom in-canvas crosshair */
-  }
-  canvas {
-    position: fixed; inset: 0; width: 100%; height: 100%;
-    display: block; z-index: 1;
-  }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Angry Birds: Piggy Island Hunt — AI Smarts</title>
+  <meta name="description" content="Authentic Angry Birds arcade game with procedural vector Red, Chuck, Bomb, The Blues, King Pig & TNT explosions. 3 weapons, combos, and Web Audio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,600;700;800&family=Geist+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0369a1;
+      --card: rgba(15, 23, 42, 0.94);
+      --border: rgba(248, 113, 113, 0.35);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --red: #ef4444;
+      --red-glow: rgba(239, 68, 68, 0.5);
+      --yellow: #facc15;
+      --amber: #f59e0b;
+      --green: #84cc16;
+      --cyan: #38bdf8;
+      --gold: #ffd32a;
+      --mono: "Geist Mono", ui-monospace, "SF Mono", monospace;
+      --display: "Funnel Display", "Bricolage Grotesque", sans-serif;
+      --body: "Bricolage Grotesque", sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      background: var(--bg); color: var(--text);
+      font-family: var(--body);
+      touch-action: none;
+      cursor: none; /* Custom in-canvas crosshair */
+    }
+    canvas {
+      position: fixed; inset: 0; width: 100%; height: 100%;
+      display: block; z-index: 1;
+    }
 
-  /* TOP HUD */
-  .hud {
-    position: fixed; inset: 0; pointer-events: none; z-index: 10;
-    font: 12px/1.4 var(--mono); color: var(--muted);
-  }
-  .hud > * { pointer-events: auto; }
+    /* TOP HUD */
+    .hud {
+      position: fixed; inset: 0; pointer-events: none; z-index: 10;
+      font: 12px/1.4 var(--mono); color: var(--muted);
+    }
+    .hud > * { pointer-events: auto; }
 
-  .top-bar {
-    position: absolute; top: 16px; left: 18px; right: 18px;
-    display: flex; justify-content: space-between; align-items: center;
-    gap: 10px;
-  }
-  .hud-left, .hud-right { display: flex; align-items: center; gap: 10px; }
+    .top-bar {
+      position: absolute; top: 14px; left: 16px; right: 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 10px;
+    }
+    .hud-left, .hud-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-  .home-link {
-    color: var(--text); text-decoration: none; font: 700 12px/1 var(--body);
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(14, 18, 26, 0.85); border: 1px solid rgba(255, 255, 255, 0.12);
-    padding: 7px 13px; border-radius: 999px; backdrop-filter: blur(12px);
-    transition: all 0.2s ease;
-  }
-  .home-link:hover { border-color: var(--cyan); color: #fff; }
-  .home-link span { color: var(--cyan); font-weight: 800; }
+    .home-link {
+      color: var(--text); text-decoration: none; font: 800 12px/1 var(--body);
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(15, 23, 42, 0.88); border: 1.5px solid rgba(255, 255, 255, 0.15);
+      padding: 7px 14px; border-radius: 999px; backdrop-filter: blur(14px);
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+    }
+    .home-link:hover { border-color: var(--red); color: #fff; transform: translateY(-1px); }
+    .home-link svg { width: 18px; height: 18px; display: inline-block; vertical-align: middle; }
+    .home-link span { color: var(--yellow); font-weight: 800; }
 
-  .hud-chip {
-    background: rgba(14, 18, 26, 0.85); border: 1px solid rgba(255, 255, 255, 0.12);
-    padding: 6px 14px; border-radius: 999px; backdrop-filter: blur(12px);
-    display: flex; align-items: baseline; gap: 7px;
-  }
-  .hud-chip-label { font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
-  .hud-chip-val { font: 800 17px/1 var(--mono); color: #fff; letter-spacing: -0.02em; }
-  .hud-chip-val.gold { color: var(--gold); }
-  .hud-chip-val.cyan { color: var(--cyan); }
-  .hud-chip-val.coral { color: var(--coral); }
+    .hud-chip {
+      background: rgba(15, 23, 42, 0.88); border: 1.5px solid rgba(255, 255, 255, 0.14);
+      padding: 6px 14px; border-radius: 999px; backdrop-filter: blur(14px);
+      display: flex; align-items: baseline; gap: 7px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    }
+    .hud-chip-label { font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .hud-chip-val { font: 800 17px/1 var(--mono); color: #fff; letter-spacing: -0.02em; }
+    .hud-chip-val.gold { color: var(--gold); }
+    .hud-chip-val.cyan { color: var(--cyan); }
+    .hud-chip-val.red { color: var(--red); }
+    .hud-chip-val.green { color: var(--green); }
 
-  /* Center: Countdown Timer */
-  .hud-center {
-    position: absolute; left: 50%; transform: translateX(-50%);
-  }
-  .timer-pill {
-    background: rgba(14, 18, 26, 0.9);
-    border: 1.5px solid rgba(53, 243, 223, 0.45);
-    padding: 6px 18px; border-radius: 999px;
-    display: flex; align-items: center; gap: 8px;
-    backdrop-filter: blur(16px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 15px rgba(53, 243, 223, 0.15);
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .timer-pill.urgent {
-    border-color: var(--coral);
-    animation: urgentPulse 0.6s infinite alternate ease-in-out;
-  }
-  @keyframes urgentPulse {
-    from { box-shadow: 0 0 10px rgba(255, 71, 87, 0.4); }
-    to { box-shadow: 0 0 26px rgba(255, 71, 87, 0.85); }
-  }
-  .timer-pill .t-num { font: 800 18px/1 var(--mono); color: #fff; }
-  .timer-pill .t-sub { font: 700 9px/1 var(--mono); color: var(--muted); text-transform: uppercase; }
+    /* Center Timer Pill */
+    .hud-center {
+      position: absolute; left: 50%; transform: translateX(-50%);
+    }
+    .timer-pill {
+      background: rgba(15, 23, 42, 0.92);
+      border: 2px solid var(--amber);
+      padding: 6px 18px; border-radius: 999px;
+      display: flex; align-items: center; gap: 8px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 16px rgba(245, 158, 11, 0.25);
+      transition: all 0.2s ease;
+    }
+    .timer-pill.urgent {
+      border-color: var(--red);
+      animation: urgentPulse 0.55s infinite alternate ease-in-out;
+    }
+    @keyframes urgentPulse {
+      from { box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); transform: scale(1); }
+      to { box-shadow: 0 0 28px rgba(239, 68, 68, 0.95); transform: scale(1.04); }
+    }
+    .timer-pill .t-num { font: 800 18px/1 var(--mono); color: #fff; }
+    .timer-pill .t-sub { font: 800 9.5px/1 var(--mono); color: var(--yellow); text-transform: uppercase; }
 
-  /* Ammo Indicator & Reload bar */
-  .ammo-wrap {
-    background: rgba(14, 18, 26, 0.85); border: 1px solid rgba(255, 255, 255, 0.12);
-    padding: 5px 12px; border-radius: 999px; backdrop-filter: blur(12px);
-    display: flex; align-items: center; gap: 8px;
-  }
-  .ammo-bullets { display: flex; align-items: center; gap: 3px; }
-  .bullet-pip {
-    width: 6px; height: 14px; border-radius: 2px 2px 1px 1px;
-    background: var(--cyan); box-shadow: 0 0 6px var(--cyan-glow);
-    transition: background 0.15s, opacity 0.15s;
-  }
-  .bullet-pip.spent {
-    background: rgba(255, 255, 255, 0.14); box-shadow: none;
-  }
-  .ammo-text { font: 800 12px/1 var(--mono); color: #fff; margin-left: 3px; }
+    /* Weapon Selector Pills */
+    .weapon-hud-group {
+      display: flex; align-items: center; gap: 5px;
+      background: rgba(15, 23, 42, 0.88); border: 1.5px solid rgba(255, 255, 255, 0.14);
+      padding: 3px 6px; border-radius: 999px; backdrop-filter: blur(14px);
+    }
+    .wep-pill {
+      background: transparent; border: none; color: var(--muted);
+      font: 700 11px/1 var(--mono); padding: 5px 9px; border-radius: 999px;
+      cursor: pointer; display: flex; align-items: center; gap: 4px;
+      transition: all 0.15s ease;
+    }
+    .wep-pill:hover { color: #fff; }
+    .wep-pill.active {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #fff; font-weight: 800;
+      box-shadow: 0 2px 10px rgba(239, 68, 68, 0.5);
+    }
+    .wep-pill.active.slingshot {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.5);
+    }
+    .wep-pill.active.mortar {
+      background: linear-gradient(135deg, #84cc16, #4d7c0f);
+      box-shadow: 0 2px 10px rgba(132, 204, 22, 0.5);
+    }
 
-  /* Reload bar */
-  .reload-overlay {
-    position: fixed; left: 50%; bottom: 95px; transform: translateX(-50%);
-    background: rgba(11, 14, 20, 0.94); border: 1.5px solid var(--amber);
-    border-radius: 12px; padding: 6px 14px; text-align: center;
-    box-shadow: 0 8px 25px rgba(255, 183, 50, 0.35);
-    z-index: 15; pointer-events: none; opacity: 0;
-    transition: opacity 0.15s ease;
-  }
-  .reload-overlay.show { opacity: 1; }
-  .reload-label { font: 800 10px/1 var(--mono); color: var(--amber); letter-spacing: 0.1em; margin-bottom: 4px; }
-  .reload-track {
-    width: 130px; height: 6px; background: rgba(255, 255, 255, 0.12);
-    border-radius: 999px; overflow: hidden;
-  }
-  .reload-fill {
-    height: 100%; width: 0%; background: linear-gradient(90deg, #ffb732, #ffd32a);
-    border-radius: 999px;
-  }
+    /* Ammo & Reload Button */
+    .ammo-wrap {
+      background: rgba(15, 23, 42, 0.88); border: 1.5px solid rgba(255, 255, 255, 0.14);
+      padding: 5px 12px; border-radius: 999px; backdrop-filter: blur(14px);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .ammo-bullets { display: flex; align-items: center; gap: 3px; }
+    .bullet-pip {
+      width: 6px; height: 14px; border-radius: 2px 2px 1px 1px;
+      background: var(--yellow); box-shadow: 0 0 6px rgba(250, 204, 21, 0.6);
+      transition: all 0.15s ease;
+    }
+    .bullet-pip.spent { background: rgba(255, 255, 255, 0.15); box-shadow: none; }
+    .ammo-text { font: 800 12px/1 var(--mono); color: #fff; margin-left: 3px; }
 
-  /* Bottom Controls / Keys Hint */
-  .bottom-bar {
-    position: absolute; bottom: 16px; left: 0; right: 0;
-    display: flex; justify-content: center; align-items: center; gap: 12px;
-    pointer-events: none;
-  }
-  .hint-pill {
-    background: rgba(14, 18, 26, 0.85); border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 999px; padding: 7px 18px;
-    font: 500 11px/1 var(--mono); color: var(--muted);
-    backdrop-filter: blur(14px); pointer-events: auto;
-  }
-  .hint-pill b { color: var(--cyan); font-weight: 700; }
-  .hint-pill span { color: var(--amber); font-weight: 700; }
+    .quick-reload-btn {
+      background: rgba(245, 158, 11, 0.2); border: 1px solid var(--amber);
+      color: var(--amber); font: 800 10.5px/1 var(--mono);
+      padding: 5px 10px; border-radius: 999px; cursor: pointer;
+      display: flex; align-items: center; gap: 4px; transition: all 0.15s ease;
+    }
+    .quick-reload-btn:hover { background: var(--amber); color: #000; }
 
-  /* MODAL OVERLAYS (START, PAUSE, GAMEOVER) */
-  .modal-backdrop {
-    position: fixed; inset: 0; z-index: 50;
-    background: rgba(5, 7, 10, 0.88); backdrop-filter: blur(14px);
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
-    cursor: default;
-  }
-  .modal-backdrop.show { opacity: 1; pointer-events: auto; }
+    /* Reload overlay floating center */
+    .reload-overlay {
+      position: fixed; left: 50%; bottom: 85px; transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95); border: 1.5px solid var(--amber);
+      border-radius: 14px; padding: 7px 16px; text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 25px rgba(245, 158, 11, 0.4);
+      z-index: 15; pointer-events: none; opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    .reload-overlay.show { opacity: 1; }
+    .reload-label { font: 800 11px/1 var(--mono); color: var(--amber); letter-spacing: 0.1em; margin-bottom: 5px; }
+    .reload-track {
+      width: 140px; height: 7px; background: rgba(255, 255, 255, 0.14);
+      border-radius: 999px; overflow: hidden;
+    }
+    .reload-fill {
+      height: 100%; width: 0%; background: linear-gradient(90deg, #f59e0b, #fde047);
+      border-radius: 999px;
+    }
 
-  .menu-card {
-    width: min(92vw, 480px);
-    background: radial-gradient(circle at 50% 0%, #1a2233 0%, #0d121c 85%);
-    border: 1.5px solid rgba(53, 243, 223, 0.4);
-    border-radius: 26px; padding: 30px 26px; text-align: center;
-    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 45px rgba(53, 243, 223, 0.18);
-    transform: scale(0.95); transition: transform 0.25s cubic-bezier(0.18, 1, 0.22, 1);
-  }
-  .modal-backdrop.show .menu-card { transform: scale(1); }
+    /* Bottom Key Hints */
+    .bottom-bar {
+      position: absolute; bottom: 14px; left: 0; right: 0;
+      display: flex; justify-content: center; align-items: center; gap: 12px;
+      pointer-events: none;
+    }
+    .hint-pill {
+      background: rgba(15, 23, 42, 0.88); border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px; padding: 7px 18px;
+      font: 600 11px/1 var(--mono); color: var(--muted);
+      backdrop-filter: blur(14px); pointer-events: auto;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+    }
+    .hint-pill b { color: var(--red); font-weight: 800; }
+    .hint-pill span { color: var(--yellow); font-weight: 800; }
 
-  .menu-logo-tag {
-    font: 800 10.5px/1 var(--mono); color: var(--cyan);
-    letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 4px;
-  }
-  .menu-title {
-    font: 800 36px/1 var(--display); color: #fff;
-    letter-spacing: -0.04em; margin-bottom: 8px;
-  }
-  .menu-title em { font-style: normal; color: var(--cyan); text-shadow: 0 0 20px var(--cyan-glow); }
-  .menu-desc { font: 500 13px/1.45 var(--body); color: var(--muted); margin-bottom: 22px; }
+    /* MODAL OVERLAYS (START, PAUSE, GAMEOVER) */
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 50;
+      background: radial-gradient(circle at center, rgba(15, 23, 42, 0.85) 0%, rgba(2, 6, 23, 0.95) 100%);
+      backdrop-filter: blur(16px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+      cursor: default; padding: 16px;
+    }
+    .modal-backdrop.show { opacity: 1; pointer-events: auto; }
 
-  /* Option Section */
-  .opt-section { margin-bottom: 18px; text-align: left; }
-  .opt-label {
-    font: 700 11px/1 var(--mono); color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
-    display: flex; justify-content: space-between;
-  }
-  .btn-group {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-  }
-  .btn-group.four { grid-template-columns: repeat(4, 1fr); }
+    .menu-card {
+      width: min(94vw, 520px);
+      max-height: 90vh; overflow-y: auto;
+      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 90%);
+      border: 2px solid rgba(239, 68, 68, 0.5);
+      border-radius: 28px; padding: 28px 24px; text-align: center;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 50px rgba(239, 68, 68, 0.25);
+      transform: scale(0.94); transition: transform 0.25s cubic-bezier(0.18, 1, 0.22, 1);
+    }
+    .modal-backdrop.show .menu-card { transform: scale(1); }
 
-  .select-btn {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 12px; color: var(--text); padding: 10px 6px;
-    font: 700 12px/1 var(--mono); cursor: pointer;
-    transition: all 0.18s ease; text-align: center;
-  }
-  .select-btn:hover { border-color: rgba(53, 243, 223, 0.5); background: rgba(53, 243, 223, 0.08); }
-  .select-btn.active {
-    background: linear-gradient(135deg, rgba(53, 243, 223, 0.22), rgba(14, 165, 233, 0.25));
-    border-color: var(--cyan); color: #fff;
-    box-shadow: 0 0 15px rgba(53, 243, 223, 0.35);
-  }
+    /* Logo Hero Branding */
+    .angry-logo-hero {
+      display: flex; align-items: center; justify-content: center; gap: 14px;
+      margin-bottom: 12px;
+    }
+    .angry-logo-svg {
+      width: 74px; height: 74px;
+      filter: drop-shadow(0 8px 16px rgba(239, 68, 68, 0.6));
+      animation: heroFloat 3s infinite ease-in-out alternate;
+    }
+    .angry-pig-svg {
+      width: 64px; height: 64px;
+      filter: drop-shadow(0 8px 16px rgba(132, 204, 22, 0.6));
+      animation: heroFloat 3s infinite ease-in-out alternate-reverse;
+    }
+    @keyframes heroFloat {
+      from { transform: translateY(0) rotate(-2deg); }
+      to { transform: translateY(-6px) rotate(3deg); }
+    }
 
-  .primary-btn {
-    width: 100%; background: linear-gradient(135deg, #35f3df, #0ea5e9);
-    border: 0; border-radius: 999px; color: #05101a;
-    font: 800 15px/1 var(--body); padding: 15px 24px; cursor: pointer;
-    box-shadow: 0 8px 25px rgba(53, 243, 223, 0.4); margin-top: 8px;
-    transition: transform 0.18s, box-shadow 0.18s;
-  }
-  .primary-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(53, 243, 223, 0.6); }
+    .menu-title-wrap { margin-bottom: 12px; }
+    .menu-badge {
+      display: inline-block;
+      background: linear-gradient(90deg, #ef4444, #f59e0b);
+      color: #fff; font: 900 10.5px/1 var(--mono);
+      padding: 4px 12px; border-radius: 999px; letter-spacing: 0.16em;
+      text-transform: uppercase; margin-bottom: 6px;
+      box-shadow: 0 3px 12px rgba(239, 68, 68, 0.4);
+    }
+    .menu-title {
+      font: 900 34px/1.05 var(--display); color: #fff;
+      letter-spacing: -0.03em; text-transform: uppercase;
+      text-shadow: 0 4px 18px rgba(0, 0, 0, 0.8);
+    }
+    .menu-title span { color: var(--yellow); text-shadow: 0 0 20px rgba(250, 204, 21, 0.6); }
+    .menu-desc { font: 600 13px/1.45 var(--body); color: var(--muted); margin-bottom: 18px; }
 
-  /* GAMEOVER STATS */
-  .gameover-grade {
-    font: 800 68px/1 var(--display); color: var(--gold);
-    text-shadow: 0 0 28px rgba(255, 215, 0, 0.6); margin: 6px 0;
-  }
-  .stats-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0 20px;
-  }
-  .stat-card {
-    background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px; padding: 12px; text-align: left;
-  }
-  .stat-card .s-lbl { font: 700 9.5px/1 var(--mono); color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
-  .stat-card .s-val { font: 800 18px/1 var(--mono); color: #fff; }
-  .stat-card .s-val.gold { color: var(--gold); }
-  .stat-card .s-val.cyan { color: var(--cyan); }
+    /* Roster Overview */
+    .roster-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px;
+      margin-bottom: 18px;
+    }
+    .roster-card {
+      background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px; padding: 8px 6px; text-align: center;
+      transition: all 0.15s ease;
+    }
+    .roster-card:hover { border-color: var(--yellow); transform: translateY(-2px); }
+    .roster-name { font: 800 11px/1 var(--display); color: #fff; }
+    .roster-sub { font: 600 9px/1 var(--mono); color: var(--yellow); margin-top: 2px; }
 
-  .high-record-tag {
-    display: inline-block; background: var(--amber); color: #020c15;
-    font: 800 10px/1 var(--mono); padding: 3px 8px; border-radius: 999px;
-    margin-left: 6px; letter-spacing: 0.05em; vertical-align: middle;
-  }
+    /* Option Section */
+    .opt-section { margin-bottom: 14px; text-align: left; }
+    .opt-label {
+      font: 700 11px/1 var(--mono); color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
+      display: flex; justify-content: space-between;
+    }
+    .btn-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .btn-group.four { grid-template-columns: repeat(4, 1fr); }
 
-  @media (max-width: 640px) {
-    .top-bar { top: 10px; left: 10px; right: 10px; }
-    .hud-chip.extra { display: none; }
-    .btn-group.four { grid-template-columns: repeat(2, 1fr); }
-    .menu-card { padding: 22px 18px; }
-    .menu-title { font-size: 28px; }
-  }
-</style>
+    .select-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px; color: var(--text); padding: 9px 6px;
+      font: 800 12px/1 var(--body); cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .select-btn:hover { border-color: rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.08); }
+    .select-btn.active {
+      border-color: var(--yellow); color: #000;
+      background: linear-gradient(135deg, #fde047, #f59e0b);
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+    }
+
+    .primary-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+      border: none; border-radius: 16px; color: #fff;
+      font: 900 16px/1 var(--display); letter-spacing: 0.04em; text-transform: uppercase;
+      padding: 15px; cursor: pointer;
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      transition: all 0.2s cubic-bezier(0.18, 1, 0.22, 1);
+    }
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(239, 68, 68, 0.7);
+    }
+
+    /* Game Over Stats */
+    .gameover-grade {
+      font: 900 58px/1 var(--display);
+      background: linear-gradient(180deg, #ffd32a 0%, #ff4757 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 2px; filter: drop-shadow(0 6px 18px rgba(255, 71, 87, 0.4));
+    }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px; padding: 10px 12px; text-align: left;
+    }
+    .stat-card .s-lbl { font: 700 9.5px/1 var(--mono); color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+    .stat-card .s-val { font: 800 18px/1 var(--mono); color: #fff; }
+    .stat-card .s-val.gold { color: var(--gold); }
+    .stat-card .s-val.cyan { color: var(--cyan); }
+    .stat-card .s-val.green { color: var(--green); }
+    .stat-card .s-val.red { color: var(--red); }
+
+    .high-record-tag {
+      display: inline-block; background: var(--amber); color: #020c15;
+      font: 800 10px/1 var(--mono); padding: 3px 8px; border-radius: 999px;
+      margin-left: 6px; letter-spacing: 0.05em; vertical-align: middle;
+    }
+
+    @media (max-width: 640px) {
+      .top-bar { top: 8px; left: 8px; right: 8px; gap: 6px; }
+      .hud-chip.extra { display: none; }
+      .weapon-hud-group .wep-pill span.w-name { display: none; }
+      .btn-group.four { grid-template-columns: repeat(2, 1fr); }
+      .menu-card { padding: 20px 16px; border-radius: 22px; }
+      .menu-title { font-size: 26px; }
+      .angry-logo-svg { width: 56px; height: 56px; }
+      .angry-pig-svg { width: 48px; height: 48px; }
+      .roster-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
 </head>
 <body>
 
@@ -257,11 +351,25 @@
   <!-- Top Bar -->
   <div class="top-bar">
     <div class="hud-left">
-      <a class="home-link" href="index.html">← <span>AI Smarts</span></a>
+      <a class="home-link" href="index.html">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="44" fill="#dc2626" stroke="#1c1917" stroke-width="6"/>
+          <path d="M 28 66 C 35 84, 65 84, 72 66 Z" fill="#fef08a"/>
+          <ellipse cx="40" cy="46" rx="8" ry="9" fill="#fff" stroke="#1c1917" stroke-width="3"/>
+          <circle cx="43" cy="46" r="3.5" fill="#1c1917"/>
+          <ellipse cx="60" cy="46" rx="8" ry="9" fill="#fff" stroke="#1c1917" stroke-width="3"/>
+          <circle cx="57" cy="46" r="3.5" fill="#1c1917"/>
+          <path d="M 20 35 L 50 44 L 80 35 L 50 48 Z" fill="#1c1917"/>
+          <path d="M 40 48 L 60 48 L 50 62 Z" fill="#f59e0b" stroke="#1c1917" stroke-width="3"/>
+        </svg>
+        <span>AI Smarts</span>
+      </a>
+
       <div class="hud-chip">
         <span class="hud-chip-label">Score</span>
         <span class="hud-chip-val" id="hud-score">0</span>
       </div>
+
       <div class="hud-chip extra">
         <span class="hud-chip-label">High</span>
         <span class="hud-chip-val gold" id="hud-high">0</span>
@@ -277,19 +385,30 @@
       </div>
     </div>
 
-    <!-- Right HUD: Combo, Speed & Ammo -->
+    <!-- Right HUD: Weapons, Combo, Ammo -->
     <div class="hud-right">
+      <!-- Weapon Switcher -->
+      <div class="weapon-hud-group" id="weapon-hud-group">
+        <button class="wep-pill active" data-wep="shotgun" title="Hunter Shotgun [1]">
+          <span>🔫</span><span class="w-name">Shotgun</span>
+        </button>
+        <button class="wep-pill slingshot" data-wep="slingshot" title="Piercing Slingshot [2]">
+          <span>🏹</span><span class="w-name">Sling</span>
+        </button>
+        <button class="wep-pill mortar" data-wep="mortar" title="Cluster Mortar [3]">
+          <span>🚀</span><span class="w-name">Mortar</span>
+        </button>
+      </div>
+
       <div class="hud-chip">
         <span class="hud-chip-label">Combo</span>
-        <span class="hud-chip-val cyan" id="hud-combo">1x</span>
+        <span class="hud-chip-val red" id="hud-combo">1x</span>
       </div>
-      <div class="hud-chip extra">
-        <span class="hud-chip-label">Speed</span>
-        <span class="hud-chip-val" id="hud-speed-badge">1.0x</span>
-      </div>
+
       <div class="ammo-wrap">
         <div class="ammo-bullets" id="ammo-bullets"></div>
         <span class="ammo-text" id="ammo-text">8/8</span>
+        <button class="quick-reload-btn" id="quick-reload-btn">🔄 Reload</button>
       </div>
     </div>
   </div>
@@ -305,7 +424,7 @@
   <!-- Bottom Hint -->
   <div class="bottom-bar">
     <div class="hint-pill">
-      aim & <b>click to shoot</b> · <span>[R]</span> reload · <span>[P]</span> pause · <span>[1-4]</span> live speed
+      aim & <b>tap / click to shoot</b> · <span>[1-3]</span> weapons · <span>[R]</span> reload · <span>[P]</span> pause
     </div>
   </div>
 </div>
@@ -313,47 +432,141 @@
 <!-- START MENU MODAL -->
 <div class="modal-backdrop show" id="start-modal">
   <div class="menu-card">
-    <div class="menu-logo-tag">Arcade Clay & Feather Hunt</div>
-    <h1 class="menu-title">Angry <em>Bird Hunt</em></h1>
-    <p class="menu-desc">Shoot angry cartoon birds before the 60-second timer expires. Chain hits for massive combos!</p>
+    <!-- Hero Angry Logo -->
+    <div class="angry-logo-hero">
+      <!-- Red Bird SVG -->
+      <svg class="angry-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="heroRedGrad" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#ff5252"/>
+            <stop offset="65%" stop-color="#dc2626"/>
+            <stop offset="100%" stop-color="#991b1b"/>
+          </radialGradient>
+        </defs>
+        <path d="M 18 52 L 2 44 L 14 56 L 2 58 L 14 62 L 5 70 L 22 64 Z" fill="#1c1917" stroke="#0c0a09" stroke-width="2"/>
+        <path d="M 44 22 C 38 7, 49 2, 55 9 C 59 14, 53 20, 50 24 Z" fill="#dc2626" stroke="#1c1917" stroke-width="3"/>
+        <path d="M 52 22 C 58 5, 71 8, 68 18 C 66 22, 60 23, 56 24 Z" fill="#b91c1c" stroke="#1c1917" stroke-width="3"/>
+        <circle cx="54" cy="55" r="37" fill="url(#heroRedGrad)" stroke="#1c1917" stroke-width="3.5"/>
+        <path d="M 32 66 C 36 82, 64 88, 76 72 C 68 89, 38 89, 32 66 Z" fill="#fef3c7" stroke="#1c1917" stroke-width="2.5"/>
+        <circle cx="27" cy="58" r="3.5" fill="#991b1b"/>
+        <circle cx="34" cy="65" r="2.8" fill="#991b1b"/>
+        <ellipse cx="44" cy="48" rx="8" ry="9" fill="#ffffff" stroke="#1c1917" stroke-width="2.5"/>
+        <circle cx="47" cy="48" r="3.5" fill="#1c1917"/>
+        <circle cx="48.5" cy="46.5" r="1.2" fill="#ffffff"/>
+        <ellipse cx="63" cy="48" rx="8" ry="9" fill="#ffffff" stroke="#1c1917" stroke-width="2.5"/>
+        <circle cx="60" cy="48" r="3.5" fill="#1c1917"/>
+        <circle cx="61.5" cy="46.5" r="1.2" fill="#ffffff"/>
+        <path d="M 23 37 L 53 45 L 83 37 L 85 45 L 53 50 L 21 45 Z" fill="#1c1917"/>
+        <path d="M 43 51 Q 53 47 63 51 L 53 66 Z" fill="#f59e0b" stroke="#1c1917" stroke-width="2.5"/>
+        <line x1="44" y1="53" x2="62" y2="53" stroke="#b45309" stroke-width="2"/>
+      </svg>
+
+      <!-- King Pig SVG -->
+      <svg class="angry-pig-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="heroPigGrad" cx="40%" cy="40%" r="65%">
+            <stop offset="0%" stop-color="#a3e635"/>
+            <stop offset="70%" stop-color="#65a30d"/>
+            <stop offset="100%" stop-color="#3f6212"/>
+          </radialGradient>
+        </defs>
+        <!-- Pig Ears -->
+        <circle cx="28" cy="28" r="10" fill="#65a30d" stroke="#1c1917" stroke-width="3"/>
+        <circle cx="72" cy="28" r="10" fill="#65a30d" stroke="#1c1917" stroke-width="3"/>
+        <!-- Crown -->
+        <path d="M 36 24 L 42 12 L 50 18 L 58 12 L 64 24 Z" fill="#facc15" stroke="#1c1917" stroke-width="2.5"/>
+        <circle cx="50" cy="18" r="2.5" fill="#ef4444"/>
+        <!-- Body -->
+        <circle cx="50" cy="55" r="36" fill="url(#heroPigGrad)" stroke="#1c1917" stroke-width="3.5"/>
+        <!-- Snout -->
+        <ellipse cx="50" cy="60" rx="16" ry="12" fill="#84cc16" stroke="#1c1917" stroke-width="2.5"/>
+        <ellipse cx="44" cy="60" rx="3.5" ry="5" fill="#365314"/>
+        <ellipse cx="56" cy="60" rx="3.5" ry="5" fill="#365314"/>
+        <!-- Eyes -->
+        <circle cx="38" cy="44" r="8" fill="#fff" stroke="#1c1917" stroke-width="2.5"/>
+        <circle cx="40" cy="44" r="3" fill="#1c1917"/>
+        <circle cx="62" cy="44" r="9" fill="#fff" stroke="#1c1917" stroke-width="2.5"/>
+        <circle cx="60" cy="43" r="3.5" fill="#1c1917"/>
+      </svg>
+    </div>
+
+    <div class="menu-title-wrap">
+      <div class="menu-badge">🏆 PIGGY ISLAND ARCADE 🏆</div>
+      <h1 class="menu-title">Angry Birds <span>Hunt</span></h1>
+      <p class="menu-desc">Defend Piggy Island! Blast the furious flock & greedy pigs before the 60-second timer expires!</p>
+    </div>
+
+    <!-- Roster Overview -->
+    <div class="roster-grid">
+      <div class="roster-card">
+        <span style="font-size:24px;">🔴</span>
+        <div class="roster-name">Red Bird</div>
+        <div class="roster-sub">+10 pts · Fierce</div>
+      </div>
+      <div class="roster-card">
+        <span style="font-size:24px;">🟡</span>
+        <div class="roster-name">Chuck</div>
+        <div class="roster-sub">+20 pts · Mach 3</div>
+      </div>
+      <div class="roster-card">
+        <span style="font-size:24px;">💣</span>
+        <div class="roster-name">Bomb Bird</div>
+        <div class="roster-sub">+30 pts · Splash AoE</div>
+      </div>
+      <div class="roster-card">
+        <span style="font-size:24px;">🔵</span>
+        <div class="roster-name">The Blues</div>
+        <div class="roster-sub">+25 pts · Agile</div>
+      </div>
+      <div class="roster-card">
+        <span style="font-size:24px;">👑</span>
+        <div class="roster-name">King Pig</div>
+        <div class="roster-sub">+100 pts · +3s Time</div>
+      </div>
+      <div class="roster-card">
+        <span style="font-size:24px;">🧨</span>
+        <div class="roster-name">TNT Crate</div>
+        <div class="roster-sub">Chain Explosion</div>
+      </div>
+    </div>
 
     <!-- Level Selector -->
     <div class="opt-section">
       <div class="opt-label">
-        <span>Select Level</span>
-        <span id="level-desc" style="color:var(--cyan);">Slow birds, big hitboxes</span>
+        <span>Select Difficulty</span>
+        <span id="level-desc" style="color:var(--yellow);">Balanced targets, steady flights</span>
       </div>
       <div class="btn-group" id="level-group">
-        <button class="select-btn active" data-level="easy">Easy</button>
-        <button class="select-btn" data-level="medium">Medium</button>
-        <button class="select-btn" data-level="hard">Hard</button>
+        <button class="select-btn" data-level="easy">Novice</button>
+        <button class="select-btn active" data-level="medium">Medium</button>
+        <button class="select-btn" data-level="hard">Frenzy</button>
       </div>
     </div>
 
-    <!-- Speed Selector -->
+    <!-- Speed Multiplier -->
     <div class="opt-section">
       <div class="opt-label">
-        <span>Flight Speed Multiplier</span>
+        <span>Speed Multiplier</span>
         <span id="speed-desc" style="color:var(--amber);">1.0x Normal</span>
       </div>
       <div class="btn-group four" id="speed-group">
-        <button class="select-btn" data-speed="0.6">Slow</button>
-        <button class="select-btn active" data-speed="1.0">Normal</button>
-        <button class="select-btn" data-speed="1.6">Fast</button>
-        <button class="select-btn" data-speed="2.4">Turbo</button>
+        <button class="select-btn" data-speed="0.6">0.6x</button>
+        <button class="select-btn active" data-speed="1.0">1.0x</button>
+        <button class="select-btn" data-speed="1.5">1.5x</button>
+        <button class="select-btn" data-speed="2.2">2.2x</button>
       </div>
     </div>
 
-    <button class="primary-btn" id="start-btn">Start 60-Second Hunt 🎯</button>
+    <button class="primary-btn" id="start-btn">Start 60s Island Hunt 🎯</button>
   </div>
 </div>
 
 <!-- PAUSE MODAL -->
 <div class="modal-backdrop" id="pause-modal">
   <div class="menu-card">
-    <div class="menu-logo-tag">Game Paused</div>
-    <h2 class="menu-title">Hunt <em>Paused</em></h2>
-    <p class="menu-desc">Take a breather. Press [P] or click Resume to continue.</p>
+    <div class="menu-badge">GAME PAUSED</div>
+    <h2 class="menu-title" style="margin:8px 0;">Island Hunt <span>Paused</span></h2>
+    <p class="menu-desc">Catch your breath. Click resume or press [P] to return to the skies!</p>
     <button class="primary-btn" id="resume-btn" style="margin-bottom:10px;">Resume Hunt 🏹</button>
     <button class="select-btn" id="quit-btn" style="width:100%; padding:12px;">Quit to Menu</button>
   </div>
@@ -362,10 +575,10 @@
 <!-- GAMEOVER MODAL -->
 <div class="modal-backdrop" id="gameover-modal">
   <div class="menu-card">
-    <div class="menu-logo-tag">Round Completed</div>
-    <div class="gameover-grade" id="go-grade">S</div>
-    <h2 class="menu-title" style="margin-bottom:4px;">Hunt Finished!</h2>
-    <p class="menu-desc" id="go-subtitle">Outstanding marksmanship!</p>
+    <div class="menu-badge">HUNT FINISHED</div>
+    <div class="gameover-grade" id="go-grade">S+</div>
+    <h2 class="menu-title" style="margin-bottom:4px;">Round <span>Complete!</span></h2>
+    <p class="menu-desc" id="go-subtitle">Legendary Piggy Island Marksman!</p>
 
     <div class="stats-grid">
       <div class="stat-card">
@@ -382,7 +595,15 @@
       </div>
       <div class="stat-card">
         <div class="s-lbl">Best Combo</div>
-        <div class="s-val gold" id="go-combo">x1</div>
+        <div class="s-val red" id="go-combo">x1</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-lbl">Birds Popped</div>
+        <div class="s-val" id="go-birds">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-lbl">Pigs Smashed</div>
+        <div class="s-val green" id="go-pigs">0</div>
       </div>
     </div>
 
@@ -391,6 +612,9 @@
 </div>
 
 <script>
+/* ==========================================================================
+   CANVAS & HIGH-DPI RETINA INITIALIZATION
+   ========================================================================== */
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 let W = window.innerWidth;
@@ -409,70 +633,101 @@ window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
 /* ==========================================================================
-   CONFIG
+   GAME CONFIGURATION & WEAPONS ARSENAL
    ========================================================================== */
+const WEAPONS = {
+  shotgun: {
+    id: 'shotgun',
+    name: 'Hunter Shotgun',
+    icon: '🔫',
+    maxAmmo: 8,
+    pellets: 5,
+    spread: 22,
+    recoil: 16,
+    sound: 'shotgun',
+    damage: 1
+  },
+  slingshot: {
+    id: 'slingshot',
+    name: 'Golden Slingshot',
+    icon: '🏹',
+    maxAmmo: 6,
+    pellets: 1,
+    pierce: true,
+    recoil: 8,
+    sound: 'slingshot',
+    damage: 2
+  },
+  mortar: {
+    id: 'mortar',
+    name: 'Cluster Mortar',
+    icon: '🚀',
+    maxAmmo: 4,
+    pellets: 1,
+    splashRadius: 150,
+    recoil: 22,
+    sound: 'mortar',
+    damage: 3
+  }
+};
+
 const CONFIG = {
-  maxAmmo: 8,
-  reloadDuration: 1.0, // seconds
-  comboWindow: 1.6,    // seconds to chain combos
-  roundDuration: 60,   // seconds per round
+  reloadDuration: 1.0,
+  comboWindow: 1.8,
+  roundDuration: 60,
   levels: {
     easy: {
-      name: 'Easy',
-      desc: 'Slow birds, big hitboxes, relaxing',
-      birdCount: 6,
-      baseSpeed: 70,
-      scale: 1.25,
-      zigzagChance: 0.05
+      name: 'Novice',
+      desc: 'Gentle flight, larger hitboxes, ideal for warmups',
+      birdCount: 7,
+      baseSpeed: 75,
+      scale: 1.15,
+      zigzagChance: 0.08
     },
     medium: {
       name: 'Medium',
-      desc: 'Medium speed, bustling sky',
-      birdCount: 9,
-      baseSpeed: 110,
+      desc: 'Balanced targets, steady flights, active sky',
+      birdCount: 10,
+      baseSpeed: 115,
       scale: 1.0,
-      zigzagChance: 0.15
+      zigzagChance: 0.18
     },
     hard: {
-      name: 'Hard',
-      desc: 'Fast, zig-zag darts, sudden turns',
-      birdCount: 12,
-      baseSpeed: 165,
-      scale: 0.85,
-      zigzagChance: 0.35
+      name: 'Frenzy',
+      desc: 'Insane speed, sharp zig-zags, sudden reversals',
+      birdCount: 14,
+      baseSpeed: 170,
+      scale: 0.88,
+      zigzagChance: 0.38
     }
   },
   speeds: {
-    '0.6': { label: 'Slow', mult: 0.6 },
-    '1.0': { label: 'Normal', mult: 1.0 },
-    '1.6': { label: 'Fast', mult: 1.6 },
-    '2.4': { label: 'Turbo', mult: 2.4 }
-  },
-  birdSpecies: [
-    { type: 'normal', emoji: '🐦', points: 10, bonusTime: 0, weight: 35, colors: ['#38bdf8', '#0284c7', '#e0f2fe'] },
-    { type: 'normal', emoji: '🦜', points: 10, bonusTime: 0, weight: 25, colors: ['#10b981', '#059669', '#ef4444'] },
-    { type: 'normal', emoji: '🐓', points: 10, bonusTime: 0, weight: 20, colors: ['#ea580c', '#c2410c', '#fde047'] },
-    { type: 'fast',   emoji: '🐤', points: 20, bonusTime: 0, weight: 15, colors: ['#facc15', '#eab308', '#fef08a'] },
-    { type: 'fast',   emoji: '🦅', points: 20, bonusTime: 0, weight: 12, colors: ['#78716c', '#44403c', '#d6d3d1'] },
-    { type: 'golden', emoji: '🦚', points: 50, bonusTime: 3, weight: 6,  colors: ['#ffd700', '#fbbf24', '#ffffff'] }
-  ]
+    '0.6': { label: '0.6x', mult: 0.6 },
+    '1.0': { label: '1.0x', mult: 1.0 },
+    '1.5': { label: '1.5x', mult: 1.5 },
+    '2.2': { label: '2.2x', mult: 2.2 }
+  }
 };
 
 /* ==========================================================================
-   STATE
+   GAME STATE
    ========================================================================== */
 const STATE = {
-  activeScreen: 'start', // 'start' | 'playing' | 'paused' | 'gameover'
-  level: 'easy',
+  activeScreen: 'start',
+  level: 'medium',
   speedMultiplier: 1.0,
+  currentWeapon: 'shotgun',
   timeLeft: 60,
   score: 0,
   shotsFired: 0,
   shotsHit: 0,
+  birdsPopped: 0,
+  pigsSmashed: 0,
+  explosionsTriggered: 0,
   combo: 1,
   bestCombo: 1,
   comboTimer: 0,
-  ammo: CONFIG.maxAmmo,
+  ammo: WEAPONS.shotgun.maxAmmo,
   isReloading: false,
   reloadTimer: 0,
   gunRecoil: 0,
@@ -482,7 +737,7 @@ const STATE = {
 };
 
 /* ==========================================================================
-   AUDIO SYNTHESIZER (WEB AUDIO API - ZERO EXTERNAL ASSETS)
+   PROCEDURAL WEB AUDIO SYNTHESIZER (ZERO ASSETS)
    ========================================================================== */
 let audioCtx = null;
 let soundEnabled = true;
@@ -499,25 +754,25 @@ function initAudio() {
 }
 
 const sfx = {
-  gunshot() {
+  shotgun() {
     if (!soundEnabled || !audioCtx) return;
     const t = audioCtx.currentTime;
 
-    // 1. Explosive noise crack
-    const dur = 0.18;
+    // Explosive noise crack
+    const dur = 0.22;
     const buf = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * dur), audioCtx.sampleRate);
     const d = buf.getChannelData(0);
-    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (d.length * 0.18));
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (d.length * 0.16));
     const noise = audioCtx.createBufferSource();
     noise.buffer = buf;
 
     const filter = audioCtx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.setValueAtTime(1400, t);
-    filter.Q.value = 1.8;
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1800, t);
+    filter.frequency.exponentialRampToValueAtTime(300, t + dur);
 
     const gNoise = audioCtx.createGain();
-    gNoise.gain.setValueAtTime(0.3, t);
+    gNoise.gain.setValueAtTime(0.45, t);
     gNoise.gain.exponentialRampToValueAtTime(0.001, t + dur);
 
     noise.connect(filter);
@@ -525,19 +780,56 @@ const sfx = {
     gNoise.connect(audioCtx.destination);
     noise.start(t);
 
-    // 2. Heavy sub-bass body thump
+    // Deep sub-bass punch
     const osc = audioCtx.createOscillator();
     const gOsc = audioCtx.createGain();
     osc.type = 'triangle';
-    osc.frequency.setValueAtTime(180, t);
-    osc.frequency.exponentialRampToValueAtTime(35, t + 0.14);
-    gOsc.gain.setValueAtTime(0.35, t);
-    gOsc.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+    osc.frequency.setValueAtTime(170, t);
+    osc.frequency.exponentialRampToValueAtTime(32, t + 0.18);
+    gOsc.gain.setValueAtTime(0.4, t);
+    gOsc.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
 
     osc.connect(gOsc);
     gOsc.connect(audioCtx.destination);
     osc.start(t);
-    osc.stop(t + 0.18);
+    osc.stop(t + 0.22);
+  },
+
+  slingshot() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    // Elastic rubber twang
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(180, t);
+    osc.frequency.exponentialRampToValueAtTime(740, t + 0.08);
+    osc.frequency.exponentialRampToValueAtTime(260, t + 0.22);
+    g.gain.setValueAtTime(0.3, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.24);
+
+    osc.connect(g);
+    g.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 0.25);
+  },
+
+  mortar() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    // Heavy cannon thud with rocket whoosh
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(120, t);
+    osc.frequency.exponentialRampToValueAtTime(45, t + 0.28);
+    g.gain.setValueAtTime(0.4, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+
+    osc.connect(g);
+    g.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 0.32);
   },
 
   emptyClick() {
@@ -547,9 +839,10 @@ const sfx = {
     const g = audioCtx.createGain();
     osc.type = 'square';
     osc.frequency.setValueAtTime(950, t);
-    osc.frequency.exponentialRampToValueAtTime(200, t + 0.04);
-    g.gain.setValueAtTime(0.12, t);
+    osc.frequency.exponentialRampToValueAtTime(220, t + 0.04);
+    g.gain.setValueAtTime(0.14, t);
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+
     osc.connect(g);
     g.connect(audioCtx.destination);
     osc.start(t);
@@ -559,44 +852,42 @@ const sfx = {
   reloadRack() {
     if (!soundEnabled || !audioCtx) return;
     const t = audioCtx.currentTime;
-
-    // Slide ejection click
+    // Slide click
     const osc1 = audioCtx.createOscillator();
     const g1 = audioCtx.createGain();
     osc1.type = 'sawtooth';
-    osc1.frequency.setValueAtTime(500, t);
-    osc1.frequency.exponentialRampToValueAtTime(1400, t + 0.08);
-    g1.gain.setValueAtTime(0.08, t);
-    g1.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+    osc1.frequency.setValueAtTime(400, t);
+    osc1.frequency.exponentialRampToValueAtTime(1200, t + 0.07);
+    g1.gain.setValueAtTime(0.09, t);
+    g1.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
     osc1.connect(g1);
     g1.connect(audioCtx.destination);
     osc1.start(t);
-    osc1.stop(t + 0.11);
+    osc1.stop(t + 0.1);
 
-    // Solid bolt rack snap clack!
+    // Solid bolt rack clack
     const osc2 = audioCtx.createOscillator();
     const g2 = audioCtx.createGain();
     osc2.type = 'triangle';
-    osc2.frequency.setValueAtTime(280, t + 0.16);
-    osc2.frequency.exponentialRampToValueAtTime(70, t + 0.28);
-    g2.gain.setValueAtTime(0.18, t + 0.16);
-    g2.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+    osc2.frequency.setValueAtTime(320, t + 0.14);
+    osc2.frequency.exponentialRampToValueAtTime(80, t + 0.25);
+    g2.gain.setValueAtTime(0.25, t + 0.14);
+    g2.gain.exponentialRampToValueAtTime(0.001, t + 0.27);
     osc2.connect(g2);
     g2.connect(audioCtx.destination);
-    osc2.start(t + 0.16);
-    osc2.stop(t + 0.32);
+    osc2.start(t + 0.14);
+    osc2.stop(t + 0.28);
   },
 
   birdPop() {
     if (!soundEnabled || !audioCtx) return;
     const t = audioCtx.currentTime;
-    // Funny cartoon pop & comedic squawk
     const osc = audioCtx.createOscillator();
     const g = audioCtx.createGain();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(550, t);
-    osc.frequency.exponentialRampToValueAtTime(160, t + 0.12);
-    g.gain.setValueAtTime(0.2, t);
+    osc.frequency.setValueAtTime(620, t);
+    osc.frequency.exponentialRampToValueAtTime(180, t + 0.12);
+    g.gain.setValueAtTime(0.25, t);
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
     osc.connect(g);
     g.connect(audioCtx.destination);
@@ -604,45 +895,783 @@ const sfx = {
     osc.stop(t + 0.15);
   },
 
-  goldenChime() {
+  redSquawk() {
     if (!soundEnabled || !audioCtx) return;
     const t = audioCtx.currentTime;
-    // Sparkling arpeggio chime (C6 - E6 - G6 - C7)
-    const freqs = [1046.5, 1318.5, 1567.98, 2093.0];
-    freqs.forEach((f, idx) => {
-      const osc = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(f, t + idx * 0.05);
-      g.gain.setValueAtTime(0.12, t + idx * 0.05);
-      g.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.05 + 0.35);
-      osc.connect(g);
-      g.connect(audioCtx.destination);
-      osc.start(t + idx * 0.05);
-      osc.stop(t + idx * 0.05 + 0.38);
-    });
-  },
-
-  whistle() {
-    if (!soundEnabled || !audioCtx) return;
-    const t = audioCtx.currentTime;
+    // Red furious cartoon war cry
     const osc = audioCtx.createOscillator();
     const g = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(880, t);
-    osc.frequency.setValueAtTime(1200, t + 0.12);
-    osc.frequency.setValueAtTime(950, t + 0.28);
-    g.gain.setValueAtTime(0.09, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(450, t);
+    osc.frequency.linearRampToValueAtTime(750, t + 0.08);
+    osc.frequency.exponentialRampToValueAtTime(320, t + 0.2);
+    g.gain.setValueAtTime(0.18, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
     osc.connect(g);
     g.connect(audioCtx.destination);
     osc.start(t);
-    osc.stop(t + 0.48);
+    osc.stop(t + 0.24);
+  },
+
+  pigOink() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    // Comical two-tone oink
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(260, t);
+    osc.frequency.setValueAtTime(340, t + 0.08);
+    osc.frequency.exponentialRampToValueAtTime(140, t + 0.22);
+    g.gain.setValueAtTime(0.3, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.24);
+    osc.connect(g);
+    g.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 0.25);
+  },
+
+  bombExplode() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+
+    // Colossal thunderous blast
+    const dur = 0.55;
+    const buf = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * dur), audioCtx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (d.length * 0.35));
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buf;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(800, t);
+    filter.frequency.exponentialRampToValueAtTime(80, t + dur);
+
+    const gNoise = audioCtx.createGain();
+    gNoise.gain.setValueAtTime(0.65, t);
+    gNoise.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+    noise.connect(filter);
+    filter.connect(gNoise);
+    gNoise.connect(audioCtx.destination);
+    noise.start(t);
+
+    // Rumbling ground sub-bass
+    const sub = audioCtx.createOscillator();
+    const gSub = audioCtx.createGain();
+    sub.type = 'sine';
+    sub.frequency.setValueAtTime(95, t);
+    sub.frequency.exponentialRampToValueAtTime(25, t + 0.45);
+    gSub.gain.setValueAtTime(0.6, t);
+    gSub.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+
+    sub.connect(gSub);
+    gSub.connect(audioCtx.destination);
+    sub.start(t);
+    sub.stop(t + 0.52);
+  },
+
+  fanfare() {
+    if (!soundEnabled || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    const notes = [523.25, 659.25, 783.99, 1046.5];
+    notes.forEach((f, i) => {
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(f, t + i * 0.08);
+      g.gain.setValueAtTime(0.2, t + i * 0.08);
+      g.gain.exponentialRampToValueAtTime(0.001, t + i * 0.08 + 0.4);
+      osc.connect(g);
+      g.connect(audioCtx.destination);
+      osc.start(t + i * 0.08);
+      osc.stop(t + i * 0.08 + 0.42);
+    });
   }
 };
 
 /* ==========================================================================
-   ENTITIES: BIRD, PARTICLES, FLOATING TEXT
+   PARTICLE SYSTEMS: FEATHERS, EXPLOSIONS, SHELL CASINGS, COMIC FLOATING TEXTS
+   ========================================================================== */
+class FeatherParticle {
+  constructor(x, y, color) {
+    this.x = x;
+    this.y = y;
+    const ang = Math.random() * Math.PI * 2;
+    const spd = 70 + Math.random() * 200;
+    this.vx = Math.cos(ang) * spd;
+    this.vy = Math.sin(ang) * spd - 60;
+    this.color = color;
+    this.size = 5 + Math.random() * 9;
+    this.rotation = Math.random() * Math.PI * 2;
+    this.vr = (Math.random() - 0.5) * 12;
+    this.life = 0.8 + Math.random() * 0.5;
+    this.maxLife = this.life;
+  }
+  update(dt) {
+    this.vy += 220 * dt; // gravity
+    this.vx *= 0.96;
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    this.rotation += this.vr * dt;
+    this.life -= dt;
+  }
+  draw(ctx) {
+    if (this.life <= 0) return;
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
+    ctx.globalAlpha = Math.max(0, this.life / this.maxLife);
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, this.size * 1.6, this.size * 0.55, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+class ShellCasing {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.vx = (Math.random() - 0.7) * 140;
+    this.vy = -180 - Math.random() * 100;
+    this.rotation = Math.random() * Math.PI * 2;
+    this.vr = (Math.random() - 0.5) * 18;
+    this.life = 1.2;
+  }
+  update(dt) {
+    this.vy += 650 * dt;
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    this.rotation += this.vr * dt;
+    this.life -= dt;
+  }
+  draw(ctx) {
+    if (this.life <= 0) return;
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(-6, -2.5, 12, 5);
+    ctx.fillStyle = '#fde047';
+    ctx.fillRect(-6, -2.5, 3, 5);
+    ctx.restore();
+  }
+}
+
+class ExplosionParticle {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    const ang = Math.random() * Math.PI * 2;
+    const spd = 50 + Math.random() * 260;
+    this.vx = Math.cos(ang) * spd;
+    this.vy = Math.sin(ang) * spd;
+    const cols = ['#ff4500', '#ff8c00', '#ffd700', '#ffffff', '#475569'];
+    this.color = cols[Math.floor(Math.random() * cols.length)];
+    this.size = 14 + Math.random() * 24;
+    this.life = 0.45 + Math.random() * 0.35;
+    this.maxLife = this.life;
+  }
+  update(dt) {
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    this.vx *= 0.94;
+    this.vy *= 0.94;
+    this.size *= 1 + dt * 0.8;
+    this.life -= dt;
+  }
+  draw(ctx) {
+    if (this.life <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, this.life / this.maxLife);
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+class FloatingText {
+  constructor(x, y, text, color = '#ffd32a', isComic = false) {
+    this.x = x;
+    this.y = y;
+    this.text = text;
+    this.color = color;
+    this.isComic = isComic;
+    this.scale = isComic ? 1.4 : 1.0;
+    this.life = 1.1;
+    this.maxLife = this.life;
+  }
+  update(dt) {
+    this.y -= 40 * dt;
+    this.life -= dt;
+  }
+  draw(ctx) {
+    if (this.life <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, this.life / this.maxLife);
+    ctx.translate(this.x, this.y);
+    ctx.scale(this.scale, this.scale);
+    ctx.font = '900 18px "Funnel Display", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineWidth = 3.5;
+    ctx.strokeStyle = '#0f172a';
+    ctx.strokeText(this.text, 0, 0);
+    ctx.fillStyle = this.color;
+    ctx.fillText(this.text, 0, 0);
+    ctx.restore();
+  }
+}
+
+/* ==========================================================================
+   AUTHENTIC PROCEDURAL CHARACTERS RENDERERS
+   ========================================================================== */
+function drawRedBird(ctx, size, flapPhase, isHit) {
+  ctx.save();
+  const r = size * 0.5;
+
+  // Tail feathers
+  ctx.fillStyle = '#1c1917';
+  ctx.beginPath();
+  ctx.moveTo(-r * 0.9, -r * 0.1);
+  ctx.lineTo(-r * 1.4, -r * 0.3);
+  ctx.lineTo(-r * 1.1, 0);
+  ctx.lineTo(-r * 1.45, r * 0.1);
+  ctx.lineTo(-r * 0.9, r * 0.2);
+  ctx.closePath();
+  ctx.fill();
+
+  // Crest feathers on top
+  ctx.fillStyle = '#dc2626';
+  ctx.strokeStyle = '#1c1917';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(-r * 0.2, -r * 0.8);
+  ctx.quadraticCurveTo(-r * 0.4, -r * 1.4, -r * 0.1, -r * 1.3);
+  ctx.quadraticCurveTo(0, -r * 1.1, 0, -r * 0.85);
+  ctx.fill();
+  ctx.stroke();
+
+  // Round Body
+  const grad = ctx.createRadialGradient(-r * 0.2, -r * 0.2, r * 0.1, 0, 0, r);
+  grad.addColorStop(0, '#ff5252');
+  grad.addColorStop(0.7, '#dc2626');
+  grad.addColorStop(1, '#991b1b');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Cream Belly
+  ctx.fillStyle = '#fef3c7';
+  ctx.beginPath();
+  ctx.ellipse(r * 0.1, r * 0.45, r * 0.55, r * 0.38, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Dark freckles on cheek
+  ctx.fillStyle = '#991b1b';
+  ctx.beginPath();
+  ctx.arc(-r * 0.45, r * 0.1, r * 0.08, 0, Math.PI * 2);
+  ctx.arc(-r * 0.32, r * 0.22, r * 0.06, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Flapping Wing
+  const wingFlap = Math.sin(flapPhase) * 0.3;
+  ctx.save();
+  ctx.translate(-r * 0.3, r * 0.1);
+  ctx.rotate(wingFlap);
+  ctx.fillStyle = '#b91c1c';
+  ctx.strokeStyle = '#1c1917';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, r * 0.32, r * 0.18, -0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+
+  // Eyes & Angry Unibrow
+  if (isHit) {
+    // Dizzy X eyes
+    ctx.strokeStyle = '#1c1917';
+    ctx.lineWidth = 3;
+    [-r * 0.15, r * 0.22].forEach(ex => {
+      ctx.beginPath();
+      ctx.moveTo(ex - 5, -r * 0.1 - 5);
+      ctx.lineTo(ex + 5, -r * 0.1 + 5);
+      ctx.moveTo(ex + 5, -r * 0.1 - 5);
+      ctx.lineTo(ex - 5, -r * 0.1 + 5);
+      ctx.stroke();
+    });
+  } else {
+    // Left eye
+    ctx.fillStyle = '#fff';
+    ctx.strokeStyle = '#1c1917';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(-r * 0.15, -r * 0.1, r * 0.2, r * 0.24, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#1c1917';
+    ctx.beginPath();
+    ctx.arc(-r * 0.1, -r * 0.1, r * 0.08, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Right eye
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.ellipse(r * 0.22, -r * 0.1, r * 0.2, r * 0.24, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#1c1917';
+    ctx.beginPath();
+    ctx.arc(r * 0.18, -r * 0.1, r * 0.08, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Massive Thick Angular V Unibrow
+    ctx.fillStyle = '#1c1917';
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.45, -r * 0.38);
+    ctx.lineTo(r * 0.05, -r * 0.18);
+    ctx.lineTo(r * 0.52, -r * 0.38);
+    ctx.lineTo(r * 0.54, -r * 0.22);
+    ctx.lineTo(r * 0.05, -r * 0.06);
+    ctx.lineTo(-r * 0.47, -r * 0.22);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // Golden Triangular Beak
+  ctx.fillStyle = '#f59e0b';
+  ctx.strokeStyle = '#1c1917';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-r * 0.12, 0);
+  ctx.lineTo(r * 0.24, 0);
+  ctx.lineTo(r * 0.06, r * 0.34);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.strokeStyle = '#b45309';
+  ctx.beginPath();
+  ctx.moveTo(-r * 0.1, r * 0.06);
+  ctx.lineTo(r * 0.22, r * 0.06);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawChuckBird(ctx, size, flapPhase, isHit) {
+  ctx.save();
+  const r = size * 0.5;
+
+  // Supersonic wind streaks trailing behind
+  ctx.strokeStyle = 'rgba(254, 240, 138, 0.4)';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(-r * 1.5, -r * 0.3);
+  ctx.lineTo(-r * 0.8, -r * 0.3);
+  ctx.moveTo(-r * 1.8, 0);
+  ctx.lineTo(-r * 0.9, 0);
+  ctx.moveTo(-r * 1.4, r * 0.4);
+  ctx.lineTo(-r * 0.7, r * 0.4);
+  ctx.stroke();
+
+  // Spiky Black Hair Tufts on Top
+  ctx.fillStyle = '#1c1917';
+  ctx.beginPath();
+  ctx.moveTo(-r * 0.4, -r * 0.9);
+  ctx.lineTo(-r * 0.9, -r * 1.35);
+  ctx.lineTo(-r * 0.3, -r * 1.1);
+  ctx.lineTo(-r * 0.7, -r * 1.55);
+  ctx.lineTo(-r * 0.05, -r * 1.15);
+  ctx.closePath();
+  ctx.fill();
+
+  // Triangular Yellow Body
+  const grad = ctx.createLinearGradient(-r * 0.5, -r, r * 0.8, r);
+  grad.addColorStop(0, '#fef08a');
+  grad.addColorStop(0.5, '#facc15');
+  grad.addColorStop(1, '#eab308');
+  ctx.fillStyle = grad;
+  ctx.strokeStyle = '#1c1917';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(r * 0.7, r * 0.6);
+  ctx.lineTo(-r * 0.75, r * 0.7);
+  ctx.quadraticCurveTo(-r * 0.6, -r * 0.2, 0, -r * 1.05);
+  ctx.quadraticCurveTo(r * 0.4, -r * 0.1, r * 0.7, r * 0.6);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // White chest patch
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.ellipse(-r * 0.05, r * 0.48, r * 0.45, r * 0.25, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Eyes
+  if (isHit) {
+    ctx.strokeStyle = '#1c1917';
+    ctx.lineWidth = 3;
+    [-r * 0.08, r * 0.22].forEach(ex => {
+      ctx.beginPath();
+      ctx.moveTo(ex - 4, -r * 0.1 - 4);
+      ctx.lineTo(ex + 4, -r * 0.1 + 4);
+      ctx.moveTo(ex + 4, -r * 0.1 - 4);
+      ctx.lineTo(ex - 4, -r * 0.1 + 4);
+      ctx.stroke();
+    });
+  } else {
+    ctx.fillStyle = '#fff';
+    ctx.strokeStyle = '#1c1917';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(-r * 0.08, -r * 0.1, r * 0.18, r * 0.22, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#1c1917';
+    ctx.beginPath();
+    ctx.arc(-r * 0.04, -r * 0.1, r * 0.07, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.ellipse(r * 0.22, -r * 0.1, r * 0.18, r * 0.22, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#1c1917';
+    ctx.beginPath();
+    ctx.arc(r * 0.18, -r * 0.1, r * 0.07, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Sharp angled eyebrows
+    ctx.fillStyle = '#1c1917';
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.3, -r * 0.32);
+    ctx.lineTo(r * 0.06, -r * 0.15);
+    ctx.lineTo(-r * 0.3, -r * 0.2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(r * 0.42, -r * 0.32);
+    ctx.lineTo(r * 0.08, -r * 0.15);
+    ctx.lineTo(r * 0.42, -r * 0.2);
+    ctx.fill();
+  }
+
+  // Long Pointed Orange Beak
+  ctx.fillStyle = '#f97316';
+  ctx.strokeStyle = '#1c1917';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, -r * 0.02);
+  ctx.lineTo(r * 0.55, r * 0.06);
+  ctx.lineTo(0, r * 0.22);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawBombBird(ctx, size, flapPhase, isHit, time) {
+  ctx.save();
+  const r = size * 0.55;
+
+  // Animated Fuse on Top
+  const fuseSpark = Math.sin(time * 25) > 0;
+  ctx.strokeStyle = '#78716c';
+  ctx.lineWidth = 3.5;
+  ctx.beginPath();
+  ctx.moveTo(0, -r * 0.85);
+  ctx.quadraticCurveTo(r * 0.2, -r * 1.3, r * 0.05, -r * 1.45);
+  ctx.stroke();
+
+  // Sparkling Fuse Flame
+  ctx.fillStyle = fuseSpark ? '#facc15' : '#ef4444';
+  ctx.shadowColor = '#f59e0b';
+  ctx.shadowBlur = 12;
+  ctx.beginPath();
+  ctx.arc(r * 0.05, -r * 1.45, fuseSpark ? 6 : 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Round Charcoal Body
+  const grad = ctx.createRadialGradient(-r * 0.2, -r * 0.2, r * 0.1, 0, 0, r);
+  grad.addColorStop(0, '#475569');
+  grad.addColorStop(0.6, '#1e293b');
+  grad.addColorStop(1, '#0f172a');
+  ctx.fillStyle = grad;
+  ctx.strokeStyle = '#020617';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Grey belly
+  ctx.fillStyle = '#334155';
+  ctx.beginPath();
+  ctx.ellipse(0, r * 0.45, r * 0.5, r * 0.32, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // White forehead dot
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(0, -r * 0.42, r * 0.1, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Fiery Red Eyebrows
+  ctx.fillStyle = '#ef4444';
+  ctx.beginPath();
+  ctx.moveTo(-r * 0.45, -r * 0.35);
+  ctx.lineTo(0, -r * 0.18);
+  ctx.lineTo(r * 0.45, -r * 0.35);
+  ctx.lineTo(0, -r * 0.08);
+  ctx.closePath();
+  ctx.fill();
+
+  // Eyes
+  if (isHit) {
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 3;
+    [-r * 0.18, r * 0.18].forEach(ex => {
+      ctx.beginPath();
+      ctx.moveTo(ex - 5, -r * 0.08 - 5);
+      ctx.lineTo(ex + 5, -r * 0.08 + 5);
+      ctx.moveTo(ex + 5, -r * 0.08 - 5);
+      ctx.lineTo(ex - 5, -r * 0.08 + 5);
+      ctx.stroke();
+    });
+  } else {
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.ellipse(-r * 0.16, -r * 0.08, r * 0.16, r * 0.2, 0, 0, Math.PI * 2);
+    ctx.ellipse(r * 0.16, -r * 0.08, r * 0.16, r * 0.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#0f172a';
+    ctx.beginPath();
+    ctx.arc(-r * 0.12, -r * 0.08, r * 0.07, 0, Math.PI * 2);
+    ctx.arc(r * 0.12, -r * 0.08, r * 0.07, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Sharp Yellow Beak
+  ctx.fillStyle = '#f59e0b';
+  ctx.strokeStyle = '#1c1917';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-r * 0.15, 0);
+  ctx.lineTo(r * 0.15, 0);
+  ctx.lineTo(0, r * 0.3);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawBlueBird(ctx, size, flapPhase, isHit) {
+  ctx.save();
+  const r = size * 0.42;
+
+  // Round Cyan Body
+  const grad = ctx.createRadialGradient(-r * 0.2, -r * 0.2, r * 0.1, 0, 0, r);
+  grad.addColorStop(0, '#7dd3fc');
+  grad.addColorStop(0.7, '#0284c7');
+  grad.addColorStop(1, '#0369a1');
+  ctx.fillStyle = grad;
+  ctx.strokeStyle = '#1c1917';
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Orange cheeks
+  ctx.fillStyle = 'rgba(251, 146, 60, 0.4)';
+  ctx.beginPath();
+  ctx.arc(-r * 0.4, r * 0.15, r * 0.15, 0, Math.PI * 2);
+  ctx.arc(r * 0.4, r * 0.15, r * 0.15, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Eyes & Beak
+  ctx.fillStyle = '#fff';
+  ctx.strokeStyle = '#1c1917';
+  ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  ctx.ellipse(-r * 0.16, -r * 0.1, r * 0.18, r * 0.22, 0, 0, Math.PI * 2);
+  ctx.ellipse(r * 0.16, -r * 0.1, r * 0.18, r * 0.22, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#1c1917';
+  ctx.beginPath();
+  ctx.arc(-r * 0.12, -r * 0.1, r * 0.08, 0, Math.PI * 2);
+  ctx.arc(r * 0.12, -r * 0.1, r * 0.08, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Tiny furious brows
+  ctx.fillStyle = '#1c1917';
+  ctx.beginPath();
+  ctx.moveTo(-r * 0.38, -r * 0.28);
+  ctx.lineTo(r * 0.38, -r * 0.28);
+  ctx.lineTo(0, -r * 0.12);
+  ctx.closePath();
+  ctx.fill();
+
+  // Orange Beak
+  ctx.fillStyle = '#ea580c';
+  ctx.beginPath();
+  ctx.moveTo(-r * 0.12, 0);
+  ctx.lineTo(r * 0.12, 0);
+  ctx.lineTo(0, r * 0.26);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawKingPig(ctx, size, flapPhase, isHit, time) {
+  ctx.save();
+  const r = size * 0.52;
+
+  // Floating party balloon string
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(0, -r * 0.9);
+  ctx.quadraticCurveTo(Math.sin(time * 3) * 12, -r * 1.5, 0, -r * 2.1);
+  ctx.stroke();
+
+  // Balloon
+  ctx.fillStyle = '#ef4444';
+  ctx.strokeStyle = '#991b1b';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(0, -r * 2.3, r * 0.45, r * 0.55, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Crown
+  ctx.fillStyle = '#facc15';
+  ctx.strokeStyle = '#ca8a04';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-r * 0.35, -r * 0.85);
+  ctx.lineTo(-r * 0.4, -r * 1.15);
+  ctx.lineTo(-r * 0.15, -r * 0.95);
+  ctx.lineTo(0, -r * 1.25);
+  ctx.lineTo(r * 0.15, -r * 0.95);
+  ctx.lineTo(r * 0.4, -r * 1.15);
+  ctx.lineTo(r * 0.35, -r * 0.85);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Round Lime-Green Pig Body
+  const grad = ctx.createRadialGradient(-r * 0.2, -r * 0.2, r * 0.1, 0, 0, r);
+  grad.addColorStop(0, '#bef264');
+  grad.addColorStop(0.6, '#84cc16');
+  grad.addColorStop(1, '#4d7c0f');
+  ctx.fillStyle = grad;
+  ctx.strokeStyle = '#1c1917';
+  ctx.lineWidth = 2.8;
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Ears
+  ctx.fillStyle = '#65a30d';
+  ctx.beginPath();
+  ctx.arc(-r * 0.6, -r * 0.55, r * 0.22, 0, Math.PI * 2);
+  ctx.arc(r * 0.6, -r * 0.55, r * 0.22, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Snout
+  ctx.fillStyle = '#a3e635';
+  ctx.strokeStyle = '#1c1917';
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.ellipse(0, r * 0.12, r * 0.36, r * 0.26, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Nostrils
+  ctx.fillStyle = '#365314';
+  ctx.beginPath();
+  ctx.ellipse(-r * 0.14, r * 0.12, r * 0.07, r * 0.1, 0, 0, Math.PI * 2);
+  ctx.ellipse(r * 0.14, r * 0.12, r * 0.07, r * 0.1, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Goofy Mismatched Eyes
+  ctx.fillStyle = '#fff';
+  ctx.strokeStyle = '#1c1917';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(-r * 0.28, -r * 0.22, r * 0.18, 0, Math.PI * 2);
+  ctx.arc(r * 0.28, -r * 0.22, r * 0.22, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#1c1917';
+  ctx.beginPath();
+  ctx.arc(-r * 0.26, -r * 0.22, r * 0.07, 0, Math.PI * 2);
+  ctx.arc(r * 0.3, -r * 0.22, r * 0.08, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawTNTCrate(ctx, size, time) {
+  ctx.save();
+  const s = size * 0.8;
+
+  // Floating red-striped balloon
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(0, -s * 0.5);
+  ctx.lineTo(0, -s * 1.5);
+  ctx.stroke();
+
+  ctx.fillStyle = '#ef4444';
+  ctx.beginPath();
+  ctx.ellipse(0, -s * 1.7, s * 0.38, s * 0.48, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Wooden Dynamite Crate
+  ctx.fillStyle = '#dc2626';
+  ctx.strokeStyle = '#1c1917';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.rect(-s * 0.5, -s * 0.5, s, s);
+  ctx.fill();
+  ctx.stroke();
+
+  // Black steel straps
+  ctx.fillStyle = '#1c1917';
+  ctx.fillRect(-s * 0.5, -s * 0.42, s, s * 0.12);
+  ctx.fillRect(-s * 0.5, s * 0.3, s, s * 0.12);
+
+  // Bold "TNT" Stencil Text
+  ctx.font = `900 ${Math.round(s * 0.42)}px "Funnel Display", sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('TNT', 0, 0);
+
+  ctx.restore();
+}
+
+/* ==========================================================================
+   BIRD ENTITY CLASS
    ========================================================================== */
 class Bird {
   constructor(levelCfg, speedMult) {
@@ -650,23 +1679,31 @@ class Bird {
   }
 
   reset(levelCfg, speedMult, initialScatter = false) {
-    // Pick random bird species based on weights
-    const totalWeight = CONFIG.birdSpecies.reduce((sum, s) => sum + s.weight, 0);
+    const speciesList = [
+      { type: 'red', name: 'Red Bird', points: 10, bonusTime: 0, weight: 32 },
+      { type: 'chuck', name: 'Chuck (Mach 3)', points: 20, bonusTime: 0, weight: 24 },
+      { type: 'bomb', name: 'Bomb Bird', points: 30, bonusTime: 0, weight: 16 },
+      { type: 'blue', name: 'The Blues', points: 25, bonusTime: 0, weight: 14 },
+      { type: 'kingpig', name: 'King Pig', points: 100, bonusTime: 3, weight: 8 },
+      { type: 'tnt', name: 'TNT Balloon', points: 50, bonusTime: 0, weight: 6 }
+    ];
+
+    const totalWeight = speciesList.reduce((sum, s) => sum + s.weight, 0);
     let r = Math.random() * totalWeight;
-    let chosen = CONFIG.birdSpecies[0];
-    for (const sp of CONFIG.birdSpecies) {
+    let chosen = speciesList[0];
+    for (const sp of speciesList) {
       if (r < sp.weight) { chosen = sp; break; }
       r -= sp.weight;
     }
     this.species = chosen;
 
     this.dir = Math.random() < 0.5 ? 1 : -1;
-    this.baseSpeed = (levelCfg.baseSpeed + (Math.random() - 0.5) * 30) * speedMult;
-    if (this.species.type === 'fast') this.baseSpeed *= 1.35;
-    if (this.species.type === 'golden') this.baseSpeed *= 1.25;
+    this.baseSpeed = (levelCfg.baseSpeed + (Math.random() - 0.5) * 35) * speedMult;
+    if (this.species.type === 'chuck') this.baseSpeed *= 1.45;
+    if (this.species.type === 'kingpig') this.baseSpeed *= 0.85;
 
-    this.size = Math.round(44 * levelCfg.scale * (this.species.type === 'fast' ? 0.8 : (this.species.type === 'golden' ? 1.15 : 1.0)));
-    this.hitRadius = this.size * 0.72;
+    this.size = Math.round(52 * levelCfg.scale * (this.species.type === 'blue' ? 0.8 : (this.species.type === 'bomb' ? 1.15 : 1.0)));
+    this.hitRadius = this.size * 0.75;
 
     const minY = 90;
     const maxY = H - 180;
@@ -676,7 +1713,7 @@ class Bird {
     if (initialScatter) {
       this.x = 40 + Math.random() * (W - 80);
     } else {
-      this.x = this.dir === 1 ? -this.size - 20 : W + this.size + 20;
+      this.x = this.dir === 1 ? -this.size - 30 : W + this.size + 30;
     }
 
     this.flapPhase = Math.random() * Math.PI * 2;
@@ -698,185 +1735,383 @@ class Bird {
       this.flapPhase += 14 * dt;
       this.x += this.vx * dt;
 
-      // Vertical sway
-      this.y += (this.targetY - this.y) * 4 * dt + Math.sin(this.flapPhase) * 1.8;
+      // Vertical wave
+      this.y += (this.targetY - this.y) * 4 * dt + Math.sin(this.flapPhase) * 2;
 
       // Zigzag logic
       this.zigzagTimer -= dt;
       if (this.zigzagTimer <= 0) {
         this.zigzagTimer = this.zigzagInterval;
         if (Math.random() < this.zigzagChance) {
-          // Change vertical layer or dart sharply
           const minY = 90;
           const maxY = H - 180;
           this.targetY = minY + Math.random() * (maxY - minY);
 
-          // Hard mode: occasional sudden horizontal reverse!
-          if (STATE.level === 'hard' && Math.random() < 0.28) {
+          if (STATE.level === 'hard' && Math.random() < 0.3) {
             this.dir = -this.dir;
             this.vx = this.dir * this.baseSpeed;
           }
         }
       }
 
-      // Screen edge boundary wrap
+      // Edge wrap
       if (this.dir === 1 && this.x > W + this.size + 40) {
         this.reset(levelCfg, speedMult, false);
       } else if (this.dir === -1 && this.x < -this.size - 40) {
         this.reset(levelCfg, speedMult, false);
       }
     } else if (this.state === 'hit') {
-      // Spinning plummet with gravity
       this.vy += 850 * dt;
       this.y += this.vy * dt;
       this.x += this.vx * 0.3 * dt;
       this.rotation += 14 * dt * this.dir;
 
-      if (this.y > H + 50) {
+      if (this.y > H + 60) {
         this.reset(levelCfg, speedMult, false);
       }
     }
   }
 
   hit() {
+    if (this.state === 'hit') return;
     this.state = 'hit';
-    this.vy = -220; // Pop up slightly before falling
-    sfx.birdPop();
-    if (this.species.type === 'golden') {
-      sfx.goldenChime();
+    this.vy = -220;
+
+    if (this.species.type === 'kingpig') {
+      sfx.pigOink();
+      STATE.pigsSmashed++;
+    } else if (this.species.type === 'red') {
+      sfx.redSquawk();
+      STATE.birdsPopped++;
+    } else {
+      sfx.birdPop();
+      STATE.birdsPopped++;
+    }
+
+    // Trigger splash explosions for Bomb & TNT
+    if (this.species.type === 'bomb' || this.species.type === 'tnt') {
+      triggerExplosion(this.x, this.y, 170, true);
     }
   }
 
-  draw(ctx) {
+  draw(ctx, time) {
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.rotation);
     ctx.scale(this.dir, 1);
 
-    // Golden Bird Aura Glow
-    if (this.species.type === 'golden') {
-      ctx.save();
-      const glowGrad = ctx.createRadialGradient(0, 0, 5, 0, 0, this.size * 0.9);
-      glowGrad.addColorStop(0, 'rgba(255, 215, 0, 0.45)');
-      glowGrad.addColorStop(0.7, 'rgba(255, 215, 0, 0.2)');
-      glowGrad.addColorStop(1, 'transparent');
-      ctx.fillStyle = glowGrad;
-      ctx.beginPath();
-      ctx.arc(0, 0, this.size * 0.9, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
+    const isHit = this.state === 'hit';
+
+    switch (this.species.type) {
+      case 'red':
+        drawRedBird(ctx, this.size, this.flapPhase, isHit);
+        break;
+      case 'chuck':
+        drawChuckBird(ctx, this.size, this.flapPhase, isHit);
+        break;
+      case 'bomb':
+        drawBombBird(ctx, this.size, this.flapPhase, isHit, time);
+        break;
+      case 'blue':
+        drawBlueBird(ctx, this.size, this.flapPhase, isHit);
+        break;
+      case 'kingpig':
+        drawKingPig(ctx, this.size, this.flapPhase, isHit, time);
+        break;
+      case 'tnt':
+        drawTNTCrate(ctx, this.size, time);
+        break;
     }
 
-    // Bird Emoji
-    ctx.font = `${this.size}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(this.species.emoji, 0, 0);
-
-    // ANGRY EYEBROW OVERLAY (Makes any emoji look hilariously furious!)
-    ctx.save();
-    ctx.strokeStyle = '#05070a';
-    ctx.lineWidth = Math.max(2.2, this.size * 0.08);
-    ctx.lineCap = 'round';
-
-    const browY = -this.size * 0.16;
-    const browW = this.size * 0.22;
-    // Left angry eyebrow slanting aggressively downward towards center
-    ctx.beginPath();
-    ctx.moveTo(-browW * 1.3, browY - 3);
-    ctx.lineTo(-browW * 0.2, browY + 4);
-    ctx.stroke();
-
-    // Right angry eyebrow slanting aggressively downward towards center
-    ctx.beginPath();
-    ctx.moveTo(browW * 0.2, browY + 4);
-    ctx.lineTo(browW * 1.3, browY - 3);
-    ctx.stroke();
-    ctx.restore();
-
-    ctx.restore();
-  }
-}
-
-class FeatherParticle {
-  constructor(x, y, color) {
-    this.x = x;
-    this.y = y;
-    const ang = Math.random() * Math.PI * 2;
-    const spd = 60 + Math.random() * 160;
-    this.vx = Math.cos(ang) * spd;
-    this.vy = Math.sin(ang) * spd - 60;
-    this.color = color;
-    this.r = 4 + Math.random() * 4;
-    this.rot = Math.random() * Math.PI * 2;
-    this.rotSpeed = (Math.random() - 0.5) * 12;
-    this.life = 1.0 + Math.random() * 0.5;
-    this.maxLife = this.life;
-  }
-  update(dt) {
-    this.vy += 220 * dt; // Soft float gravity
-    this.vx *= Math.pow(0.5, dt);
-    this.x += this.vx * dt;
-    this.y += this.vy * dt;
-    this.rot += this.rotSpeed * dt;
-    this.life -= dt;
-  }
-  draw(ctx) {
-    if (this.life <= 0) return;
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate(this.rot);
-    ctx.globalAlpha = Math.max(0, this.life / this.maxLife);
-    ctx.fillStyle = this.color;
-
-    // Feather quill shape
-    ctx.beginPath();
-    ctx.ellipse(0, 0, this.r * 1.6, this.r * 0.7, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(-this.r * 1.4, 0);
-    ctx.lineTo(this.r * 1.4, 0);
-    ctx.stroke();
-    ctx.restore();
-  }
-}
-
-class FloatingText {
-  constructor(x, y, text, color = '#35f3df') {
-    this.x = x;
-    this.y = y;
-    this.text = text;
-    this.color = color;
-    this.life = 1.1;
-    this.maxLife = this.life;
-  }
-  update(dt) {
-    this.y -= 45 * dt;
-    this.life -= dt;
-  }
-  draw(ctx) {
-    if (this.life <= 0) return;
-    ctx.save();
-    ctx.globalAlpha = Math.max(0, this.life / this.maxLife);
-    ctx.font = '800 18px "Geist Mono", monospace';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = this.color;
-    ctx.shadowColor = this.color;
-    ctx.shadowBlur = 10;
-    ctx.fillText(this.text, this.x, this.y);
     ctx.restore();
   }
 }
 
 /* ==========================================================================
-   INPUT & MOUSE / TOUCH HANDLING
+   EXPLOSION TRIGGER & CHAIN REACTION LOGIC
+   ========================================================================== */
+function triggerExplosion(x, y, radius = 170, isChain = false) {
+  STATE.explosionsTriggered++;
+  STATE.screenShake = 18;
+  sfx.bombExplode();
+
+  // Spawn visual shockwave particles
+  for (let i = 0; i < 28; i++) {
+    explosionParticles.push(new ExplosionParticle(x, y));
+  }
+
+  floatingTexts.push(new FloatingText(x, y - 20, isChain ? '💥 KA-BOOM!' : '💥 EXPLOSION!', '#f97316', true));
+
+  // Splash damage check on all active birds
+  birds.forEach(b => {
+    if (b.state === 'flying' && b.alive) {
+      const d = Math.hypot(x - b.x, y - b.y);
+      if (d <= radius) {
+        b.hit();
+        const pts = b.species.points * 2;
+        STATE.score += pts;
+        floatingTexts.push(new FloatingText(b.x, b.y - 15, `+${pts} SPLASH!`, '#ffd32a'));
+      }
+    }
+  });
+}
+
+/* ==========================================================================
+   PIGGY ISLAND SCENIC BACKGROUND RENDERER
+   ========================================================================== */
+const clouds = [
+  { x: 120, y: 80, scale: 1.1, spd: 12 },
+  { x: 480, y: 130, scale: 0.8, spd: 8 },
+  { x: 860, y: 60, scale: 1.4, spd: 15 },
+  { x: 1300, y: 110, scale: 0.9, spd: 10 }
+];
+
+function drawPiggyIslandSky(time, dt) {
+  // 1. Tropical Azure-to-Sunset Sky
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
+  skyGrad.addColorStop(0, '#0284c7');
+  skyGrad.addColorStop(0.45, '#38bdf8');
+  skyGrad.addColorStop(0.75, '#fed7aa');
+  skyGrad.addColorStop(1, '#fde047');
+  ctx.fillStyle = skyGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // 2. Warm Glowing Sun with Corona
+  const sunX = W * 0.82;
+  const sunY = H * 0.22;
+  const sunGrad = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 130);
+  sunGrad.addColorStop(0, '#ffffff');
+  sunGrad.addColorStop(0.3, '#fef08a');
+  sunGrad.addColorStop(0.7, 'rgba(250, 204, 21, 0.25)');
+  sunGrad.addColorStop(1, 'transparent');
+  ctx.fillStyle = sunGrad;
+  ctx.beginPath();
+  ctx.arc(sunX, sunY, 130, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 3. Procedural Drifting Clouds
+  clouds.forEach(c => {
+    c.x += c.spd * dt;
+    if (c.x > W + 180) c.x = -180;
+
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.scale(c.scale, c.scale);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+    ctx.beginPath();
+    ctx.arc(0, 0, 32, 0, Math.PI * 2);
+    ctx.arc(28, -10, 26, 0, Math.PI * 2);
+    ctx.arc(54, 0, 30, 0, Math.PI * 2);
+    ctx.arc(24, 12, 28, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+
+  // 4. Distant Tropical Blue Mountains
+  ctx.fillStyle = '#0284c7';
+  ctx.beginPath();
+  ctx.moveTo(0, H);
+  ctx.lineTo(0, H - 150);
+  ctx.quadraticCurveTo(W * 0.2, H - 240, W * 0.45, H - 140);
+  ctx.quadraticCurveTo(W * 0.7, H - 260, W, H - 160);
+  ctx.lineTo(W, H);
+  ctx.closePath();
+  ctx.fill();
+
+  // 5. Lush Midground Rolling Green Hills
+  ctx.fillStyle = '#16a34a';
+  ctx.beginPath();
+  ctx.moveTo(0, H);
+  ctx.lineTo(0, H - 110);
+  ctx.quadraticCurveTo(W * 0.3, H - 170, W * 0.6, H - 95);
+  ctx.quadraticCurveTo(W * 0.85, H - 145, W, H - 85);
+  ctx.lineTo(W, H);
+  ctx.closePath();
+  ctx.fill();
+
+  // 6. Foreground Grassy Slopes with Wooden Fences
+  ctx.fillStyle = '#22c55e';
+  ctx.beginPath();
+  ctx.moveTo(0, H);
+  ctx.lineTo(0, H - 65);
+  ctx.quadraticCurveTo(W * 0.35, H - 95, W * 0.7, H - 55);
+  ctx.quadraticCurveTo(W * 0.9, H - 40, W, H - 70);
+  ctx.lineTo(W, H);
+  ctx.closePath();
+  ctx.fill();
+
+  // Wooden scaffolding post on distant ridge
+  ctx.fillStyle = '#92400e';
+  const postX = W * 0.25;
+  const postY = H - 125;
+  ctx.fillRect(postX, postY, 8, 35);
+  ctx.fillRect(postX + 22, postY + 5, 8, 30);
+  ctx.fillRect(postX - 5, postY + 8, 40, 6);
+}
+
+/* ==========================================================================
+   WEAPON GUN & CROSSHAIR RENDERING
+   ========================================================================== */
+function drawGun() {
+  const gunBaseX = W * 0.5;
+  const gunBaseY = H + 12;
+
+  const dx = mouse.x - gunBaseX;
+  const dy = mouse.y - gunBaseY;
+  const aimAngle = Math.atan2(dy, dx);
+
+  ctx.save();
+  ctx.translate(gunBaseX, gunBaseY);
+  ctx.rotate(aimAngle);
+  ctx.translate(-STATE.gunRecoil, 0);
+
+  const wep = WEAPONS[STATE.currentWeapon];
+
+  if (wep.id === 'slingshot') {
+    // Slingshot wooden fork
+    ctx.strokeStyle = '#92400e';
+    ctx.lineWidth = 14;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(55, 0);
+    ctx.lineTo(85, -24);
+    ctx.moveTo(55, 0);
+    ctx.lineTo(85, 24);
+    ctx.stroke();
+
+    // Elastic band
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(85, -24);
+    ctx.lineTo(35, 0);
+    ctx.lineTo(85, 24);
+    ctx.stroke();
+
+    // Golden plasma stone loaded
+    if (STATE.ammo > 0) {
+      ctx.fillStyle = '#facc15';
+      ctx.shadowColor = '#f59e0b';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(38, 0, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+  } else {
+    // Shotgun / Mortar barrel
+    const barrelLen = wep.id === 'mortar' ? 110 : 95;
+    const barrelH = wep.id === 'mortar' ? 22 : 15;
+
+    // Muzzle flash
+    if (STATE.muzzleFlash > 0.05) {
+      const muzzleX = barrelLen + 8;
+      const flashGrad = ctx.createRadialGradient(muzzleX, 0, 2, muzzleX, 0, 48 * STATE.muzzleFlash);
+      flashGrad.addColorStop(0, '#ffffff');
+      flashGrad.addColorStop(0.35, '#facc15');
+      flashGrad.addColorStop(0.7, '#ef4444');
+      flashGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = flashGrad;
+      ctx.beginPath();
+      ctx.arc(muzzleX, 0, 48 * STATE.muzzleFlash, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Barrel
+    const barrelGrad = ctx.createLinearGradient(0, -barrelH * 0.5, 0, barrelH * 0.5);
+    barrelGrad.addColorStop(0, '#475569');
+    barrelGrad.addColorStop(0.5, '#1e293b');
+    barrelGrad.addColorStop(1, '#0f172a');
+    ctx.fillStyle = barrelGrad;
+    ctx.beginPath();
+    ctx.roundRect(15, -barrelH * 0.5, barrelLen, barrelH, 4);
+    ctx.fill();
+
+    // Red Angry Birds stripe on barrel
+    ctx.fillStyle = '#ef4444';
+    ctx.fillRect(35, -barrelH * 0.5 + 2, barrelLen - 30, 3);
+
+    // Receiver base
+    ctx.fillStyle = '#1e293b';
+    ctx.beginPath();
+    ctx.roundRect(-25, -barrelH * 0.8, 45, barrelH * 1.6, 6);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+function drawCrosshair() {
+  const cx = mouse.x;
+  const cy = mouse.y;
+  const isLocked = mouse.isHoveringBird;
+  const bloom = STATE.crosshairBloom;
+
+  ctx.save();
+  ctx.translate(cx, cy);
+
+  const mainColor = isLocked ? '#ef4444' : (STATE.ammo <= 0 ? '#f59e0b' : '#38bdf8');
+  ctx.strokeStyle = mainColor;
+  ctx.fillStyle = mainColor;
+  ctx.shadowColor = mainColor;
+  ctx.shadowBlur = isLocked ? 14 : 7;
+
+  // Center dot
+  ctx.beginPath();
+  ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Outer Crosshair Ring
+  const ringR = 18 + bloom;
+  ctx.lineWidth = 2.0;
+  ctx.beginPath();
+  ctx.arc(0, 0, ringR, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // 4 Directional Reticle Ticks
+  const tickInner = 8;
+  const tickOuter = 26 + bloom;
+  [0, Math.PI * 0.5, Math.PI, Math.PI * 1.5].forEach(ang => {
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(ang) * tickInner, Math.sin(ang) * tickInner);
+    ctx.lineTo(Math.cos(ang) * tickOuter, Math.sin(ang) * tickOuter);
+    ctx.stroke();
+  });
+
+  // Corner brackets when locked
+  if (isLocked) {
+    const bSize = ringR + 8;
+    ctx.lineWidth = 2.4;
+    [-1, 1].forEach(sx => {
+      [-1, 1].forEach(sy => {
+        ctx.beginPath();
+        ctx.moveTo(sx * bSize, sy * (bSize - 7));
+        ctx.lineTo(sx * bSize, sy * bSize);
+        ctx.lineTo(sx * (bSize - 7), sy * bSize);
+        ctx.stroke();
+      });
+    });
+  }
+
+  // Ammo Empty Reminder at Reticle
+  if (STATE.ammo <= 0 && STATE.activeScreen === 'playing') {
+    ctx.font = '800 11px "Geist Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('RELOAD [R]', 0, ringR + 18);
+  }
+
+  ctx.restore();
+}
+
+/* ==========================================================================
+   INPUT HANDLING (DESKTOP & MOBILE TOUCH)
    ========================================================================== */
 const mouse = { x: -100, y: -100, isHoveringBird: false };
 let birds = [];
 let feathers = [];
+let shellCasings = [];
+let explosionParticles = [];
 let floatingTexts = [];
 
 window.addEventListener('mousemove', e => {
@@ -893,8 +2128,7 @@ window.addEventListener('touchmove', e => {
 
 window.addEventListener('pointerdown', e => {
   if (STATE.activeScreen !== 'playing') return;
-  // If clicking on UI overlay buttons, ignore canvas shoot
-  if (e.target.closest('.modal-backdrop') || e.target.closest('.home-link') || e.target.closest('.select-btn')) return;
+  if (e.target.closest('.modal-backdrop') || e.target.closest('.home-link') || e.target.closest('.wep-pill') || e.target.closest('.quick-reload-btn')) return;
 
   initAudio();
   mouse.x = e.clientX;
@@ -907,24 +2141,28 @@ window.addEventListener('keydown', e => {
   if (e.repeat) return;
   const k = e.key.toLowerCase();
 
-  // Reload key [R]
-  if (k === 'r') {
-    triggerReload();
-  }
-  // Pause key [P] or Escape
+  if (k === 'r') triggerReload();
+  else if (k === '1') switchWeapon('shotgun');
+  else if (k === '2') switchWeapon('slingshot');
+  else if (k === '3') switchWeapon('mortar');
   else if (k === 'p' || k === 'escape') {
-    if (STATE.activeScreen === 'playing') {
-      pauseGame();
-    } else if (STATE.activeScreen === 'paused') {
-      resumeGame();
-    }
+    if (STATE.activeScreen === 'playing') pauseGame();
+    else if (STATE.activeScreen === 'paused') resumeGame();
   }
-  // Live speed switching [1-4]
-  else if (k === '1') setSpeedMultiplier('0.6');
-  else if (k === '2') setSpeedMultiplier('1.0');
-  else if (k === '3') setSpeedMultiplier('1.6');
-  else if (k === '4') setSpeedMultiplier('2.4');
 });
+
+function switchWeapon(wepKey) {
+  if (!WEAPONS[wepKey] || STATE.currentWeapon === wepKey) return;
+  STATE.currentWeapon = wepKey;
+  STATE.ammo = WEAPONS[wepKey].maxAmmo;
+  STATE.isReloading = false;
+  reloadOverlay.classList.remove('show');
+
+  document.querySelectorAll('#weapon-hud-group .wep-pill').forEach(b => {
+    b.classList.toggle('active', b.dataset.wep === wepKey);
+  });
+  updateAmmoUI();
+}
 
 function shoot() {
   if (STATE.isReloading) {
@@ -938,59 +2176,63 @@ function shoot() {
     return;
   }
 
-  // Fire Gun!
+  const wep = WEAPONS[STATE.currentWeapon];
   STATE.ammo--;
   STATE.shotsFired++;
-  STATE.gunRecoil = 14;
+  STATE.gunRecoil = wep.recoil;
   STATE.muzzleFlash = 1.0;
-  STATE.crosshairBloom = 10;
-  STATE.screenShake = 3.5;
+  STATE.crosshairBloom = 12;
+  STATE.screenShake = wep.id === 'mortar' ? 7.0 : 4.0;
 
-  sfx.gunshot();
+  // Weapon audio
+  if (wep.id === 'shotgun') sfx.shotgun();
+  else if (wep.id === 'slingshot') sfx.slingshot();
+  else if (wep.id === 'mortar') sfx.mortar();
+
+  // Eject shell casing for shotgun
+  if (wep.id === 'shotgun') {
+    shellCasings.push(new ShellCasing(W * 0.5, H - 10));
+  }
+
   updateAmmoUI();
 
-  // Check Hit on Birds
+  // Hit Detection
   let hitDetected = false;
-  // Sort by z/size so closest gets hit first
-  for (let i = birds.length - 1; i >= 0; i--) {
-    const b = birds[i];
-    if (b.state === 'flying' && b.alive) {
-      const d = Math.hypot(mouse.x - b.x, mouse.y - b.y);
-      if (d < b.hitRadius) {
-        hitDetected = true;
-        STATE.shotsHit++;
-        b.hit();
 
-        // Combo system
-        STATE.comboTimer = CONFIG.comboWindow;
-        STATE.combo++;
-        if (STATE.combo > STATE.bestCombo) STATE.bestCombo = STATE.combo;
-
-        // Scoring calculation
-        const pts = b.species.points * Math.min(STATE.combo, 8);
-        STATE.score += pts;
-
-        // Golden bird time bonus
-        if (b.species.bonusTime > 0) {
-          STATE.timeLeft = Math.min(CONFIG.roundDuration, STATE.timeLeft + b.species.bonusTime);
-          floatingTexts.push(new FloatingText(b.x, b.y - 28, `+${pts} & +${b.species.bonusTime}s!`, '#ffd32a'));
-        } else {
-          const comboTxt = STATE.combo > 1 ? ` (x${STATE.combo})` : '';
-          floatingTexts.push(new FloatingText(b.x, b.y - 18, `+${pts}${comboTxt}`, b.species.type === 'fast' ? '#35f3df' : '#ffb732'));
+  if (wep.id === 'mortar') {
+    // Cluster Mortar area detonation at mouse point
+    triggerExplosion(mouse.x, mouse.y, wep.splashRadius, false);
+    hitDetected = true;
+  } else if (wep.pierce) {
+    // Golden Slingshot Piercing line trace
+    birds.forEach(b => {
+      if (b.state === 'flying' && b.alive) {
+        const d = Math.hypot(mouse.x - b.x, mouse.y - b.y);
+        if (d < b.hitRadius * 1.3) {
+          hitDetected = true;
+          STATE.shotsHit++;
+          b.hit();
+          handleHitScoring(b, 'PIERCED!');
         }
-
-        // Spawn Feather Particles
-        for (let f = 0; f < 16; f++) {
-          const col = b.species.colors[Math.floor(Math.random() * b.species.colors.length)];
-          feathers.push(new FeatherParticle(b.x, b.y, col));
+      }
+    });
+  } else {
+    // Shotgun Buckshot
+    for (let i = birds.length - 1; i >= 0; i--) {
+      const b = birds[i];
+      if (b.state === 'flying' && b.alive) {
+        const d = Math.hypot(mouse.x - b.x, mouse.y - b.y);
+        if (d < b.hitRadius) {
+          hitDetected = true;
+          STATE.shotsHit++;
+          b.hit();
+          handleHitScoring(b);
+          break;
         }
-
-        break; // Only hit one bird per bullet
       }
     }
   }
 
-  // Missed shot breaks combo
   if (!hitDetected) {
     STATE.combo = 1;
     STATE.comboTimer = 0;
@@ -998,14 +2240,45 @@ function shoot() {
 
   updateHUD();
 
-  // Auto-reload when ammo empties
   if (STATE.ammo <= 0) {
     triggerReload();
   }
 }
 
+function handleHitScoring(b, extraTag = '') {
+  STATE.comboTimer = CONFIG.comboWindow;
+  STATE.combo++;
+  if (STATE.combo > STATE.bestCombo) STATE.bestCombo = STATE.combo;
+
+  const pts = b.species.points * Math.min(STATE.combo, 8);
+  STATE.score += pts;
+
+  if (b.species.bonusTime > 0) {
+    STATE.timeLeft = Math.min(CONFIG.roundDuration, STATE.timeLeft + b.species.bonusTime);
+    floatingTexts.push(new FloatingText(b.x, b.y - 28, `+${pts} & +${b.species.bonusTime}s!`, '#ffd32a', true));
+  } else {
+    const comboTxt = STATE.combo > 1 ? ` (x${STATE.combo})` : '';
+    floatingTexts.push(new FloatingText(b.x, b.y - 18, `+${pts} ${extraTag}${comboTxt}`, '#facc15', true));
+  }
+
+  // Spawn matching colored feathers
+  const featherColorMap = {
+    red: ['#ef4444', '#dc2626', '#b91c1c'],
+    chuck: ['#facc15', '#fef08a', '#eab308'],
+    bomb: ['#334155', '#1e293b', '#ef4444'],
+    blue: ['#38bdf8', '#0284c7', '#e0f2fe'],
+    kingpig: ['#84cc16', '#65a30d', '#facc15'],
+    tnt: ['#dc2626', '#f59e0b', '#1c1917']
+  };
+  const cols = featherColorMap[b.species.type] || ['#ef4444', '#facc15'];
+  for (let f = 0; f < 18; f++) {
+    feathers.push(new FeatherParticle(b.x, b.y, cols[Math.floor(Math.random() * cols.length)]));
+  }
+}
+
 function triggerReload() {
-  if (STATE.isReloading || STATE.ammo === CONFIG.maxAmmo) return;
+  const wep = WEAPONS[STATE.currentWeapon];
+  if (STATE.isReloading || STATE.ammo === wep.maxAmmo) return;
   STATE.isReloading = true;
   STATE.reloadTimer = CONFIG.reloadDuration;
   reloadOverlay.classList.add('show');
@@ -1022,18 +2295,22 @@ function startGame() {
   STATE.score = 0;
   STATE.shotsFired = 0;
   STATE.shotsHit = 0;
+  STATE.birdsPopped = 0;
+  STATE.pigsSmashed = 0;
+  STATE.explosionsTriggered = 0;
   STATE.combo = 1;
   STATE.bestCombo = 1;
   STATE.comboTimer = 0;
-  STATE.ammo = CONFIG.maxAmmo;
+  STATE.ammo = WEAPONS[STATE.currentWeapon].maxAmmo;
   STATE.isReloading = false;
   STATE.reloadTimer = 0;
   reloadOverlay.classList.remove('show');
 
-  // Spawn Birds for selected level
   const lvlCfg = CONFIG.levels[STATE.level];
   birds = [];
   feathers = [];
+  shellCasings = [];
+  explosionParticles = [];
   floatingTexts = [];
   for (let i = 0; i < lvlCfg.birdCount; i++) {
     birds.push(new Bird(lvlCfg, STATE.speedMultiplier));
@@ -1056,10 +2333,9 @@ function resumeGame() {
 
 function finishGame() {
   STATE.activeScreen = 'gameover';
-  sfx.whistle();
+  sfx.fanfare();
 
-  // High score handling per level
-  const storageKey = `birdhunt_high_${STATE.level}`;
+  const storageKey = `angrybirds_high_${STATE.level}`;
   const prevHigh = parseInt(localStorage.getItem(storageKey) || '0', 10);
   let isNewRecord = false;
   if (STATE.score > prevHigh) {
@@ -1068,12 +2344,11 @@ function finishGame() {
   }
   const currentHigh = Math.max(STATE.score, prevHigh);
 
-  // Grade calculation
   let grade = 'C';
   let sub = 'Keep practicing your aim!';
-  if (STATE.score >= 1200) { grade = 'S+'; sub = 'Legendary Marksman! Unbelievable precision!'; }
-  else if (STATE.score >= 800) { grade = 'A'; sub = 'Superb accuracy & hawk-like reflexes!'; }
-  else if (STATE.score >= 450) { grade = 'B'; sub = 'Great shooting, solid combo streaks!'; }
+  if (STATE.score >= 1400) { grade = 'S+'; sub = 'Legendary Piggy Island Marksman!'; }
+  else if (STATE.score >= 900) { grade = 'A'; sub = 'Superb accuracy & hawk-like reflexes!'; }
+  else if (STATE.score >= 500) { grade = 'B'; sub = 'Great shooting, solid combo streaks!'; }
 
   const accuracy = STATE.shotsFired > 0 ? ((STATE.shotsHit / STATE.shotsFired) * 100).toFixed(1) : '0.0';
 
@@ -1083,6 +2358,8 @@ function finishGame() {
   goHigh.textContent = currentHigh.toLocaleString();
   goAccuracy.textContent = `${accuracy}%`;
   goCombo.textContent = `x${STATE.bestCombo}`;
+  goBirds.textContent = STATE.birdsPopped;
+  goPigs.textContent = STATE.pigsSmashed;
   goRecordBadge.style.display = isNewRecord ? 'inline-block' : 'none';
 
   gameoverModal.classList.add('show');
@@ -1099,14 +2376,11 @@ function setSpeedMultiplier(spdKey) {
   if (!opt) return;
   STATE.speedMultiplier = opt.mult;
 
-  // Update UI buttons
   speedGroup.querySelectorAll('.select-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.speed === spdKey);
   });
-  speedDesc.textContent = `${opt.mult}x ${opt.label}`;
-  hudSpeedBadge.textContent = `${opt.mult}x`;
+  speedDesc.textContent = `${opt.label} Multiplier`;
 
-  // Dynamically update active birds speeds
   const lvlCfg = CONFIG.levels[STATE.level];
   birds.forEach(b => {
     b.baseSpeed = lvlCfg.baseSpeed * STATE.speedMultiplier;
@@ -1115,7 +2389,7 @@ function setSpeedMultiplier(spdKey) {
 }
 
 function getStoredHigh(lvlKey) {
-  return parseInt(localStorage.getItem(`birdhunt_high_${lvlKey}`) || '0', 10);
+  return parseInt(localStorage.getItem(`angrybirds_high_${lvlKey}`) || '0', 10);
 }
 
 /* ==========================================================================
@@ -1129,6 +2403,7 @@ const startBtn = document.getElementById('start-btn');
 const resumeBtn = document.getElementById('resume-btn');
 const quitBtn = document.getElementById('quit-btn');
 const restartBtn = document.getElementById('restart-btn');
+const quickReloadBtn = document.getElementById('quick-reload-btn');
 
 const levelGroup = document.getElementById('level-group');
 const speedGroup = document.getElementById('speed-group');
@@ -1141,7 +2416,6 @@ const hudTimer = document.getElementById('hud-timer');
 const hudTimerPill = document.getElementById('hud-timer-pill');
 const hudLevelTag = document.getElementById('hud-level-tag');
 const hudCombo = document.getElementById('hud-combo');
-const hudSpeedBadge = document.getElementById('hud-speed-badge');
 const ammoBullets = document.getElementById('ammo-bullets');
 const ammoText = document.getElementById('ammo-text');
 
@@ -1154,7 +2428,17 @@ const goScore = document.getElementById('go-score');
 const goHigh = document.getElementById('go-high');
 const goAccuracy = document.getElementById('go-accuracy');
 const goCombo = document.getElementById('go-combo');
+const goBirds = document.getElementById('go-birds');
+const goPigs = document.getElementById('go-pigs');
 const goRecordBadge = document.getElementById('go-record-badge');
+
+// Weapon HUD click listeners
+document.querySelectorAll('#weapon-hud-group .wep-pill').forEach(btn => {
+  btn.addEventListener('click', () => switchWeapon(btn.dataset.wep));
+});
+
+// Quick Reload Button
+quickReloadBtn.addEventListener('click', triggerReload);
 
 // Level buttons
 levelGroup.addEventListener('click', e => {
@@ -1201,20 +2485,20 @@ function updateHUD() {
 }
 
 function updateAmmoUI() {
+  const wep = WEAPONS[STATE.currentWeapon];
   ammoBullets.innerHTML = '';
-  for (let i = 0; i < CONFIG.maxAmmo; i++) {
+  for (let i = 0; i < wep.maxAmmo; i++) {
     const pip = document.createElement('div');
     pip.className = 'bullet-pip' + (i >= STATE.ammo ? ' spent' : '');
     ammoBullets.appendChild(pip);
   }
-  ammoText.textContent = `${STATE.ammo}/${CONFIG.maxAmmo}`;
+  ammoText.textContent = `${STATE.ammo}/${wep.maxAmmo}`;
 }
 
 /* ==========================================================================
    UPDATE LOOP
    ========================================================================== */
 function update(dt) {
-  // Screen recoil and bloom recovery
   STATE.gunRecoil = Math.max(0, STATE.gunRecoil - dt * 45);
   STATE.muzzleFlash = Math.max(0, STATE.muzzleFlash - dt * 8);
   STATE.crosshairBloom = Math.max(0, STATE.crosshairBloom - dt * 35);
@@ -1222,7 +2506,7 @@ function update(dt) {
 
   if (STATE.activeScreen !== 'playing') return;
 
-  // 60-Second Round Countdown
+  // Round countdown
   STATE.timeLeft -= dt;
   if (STATE.timeLeft <= 0) {
     STATE.timeLeft = 0;
@@ -1231,7 +2515,7 @@ function update(dt) {
   }
   updateHUD();
 
-  // Combo Timer Decay
+  // Combo decay
   if (STATE.combo > 1) {
     STATE.comboTimer -= dt;
     if (STATE.comboTimer <= 0) {
@@ -1248,13 +2532,13 @@ function update(dt) {
 
     if (STATE.reloadTimer <= 0) {
       STATE.isReloading = false;
-      STATE.ammo = CONFIG.maxAmmo;
+      STATE.ammo = WEAPONS[STATE.currentWeapon].maxAmmo;
       reloadOverlay.classList.remove('show');
       updateAmmoUI();
     }
   }
 
-  // Check if hovering over any bird for reticle lock
+  // Hover target lock
   mouse.isHoveringBird = false;
   for (const b of birds) {
     if (b.state === 'flying' && b.alive) {
@@ -1276,6 +2560,20 @@ function update(dt) {
     if (f.life <= 0) feathers.splice(i, 1);
   }
 
+  // Update Shell Casings
+  for (let i = shellCasings.length - 1; i >= 0; i--) {
+    const sc = shellCasings[i];
+    sc.update(dt);
+    if (sc.life <= 0) shellCasings.splice(i, 1);
+  }
+
+  // Update Explosion Particles
+  for (let i = explosionParticles.length - 1; i >= 0; i--) {
+    const ep = explosionParticles[i];
+    ep.update(dt);
+    if (ep.life <= 0) explosionParticles.splice(i, 1);
+  }
+
   // Update Floating Texts
   for (let i = floatingTexts.length - 1; i >= 0; i--) {
     const ft = floatingTexts[i];
@@ -1287,7 +2585,7 @@ function update(dt) {
 /* ==========================================================================
    RENDER / DRAW LOOP
    ========================================================================== */
-function draw() {
+function draw(time, dt) {
   ctx.save();
 
   // Screen shake
@@ -1297,28 +2595,23 @@ function draw() {
     ctx.translate(sx, sy);
   }
 
-  // 1. Atmosphere Gradient Sky
-  const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
-  skyGrad.addColorStop(0, '#070b12');
-  skyGrad.addColorStop(0.5, '#121a29');
-  skyGrad.addColorStop(0.85, '#221832');
-  skyGrad.addColorStop(1, '#2d1b38');
-  ctx.fillStyle = skyGrad;
-  ctx.fillRect(0, 0, W, H);
+  // 1. Piggy Island Scenic Background
+  drawPiggyIslandSky(time, dt);
 
-  // 2. Distant Horizon Glow & Silhouette Hills
-  drawHills();
+  // 2. Birds
+  birds.forEach(b => b.draw(ctx, time));
 
-  // 3. Birds
-  birds.forEach(b => b.draw(ctx));
-
-  // 4. Feather Particles
+  // 3. Feathers & Shell Casings
   feathers.forEach(f => f.draw(ctx));
+  shellCasings.forEach(sc => sc.draw(ctx));
+
+  // 4. Explosion Particles
+  explosionParticles.forEach(ep => ep.draw(ctx));
 
   // 5. Floating Score Texts
   floatingTexts.forEach(ft => ft.draw(ctx));
 
-  // 6. Gun & Crosshair (only when mouse is inside window)
+  // 6. Gun & Crosshair
   if (mouse.x > 0 && mouse.y > 0) {
     drawGun();
     drawCrosshair();
@@ -1327,192 +2620,9 @@ function draw() {
   ctx.restore();
 }
 
-function drawHills() {
-  ctx.save();
-
-  // Distant glowing moon / sun
-  ctx.fillStyle = 'rgba(255, 230, 180, 0.12)';
-  ctx.beginPath();
-  ctx.arc(W * 0.78, H * 0.35, 65, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Far Layer Hills
-  ctx.fillStyle = '#0f1422';
-  ctx.beginPath();
-  ctx.moveTo(0, H);
-  ctx.lineTo(0, H - 120);
-  ctx.quadraticCurveTo(W * 0.25, H - 180, W * 0.55, H - 110);
-  ctx.quadraticCurveTo(W * 0.8, H - 60, W, H - 140);
-  ctx.lineTo(W, H);
-  ctx.closePath();
-  ctx.fill();
-
-  // Near Layer Hills & Grass Crest
-  ctx.fillStyle = '#080a10';
-  ctx.beginPath();
-  ctx.moveTo(0, H);
-  ctx.lineTo(0, H - 75);
-  ctx.quadraticCurveTo(W * 0.35, H - 110, W * 0.7, H - 65);
-  ctx.quadraticCurveTo(W * 0.88, H - 45, W, H - 85);
-  ctx.lineTo(W, H);
-  ctx.closePath();
-  ctx.fill();
-
-  // Neon subtle rim light on top edge of near hill
-  ctx.strokeStyle = 'rgba(53, 243, 223, 0.25)';
-  ctx.lineWidth = 1.8;
-  ctx.stroke();
-
-  ctx.restore();
-}
-
-function drawGun() {
-  const gunBaseX = W * 0.5;
-  const gunBaseY = H + 10;
-
-  const dx = mouse.x - gunBaseX;
-  const dy = mouse.y - gunBaseY;
-  const aimAngle = Math.atan2(dy, dx);
-
-  ctx.save();
-  ctx.translate(gunBaseX, gunBaseY);
-  ctx.rotate(aimAngle);
-
-  // Recoil translation along barrel axis
-  ctx.translate(-STATE.gunRecoil, 0);
-
-  // Gun Dimensions
-  const barrelLen = 95;
-  const barrelH = 14;
-
-  // 1. Bullet Tracer & Muzzle Flash
-  if (STATE.muzzleFlash > 0.05) {
-    ctx.save();
-    // Muzzle blast star
-    const muzzleX = barrelLen + 6;
-    const flashGrad = ctx.createRadialGradient(muzzleX, 0, 2, muzzleX, 0, 42 * STATE.muzzleFlash);
-    flashGrad.addColorStop(0, '#ffffff');
-    flashGrad.addColorStop(0.35, '#ffb732');
-    flashGrad.addColorStop(0.7, '#ff4757');
-    flashGrad.addColorStop(1, 'transparent');
-    ctx.fillStyle = flashGrad;
-    ctx.beginPath();
-    ctx.arc(muzzleX, 0, 42 * STATE.muzzleFlash, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  // 2. Blued Steel Barrel
-  const barrelGrad = ctx.createLinearGradient(0, -barrelH * 0.5, 0, barrelH * 0.5);
-  barrelGrad.addColorStop(0, '#334155');
-  barrelGrad.addColorStop(0.4, '#1e293b');
-  barrelGrad.addColorStop(0.7, '#0f172a');
-  barrelGrad.addColorStop(1, '#020617');
-
-  ctx.fillStyle = barrelGrad;
-  ctx.beginPath();
-  ctx.roundRect(15, -barrelH * 0.5, barrelLen, barrelH, 3);
-  ctx.fill();
-
-  // Ventilated Rib on top of barrel
-  ctx.strokeStyle = '#35f3df';
-  ctx.lineWidth = 1.8;
-  ctx.beginPath();
-  ctx.moveTo(25, -barrelH * 0.5);
-  ctx.lineTo(barrelLen + 10, -barrelH * 0.5);
-  ctx.stroke();
-
-  // Muzzle brake tip
-  ctx.fillStyle = '#0f172a';
-  ctx.fillRect(barrelLen + 10, -barrelH * 0.5 - 1, 6, barrelH + 2);
-
-  // 3. Receiver & Handgrip Base
-  ctx.fillStyle = '#1e293b';
-  ctx.beginPath();
-  ctx.roundRect(-25, -barrelH * 0.8, 45, barrelH * 1.6, 6);
-  ctx.fill();
-
-  // Glowing neon indicator light on receiver
-  ctx.fillStyle = STATE.ammo > 0 ? '#35f3df' : '#ff4757';
-  ctx.shadowColor = ctx.fillStyle;
-  ctx.shadowBlur = 8;
-  ctx.beginPath();
-  ctx.arc(-5, 0, 3, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.restore();
-}
-
-function drawCrosshair() {
-  const cx = mouse.x;
-  const cy = mouse.y;
-  const isLocked = mouse.isHoveringBird;
-  const bloom = STATE.crosshairBloom;
-
-  ctx.save();
-  ctx.translate(cx, cy);
-
-  const mainColor = isLocked ? '#ff4757' : (STATE.ammo <= 0 ? '#ffb732' : '#35f3df');
-  ctx.strokeStyle = mainColor;
-  ctx.fillStyle = mainColor;
-  ctx.shadowColor = mainColor;
-  ctx.shadowBlur = isLocked ? 14 : 7;
-
-  // Center pip
-  ctx.beginPath();
-  ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Outer Crosshair Ring
-  const ringR = 18 + bloom;
-  ctx.lineWidth = 1.8;
-  ctx.beginPath();
-  ctx.arc(0, 0, ringR, 0, Math.PI * 2);
-  ctx.stroke();
-
-  // 4 Directional Reticle Ticks
-  const tickInner = 8;
-  const tickOuter = 26 + bloom;
-  ctx.lineWidth = 2.0;
-
-  [0, Math.PI * 0.5, Math.PI, Math.PI * 1.5].forEach(ang => {
-    ctx.beginPath();
-    ctx.moveTo(Math.cos(ang) * tickInner, Math.sin(ang) * tickInner);
-    ctx.lineTo(Math.cos(ang) * tickOuter, Math.sin(ang) * tickOuter);
-    ctx.stroke();
-  });
-
-  // Target Lock Corner Brackets when over bird
-  if (isLocked) {
-    const bSize = ringR + 8;
-    ctx.lineWidth = 2.2;
-    // 4 Corner Brackets
-    [-1, 1].forEach(sx => {
-      [-1, 1].forEach(sy => {
-        ctx.beginPath();
-        ctx.moveTo(sx * bSize, sy * (bSize - 6));
-        ctx.lineTo(sx * bSize, sy * bSize);
-        ctx.lineTo(sx * (bSize - 6), sy * bSize);
-        ctx.stroke();
-      });
-    });
-  }
-
-  // Ammo Empty Reminder at Reticle
-  if (STATE.ammo <= 0 && STATE.activeScreen === 'playing') {
-    ctx.font = '800 10px "Geist Mono", monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('RELOAD [R]', 0, ringR + 18);
-  }
-
-  ctx.restore();
-}
-
 /* ==========================================================================
-   INITIAL SETUP & MAIN ENGINE LOOP
+   ENGINE LOOP
    ========================================================================== */
-
-// Initial Setup
 updateAmmoUI();
 updateHUD();
 
@@ -1522,7 +2632,7 @@ function gameLoop(now) {
   lastTime = now;
 
   update(dt);
-  draw();
+  draw(now / 1000, dt);
 
   requestAnimationFrame(gameLoop);
 }

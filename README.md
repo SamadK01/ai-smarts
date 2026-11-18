@@ -26,7 +26,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 | **14** | [**Reef Angler: Apex Marine Hunt**](fish.html) | Canvas 2D, Bio-kinematics, Web Audio | Lifelike deep-water fishing simulation featuring 21 active marine species: Apex Great White Sharks, Bluefin Tuna, Mahi-Mahi, Red Snappers, Tangs, and Clownfish. Natural horizontal swimming physics, mouth-piercing hook strikes with arterial blood plumes, mechanical reel winch, and acrobatic parabolic leaping catches into an automatic opening-hatch side aquarium tank. |
 | **15** | [**Slingshot Smash: Antique Tabletop Alley**](smash.html) | Canvas 2D, 120Hz Sub-step Physics | Ultra-smooth physical destruction toy sharing the beloved tactile slingshot feel of Slingshot Lamp. Shatter crystal bottles, trigger domino cascades, ring tuned pentatonic brass bells, and fire river pebbles, steel bearings, glowing orbs, or superballs. |
 | **16** | [**Fruit Slash**](fruit.html) | Canvas 2D, Web Audio API, Segment Slicing | Fast-paced neon blade arcade featuring unlimited recursive slicing, parabolic fruit trajectories, glowing cyan blade trails with velocity swish, explosive bombs, golden slow-mo mangoes, combo multipliers, and live speed switching. |
-| **17** | [**Angry Bird Hunt**](birds.html) | Canvas 2D, Web Audio API | Fast-paced arcade clay & bird shooting game with cartoonish angry bird emojis, dynamic rotating shotgun with recoil & muzzle flash, custom glowing crosshair with target-lock brackets, feather particle explosions, combo multipliers, speed selector (Slow/Normal/Fast/Turbo), 8-round magazine reload mechanics, and 60-second tournament timer. |
+| **17** | [**Angry Birds: Piggy Island Hunt**](birds.html) | Canvas 2D, Procedural Vectors, Web Audio API | Authentic Angry Birds arcade featuring 100% procedural vector graphics for Red, Chuck, Bomb, The Blues, King Pig & TNT Balloon Crates. Includes 3 selectable weapons (Hunter Shotgun with bouncing brass casings, Piercing Slingshot with laser bolts, Cluster Mortar with area explosions), chain-reaction splash explosions, Piggy Island rolling hills & drifting clouds, comic-book hit popups, and authentic procedural cartoon audio (Red squawks, Bomb blasts, Pig oinks). |
 | **18** | [**NeuroLife 3D: Neural Evolution Simulator**](neuro.html) | Three.js WebGL, Real Neural Networks | 3D artificial life ecosystem powered by genuine feedforward neural networks (8 inputs, 8 hidden, 3 motor outputs). Inspect live firing neurons and synapses in real-time, trigger cosmic mutations, inject apex predators, or possess ("Mind-Jack") any organism directly. |
 | **19** | [**The Focus Candle: Atmospheric Melting Timer**](candle.html) | Canvas 2D, Dynamic Wax Physics, Web Audio | Realistic beeswax candle timer with smooth real-time melting, organic multi-harmonic flame flickering, interactive wind flutter, dripping wax tear rivulets, cotton wick crackle, wooden matchstick strike, and dual-tone digital beep alarm. |
 | **20** | [**Galaxy Giggles**](orbit.html) | Canvas 2D & Orbital Mechanics | Solar system simulator with Keplerian orbits, dynamic planetary velocity ratios, tidal trails, and interactive time-dilation. |
@@ -215,6 +215,26 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
   - Dual canvas lighting engine (`glowCanvas` and `darkCanvas`) casting warm radial spotlight cones across the mahogany shelves and floor.
   - 4 Selectable Ammunition Types: River Pebble, Heavy Steel Bearing, Plasma Glow Orb, and Super Bouncy Rubber Ball.
   - 4 Interactive Stages: *Crystal Bar*, *Chimes & Lamp*, *Domino Cascade*, and *Free Sandbox*.
+
+### 14. Angry Birds: Piggy Island Hunt (`birds.html`)
+- **100% Authentic Procedural Vector Characters**:
+  - **Red Bird**: Spherical crimson body with radial gradients, peach chest crescent, double crest feathers, 3 black tail quills, cheek freckles, and iconic thick angled V-unibrow.
+  - **Chuck**: Triangular yellow speedster with spiky black crest, sharp beak, and supersonic trail lines.
+  - **Bomb Bird**: Heavy charcoal-black juggernaut with an animated sparking fuse flame on his head. Triggers screen-shaking **KA-BOOM** explosions on impact!
+  - **The Blues**: Compact sky-blue acrobats with peach bellies and high-frequency flutter wings.
+  - **King Pig**: Round lime-green bad piggy with floppy ears, wide nostrils, goofy eyes, and a golden ruby-studded royal crown, floating from a balloon!
+  - **TNT Balloon Crate**: Stenciled wooden dynamite crate that triggers colossal chain-reaction detonations across the sky.
+- **Weapon Arsenal with Quick-Switching**:
+  - **Hunter Shotgun**: 8 Shells, 5-pellet buckshot spread, and tumbling brass shell casings with physical bounce.
+  - **Golden Slingshot**: 6 Shots, high-velocity golden plasma stone that pierces through multiple birds in a row.
+  - **Cluster Mortar**: 4 Shells, explosive area-of-effect rocket with smoke trail and fiery detonation.
+  - Switch via HUD pills or keyboard keys `[1]`, `[2]`, `[3]`.
+- **Dynamic Piggy Island Environment**:
+  - Tropical azure-to-golden sunset gradient sky with procedural drifting clouds, warm glowing sun with corona, turquoise ocean horizon, verdant rolling green hills, wooden scaffolding posts, and floating dandelion seeds.
+- **Procedural Web Audio Cartoon Synthesizer**:
+  - Red's furious squawk, Chuck's supersonic whoosh, Bomb's hissing fuse & rumbling sub-bass detonation, King Pig's comical oink and squeal, mechanical shotgun pump, shell eject clinks, and victory fanfare.
+- **Mobile Touch Optimized**:
+  - Instant tap-to-shoot, on-screen quick-reload button (`🔄 Reload`), and weapon pills with zero touch delay.
 
 ---
 
