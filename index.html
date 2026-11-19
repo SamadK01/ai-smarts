@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-  <title>AI Smarts Play — 19 Interactive Experiments & Masterpieces</title>
+  <title>AI Smarts Play — 21 Interactive Experiments & Masterpieces</title>
   <meta name="description" content="A curated suite of 19 physics-driven, 3D WebGL, and neural-powered browser games and experiments. 100% offline, zero build tools.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="alternate icon" type="image/png" href="favicon.png">
@@ -345,6 +345,7 @@
     .neuro { background: radial-gradient(circle at 75% 25%, rgba(0, 240, 255, 0.25), var(--surface-card) 60%); }
     .candle { background: radial-gradient(circle at 75% 25%, rgba(217, 119, 6, 0.25), var(--surface-card) 60%); }
     .galaxy { background: radial-gradient(circle at 75% 25%, rgba(23, 70, 107, 0.25), var(--surface-card) 60%); }
+    .ocean { background: radial-gradient(circle at 75% 25%, rgba(14, 116, 144, 0.35), var(--surface-card) 60%); }
 
     /* Artwork on card */
     .art {
@@ -438,7 +439,7 @@
       </div>
     </section>
 
-    <!-- 20 Ordered Experiments Grid -->
+    <!-- 21 Ordered Experiments Grid -->
     <section class="grid" id="experiments-grid">
 
       <!-- ROW 1 (As explicitly requested by user) -->
@@ -806,12 +807,76 @@
         </div>
       </a>
 
+      <!-- 21: Ocean Serenity (Deep Sea Stargazer) -->
+      <a class="card ocean" href="ocean.html" data-category="flagship zen space" data-name="ocean serenity deep sea stargazer astral abyss sanctuary bioluminescent jellyfish shooting stars relaxation peace meditation toot-te taare samundar">
+        <div class="card-top">
+          <small>ASTRAL ABYSS SANCTUARY</small>
+          <span class="num">21</span>
+        </div>
+        <i class="art">
+          <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="oceanCardBg" x1="0" y1="0" x2="0" y2="100" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#030814"/>
+                <stop offset="28%" stop-color="#0c1e3d"/>
+                <stop offset="35%" stop-color="#0284c7"/>
+                <stop offset="100%" stop-color="#010a18"/>
+              </linearGradient>
+              <linearGradient id="oceanWaveGlow" x1="0" y1="0" x2="100" y2="0" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.8"/>
+                <stop offset="50%" stop-color="#2dd4bf" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.8"/>
+              </linearGradient>
+            </defs>
+            <rect width="100" height="100" rx="16" fill="url(#oceanCardBg)"/>
+            <!-- Starry Night Sky above surface -->
+            <circle cx="18" cy="12" r="1.2" fill="#ffffff" opacity="0.9"/>
+            <circle cx="34" cy="8" r="0.9" fill="#ffffff" opacity="0.7"/>
+            <circle cx="78" cy="14" r="1.4" fill="#fde047" opacity="0.9"/>
+            <circle cx="90" cy="9" r="1.0" fill="#ffffff" opacity="0.8"/>
+            <circle cx="58" cy="15" r="0.8" fill="#ffffff" opacity="0.6"/>
+            <!-- Shooting Star Streak -->
+            <line x1="8" y1="6" x2="52" y2="24" stroke="url(#oceanWaveGlow)" stroke-width="2.2" stroke-linecap="round"/>
+            <circle cx="52" cy="24" r="2.8" fill="#ffffff"/>
+            <circle cx="52" cy="24" r="6" fill="#fde047" opacity="0.35"/>
+            <!-- Undulating Surface Wave -->
+            <path d="M 0 32 Q 25 26 50 32 T 100 32 L 100 100 L 0 100 Z" fill="#02162e" opacity="0.75"/>
+            <path d="M 0 32 Q 25 26 50 32 T 100 32" stroke="url(#oceanWaveGlow)" stroke-width="2.5" fill="none"/>
+            <!-- God Rays -->
+            <polygon points="45,32 55,32 75,95 35,95" fill="#38bdf8" opacity="0.08"/>
+            <polygon points="20,32 28,32 40,88 12,88" fill="#2dd4bf" opacity="0.06"/>
+            <!-- Translucent Bioluminescent Jellyfish -->
+            <!-- Tentacles -->
+            <path d="M 44 68 Q 42 78 40 88" stroke="#2dd4bf" stroke-width="1.2" opacity="0.6"/>
+            <path d="M 48 70 Q 50 80 47 92" stroke="#38bdf8" stroke-width="1.5" opacity="0.7"/>
+            <path d="M 52 70 Q 51 82 54 92" stroke="#38bdf8" stroke-width="1.5" opacity="0.7"/>
+            <path d="M 56 68 Q 59 78 61 88" stroke="#2dd4bf" stroke-width="1.2" opacity="0.6"/>
+            <!-- Oral arms -->
+            <path d="M 49 68 Q 46 76 49 84" stroke="#a78bfa" stroke-width="2" opacity="0.5"/>
+            <path d="M 51 68 Q 54 76 51 84" stroke="#a78bfa" stroke-width="2" opacity="0.5"/>
+            <!-- Bell Dome -->
+            <path d="M 38 68 C 38 52 62 52 62 68 C 54 71 46 71 38 68 Z" fill="#38bdf8" opacity="0.45"/>
+            <path d="M 38 68 C 38 52 62 52 62 68" stroke="#2dd4bf" stroke-width="1.8" fill="none" opacity="0.9"/>
+            <circle cx="50" cy="62" r="3" fill="#fde047" opacity="0.9"/>
+            <!-- Tiny Rising Bubbles -->
+            <circle cx="68" cy="55" r="2.2" stroke="#ffffff" stroke-width="0.8" fill="none" opacity="0.7"/>
+            <circle cx="74" cy="42" r="1.5" stroke="#ffffff" stroke-width="0.7" fill="none" opacity="0.6"/>
+            <circle cx="28" cy="74" r="1.8" stroke="#ffffff" stroke-width="0.8" fill="none" opacity="0.6"/>
+          </svg>
+        </i>
+        <div class="card-bottom">
+          <h2>Ocean<br>Serenity</h2>
+          <span class="go">open experiment ↗</span>
+        </div>
+      </a>
+
+
     </section>
 
     <!-- Footer -->
     <footer>
       <span>AI SMARTS / 2026 • Curated Interactive Suite</span>
-      <span>20 zero-dependency physics & cognitive experiments</span>
+      <span>21 zero-dependency physics & cognitive experiments</span>
     </footer>
   </main>
 

@@ -6,7 +6,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 
 ---
 
-## 🎮 The 20 Experiments
+## 🎮 The 21 Experiments
 
 | # | Experiment | Technology | Highlights |
 |---|---|---|---|
@@ -30,6 +30,7 @@ A curated suite of interactive, physics-driven, and neural-powered browser games
 | **18** | [**NeuroLife 3D: Neural Evolution Simulator**](neuro.html) | Three.js WebGL, Real Neural Networks | 3D artificial life ecosystem powered by genuine feedforward neural networks (8 inputs, 8 hidden, 3 motor outputs). Inspect live firing neurons and synapses in real-time, trigger cosmic mutations, inject apex predators, or possess ("Mind-Jack") any organism directly. |
 | **19** | [**The Focus Candle: Atmospheric Melting Timer**](candle.html) | Canvas 2D, Dynamic Wax Physics, Web Audio | Realistic beeswax candle timer with smooth real-time melting, organic multi-harmonic flame flickering, interactive wind flutter, dripping wax tear rivulets, cotton wick crackle, wooden matchstick strike, and dual-tone digital beep alarm. |
 | **20** | [**Galaxy Giggles**](orbit.html) | Canvas 2D & Orbital Mechanics | Solar system simulator with Keplerian orbits, dynamic planetary velocity ratios, tidal trails, and interactive time-dilation. |
+| **21** | [**Ocean Serenity: Deep Sea Stargazer**](ocean.html) | Canvas 2D, Fluid Bio-kinematics, Procedural Web Audio Synth | Deeply relaxing, meditative underwater sanctuary. Look up through abyssal waters into a cosmic starry night, watch shooting stars ("toot-te taare") refract through gentle waves, and drift with bioluminescent jellyfish, ethereal manta rays, rising bubbles, and binaural ocean drone audio. |
 
 ---
 
@@ -259,3 +260,10 @@ Then navigate to `http://localhost:8000`.
 
 ## 📄 License
 MIT © 2026 [Samad Khalid](https://github.com/SamadK01)
+
+### 5. Meditative Ocean Bio-kinematics & Procedural Synth (`ocean.html`)
+- **Undulating Surface Refraction**: Multi-harmonic trigonometric wave equation calculating the ocean-sky interface and casting dynamic volumetric light rays (god rays) into the depths.
+- **Shooting Star Celestial Physics**: High-speed parabolic meteors traversing the sky that illuminate the surface, trigger harmonic pentatonic crystal chimes, and drop sinking stardust (marine snow) through the water column.
+- **Organic Jellyfish Bell Propulsion**: Asymmetric swimming cycle (rapid contraction power stroke + slow graceful relaxation expansion) with Verlet-chain inverse kinematics driving 8 multi-node swaying tentacles.
+- **Procedural Delta-Wave Binaural Drone**: Dual sine oscillators (55Hz + 55.4Hz) generating a 0.4Hz meditative delta brainwave beat filtered through a slow LFO lowpass sweep to simulate the deep rhythmic breathing of the ocean tides.
+- **Pranayama Sukun Breathing Guide**: 16-second box-breathing cycle (4s Inhale, 4s Hold, 4s Exhale, 4s Rest) synchronized with aquatic pulses for instant stress relief.

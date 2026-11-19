@@ -1,0 +1,1500 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" type="image/png" href="favicon.png">
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Ocean Serenity: Deep Sea Stargazer — AI Smarts</title>
+  <meta name="description" content="A deeply relaxing, meditative underwater sanctuary. Look up through abyssal waters into a cosmic starry night, watch shooting stars refract through gentle waves, and drift with bioluminescent jellyfish.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #030814;
+      --panel: rgba(8, 16, 32, 0.72);
+      --panel-border: rgba(56, 189, 248, 0.22);
+      --panel-hover: rgba(56, 189, 248, 0.4);
+      --cyan: #38bdf8;
+      --teal: #2dd4bf;
+      --violet: #a78bfa;
+      --gold: #fde047;
+      --text: #f0fdfa;
+      --text-muted: rgba(220, 240, 255, 0.6);
+      --mono: "Geist Mono", ui-monospace, monospace;
+      --display: "Funnel Display", sans-serif;
+      --body: "Bricolage Grotesque", -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      background: var(--bg); color: var(--text);
+      font-family: var(--body);
+      touch-action: none;
+    }
+
+    canvas {
+      position: fixed; inset: 0; width: 100%; height: 100%;
+      display: block; z-index: 1; cursor: grab;
+    }
+    canvas:active { cursor: grabbing; }
+
+    /* Glassmorphic Minimal HUD */
+    .hud {
+      position: fixed; inset: 0; pointer-events: none; z-index: 10;
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hud.idle { opacity: 0; pointer-events: none; }
+
+    .top-bar {
+      position: absolute; top: 18px; left: 20px; right: 20px;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 12px; pointer-events: auto; flex-wrap: wrap;
+    }
+
+    .brand-wrap {
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .home-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--panel); border: 1px solid var(--panel-border);
+      padding: 8px 16px; border-radius: 999px; color: var(--text);
+      text-decoration: none; font: 600 12px/1 var(--body);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+    .home-link:hover {
+      border-color: var(--cyan); color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(56, 189, 248, 0.25);
+    }
+    .home-link svg { width: 14px; height: 14px; fill: currentColor; }
+
+    .title-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--panel); border: 1px solid var(--panel-border);
+      padding: 8px 16px; border-radius: 999px;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      font: 700 13px/1 var(--display); letter-spacing: 0.5px;
+      color: #fff;
+    }
+    .title-pill .sparkle {
+      color: var(--gold);
+      animation: pulseSparkle 2.2s infinite ease-in-out;
+    }
+    @keyframes pulseSparkle {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; filter: drop-shadow(0 0 6px var(--gold)); }
+    }
+
+    .controls-wrap {
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .hud-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--panel); border: 1px solid var(--panel-border);
+      padding: 8px 14px; border-radius: 999px; color: var(--text);
+      font: 600 12px/1 var(--body); cursor: pointer;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    .hud-btn:hover {
+      border-color: var(--cyan); color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.2);
+    }
+    .hud-btn.active {
+      background: rgba(56, 189, 248, 0.25);
+      border-color: var(--cyan);
+      color: #fff;
+    }
+    .hud-btn svg { width: 14px; height: 14px; fill: currentColor; }
+
+    /* Bottom Centered Floating Bar */
+    .bottom-bar {
+      position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 12px; pointer-events: auto;
+      background: var(--panel); border: 1px solid var(--panel-border);
+      padding: 8px 14px; border-radius: 999px;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      max-width: 90vw; flex-wrap: wrap; justify-content: center;
+    }
+
+    .palette-selector {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .palette-btn {
+      width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2);
+      cursor: pointer; transition: transform 0.2s, border-color 0.2s;
+    }
+    .palette-btn:hover { transform: scale(1.15); border-color: #fff; }
+    .palette-btn.active { border-color: #fff; transform: scale(1.2); box-shadow: 0 0 10px currentColor; }
+    .pal-cyan { background: linear-gradient(135deg, #0284c7, #2dd4bf); color: #2dd4bf; }
+    .pal-violet { background: linear-gradient(135deg, #6366f1, #d946ef); color: #d946ef; }
+    .pal-aurora { background: linear-gradient(135deg, #059669, #38bdf8); color: #38bdf8; }
+    .pal-sunset { background: linear-gradient(135deg, #ea580c, #ec4899); color: #ec4899; }
+
+    .divider { width: 1px; height: 18px; background: rgba(255,255,255,0.15); }
+
+    .hint-text {
+      font: 500 11px/1 var(--mono); color: var(--text-muted);
+      letter-spacing: 0.3px;
+    }
+    .hint-text span {
+      color: var(--cyan); font-weight: 700;
+    }
+
+    /* Pranayama Breathing Guide Overlay */
+    .breathe-overlay {
+      position: absolute; bottom: 84px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      pointer-events: none; opacity: 0; transition: opacity 0.6s ease;
+    }
+    .breathe-overlay.show { opacity: 1; }
+
+    .breathe-orb {
+      width: 90px; height: 90px; border-radius: 50%;
+      border: 1.5px solid rgba(56, 189, 248, 0.5);
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, rgba(45, 212, 191, 0.05) 60%, transparent 80%);
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.25);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 4s ease, border-color 4s ease;
+    }
+    .breathe-orb.inhale {
+      transform: scale(1.6);
+      box-shadow: 0 0 45px rgba(45, 212, 191, 0.5);
+      border-color: rgba(45, 212, 191, 0.9);
+    }
+    .breathe-orb.hold {
+      transform: scale(1.6);
+      border-color: rgba(253, 224, 71, 0.9);
+      box-shadow: 0 0 50px rgba(253, 224, 71, 0.5);
+    }
+    .breathe-orb.exhale {
+      transform: scale(0.9);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .breathe-caption {
+      font: 700 13px/1 var(--display); letter-spacing: 2px; text-transform: uppercase;
+      color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+      transition: color 0.4s ease;
+    }
+
+    /* Wish Notification Banner */
+    .wish-banner {
+      position: absolute; top: 76px; left: 50%; transform: translateX(-50%) translateY(-10px);
+      background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(253, 224, 71, 0.4);
+      padding: 8px 18px; border-radius: 999px;
+      font: 600 12px/1 var(--body); color: var(--gold);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 4px 25px rgba(253, 224, 71, 0.25);
+      pointer-events: none; opacity: 0;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .wish-banner.show {
+      opacity: 1; transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 640px) {
+      .top-bar { top: 12px; left: 12px; right: 12px; }
+      .bottom-bar { bottom: 14px; padding: 6px 10px; gap: 8px; }
+      .title-pill span.sub { display: none; }
+      .hint-text { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="oceanCanvas"></canvas>
+
+  <div class="hud" id="hud">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="brand-wrap">
+        <a class="home-link" href="index.html" title="Return to Suite">
+          <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+          Suite
+        </a>
+        <div class="title-pill">
+          <span class="sparkle">✦</span>
+          <span>Ocean Serenity</span>
+          <span class="sub" style="opacity: 0.5; font-size: 11px; margin-left: 2px;">• Deep Sea Stargazer</span>
+        </div>
+      </div>
+
+      <div class="controls-wrap">
+        <button class="hud-btn" id="wishBtn" title="Make a celestial wish (Space)">
+          <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
+          <span>Wish</span>
+        </button>
+        <button class="hud-btn" id="breatheBtn" title="Toggle Guided Sukun Breathing (B)">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4"/></svg>
+          <span>Breathe</span>
+        </button>
+        <button class="hud-btn" id="soundBtn" title="Sound Ambience (M)">
+          <svg id="soundIcon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          <span id="soundLabel">Sound</span>
+        </button>
+        <button class="hud-btn" id="zenBtn" title="Pure Zen Fullscreen (F)">
+          <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Breathing Guide Overlay -->
+    <div class="breathe-overlay" id="breatheOverlay">
+      <div class="breathe-orb" id="breatheOrb">
+        <span style="font-size: 24px; opacity: 0.85;">🌊</span>
+      </div>
+      <div class="breathe-caption" id="breatheCaption">Inhale Peace...</div>
+    </div>
+
+    <!-- Wish Notification Banner -->
+    <div class="wish-banner" id="wishBanner">
+      ✨ A falling star streaks across the deep... peace is within you.
+    </div>
+
+    <!-- Bottom Controls & Palette -->
+    <div class="bottom-bar">
+      <div class="palette-selector" title="Ambience Palettes">
+        <button class="palette-btn pal-cyan active" data-pal="cyan" title="Abyssal Cyan"></button>
+        <button class="palette-btn pal-aurora" data-pal="aurora" title="Aurora Borealis"></button>
+        <button class="palette-btn pal-violet" data-pal="violet" title="Twilight Violet"></button>
+        <button class="palette-btn pal-sunset" data-pal="sunset" title="Sunken Sunset"></button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="hint-text">
+        move cursor to <span>stir waters</span> · click to <span>make a wish</span> · <span>[Space]</span> falling star
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ==========================================================================
+   OCEAN SERENITY: DEEP SEA STARGAZER
+   Pure Vanilla Canvas & Procedural Web Audio Synth
+   100% Zero Dependencies • Offline Capable
+   ========================================================================== */
+
+const canvas = document.getElementById('oceanCanvas');
+const ctx = canvas.getContext('2d');
+
+let W = window.innerWidth;
+let H = window.innerHeight;
+let DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+function resize() {
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = Math.floor(W * DPR);
+  canvas.height = Math.floor(H * DPR);
+  ctx.scale(DPR, DPR);
+}
+window.addEventListener('resize', resize);
+resize();
+
+/* ==========================================================================
+   PALETTES & THEMES
+   ========================================================================== */
+const PALETTES = {
+  cyan: {
+    name: 'Abyssal Cyan',
+    skyTop: '#020617',
+    skyBottom: '#0c1e3d',
+    waterSurface: '#38bdf8',
+    waterMid: '#0369a1',
+    waterDeep: '#02182b',
+    waterAbyss: '#010914',
+    godRayColor: 'rgba(56, 189, 248, 0.07)',
+    jellyPrimary: '#38bdf8',
+    jellyGlow: '#2dd4bf',
+    jellyCore: '#fde047',
+    mantaColor: 'rgba(14, 165, 233, 0.28)',
+    starColor: '#f0fdf4',
+    stardustColor: '#38bdf8'
+  },
+  aurora: {
+    name: 'Aurora Borealis',
+    skyTop: '#03101e',
+    skyBottom: '#064e3b',
+    waterSurface: '#34d399',
+    waterMid: '#047857',
+    waterDeep: '#022c22',
+    waterAbyss: '#021410',
+    godRayColor: 'rgba(52, 211, 153, 0.08)',
+    jellyPrimary: '#34d399',
+    jellyGlow: '#38bdf8',
+    jellyCore: '#a7f3d0',
+    mantaColor: 'rgba(16, 185, 129, 0.26)',
+    starColor: '#ecfdf5',
+    stardustColor: '#34d399'
+  },
+  violet: {
+    name: 'Twilight Violet',
+    skyTop: '#090514',
+    skyBottom: '#2e1065',
+    waterSurface: '#c084fc',
+    waterMid: '#7e22ce',
+    waterDeep: '#3b0764',
+    waterAbyss: '#160228',
+    godRayColor: 'rgba(192, 132, 252, 0.08)',
+    jellyPrimary: '#c084fc',
+    jellyGlow: '#f472b6',
+    jellyCore: '#fde047',
+    mantaColor: 'rgba(168, 85, 247, 0.25)',
+    starColor: '#faf5ff',
+    stardustColor: '#e879f9'
+  },
+  sunset: {
+    name: 'Sunken Sunset',
+    skyTop: '#180718',
+    skyBottom: '#701a75',
+    waterSurface: '#f43f5e',
+    waterMid: '#9f1239',
+    waterDeep: '#4c0519',
+    waterAbyss: '#1d020a',
+    godRayColor: 'rgba(251, 113, 133, 0.08)',
+    jellyPrimary: '#fb7185',
+    jellyGlow: '#f59e0b',
+    jellyCore: '#fef08a',
+    mantaColor: 'rgba(244, 63, 94, 0.24)',
+    starColor: '#fff1f2',
+    stardustColor: '#fbbf24'
+  }
+};
+
+let currentPalette = PALETTES.cyan;
+
+/* ==========================================================================
+   PROCEDURAL ZEN WEB AUDIO SYNTH
+   Harmonic Singing Chimes, Ocean Binaural Drone, Bubble Pings
+   ========================================================================== */
+let audioCtx = null;
+let soundEnabled = false;
+let droneNodes = null;
+let masterGain = null;
+
+const PENTATONIC_SCALE = [
+  261.63, // C4
+  293.66, // D4
+  329.63, // E4
+  392.00, // G4
+  440.00, // A4
+  523.25, // C5
+  587.33, // D5
+  659.25, // E5
+  783.99, // G5
+  880.00, // A5
+  1046.50 // C6
+];
+
+function initAudio() {
+  if (audioCtx) return;
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioContextClass();
+
+    masterGain = audioCtx.createGain();
+    masterGain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+    masterGain.connect(audioCtx.destination);
+
+    // Warm Oceanic Binaural Drone
+    setupOceanDrone();
+  } catch (err) {
+    console.warn("Web Audio not supported", err);
+  }
+}
+
+function setupOceanDrone() {
+  if (!audioCtx) return;
+  const t = audioCtx.currentTime;
+
+  const droneGain = audioCtx.createGain();
+  droneGain.gain.setValueAtTime(0.18, t);
+
+  // Sub-bass root (55Hz) + Delta beat (55.4Hz -> 0.4Hz meditative alpha/theta brainwave)
+  const osc1 = audioCtx.createOscillator();
+  const osc2 = audioCtx.createOscillator();
+  const osc5th = audioCtx.createOscillator();
+
+  osc1.type = 'sine';
+  osc1.frequency.setValueAtTime(55, t);
+
+  osc2.type = 'sine';
+  osc2.frequency.setValueAtTime(55.4, t);
+
+  osc5th.type = 'triangle';
+  osc5th.frequency.setValueAtTime(82.41, t); // E2 sweet fifth harmonic
+
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(140, t);
+  filter.Q.setValueAtTime(2, t);
+
+  // Slow LFO for ocean wave breathing modulation
+  const lfo = audioCtx.createOscillator();
+  const lfoGain = audioCtx.createGain();
+  lfo.frequency.setValueAtTime(0.07, t); // ~14 second breathing cycle
+  lfoGain.gain.setValueAtTime(50, t);
+  lfo.connect(filter.frequency);
+
+  osc1.connect(filter);
+  osc2.connect(filter);
+  osc5th.connect(filter);
+  filter.connect(droneGain);
+  droneGain.connect(masterGain);
+
+  osc1.start(t);
+  osc2.start(t);
+  osc5th.start(t);
+  lfo.start(t);
+
+  droneNodes = { osc1, osc2, osc5th, lfo, droneGain };
+}
+
+function playStarChime(freq) {
+  if (!soundEnabled || !audioCtx) return;
+  try {
+    const t = audioCtx.currentTime;
+    const note = freq || PENTATONIC_SCALE[Math.floor(Math.random() * PENTATONIC_SCALE.length)];
+
+    // Dual crystalline bell sine oscillators
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(note, t);
+
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(note * 1.501, t); // gentle harmonic overtone
+
+    g.gain.setValueAtTime(0.001, t);
+    g.gain.exponentialRampToValueAtTime(0.15, t + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 3.2);
+
+    osc1.connect(g);
+    osc2.connect(g);
+    g.connect(masterGain);
+
+    osc1.start(t);
+    osc2.start(t);
+    osc1.stop(t + 3.3);
+    osc2.stop(t + 3.3);
+  } catch (e) {}
+}
+
+function playBubblePop(freq) {
+  if (!soundEnabled || !audioCtx) return;
+  try {
+    const t = audioCtx.currentTime;
+    const base = freq || (600 + Math.random() * 400);
+
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(base * 0.7, t);
+    osc.frequency.exponentialRampToValueAtTime(base * 1.6, t + 0.08);
+
+    g.gain.setValueAtTime(0.08, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+
+    osc.connect(g);
+    g.connect(masterGain);
+
+    osc.start(t);
+    osc.stop(t + 0.13);
+  } catch (e) {}
+}
+
+function toggleSound() {
+  initAudio();
+  if (!audioCtx) return;
+
+  soundEnabled = !soundEnabled;
+  const label = document.getElementById('soundLabel');
+  const btn = document.getElementById('soundBtn');
+
+  if (soundEnabled) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+    masterGain.gain.exponentialRampToValueAtTime(0.85, audioCtx.currentTime + 1.2);
+    btn.classList.add('active');
+    label.textContent = 'Mute';
+    playStarChime(523.25);
+  } else {
+    masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+    masterGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.6);
+    btn.classList.remove('active');
+    label.textContent = 'Sound';
+  }
+}
+
+/* ==========================================================================
+   INTERACTION & INPUT STATE
+   ========================================================================== */
+const mouse = {
+  x: W * 0.5,
+  y: H * 0.5,
+  prevX: W * 0.5,
+  prevY: H * 0.5,
+  vx: 0,
+  vy: 0,
+  isDown: false,
+  idleTimer: 0
+};
+
+function updatePointer(x, y) {
+  mouse.vx = x - mouse.x;
+  mouse.vy = y - mouse.y;
+  mouse.prevX = mouse.x;
+  mouse.prevY = mouse.y;
+  mouse.x = x;
+  mouse.y = y;
+  mouse.idleTimer = 0;
+  hudEl.classList.remove('idle');
+
+  // Spawn gentle bioluminescent water eddies on movement
+  const spd = Math.hypot(mouse.vx, mouse.vy);
+  if (spd > 3) {
+    const count = Math.min(Math.floor(spd / 6), 3);
+    for (let i = 0; i < count; i++) {
+      waterRipples.push(new WaterCurrentParticle(
+        mouse.x + (Math.random() - 0.5) * 20,
+        mouse.y + (Math.random() - 0.5) * 20,
+        mouse.vx * 0.18 + (Math.random() - 0.5) * 15,
+        mouse.vy * 0.18 + (Math.random() - 0.5) * 15
+      ));
+    }
+  }
+}
+
+window.addEventListener('mousemove', e => updatePointer(e.clientX, e.clientY));
+window.addEventListener('touchmove', e => {
+  if (e.touches.length > 0) {
+    updatePointer(e.touches[0].clientX, e.touches[0].clientY);
+  }
+}, { passive: true });
+
+function handleScreenClick(clientX, clientY) {
+  initAudio();
+  updatePointer(clientX, clientY);
+
+  // Check if clicked an air bubble to pop it
+  let popped = false;
+  for (let i = bubbles.length - 1; i >= 0; i--) {
+    const b = bubbles[i];
+    if (Math.hypot(clientX - b.x, clientY - b.y) < b.radius + 15) {
+      b.pop();
+      popped = true;
+      break;
+    }
+  }
+
+  // If didn't pop bubble, make an instant shooting star and ripple wave
+  if (!popped) {
+    spawnShootingStar(clientX);
+    spawnWaterPulse(clientX, clientY);
+  }
+}
+
+window.addEventListener('pointerdown', e => {
+  if (e.target.closest('.hud') || e.target.closest('button') || e.target.closest('a')) return;
+  mouse.isDown = true;
+  handleScreenClick(e.clientX, e.clientY);
+});
+window.addEventListener('pointerup', () => { mouse.isDown = false; });
+
+/* ==========================================================================
+   WATER SURFACE & SKY SYSTEM
+   ========================================================================== */
+function getSurfaceY(x, time) {
+  const base = H * 0.22;
+  const wave1 = Math.sin(x * 0.007 + time * 1.1) * 8;
+  const wave2 = Math.cos(x * 0.018 - time * 0.8) * 4;
+  const wave3 = Math.sin(x * 0.003 + time * 0.5) * 5;
+  return base + wave1 + wave2 + wave3;
+}
+
+/* Background Night Sky Stars */
+class SkyStar {
+  constructor() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * (H * 0.25);
+    this.size = 0.6 + Math.random() * 1.6;
+    this.baseAlpha = 0.3 + Math.random() * 0.7;
+    this.twinkleSpeed = 0.8 + Math.random() * 2.2;
+    this.phase = Math.random() * Math.PI * 2;
+  }
+  draw(ctx, time) {
+    const a = this.baseAlpha * (0.6 + 0.4 * Math.sin(time * this.twinkleSpeed + this.phase));
+    ctx.fillStyle = currentPalette.starColor;
+    ctx.globalAlpha = a;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+}
+
+const skyStars = [];
+for (let i = 0; i < 180; i++) skyStars.push(new SkyStar());
+
+/* ==========================================================================
+   SHOOTING STARS / FALLING STARS ("TOOT-TE TAARE")
+   Streaks across the heavens, reflects & drops starlight down into the ocean
+   ========================================================================== */
+class ShootingStar {
+  constructor(targetX) {
+    const fromLeft = Math.random() > 0.4;
+    this.x = fromLeft ? -40 : (W * 0.4 + Math.random() * W * 0.6);
+    this.y = 10 + Math.random() * (H * 0.16);
+    const angle = fromLeft ? (0.2 + Math.random() * 0.25) : (Math.PI - 0.2 - Math.random() * 0.25);
+    const speed = 750 + Math.random() * 450;
+    this.vx = Math.cos(angle) * speed;
+    this.vy = Math.sin(angle) * speed;
+    this.length = 140 + Math.random() * 160;
+    this.life = 1.4;
+    this.maxLife = this.life;
+    this.color = '#ffffff';
+    this.tailColor = currentPalette.stardustColor;
+    this.history = [];
+    this.waterSpawnTimer = 0;
+
+    // Harmonic chime tone on birth
+    playStarChime();
+  }
+
+  update(dt) {
+    this.life -= dt;
+    this.history.unshift({ x: this.x, y: this.y });
+    if (this.history.length > 25) this.history.pop();
+
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+
+    // As shooting star passes above water, rain starlight into the sea
+    this.waterSpawnTimer += dt;
+    if (this.waterSpawnTimer > 0.03 && this.x > 0 && this.x < W) {
+      this.waterSpawnTimer = 0;
+      const surfY = getSurfaceY(this.x, performance.now() * 0.001);
+      // Spawn sinking celestial stardust in ocean
+      stardustParticles.push(new SinkingStardust(
+        this.x + (Math.random() - 0.5) * 30,
+        surfY + Math.random() * 12,
+        (Math.random() - 0.5) * 20,
+        25 + Math.random() * 45
+      ));
+    }
+  }
+
+  draw(ctx) {
+    if (this.history.length < 2) return;
+    const progress = Math.max(0, this.life / this.maxLife);
+    const alpha = Math.sin(progress * Math.PI);
+
+    ctx.save();
+
+    // 1. Radiant Tail Line
+    const grad = ctx.createLinearGradient(
+      this.history[this.history.length - 1].x,
+      this.history[this.history.length - 1].y,
+      this.x,
+      this.y
+    );
+    grad.addColorStop(0, 'transparent');
+    grad.addColorStop(0.7, this.tailColor);
+    grad.addColorStop(1, '#ffffff');
+
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 3.2;
+    ctx.lineCap = 'round';
+    ctx.globalAlpha = alpha * 0.9;
+    ctx.beginPath();
+    ctx.moveTo(this.history[this.history.length - 1].x, this.history[this.history.length - 1].y);
+    for (let i = this.history.length - 2; i >= 0; i--) {
+      ctx.lineTo(this.history[i].x, this.history[i].y);
+    }
+    ctx.lineTo(this.x, this.y);
+    ctx.stroke();
+
+    // 2. Star Blazing Head & Radial Bloom
+    const headGlow = ctx.createRadialGradient(this.x, this.y, 1, this.x, this.y, 22);
+    headGlow.addColorStop(0, '#ffffff');
+    headGlow.addColorStop(0.3, this.tailColor);
+    headGlow.addColorStop(1, 'transparent');
+
+    ctx.fillStyle = headGlow;
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, 22, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 3. Diamond Starburst
+    ctx.fillStyle = '#ffffff';
+    ctx.globalAlpha = alpha * 0.95;
+    ctx.beginPath();
+    ctx.ellipse(this.x, this.y, 12, 2.5, Math.atan2(this.vy, this.vx), 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+}
+
+let shootingStars = [];
+
+function spawnShootingStar(hintX) {
+  shootingStars.push(new ShootingStar(hintX));
+}
+
+let autoStarTimer = 4.0;
+
+/* ==========================================================================
+   SINKING CELESTIAL STARDUST (Marine Snow from Falling Stars)
+   ========================================================================== */
+class SinkingStardust {
+  constructor(x, y, vx, vy) {
+    this.x = x;
+    this.y = y;
+    this.vx = vx;
+    this.vy = vy;
+    this.size = 1.2 + Math.random() * 2.2;
+    this.life = 6.0 + Math.random() * 4.0;
+    this.maxLife = this.life;
+    this.color = Math.random() > 0.4 ? currentPalette.jellyGlow : '#ffffff';
+    this.wobble = Math.random() * Math.PI * 2;
+  }
+  update(dt, time) {
+    this.wobble += dt * 1.5;
+    this.x += (this.vx + Math.sin(this.wobble) * 8) * dt;
+    this.y += this.vy * dt;
+    this.life -= dt;
+  }
+  draw(ctx) {
+    if (this.life <= 0) return;
+    const alpha = Math.min(1, this.life / this.maxLife) * 0.85;
+    ctx.save();
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+let stardustParticles = [];
+
+/* ==========================================================================
+   WATER WAKE / CURRENT PARTICLES (Cursor Stirring Plankton)
+   ========================================================================== */
+class WaterCurrentParticle {
+  constructor(x, y, vx, vy) {
+    this.x = x;
+    this.y = y;
+    this.vx = vx;
+    this.vy = vy;
+    this.life = 1.8 + Math.random() * 1.2;
+    this.maxLife = this.life;
+    this.size = 1.5 + Math.random() * 2.5;
+    this.color = Math.random() > 0.3 ? currentPalette.jellyPrimary : currentPalette.jellyGlow;
+  }
+  update(dt) {
+    this.vx *= 0.94;
+    this.vy *= 0.94;
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    this.life -= dt;
+  }
+  draw(ctx) {
+    if (this.life <= 0) return;
+    const a = Math.max(0, this.life / this.maxLife);
+    ctx.save();
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = a * 0.7;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+let waterRipples = [];
+
+/* Radial Water Expansion Wave on Click */
+class WaterPulse {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.radius = 4;
+    this.maxRadius = 140 + Math.random() * 60;
+    this.life = 1.2;
+    this.maxLife = this.life;
+  }
+  update(dt) {
+    this.life -= dt;
+    const progress = 1 - (this.life / this.maxLife);
+    this.radius = 4 + progress * this.maxRadius;
+  }
+  draw(ctx) {
+    if (this.life <= 0) return;
+    const a = Math.max(0, this.life / this.maxLife);
+    ctx.save();
+    ctx.strokeStyle = currentPalette.waterSurface;
+    ctx.lineWidth = 1.8 * a;
+    ctx.globalAlpha = a * 0.45;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+let waterPulses = [];
+function spawnWaterPulse(x, y) {
+  waterPulses.push(new WaterPulse(x, y));
+}
+
+/* ==========================================================================
+   BIOLUMINESCENT JELLYFISH (Aurelia Medusae)
+   Dynamic Fluid Contraction, Swaying Tentacles & Inner Radial Glow
+   ========================================================================== */
+class Jellyfish {
+  constructor(x, y, scale = 1.0, speed = 1.0) {
+    this.x = x;
+    this.y = y;
+    this.scale = scale;
+    this.speed = speed;
+    this.angle = 0; // facing direction (-PI/2 is straight up)
+    this.targetAngle = -Math.PI * 0.5;
+    this.vx = 0;
+    this.vy = -12;
+    this.pulseTime = Math.random() * 10;
+    this.pulseCycle = 3.6 / speed; // seconds per full pump
+
+    // Tentacles: array of chain nodes
+    this.tentacleCount = 8;
+    this.nodeCount = 12;
+    this.tentacles = [];
+    for (let t = 0; t < this.tentacleCount; t++) {
+      const nodes = [];
+      const spread = (t / (this.tentacleCount - 1) - 0.5) * 44 * scale;
+      for (let n = 0; n < this.nodeCount; n++) {
+        nodes.push({ x: this.x + spread, y: this.y + n * 8 * scale, vx: 0, vy: 0 });
+      }
+      this.tentacles.push(nodes);
+    }
+  }
+
+  update(dt, time) {
+    this.pulseTime += dt;
+    const phase = (this.pulseTime % this.pulseCycle) / this.pulseCycle; // 0 to 1
+
+    // Asymmetric swimming rhythm: Power stroke (0 to 0.35), Recovery stroke (0.35 to 1.0)
+    let thrust = 0;
+    if (phase < 0.35) {
+      // Powerful upward squeeze
+      const strokeProgress = phase / 0.35;
+      thrust = Math.sin(strokeProgress * Math.PI) * 55 * this.speed;
+      this.bellContract = Math.sin(strokeProgress * Math.PI) * 0.38;
+    } else {
+      // Slow majestic expansion
+      const strokeProgress = (phase - 0.35) / 0.65;
+      thrust = -8 * (1 - strokeProgress);
+      this.bellContract = -Math.sin(strokeProgress * Math.PI) * 0.12;
+    }
+
+    // Drifting motion
+    const forwardX = Math.cos(this.targetAngle);
+    const forwardY = Math.sin(this.targetAngle);
+
+    this.vx += (forwardX * thrust * dt) - this.vx * 0.04;
+    this.vy += (forwardY * thrust * dt) - this.vy * 0.04;
+
+    // Buoyancy drift & gentle sinusoidal wander
+    this.vx += Math.sin(time * 0.5 + this.x * 0.01) * 3 * dt;
+    this.vy -= 4 * dt;
+
+    // Mouse evasion / attraction
+    const dx = mouse.x - this.x;
+    const dy = mouse.y - this.y;
+    const distToMouse = Math.hypot(dx, dy);
+    if (distToMouse < 180 * this.scale) {
+      const avoid = (180 * this.scale - distToMouse) / (180 * this.scale);
+      this.vx -= (dx / distToMouse) * avoid * 30 * dt;
+      this.vy -= (dy / distToMouse) * avoid * 30 * dt;
+    }
+
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+
+    // Wrap around screen boundaries with seamless reappearance
+    if (this.y < H * 0.18) {
+      this.y = H + 60;
+      this.x = W * 0.1 + Math.random() * W * 0.8;
+    }
+    if (this.x < -80) this.x = W + 60;
+    if (this.x > W + 80) this.x = -60;
+
+    // Update Tentacle Verlet Physics
+    const bellWidth = 46 * this.scale * (1 - this.bellContract * 0.5);
+    for (let t = 0; t < this.tentacleCount; t++) {
+      const spreadOffset = (t / (this.tentacleCount - 1) - 0.5) * bellWidth;
+      const rootX = this.x + spreadOffset;
+      const rootY = this.y + 10 * this.scale;
+
+      const chain = this.tentacles[t];
+      chain[0].x = rootX;
+      chain[0].y = rootY;
+
+      for (let n = 1; n < this.nodeCount; n++) {
+        const prev = chain[n - 1];
+        const curr = chain[n];
+
+        // Fluid resistance & sway
+        const sway = Math.sin(time * 1.5 + n * 0.4 + t) * 6 * this.scale;
+        curr.x += (prev.x + sway - curr.x) * 0.22;
+        curr.y += (prev.y + 7 * this.scale - curr.y) * 0.22 + 6 * dt;
+      }
+    }
+  }
+
+  draw(ctx, time) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+
+    const s = this.scale;
+    const contract = this.bellContract;
+    const w = 48 * s * (1 - contract * 0.4);
+    const h = 42 * s * (1 + contract * 0.5);
+
+    // 1. Draw Flowing Tentacles
+    ctx.restore();
+    ctx.save();
+    for (let t = 0; t < this.tentacleCount; t++) {
+      const chain = this.tentacles[t];
+      ctx.beginPath();
+      ctx.moveTo(chain[0].x, chain[0].y);
+      for (let n = 1; n < this.nodeCount; n++) {
+        ctx.lineTo(chain[n].x, chain[n].y);
+      }
+      ctx.strokeStyle = currentPalette.jellyGlow;
+      ctx.globalAlpha = 0.35 + (t % 2) * 0.15;
+      ctx.lineWidth = (1.6 - (t % 2) * 0.5) * s;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(this.x, this.y);
+
+    // 2. Trailing Inner Oral Arms (Ruffled central ribbons)
+    for (let a = -1; a <= 1; a += 2) {
+      ctx.save();
+      ctx.strokeStyle = currentPalette.jellyPrimary;
+      ctx.lineWidth = 3.0 * s;
+      ctx.globalAlpha = 0.45;
+      ctx.beginPath();
+      ctx.moveTo(a * 8 * s, 6 * s);
+      const waveX = Math.sin(time * 2.5 + a) * 8 * s;
+      ctx.bezierCurveTo(
+        a * 14 * s + waveX, 20 * s,
+        a * 6 * s - waveX, 42 * s,
+        a * 10 * s, 58 * s
+      );
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // 3. Translucent Outer Bell Umbrella (Organic Bezier Cap)
+    const bellGrad = ctx.createRadialGradient(0, -h * 0.3, 4 * s, 0, 0, w);
+    bellGrad.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
+    bellGrad.addColorStop(0.3, currentPalette.jellyPrimary);
+    bellGrad.addColorStop(0.75, currentPalette.jellyGlow);
+    bellGrad.addColorStop(1, 'transparent');
+
+    ctx.fillStyle = bellGrad;
+    ctx.globalAlpha = 0.55;
+
+    ctx.beginPath();
+    ctx.moveTo(-w, 4 * s);
+    // Smooth dome top
+    ctx.bezierCurveTo(-w * 1.05, -h * 0.85, w * 1.05, -h * 0.85, w, 4 * s);
+    // Scalloped bottom rim
+    ctx.bezierCurveTo(w * 0.5, 8 * s, -w * 0.5, 8 * s, -w, 4 * s);
+    ctx.closePath();
+    ctx.fill();
+
+    // 4. Glowing Rim Stroke
+    ctx.strokeStyle = currentPalette.jellyGlow;
+    ctx.lineWidth = 1.8 * s;
+    ctx.globalAlpha = 0.85;
+    ctx.stroke();
+
+    // 5. Four Horseshoe Gonads / Radial Organs in the Center
+    ctx.strokeStyle = currentPalette.jellyCore;
+    ctx.lineWidth = 2.2 * s;
+    ctx.globalAlpha = 0.75;
+    const gonadRadius = 7 * s;
+    [-1, 1].forEach(gx => {
+      [-1, 1].forEach(gy => {
+        ctx.beginPath();
+        ctx.arc(gx * 11 * s, -h * 0.3 + gy * 7 * s, gonadRadius, 0, Math.PI * 1.5);
+        ctx.stroke();
+      });
+    });
+
+    // 6. Radiant Inner Luminescence Sparkle
+    const innerLight = ctx.createRadialGradient(0, -h * 0.3, 1, 0, -h * 0.3, 16 * s);
+    innerLight.addColorStop(0, '#ffffff');
+    innerLight.addColorStop(0.4, currentPalette.jellyCore);
+    innerLight.addColorStop(1, 'transparent');
+    ctx.fillStyle = innerLight;
+    ctx.globalAlpha = 0.7;
+    ctx.beginPath();
+    ctx.arc(0, -h * 0.3, 16 * s, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+}
+
+let jellyfishGroup = [];
+function initJellyfish() {
+  jellyfishGroup = [
+    new Jellyfish(W * 0.22, H * 0.65, 1.15, 0.95),
+    new Jellyfish(W * 0.75, H * 0.75, 1.05, 1.1),
+    new Jellyfish(W * 0.48, H * 0.50, 0.80, 1.25),
+    new Jellyfish(W * 0.15, H * 0.85, 0.65, 1.3),
+    new Jellyfish(W * 0.88, H * 0.45, 0.55, 1.4)
+  ];
+}
+initJellyfish();
+
+/* ==========================================================================
+   THE MAJESTIC MANTA RAY ("Deep Sea Voyager")
+   Gracefully glides across the abyss with undulating wings
+   ========================================================================== */
+class MantaRay {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    this.dir = Math.random() > 0.5 ? 1 : -1;
+    this.x = this.dir === 1 ? -160 : W + 160;
+    this.y = H * 0.42 + Math.random() * (H * 0.45);
+    this.speed = 34 + Math.random() * 22;
+    this.scale = 0.9 + Math.random() * 0.35;
+    this.wingPhase = Math.random() * Math.PI * 2;
+    this.active = true;
+  }
+  update(dt, time) {
+    this.x += this.dir * this.speed * dt;
+    this.wingPhase += dt * 1.6;
+    this.y += Math.sin(time * 0.4) * 6 * dt;
+
+    if (this.dir === 1 && this.x > W + 200) this.reset();
+    if (this.dir === -1 && this.x < -200) this.reset();
+  }
+  draw(ctx) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.scale(this.dir * this.scale, this.scale);
+
+    const wingFlap = Math.sin(this.wingPhase) * 18;
+
+    // Manta Silky Body Gradient
+    ctx.fillStyle = currentPalette.mantaColor;
+    ctx.strokeStyle = currentPalette.jellyPrimary;
+    ctx.lineWidth = 1.4;
+    ctx.globalAlpha = 0.65;
+
+    // Fluid Body Silhouette with Wings
+    ctx.beginPath();
+    // Head & Cephalic Horns
+    ctx.moveTo(70, -4);
+    ctx.bezierCurveTo(85, -12, 85, -4, 75, 4);
+    // Right Wing
+    ctx.bezierCurveTo(30, 25, 10, 60 + wingFlap, -20, 85 + wingFlap);
+    ctx.bezierCurveTo(-15, 55 + wingFlap, -10, 30, -35, 12);
+    // Long Slender Tail
+    ctx.lineTo(-120, 10);
+    ctx.lineTo(-35, 6);
+    // Left Wing
+    ctx.bezierCurveTo(-10, -25, -15, -55 - wingFlap, -20, -85 - wingFlap);
+    ctx.bezierCurveTo(10, -60 - wingFlap, 30, -25, 75, -4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Bioluminescent Spine Markings
+    ctx.fillStyle = currentPalette.jellyGlow;
+    ctx.globalAlpha = 0.8;
+    for (let i = 0; i < 5; i++) {
+      ctx.beginPath();
+      ctx.ellipse(35 - i * 14, 0, 4 - i * 0.6, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+}
+
+const mantaRay = new MantaRay();
+
+/* ==========================================================================
+   OCEAN AIR BUBBLES
+   Buoyant, Wobbling Translucent Spheres with Specular Highlights
+   ========================================================================== */
+class Bubble {
+  constructor() {
+    this.reset(true);
+  }
+  reset(initial = false) {
+    this.x = Math.random() * W;
+    this.y = initial ? (H * 0.25 + Math.random() * H * 0.75) : (H + 20 + Math.random() * 50);
+    this.radius = 3 + Math.random() * 9;
+    this.vy = -18 - Math.random() * 35;
+    this.wobbleSpeed = 1.2 + Math.random() * 2.2;
+    this.wobbleAmp = 4 + Math.random() * 10;
+    this.phase = Math.random() * Math.PI * 2;
+  }
+  pop() {
+    playBubblePop(700 + Math.random() * 300);
+    for (let i = 0; i < 6; i++) {
+      waterRipples.push(new WaterCurrentParticle(
+        this.x + (Math.random() - 0.5) * 10,
+        this.y + (Math.random() - 0.5) * 10,
+        (Math.random() - 0.5) * 35,
+        (Math.random() - 0.5) * 35
+      ));
+    }
+    this.reset();
+  }
+  update(dt, time) {
+    this.y += this.vy * dt;
+    this.x += Math.sin(time * this.wobbleSpeed + this.phase) * this.wobbleAmp * dt;
+
+    const surfY = getSurfaceY(this.x, time);
+    if (this.y < surfY + 4) {
+      this.pop();
+    }
+  }
+  draw(ctx) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+
+    // Glassy Translucent Bubble
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+    ctx.lineWidth = 1.2;
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.08)';
+    ctx.beginPath();
+    ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Specular Highlight
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+    ctx.beginPath();
+    ctx.arc(-this.radius * 0.35, -this.radius * 0.35, this.radius * 0.25, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+}
+
+const bubbles = [];
+for (let i = 0; i < 55; i++) bubbles.push(new Bubble());
+
+/* ==========================================================================
+   VOLUMETRIC GOD RAYS (Moon/Starlight Beams Piercing the Sea)
+   ========================================================================== */
+function drawGodRays(ctx, time) {
+  const raysCount = 7;
+  for (let i = 0; i < raysCount; i++) {
+    const sway = Math.sin(time * 0.4 + i * 1.1) * 35;
+    const originX = W * (0.2 + (i / (raysCount - 1)) * 0.6) + sway;
+    const originY = getSurfaceY(originX, time);
+
+    const widthTop = 15 + i * 5;
+    const widthBottom = 120 + i * 35;
+    const bottomX = originX + sway * 2.5 + (i - raysCount * 0.5) * 70;
+
+    const grad = ctx.createLinearGradient(originX, originY, bottomX, H);
+    grad.addColorStop(0, currentPalette.godRayColor);
+    grad.addColorStop(0.6, 'rgba(56, 189, 248, 0.02)');
+    grad.addColorStop(1, 'transparent');
+
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(originX - widthTop * 0.5, originY);
+    ctx.lineTo(originX + widthTop * 0.5, originY);
+    ctx.lineTo(bottomX + widthBottom * 0.5, H);
+    ctx.lineTo(bottomX - widthBottom * 0.5, H);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+/* ==========================================================================
+   PRANAYAMA SUKUN BREATHING GUIDE
+   Synchronized Relaxation Loop: Inhale (4s) -> Hold (4s) -> Exhale (4s) -> Peace (4s)
+   ========================================================================== */
+let breatheActive = false;
+let breatheTimer = 0;
+const breathePhases = [
+  { name: 'Inhale Peace...', dur: 4, cls: 'inhale', color: '#38bdf8' },
+  { name: 'Hold & Savor...', dur: 4, cls: 'hold', color: '#fde047' },
+  { name: 'Exhale Tension...', dur: 4, cls: 'exhale', color: '#34d399' },
+  { name: 'Rest in Stillness...', dur: 4, cls: 'exhale', color: '#a78bfa' }
+];
+
+function toggleBreathe() {
+  breatheActive = !breatheActive;
+  const overlay = document.getElementById('breatheOverlay');
+  const btn = document.getElementById('breatheBtn');
+  if (breatheActive) {
+    breatheTimer = 0;
+    overlay.classList.add('show');
+    btn.classList.add('active');
+  } else {
+    overlay.classList.remove('show');
+    btn.classList.remove('active');
+  }
+}
+
+function updateBreatheGuide(dt) {
+  if (!breatheActive) return;
+  breatheTimer += dt;
+  const cycleTotal = 16;
+  const curInCycle = breatheTimer % cycleTotal;
+
+  let acc = 0;
+  let activePhase = breathePhases[0];
+  for (const p of breathePhases) {
+    if (curInCycle >= acc && curInCycle < acc + p.dur) {
+      activePhase = p;
+      break;
+    }
+    acc += p.dur;
+  }
+
+  const orb = document.getElementById('breatheOrb');
+  const cap = document.getElementById('breatheCaption');
+  orb.className = 'breathe-orb ' + activePhase.cls;
+  cap.textContent = activePhase.name;
+  cap.style.color = activePhase.color;
+}
+
+/* ==========================================================================
+   MAIN RENDER LOOP
+   ========================================================================== */
+let lastTime = performance.now();
+
+function animate(now) {
+  const dt = Math.min((now - lastTime) * 0.001, 0.1);
+  lastTime = now;
+  const time = now * 0.001;
+
+  // 1. Clear & Draw Cosmic Night Sky (Above Surface)
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, H * 0.25);
+  skyGrad.addColorStop(0, currentPalette.skyTop);
+  skyGrad.addColorStop(1, currentPalette.skyBottom);
+  ctx.fillStyle = skyGrad;
+  ctx.fillRect(0, 0, W, H * 0.25);
+
+  // Twinkling Night Sky Stars
+  skyStars.forEach(star => star.draw(ctx, time));
+
+  // Celestial Crescent / Radiant Moon
+  const moonX = W * 0.82;
+  const moonY = H * 0.08;
+  const moonGlow = ctx.createRadialGradient(moonX, moonY, 4, moonX, moonY, 60);
+  moonGlow.addColorStop(0, '#ffffff');
+  moonGlow.addColorStop(0.3, currentPalette.stardustColor);
+  moonGlow.addColorStop(1, 'transparent');
+  ctx.fillStyle = moonGlow;
+  ctx.beginPath();
+  ctx.arc(moonX, moonY, 60, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(moonX, moonY, 12, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 2. Draw Ocean Water Depths (Below Undulating Surface)
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(0, H);
+  for (let x = 0; x <= W; x += 15) {
+    ctx.lineTo(x, getSurfaceY(x, time));
+  }
+  ctx.lineTo(W, H);
+  ctx.closePath();
+
+  const oceanGrad = ctx.createLinearGradient(0, H * 0.2, 0, H);
+  oceanGrad.addColorStop(0, currentPalette.waterMid);
+  oceanGrad.addColorStop(0.45, currentPalette.waterDeep);
+  oceanGrad.addColorStop(1, currentPalette.waterAbyss);
+  ctx.fillStyle = oceanGrad;
+  ctx.fill();
+
+  // Luminous Water Surface Boundary Line
+  ctx.strokeStyle = currentPalette.waterSurface;
+  ctx.lineWidth = 2.4;
+  ctx.shadowColor = currentPalette.waterSurface;
+  ctx.shadowBlur = 12;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  ctx.restore();
+
+  // 3. Volumetric God Rays Swaying Through the Abyss
+  drawGodRays(ctx, time);
+
+  // 4. Update & Draw Shooting Stars
+  autoStarTimer -= dt;
+  if (autoStarTimer <= 0) {
+    spawnShootingStar();
+    autoStarTimer = 6.0 + Math.random() * 7.0; // spontaneous starry wonder
+  }
+
+  for (let i = shootingStars.length - 1; i >= 0; i--) {
+    const s = shootingStars[i];
+    s.update(dt);
+    s.draw(ctx);
+    if (s.life <= 0) shootingStars.splice(i, 1);
+  }
+
+  // 5. Sinking Stardust (Marine Snow from Falling Stars)
+  for (let i = stardustParticles.length - 1; i >= 0; i--) {
+    const p = stardustParticles[i];
+    p.update(dt, time);
+    p.draw(ctx);
+    if (p.life <= 0) stardustParticles.splice(i, 1);
+  }
+
+  // 6. Water Current Eddy Particles (Cursor trails)
+  for (let i = waterRipples.length - 1; i >= 0; i--) {
+    const r = waterRipples[i];
+    r.update(dt);
+    r.draw(ctx);
+    if (r.life <= 0) waterRipples.splice(i, 1);
+  }
+
+  // 7. Water Pulses (Click waves)
+  for (let i = waterPulses.length - 1; i >= 0; i--) {
+    const wp = waterPulses[i];
+    wp.update(dt);
+    wp.draw(ctx);
+    if (wp.life <= 0) waterPulses.splice(i, 1);
+  }
+
+  // 8. Manta Ray Glider
+  mantaRay.update(dt, time);
+  mantaRay.draw(ctx);
+
+  // 9. Floating Air Bubbles
+  bubbles.forEach(b => {
+    b.update(dt, time);
+    b.draw(ctx);
+  });
+
+  // 10. Bioluminescent Jellyfish
+  jellyfishGroup.forEach(jelly => {
+    jelly.update(dt, time);
+    jelly.draw(ctx, time);
+  });
+
+  // 11. Sukun Breathing Guide & HUD Inactivity Check
+  updateBreatheGuide(dt);
+
+  mouse.idleTimer += dt;
+  if (mouse.idleTimer > 3.8 && !breatheActive) {
+    hudEl.classList.add('idle');
+  }
+
+  requestAnimationFrame(animate);
+}
+
+const hudEl = document.getElementById('hud');
+
+/* ==========================================================================
+   UI CONTROLS & EVENT LISTENERS
+   ========================================================================== */
+document.getElementById('soundBtn').addEventListener('click', toggleSound);
+document.getElementById('breatheBtn').addEventListener('click', toggleBreathe);
+
+const wishBtn = document.getElementById('wishBtn');
+const wishBanner = document.getElementById('wishBanner');
+let wishBannerTimeout = null;
+
+function triggerWish() {
+  initAudio();
+  spawnShootingStar(W * 0.5);
+
+  wishBanner.classList.add('show');
+  clearTimeout(wishBannerTimeout);
+  wishBannerTimeout = setTimeout(() => {
+    wishBanner.classList.remove('show');
+  }, 4200);
+}
+
+wishBtn.addEventListener('click', triggerWish);
+
+// Keyboard Shortcuts
+window.addEventListener('keydown', e => {
+  if (e.key === ' ' || e.code === 'Space') {
+    e.preventDefault();
+    triggerWish();
+  } else if (e.key === 'b' || e.key === 'B') {
+    toggleBreathe();
+  } else if (e.key === 'm' || e.key === 'M') {
+    toggleSound();
+  } else if (e.key === 'f' || e.key === 'F') {
+    toggleFullscreen();
+  }
+});
+
+// Fullscreen Toggle
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+}
+document.getElementById('zenBtn').addEventListener('click', toggleFullscreen);
+
+// Palette Switching
+const palButtons = document.querySelectorAll('.palette-btn');
+palButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    palButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const palKey = btn.getAttribute('data-pal');
+    if (PALETTES[palKey]) {
+      currentPalette = PALETTES[palKey];
+      playStarChime(659.25);
+    }
+  });
+});
+
+// Kick off simulation
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>
